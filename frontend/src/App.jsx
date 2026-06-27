@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   BookOpen,
@@ -24,9 +24,21 @@ const MODEL_LABELS = {
   dnn: 'Deep Neural Network',
 };
 
+const CLASSIFICATION_OPTIONS = [
+  'Likely Legitimate',
+  'Suspicious',
+  'Likely Deceptive',
+];
+
 function getRiskLevel(score) {
   if (score >= 60) return 'high';
   if (score >= 30) return 'medium';
+  return 'low';
+}
+
+function levelFromClassification(label) {
+  if (label === 'Likely Deceptive') return 'high';
+  if (label === 'Suspicious') return 'medium';
   return 'low';
 }
 
@@ -70,8 +82,87 @@ function modelScoreCards(models) {
     },
   ].map((model) => ({
     ...model,
-    level: getRiskLevel(model.score),
+    level: levelFromClassification(model.classification),
   }));
+}
+
+function MeteorBackground() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let animationFrame;
+    let meteors = [];
+
+    const createMeteor = (width, height) => ({
+      x: Math.random() * width,
+      y: Math.random() * height - height,
+      length: 90 + Math.random() * 160,
+      speed: 0.55 + Math.random() * 1.25,
+      drift: -0.12 + Math.random() * 0.32,
+      alpha: 0.06 + Math.random() * 0.16,
+      width: Math.random() > 0.78 ? 2 : 1,
+    });
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      meteors = Array.from({ length: Math.max(18, Math.floor(width / 70)) }, () =>
+        createMeteor(width, height),
+      );
+    };
+
+    const draw = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      meteors.forEach((meteor, index) => {
+        const endX = meteor.x + meteor.drift * meteor.length;
+        const endY = meteor.y + meteor.length;
+        const gradient = ctx.createLinearGradient(meteor.x, meteor.y, endX, endY);
+        gradient.addColorStop(0, `rgba(201, 127, 61, ${meteor.alpha * 0.28})`);
+        gradient.addColorStop(0.42, `rgba(201, 127, 61, ${meteor.alpha * 0.62})`);
+        gradient.addColorStop(0.82, `rgba(201, 127, 61, ${meteor.alpha})`);
+        gradient.addColorStop(1, 'rgba(201, 127, 61, 0)');
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = meteor.width;
+        ctx.beginPath();
+        ctx.moveTo(meteor.x, meteor.y);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        meteor.x += meteor.drift;
+        meteor.y += meteor.speed;
+
+        if (meteor.y > height + meteor.length) {
+          meteors[index] = createMeteor(width, height);
+          meteors[index].y = -meteor.length;
+        }
+      });
+
+      animationFrame = window.requestAnimationFrame(draw);
+    };
+
+    resize();
+    draw();
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  return <canvas className="meteor-canvas" ref={canvasRef} aria-hidden="true" />;
 }
 
 export default function App() {
@@ -140,6 +231,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <MeteorBackground />
       <nav className="app-nav">
         <div className="app-nav-inner">
           <div className="nav-brand">
@@ -271,9 +363,15 @@ export default function App() {
                     <span>0 - Safe</span>
                     <span>100 - Danger</span>
                   </div>
-                  <div className="model-meta">
-                    <span>Three-class output</span>
-                    <span>{model.action}</span>
+                  <div className="classification-tabs" aria-label={`${model.title} classification`}>
+                    {CLASSIFICATION_OPTIONS.map((label) => (
+                      <span
+                        key={label}
+                        className={label === model.classification ? `active ${model.level}` : ''}
+                      >
+                        {label}
+                      </span>
+                    ))}
                   </div>
                 </article>
               ))}

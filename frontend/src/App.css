@@ -1,24 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  --blue: #2474d2;
-  --blue-dark: #0f4f9d;
-  --blue-soft: #e8f3ff;
-  --page: #eef4fa;
+  --blue: #e8a86f;
+  --blue-dark: #c97f3d;
+  --blue-soft: #fff5eb;
+  --page: #fbfaf8;
   --card: #ffffff;
-  --line: #bfdbf6;
-  --text: #14253b;
-  --muted: #55708f;
-  --danger: #e5252a;
-  --danger-bg: #fff5f5;
-  --danger-line: #ffb8bc;
-  --safe: #188c5f;
-  --safe-bg: #f0fbf6;
-  --safe-line: #b8ead4;
-  --warn: #c97811;
-  --warn-bg: #fff9ed;
-  --warn-line: #ffd99b;
-  --shadow: 0 12px 30px rgba(39, 104, 172, 0.08);
+  --line: #e4ded7;
+  --text: #1a1a1a;
+  --muted: #726f6a;
+  --danger: #b85f4c;
+  --danger-bg: #fff7f3;
+  --danger-line: #e9b8aa;
+  --safe: #6f8067;
+  --safe-bg: #f7f9f5;
+  --safe-line: #cbd6c5;
+  --warn: #b98345;
+  --warn-bg: #fff8ee;
+  --warn-line: #e8c79c;
+  --shadow: 0 16px 34px rgba(51, 44, 36, 0.06);
   --radius: 8px;
 }
 
@@ -29,7 +29,10 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--page);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(251, 250, 248, 0.96)),
+    repeating-linear-gradient(92deg, rgba(232, 168, 111, 0.055) 0 1px, transparent 1px 96px),
+    var(--page);
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,11 +45,24 @@ textarea {
 
 .app {
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.meteor-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
 }
 
 .app-nav {
-  background: var(--blue);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #ece7e1;
+  backdrop-filter: blur(16px);
 }
 
 .app-nav-inner {
@@ -76,23 +92,25 @@ textarea {
   place-items: center;
   border-radius: 10px;
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--blue);
 }
 
 .nav-brand-text {
-  color: #ffffff;
+  color: var(--text);
   font-size: 1.55rem;
   font-weight: 900;
 }
 
 .nav-badge {
   gap: 10px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
   font-size: 1.15rem;
   font-weight: 700;
 }
 
 .app-main {
+  position: relative;
+  z-index: 1;
   width: min(100%, 1480px);
   margin: 0 auto;
   padding: 70px 48px 80px;
@@ -128,10 +146,11 @@ textarea {
 .error-banner,
 .loading-state,
 .empty-state {
-  background: var(--card);
+  background: rgba(255, 255, 255, 0.93);
   border: 2px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
 }
 
 .input-card {
@@ -155,7 +174,7 @@ textarea {
   border: 2px solid var(--line);
   border-radius: var(--radius);
   outline: none;
-  background: #f8fbff;
+  background: #fffdfb;
   color: var(--text);
   font-size: 1.15rem;
   line-height: 1.6;
@@ -163,7 +182,7 @@ textarea {
 
 .input-card textarea:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 4px rgba(36, 116, 210, 0.13);
+  box-shadow: 0 0 0 4px rgba(232, 168, 111, 0.18);
 }
 
 .input-actions {
@@ -362,8 +381,8 @@ textarea {
 .class-legend span {
   padding: 8px 10px;
   border-radius: 999px;
-  background: #f2f7fc;
-  border: 1px solid #d6e7f7;
+  background: #fff8f1;
+  border: 1px solid #eadfd3;
   color: var(--muted);
   font-size: 0.85rem;
   font-weight: 800;
@@ -412,7 +431,7 @@ textarea {
 
 .risk-pill.high {
   color: var(--danger);
-  background: #ffe1e3;
+  background: var(--danger-bg);
   border: 2px solid var(--danger-line);
 }
 
@@ -480,7 +499,7 @@ textarea {
   height: 14px;
   overflow: hidden;
   border-radius: 999px;
-  background: #dde9f5;
+  background: #ece7e1;
 }
 
 .score-fill {
@@ -507,21 +526,48 @@ textarea {
   font-weight: 700;
 }
 
-.model-meta {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 22px;
+.classification-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 28px;
+  overflow: hidden;
+  border: 2px solid #eadfd3;
+  border-radius: var(--radius);
+  background: #fffaf5;
 }
 
-.model-meta span {
-  padding: 8px 10px;
-  border-radius: 999px;
+.classification-tabs span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 10px 12px;
+  border-right: 1px solid #eadfd3;
   color: var(--muted);
-  background: #f2f7fc;
-  border: 1px solid #d6e7f7;
-  font-size: 0.9rem;
-  font-weight: 800;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.classification-tabs span:last-child {
+  border-right: 0;
+}
+
+.classification-tabs span.active.low {
+  color: #ffffff;
+  background: var(--safe);
+}
+
+.classification-tabs span.active.medium {
+  color: #ffffff;
+  background: var(--warn);
+}
+
+.classification-tabs span.active.high {
+  color: #ffffff;
+  background: var(--danger);
 }
 
 .explanation-card,
@@ -589,7 +635,7 @@ textarea {
 }
 
 .tips-card {
-  background: #e6f2ff;
+  background: #fff6eb;
 }
 
 .tips-grid {
