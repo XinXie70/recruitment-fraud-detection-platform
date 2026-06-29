@@ -16,9 +16,13 @@ if str(PROJECT_ROOT) not in sys.path:
 if str(MODEL_DIR) not in sys.path:
     sys.path.insert(0, str(MODEL_DIR))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
+
+from auth import get_current_user, router as auth_router
+from database import Base, engine
+from models import User
 
 try:
     from final_model_pipelines.predict_all import predict_with_all_models
@@ -46,6 +50,10 @@ MODEL_READY = False
 MODEL_STARTUP_ERROR: str | None = None
 
 
+def _init_database() -> None:
+    Base.metadata.create_all(bind=engine)
+
+
 def _warm_up_models() -> None:
     predict_with_all_models(
         "Software engineer role with clear requirements, company benefits, and standard interview process."
@@ -55,6 +63,7 @@ def _warm_up_models() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global MODEL_READY, MODEL_STARTUP_ERROR
+    _init_database()
     try:
         _warm_up_models()
         MODEL_READY = True
@@ -82,6 +91,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router)
 
 
 class PredictionRequest(BaseModel):
@@ -97,9 +107,12 @@ class PredictionRequest(BaseModel):
 
 
 class ModelPrediction(BaseModel):
-    risk_score: float = Field(..., ge=0, le=1)
-    classification_label: str
-    prediction: Literal["real", "fake"]
+    status: str | None = None
+    message: str | None = None
+    job_relevance_score: float | None = None
+    risk_score: float | None = Field(default=None, ge=0, le=1)
+    classification_label: str | None = None
+    prediction: Literal["real", "fake"] | None = None
     recommended_action: str
 
 
@@ -120,7 +133,7 @@ class ReadyResponse(BaseModel):
 
 
 @app.post("/api/predict", response_model=PredictionResponse)
-def predict_job(payload: PredictionRequest):
+def predict_job(payload: PredictionRequest, current_user: User = Depends(get_current_user)):
     """
     Accepts job posting text and returns classification results from both 
     Logistic Regression and Deep Neural Network models.

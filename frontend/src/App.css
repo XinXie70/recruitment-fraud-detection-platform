@@ -30,8 +30,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(251, 250, 248, 0.96)),
-    repeating-linear-gradient(92deg, rgba(232, 168, 111, 0.055) 0 1px, transparent 1px 96px),
+    radial-gradient(circle at 18% 18%, rgba(232, 168, 111, 0.16), transparent 28%),
+    radial-gradient(circle at 78% 12%, rgba(111, 128, 103, 0.10), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(251, 250, 248, 0.96)),
     var(--page);
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -39,8 +40,14 @@ body {
 }
 
 button,
+input,
 textarea {
   font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .app {
@@ -49,12 +56,12 @@ textarea {
   overflow-x: hidden;
 }
 
-.meteor-canvas {
+.galaxy-canvas {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.95;
 }
 
 .app-nav {
@@ -76,7 +83,10 @@ textarea {
 }
 
 .nav-brand,
-.nav-badge {
+.nav-badge,
+.nav-actions,
+.nav-link,
+.nav-button {
   display: flex;
   align-items: center;
 }
@@ -108,6 +118,49 @@ textarea {
   font-weight: 700;
 }
 
+.nav-actions {
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-link,
+.nav-button {
+  min-height: 44px;
+  gap: 8px;
+  border-radius: var(--radius);
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.nav-link {
+  padding: 0 10px;
+  color: var(--muted);
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+.nav-button {
+  padding: 0 16px;
+  border: 2px solid var(--blue);
+  color: #ffffff;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background: var(--blue-dark);
+  border-color: var(--blue-dark);
+}
+
+.nav-user {
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
 .app-main {
   position: relative;
   z-index: 1;
@@ -128,6 +181,68 @@ textarea {
   font-size: clamp(2rem, 4vw, 2.9rem);
   line-height: 1.15;
   font-weight: 900;
+  animation: titleGlow 2.8s ease-in-out infinite;
+  will-change: color, filter, text-shadow;
+}
+
+.letter-title {
+  cursor: default;
+}
+
+.title-letter {
+  display: inline-block;
+  transform-origin: center bottom;
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    text-shadow 0.18s ease;
+  will-change: transform;
+}
+
+.title-letter:hover {
+  color: #c97f3d;
+  transform: scale(1.32) translateY(-4px);
+  text-shadow:
+    0 0 12px rgba(232, 168, 111, 0.46),
+    0 0 28px rgba(232, 168, 111, 0.24);
+}
+
+.title-space {
+  width: 0.32em;
+}
+
+@keyframes titleGlow {
+  0%,
+  100% {
+    color: #171717;
+    filter: brightness(0.78);
+    text-shadow: 0 0 0 rgba(232, 168, 111, 0);
+  }
+
+  35% {
+    color: #2b2119;
+    filter: brightness(1.18);
+    text-shadow:
+      0 0 12px rgba(232, 168, 111, 0.34),
+      0 0 26px rgba(232, 168, 111, 0.18);
+  }
+
+  50% {
+    color: #3a2616;
+    filter: brightness(1.38);
+    text-shadow:
+      0 0 18px rgba(232, 168, 111, 0.52),
+      0 0 42px rgba(232, 168, 111, 0.28),
+      0 0 72px rgba(255, 221, 188, 0.22);
+  }
+
+  65% {
+    color: #2b2119;
+    filter: brightness(1.16);
+    text-shadow:
+      0 0 12px rgba(232, 168, 111, 0.32),
+      0 0 26px rgba(232, 168, 111, 0.16);
+  }
 }
 
 .hero p {
@@ -138,11 +253,28 @@ textarea {
   font-weight: 600;
 }
 
+.home-main,
+.auth-main {
+  min-height: calc(100vh - 88px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 .input-card,
 .prediction-card,
 .risk-card,
 .explanation-card,
 .tips-card,
+.auth-panel,
+.notice-dialog,
 .error-banner,
 .loading-state,
 .empty-state {
@@ -151,6 +283,81 @@ textarea {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
+}
+
+.auth-panel {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding: 34px;
+}
+
+.auth-panel .section-title {
+  margin-bottom: 30px;
+}
+
+.auth-panel .section-title h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.auth-form input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  outline: none;
+  background: #fffdfb;
+  color: var(--text);
+}
+
+.auth-form input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(232, 168, 111, 0.18);
+}
+
+.auth-form .btn-analyze {
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.auth-error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 2px solid var(--danger-line);
+  border-radius: var(--radius);
+  color: var(--danger);
+  background: var(--danger-bg);
+  font-weight: 700;
+}
+
+.auth-switch {
+  margin: 24px 0 0;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 700;
+}
+
+.auth-switch a {
+  color: var(--blue-dark);
+  font-weight: 900;
 }
 
 .input-card {
@@ -268,6 +475,48 @@ textarea {
 .empty-state {
   margin-bottom: 34px;
   padding: 24px 28px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(26, 26, 26, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+.notice-dialog {
+  width: min(100%, 460px);
+  padding: 32px;
+  color: var(--text);
+  text-align: center;
+}
+
+.notice-dialog svg {
+  color: var(--danger);
+}
+
+.notice-dialog h2 {
+  margin: 16px 0 10px;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.notice-dialog p {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.notice-dialog .btn-analyze {
+  justify-content: center;
+  min-width: 130px;
 }
 
 .error-banner {
@@ -690,10 +939,18 @@ textarea {
     height: auto;
     min-height: 76px;
     padding: 16px 20px;
+    align-items: flex-start;
+    gap: 16px;
+    flex-direction: column;
   }
 
-  .nav-badge {
-    display: none;
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav-user {
+    width: 100%;
   }
 
   .app-main {
@@ -712,7 +969,8 @@ textarea {
   .prediction-card,
   .risk-card,
   .explanation-card,
-  .tips-card {
+  .tips-card,
+  .auth-panel {
     padding: 22px;
   }
 
@@ -726,6 +984,11 @@ textarea {
   .btn-clear {
     width: 100%;
     justify-content: center;
+  }
+
+  .home-actions .btn-analyze,
+  .home-actions .btn-sample {
+    width: 100%;
   }
 
   .summary-grid,
