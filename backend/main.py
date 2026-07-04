@@ -11,14 +11,21 @@ PROJECT_ROOT = BACKEND_DIR.parent
 MODEL_DIR = PROJECT_ROOT / "model"
 
 # Add directories to system path for import resolution
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 if str(MODEL_DIR) not in sys.path:
     sys.path.insert(0, str(MODEL_DIR))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
+
+from auth import get_current_user, router as auth_router
+from database import Base, engine
+from models import User
+from url_analyzer import analyze_urls
 
 try:
     from final_model_pipelines.predict_all import predict_with_all_models
@@ -46,6 +53,10 @@ MODEL_READY = False
 MODEL_STARTUP_ERROR: str | None = None
 
 
+def _init_database() -> None:
+    Base.metadata.create_all(bind=engine)
+
+
 def _warm_up_models() -> None:
     predict_with_all_models(
         "Software engineer role with clear requirements, company benefits, and standard interview process."
@@ -55,6 +66,7 @@ def _warm_up_models() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global MODEL_READY, MODEL_STARTUP_ERROR
+    _init_database()
     try:
         _warm_up_models()
         MODEL_READY = True
@@ -82,6 +94,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router)
 
 
 class PredictionRequest(BaseModel):
@@ -97,15 +110,38 @@ class PredictionRequest(BaseModel):
 
 
 class ModelPrediction(BaseModel):
+    risk_score: float | None = Field(None, ge=0, le=1)
+    classification_label: str | None = None
+    prediction: Literal["real", "fake"] | None = None
+    recommended_action: str | None = None
+    status: str | None = None
+    message: str | None = None
+    job_relevance_score: float | None = Field(None, ge=0, le=1)
+
+
+class UrlResult(BaseModel):
+    url: str
+    domain: str
     risk_score: float = Field(..., ge=0, le=1)
-    classification_label: str
-    prediction: Literal["real", "fake"]
-    recommended_action: str
+    risk_level: Literal["low", "medium", "high"]
+    flags: list[str]
+    flag_codes: list[str]
+
+
+class UrlAnalysis(BaseModel):
+    urls_found: int
+    risk_score: float = Field(..., ge=0, le=1)
+    risk_level: Literal["low", "medium", "high"]
+    high_risk_count: int
+    medium_risk_count: int
+    urls: list[UrlResult]
+    reasons: list[str]
 
 
 class PredictionResponse(BaseModel):
     logistic_regression: ModelPrediction
     dnn: ModelPrediction
+    url_analysis: UrlAnalysis
 
 
 class HealthResponse(BaseModel):
@@ -119,8 +155,24 @@ class ReadyResponse(BaseModel):
     model_ready: bool
 
 
+@app.post("/api/analyze-url", response_model=UrlAnalysis)
+def analyze_url_payload(
+    payload: PredictionRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Accepts text or a standalone link and returns URL safety analysis."""
+    try:
+        return analyze_urls(payload.text)
+    except Exception:
+        logger.exception("URL analysis failed.")
+        raise HTTPException(status_code=500, detail="URL analysis failed. Please try again later.")
+
+
 @app.post("/api/predict", response_model=PredictionResponse)
-def predict_job(payload: PredictionRequest):
+def predict_job(
+    payload: PredictionRequest,
+    current_user: User = Depends(get_current_user),
+):
     """
     Accepts job posting text and returns classification results from both 
     Logistic Regression and Deep Neural Network models.
@@ -129,7 +181,11 @@ def predict_job(payload: PredictionRequest):
         raise HTTPException(status_code=503, detail="Prediction models are not ready.")
 
     try:
-        return predict_with_all_models(payload.text)
+        model_results = predict_with_all_models(payload.text)
+        return {
+            **model_results,
+            "url_analysis": analyze_urls(payload.text),
+        }
     except Exception:
         logger.exception("Prediction failed.")
         raise HTTPException(status_code=500, detail="Prediction failed. Please try again later.")

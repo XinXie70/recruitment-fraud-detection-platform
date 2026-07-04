@@ -104,6 +104,10 @@ export function buildReasons(text, apiResults, combined) {
     );
   }
 
+  if (apiResults.url_analysis?.reasons?.length) {
+    reasons.push(...apiResults.url_analysis.reasons);
+  }
+
   if (reasons.length === 0) {
     reasons.push(
       combined.prediction === 'fake'
