@@ -1,0 +1,23 @@
+[
+  {
+    "model": "XGBoost",
+    "risk_score": 0.1999,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  },
+  {
+    "model": "XGBoost",
+    "risk_score": 0.8364,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  },
+  {
+    "model": "XGBoost",
+    "risk_score": 0.2237,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  }
+]

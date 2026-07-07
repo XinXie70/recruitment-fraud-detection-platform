@@ -1,6 +1,6 @@
 # Fake Job Detection — Final Model Pipelines
 
-Two **text-only** fake job detection models — Logistic Regression and DNN — with three-tier risk mapping post-processing.
+Two **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, and Bi-LSTM — with three-tier risk mapping post-processing.
 
 > **Note:** Training, evaluation, and prediction are fully self-contained within `final_model_pipelines/` and **do not depend** on `data_cleaning/`. Only `DataSet.csv` is required (see "Data Preparation" below).
 
@@ -20,9 +20,14 @@ final_model_pipelines/
 ├── text_utils.py
 ├── data_split.py
 ├── predict_all.py
+├── compare_all_models.py
 ├── risk_mapping.py
 ├── lr_pipeline/
-└── dnn_pipeline/
+├── svm_pipeline/
+├── xgboost_pipeline/
+├── dnn_pipeline/
+├── rnn_pipeline/
+└── bilstm_pipeline/
 ```
 
 ---
@@ -196,8 +201,22 @@ python final_model_pipelines/prepare_data.py                 # first run: clean 
 python final_model_pipelines/lr_pipeline/train_model.py
 python final_model_pipelines/lr_pipeline/evaluate_model.py
 
+python final_model_pipelines/svm_pipeline/train_model.py
+python final_model_pipelines/svm_pipeline/evaluate_model.py
+
+python final_model_pipelines/xgboost_pipeline/train_model.py
+python final_model_pipelines/xgboost_pipeline/evaluate_model.py
+
 python final_model_pipelines/dnn_pipeline/train_model.py
 python final_model_pipelines/dnn_pipeline/evaluate_model.py
+
+python final_model_pipelines/rnn_pipeline/train_model.py
+python final_model_pipelines/rnn_pipeline/evaluate_model.py
+
+python final_model_pipelines/bilstm_pipeline/train_model.py
+python final_model_pipelines/bilstm_pipeline/evaluate_model.py
+
+python final_model_pipelines/compare_all_models.py
 ```
 
 Data and splits are stored under `final_model_pipelines/data/`; no `data_cleaning/` dependency.
