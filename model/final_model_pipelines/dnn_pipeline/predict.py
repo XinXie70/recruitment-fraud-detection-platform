@@ -23,6 +23,11 @@ from final_model_pipelines.dnn_pipeline.model_config import (  # noqa: E402
 )
 from final_model_pipelines.evaluation_utils import load_thresholds  # noqa: E402
 from final_model_pipelines.risk_mapping import build_structured_output  # noqa: E402
+from final_model_pipelines.validation_pipeline import (  # noqa: E402
+    apply_validation_to_prediction,
+    build_rejection_response,
+    validate_job_input,
+)
 
 
 def _to_dense(x) -> np.ndarray:
@@ -55,11 +60,36 @@ def _apply_risk_mapping_layer(risk_score: float) -> dict:
 
 def predict_job_posting(input_text: str) -> dict:
     """Predict a single job posting text."""
+    validation = validate_job_input(input_text)
+    if not validation["is_valid"]:
+        return build_rejection_response(MODEL_DISPLAY_NAME, validation)
+
     score = float(_predict_risk_score([input_text])[0])
-    return _apply_risk_mapping_layer(score)
+    return apply_validation_to_prediction(validation, _apply_risk_mapping_layer(score))
 
 
 def predict_batch_job_postings(input_texts: list[str]) -> list[dict]:
     """Batch prediction."""
-    scores = _predict_risk_score(input_texts)
-    return [_apply_risk_mapping_layer(float(s)) for s in scores]
+    results: list[dict | None] = [None] * len(input_texts)
+    valid_indices: list[int] = []
+    valid_texts: list[str] = []
+    validations: list[dict] = []
+
+    for idx, text in enumerate(input_texts):
+        validation = validate_job_input(text)
+        if not validation["is_valid"]:
+            results[idx] = build_rejection_response(MODEL_DISPLAY_NAME, validation)
+            continue
+        valid_indices.append(idx)
+        valid_texts.append(text)
+        validations.append(validation)
+
+    if valid_texts:
+        scores = _predict_risk_score(valid_texts)
+        for i, score in enumerate(scores):
+            results[valid_indices[i]] = apply_validation_to_prediction(
+                validations[i],
+                _apply_risk_mapping_layer(float(score)),
+            )
+
+    return results  # type: ignore[return-value]

@@ -9,6 +9,13 @@ Usage (from repository root):
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from final_model_pipelines.data_split import load_or_create_splits
 from final_model_pipelines.shared_config import CLEANED_DATA_PATH, SPLIT_DIR, resolve_raw_data_path
 

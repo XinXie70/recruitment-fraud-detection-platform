@@ -1,0 +1,34 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+
+# Local runtime files
+*.db
+*.sqlite
+*.sqlite3
+
+# Raw local data can be large; keep processed examples only when intentionally tracked.
+DataSet.csv
+model/final_model_pipelines/data/DataSet.csv
+modelversion1/data/DataSet.csv

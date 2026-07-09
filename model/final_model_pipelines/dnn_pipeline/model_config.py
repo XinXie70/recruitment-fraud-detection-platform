@@ -38,4 +38,3 @@ SAMPLE_TEXTS = [
     "URGENT HIRING! Work from home, earn $5000/week. No experience needed. Wire transfer required.",
     "Marketing manager needed. 3 years experience. Office in New York. Standard interview process.",
 ]
-
