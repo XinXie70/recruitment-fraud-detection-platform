@@ -1,6 +1,6 @@
 # Fake Job Detection — Final Model Pipelines
 
-Two **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, and Bi-LSTM — with three-tier risk mapping post-processing.
+Six **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, and Bi-LSTM — with input validation and three-tier risk mapping post-processing.
 
 > **Note:** Training, evaluation, and prediction are fully self-contained within `final_model_pipelines/` and **do not depend** on `data_cleaning/`. Only `DataSet.csv` is required (see "Data Preparation" below).
 
@@ -21,6 +21,10 @@ final_model_pipelines/
 ├── data_split.py
 ├── predict_all.py
 ├── compare_all_models.py
+├── data_diagnostics.py       ← imbalance / missingness / shortcut-risk report
+├── input_validator.py        ← layer 1: basic text validity
+├── job_description_filter.py ← layer 2: job-posting relevance scoring
+├── validation_pipeline.py    ← pre-prediction validation + API response shaping
 ├── risk_mapping.py
 ├── lr_pipeline/
 ├── svm_pipeline/
@@ -77,10 +81,13 @@ export PYTHONPATH=/path/to/datapreprocessing   # Linux / macOS
 
 ### Dependencies
 
-| Scenario | Command |
-|----------|---------|
-| Inference only (LR + DNN) | `pip install -e ".[inference]"` |
-| Training / evaluation | `pip install -e ".[full]"` + prepare `DataSet.csv` |
+Install the aggregate pipeline requirements:
+
+```bash
+pip install -r final_model_pipelines/requirements.txt
+```
+
+For a lighter deployment, install only the selected model's requirements, for example `lr_pipeline/requirements.txt` or `svm_pipeline/requirements.txt`.
 
 ---
 
@@ -100,6 +107,24 @@ python final_model_pipelines/prepare_data.py
 
 This automatically performs: HTML cleaning → `combined_text` → save `data/cleaned_data.csv` → stratified split to `data/splits/`.
 
+### Dataset Diagnostics and Imbalance
+
+The EMSCAD dataset is highly imbalanced. In the full dataset used during development:
+
+- Legitimate postings: `17,014` (`95.16%`)
+- Fraudulent postings: `866` (`4.84%`)
+- Approximate class ratio: `19.6 : 1`
+
+The column `in_balanced_dataset` is a dataset marker, not a target label or model feature. It should not be used for training features because it leaks how the dataset subset was constructed.
+
+Run the lightweight diagnostics script before retraining:
+
+```bash
+python final_model_pipelines/data_diagnostics.py --csv /path/to/DataSet.csv
+```
+
+Training uses stratified train / validation / test splits so validation and test keep the original fraud ratio. Compare models using fraud-class precision, recall, F1, and PR-AUC rather than accuracy alone.
+
 ---
 
 ## Quick Prediction
@@ -108,14 +133,13 @@ This automatically performs: HTML cleaning → `combined_text` → save `data/cl
 
 ```python
 from final_model_pipelines.lr_pipeline.predict import predict_job_posting
-from final_model_pipelines.dnn_pipeline.predict import predict_job_posting as dnn_predict
 from final_model_pipelines.predict_all import predict_with_all_models
 
 # Single model
 result = predict_job_posting("Software engineer at Google. Bachelor degree required...")
 print(result)
 
-# Both models
+# All models
 results = predict_with_all_models("URGENT! Work from home, wire transfer required...")
 print(results)
 ```
@@ -131,10 +155,20 @@ python final_model_pipelines/predict_all.py
 
 ## API Response Fields (frontend/backend contract)
 
+Every prediction first passes the validation layer:
+
+1. `input_validator.py` rejects empty text, URL-only input, gibberish, code snippets, and very short casual text.
+2. `job_description_filter.py` checks whether valid text looks like a job posting.
+3. The selected model runs only when validation passes.
+
+Rejected inputs return `status` values such as `invalid_input` or `not_job_related` with `risk_score`, `classification_label`, and `prediction` set to `null`.
+
 ### Single-model response
 
 ```json
 {
+  "status": "success",
+  "job_relevance_score": 0.8117,
   "model": "Logistic Regression",
   "risk_score": 0.7694,
   "classification_label": "Suspicious",
@@ -145,7 +179,10 @@ python final_model_pipelines/predict_all.py
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `model` | string | `"Logistic Regression"` or `"DNN"` |
+| `status` | string | `success`, `success_with_warning`, `invalid_input`, or `not_job_related` |
+| `message` | string/null | Warning or rejection reason when applicable |
+| `job_relevance_score` | float | Job-posting relevance score from the validation layer |
+| `model` | string | Model display name |
 | `risk_score` | float | Predicted fake job probability, 0~1; higher means more suspicious |
 | `classification_label` | string | `Likely Legitimate` / `Suspicious` / `Likely Deceptive` |
 | `prediction` | string | Backend binary label: `real` (prob < LOW) or `fake` (prob ≥ LOW) |
@@ -227,8 +264,9 @@ Data and splits are stored under `final_model_pipelines/data/`; no `data_cleanin
 
 | Scenario | Recommendation |
 |----------|----------------|
-| Production API / low latency | **Logistic Regression** (~93 KB, millisecond-level) |
-| High-recall screening | **DNN** (Test Recall ≈ 0.86) |
+| Production API / low latency | **SVM** or **Logistic Regression** |
+| Strongest current test F1 | **Bi-LSTM** |
+| High-recall screening | **Logistic Regression**, **DNN**, **XGBoost**, or **Bi-LSTM** depending on the precision trade-off |
 | Dashboard side-by-side comparison | `predict_with_all_models` |
 
 See [`model_comparison_summary.md`](model_comparison_summary.md) for details.
@@ -237,16 +275,16 @@ See [`model_comparison_summary.md`](model_comparison_summary.md) for details.
 
 ## FAQ
 
-**Q: `ModuleNotFoundError: No module named 'final_model_pipelines'`**  
+**Q: `ModuleNotFoundError: No module named 'final_model_pipelines'`**
 A: Run `pip install -e ".[inference]"` from the repository root, or set `PYTHONPATH` to the root.
 
-**Q: `FileNotFoundError: model not found`**  
-A: Ensure `lr_pipeline/saved_model/` and `dnn_pipeline/saved_model/` are present (including `model.joblib` / `model.keras`, etc.).
+**Q: `FileNotFoundError: model not found`**
+A: Ensure each selected pipeline has its `saved_model/` artifacts present (`model.joblib` or `model.keras`, vectorizer/tokenizer, threshold files, etc.).
 
-**Q: I only want to deploy LR without TensorFlow**  
-A: You can call `lr_pipeline/predict.py` alone; however, `predict_all.py` loads both models and requires TensorFlow.
+**Q: I only want to deploy LR/SVM/XGBoost without TensorFlow**
+A: Call the selected non-neural pipeline directly. `predict_all.py` imports the neural models too and therefore requires TensorFlow.
 
-**Q: Is low precision expected?**  
+**Q: Is low precision expected?**
 A: The current threshold strategy favors **high recall (fewer missed fake jobs)**, so the Suspicious tier may be large and should be paired with manual review. See each pipeline's `outputs/evaluation_results.csv`.
 
 ---
