@@ -1,8 +1,7 @@
 """
-Unified invocation of Logistic Regression and DNN.
+Unified invocation of all binary classifiers.
 
-Both models are binary classifiers; risk_score is mapped to three-tier display
-labels via the risk mapping layer.
+Each model outputs risk_score mapped to three-tier display labels via the risk mapping layer.
 """
 
 from __future__ import annotations
@@ -14,6 +13,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from final_model_pipelines.bilstm_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as bilstm_predict_batch,
+    predict_job_posting as bilstm_predict,
+)
 from final_model_pipelines.dnn_pipeline.predict import (  # noqa: E402
     predict_batch_job_postings as dnn_predict_batch,
     predict_job_posting as dnn_predict,
@@ -22,6 +25,18 @@ from final_model_pipelines.lr_pipeline.predict import (  # noqa: E402
     predict_batch_job_postings as lr_predict_batch,
     predict_job_posting as lr_predict,
 )
+from final_model_pipelines.rnn_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as rnn_predict_batch,
+    predict_job_posting as rnn_predict,
+)
+from final_model_pipelines.svm_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as svm_predict_batch,
+    predict_job_posting as svm_predict,
+)
+from final_model_pipelines.xgboost_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as xgboost_predict_batch,
+    predict_job_posting as xgboost_predict,
+)
 
 
 def _strip_model_key(result: dict) -> dict:
@@ -29,23 +44,37 @@ def _strip_model_key(result: dict) -> dict:
 
 
 def predict_with_all_models(input_text: str) -> dict:
-    """Run LR + DNN on a single text and return structured JSON."""
+    """Run all models on a single text and return structured JSON."""
     return {
         "logistic_regression": _strip_model_key(lr_predict(input_text)),
+        "svm": _strip_model_key(svm_predict(input_text)),
+        "xgboost": _strip_model_key(xgboost_predict(input_text)),
         "dnn": _strip_model_key(dnn_predict(input_text)),
+        "rnn": _strip_model_key(rnn_predict(input_text)),
+        "bilstm": _strip_model_key(bilstm_predict(input_text)),
     }
 
 
 def predict_batch_with_all_models(input_texts: list[str]) -> list[dict]:
-    """Batch prediction."""
+    """Batch prediction across all models."""
     lr_results = lr_predict_batch(input_texts)
+    svm_results = svm_predict_batch(input_texts)
+    xgb_results = xgboost_predict_batch(input_texts)
     dnn_results = dnn_predict_batch(input_texts)
+    rnn_results = rnn_predict_batch(input_texts)
+    bilstm_results = bilstm_predict_batch(input_texts)
     return [
         {
-            "logistic_regression": _strip_model_key(l),
-            "dnn": _strip_model_key(d),
+            "logistic_regression": _strip_model_key(lr),
+            "svm": _strip_model_key(svm),
+            "xgboost": _strip_model_key(xgb),
+            "dnn": _strip_model_key(dnn),
+            "rnn": _strip_model_key(rnn),
+            "bilstm": _strip_model_key(bilstm),
         }
-        for l, d in zip(lr_results, dnn_results)
+        for lr, svm, xgb, dnn, rnn, bilstm in zip(
+            lr_results, svm_results, xgb_results, dnn_results, rnn_results, bilstm_results
+        )
     ]
 
 

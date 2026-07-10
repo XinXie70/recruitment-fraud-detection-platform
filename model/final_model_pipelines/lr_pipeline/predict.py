@@ -15,11 +15,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from final_model_pipelines.evaluation_utils import load_thresholds  # noqa: E402
-from final_model_pipelines.validation_pipeline import (  # noqa: E402
-    apply_validation_to_prediction,
-    build_rejection_response,
-    validate_job_input,
-)
 from final_model_pipelines.lr_pipeline.data_preprocessing import prepare_text_from_input  # noqa: E402
 from final_model_pipelines.lr_pipeline.model_config import (  # noqa: E402
     MODEL_DISPLAY_NAME,
@@ -27,6 +22,11 @@ from final_model_pipelines.lr_pipeline.model_config import (  # noqa: E402
     SAVED_MODEL_DIR,
 )
 from final_model_pipelines.risk_mapping import build_structured_output  # noqa: E402
+from final_model_pipelines.validation_pipeline import (  # noqa: E402
+    apply_validation_to_prediction,
+    build_rejection_response,
+    validate_job_input,
+)
 
 
 @lru_cache(maxsize=1)
@@ -54,7 +54,7 @@ def predict_job_posting(input_text: str) -> dict:
     """
     Predict a single job posting text.
 
-    Flow: validation pipeline → LR binary classification → risk_score → risk mapping layer.
+    Flow: validation pipeline → LR binary classification → risk_score → risk mapping
     """
     validation = validate_job_input(input_text)
     if not validation["is_valid"]:
@@ -71,20 +71,20 @@ def predict_batch_job_postings(input_texts: list[str]) -> list[dict]:
     valid_texts: list[str] = []
     validations: list[dict] = []
 
-    for index, text in enumerate(input_texts):
+    for idx, text in enumerate(input_texts):
         validation = validate_job_input(text)
         if not validation["is_valid"]:
-            results[index] = build_rejection_response(MODEL_DISPLAY_NAME, validation)
+            results[idx] = build_rejection_response(MODEL_DISPLAY_NAME, validation)
             continue
-        valid_indices.append(index)
+        valid_indices.append(idx)
         valid_texts.append(text)
         validations.append(validation)
 
     if valid_texts:
         scores = _predict_risk_score(valid_texts)
-        for score_index, score in enumerate(scores):
-            results[valid_indices[score_index]] = apply_validation_to_prediction(
-                validations[score_index],
+        for i, score in enumerate(scores):
+            results[valid_indices[i]] = apply_validation_to_prediction(
+                validations[i],
                 _apply_risk_mapping_layer(float(score)),
             )
 

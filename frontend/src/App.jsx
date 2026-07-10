@@ -8,13 +8,10 @@ import {
   CalendarClock,
   CheckCircle2,
   Gift,
-  Globe2,
   Info,
-  Link2,
   LogIn,
   LogOut,
   Loader2,
-  MessageSquareText,
   Search,
   Share2,
   ShieldAlert,
@@ -42,8 +39,14 @@ const AUTH_STORAGE_KEY = 'fake_job_auth';
 
 const MODEL_LABELS = {
   logistic_regression: 'Logistic Regression',
+  svm: 'SVM',
+  xgboost: 'XGBoost',
   dnn: 'Deep Neural Network',
+  rnn: 'RNN',
+  bilstm: 'Bi-LSTM',
 };
+
+const MODEL_KEYS = ['logistic_regression', 'svm', 'xgboost', 'dnn', 'rnn', 'bilstm'];
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
 
@@ -101,95 +104,21 @@ function combinedClassification(level) {
   return 'Likely Legitimate';
 }
 
-function urlClassification(level) {
-  if (level === 'high') return 'High-Risk Link';
-  if (level === 'medium') return 'Review Link';
-  return 'Low-Risk Link';
-}
-
 function modelScoreCards(models) {
-  return [
-    {
-      key: 'logistic_regression',
-      title: MODEL_LABELS.logistic_regression,
-      score: Math.round(models.lr.risk_score * 100),
-      classification: models.lr.classification_label,
-      action: models.lr.recommended_action,
-    },
-    {
-      key: 'dnn',
-      title: MODEL_LABELS.dnn,
-      score: Math.round(models.dnn.risk_score * 100),
-      classification: models.dnn.classification_label,
-      action: models.dnn.recommended_action,
-    },
-  ].map((model) => ({
-    ...model,
-    level: levelFromClassification(model.classification),
-  }));
-}
-
-function urlScoreCard(urlAnalysis) {
-  const score = Math.round((urlAnalysis?.risk_score || 0) * 100);
-  const level = urlAnalysis?.risk_level || 'low';
-
-  return {
-    key: 'url_analysis',
-    title: 'URL Safety',
-    score,
-    level,
-    classification: urlClassification(level),
-  };
-}
-
-function UrlDetails({ analysis }) {
-  if (!analysis) return null;
-
-  return (
-    <article className="url-details-card">
-      <div className="section-title">
-        <Globe2 size={24} />
-        <h2>Website / Link Analysis</h2>
-      </div>
-      {analysis.urls.length === 0 ? (
-        <p className="url-empty">No URLs were found in this input.</p>
-      ) : (
-        <ul className="url-list">
-          {analysis.urls.map((item) => (
-            <li key={item.url} className={`url-item ${item.risk_level}`}>
-              <div className="url-item-header">
-                <div>
-                  <strong>{item.domain}</strong>
-                  <span>{item.url}</span>
-                </div>
-                <span className={`risk-pill ${item.risk_level}`}>{riskLabel(item.risk_level)}</span>
-              </div>
-              {item.flags.length > 0 ? (
-                <ul className="url-flags">
-                  {item.flags.map((flag) => (
-                    <li key={flag}>{flag}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="url-clean">No major URL risk signals detected.</p>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </article>
-  );
+  return MODEL_KEYS
+    .filter((key) => models[key])
+    .map((key) => ({
+      key,
+      title: MODEL_LABELS[key],
+      score: Math.round(models[key].risk_score * 100),
+      classification: models[key].classification_label,
+      action: models[key].recommended_action,
+      level: levelFromClassification(models[key].classification_label),
+    }));
 }
 
 function modelScoreBars(result) {
-  if (result.mode === 'url') {
-    return [urlScoreCard(result.urlAnalysis)];
-  }
-
-  return [
-    ...modelScoreCards(result.models),
-    urlScoreCard(result.urlAnalysis),
-  ];
+  return modelScoreCards(result.models);
 }
 
 function ScoreBar({ item }) {
@@ -210,19 +139,14 @@ function ScoreBar({ item }) {
 }
 
 function ReportPage({ result, onBack }) {
-  const isUrlReport = result.mode === 'url';
-  const riskLevel = isUrlReport ? result.urlAnalysis.risk_level : result.riskLevel;
-  const score = isUrlReport
-    ? Math.round(result.urlAnalysis.risk_score * 100)
-    : result.riskScore;
-  const verdict = isUrlReport ? urlClassification(riskLevel) : combinedClassification(riskLevel);
-  const scanType = isUrlReport ? 'Website / Link Scan' : 'Text / Email Scan';
-  const confidence = Math.max(score, isUrlReport ? 72 : Math.round(result.models.combined.combinedProb * 100));
-  const caseId = isUrlReport
-    ? `URL-${String(result.urlAnalysis.urls_found).padStart(2, '0')}${score}`
-    : `TXT-${String(score).padStart(3, '0')}`;
+  const riskLevel = result.riskLevel;
+  const score = result.riskScore;
+  const verdict = combinedClassification(riskLevel);
+  const scanType = 'Text / Email Scan';
+  const confidence = Math.max(score, Math.round(result.models.combined.combinedProb * 100));
+  const caseId = `TXT-${String(score).padStart(3, '0')}`;
   const scoreItems = modelScoreBars(result);
-  const signalCount = result.reasons.length + (result.urlAnalysis?.urls_found || 0);
+  const signalCount = result.reasons.length;
   const isHigh = riskLevel === 'high';
   const isMedium = riskLevel === 'medium';
 
@@ -367,24 +291,20 @@ function ReportPage({ result, onBack }) {
             </ul>
           </section>
 
-          {!isUrlReport && (
-            <section className="report-panel">
-              <div className="section-title compact">
-                <BookOpen size={22} />
-                <h2>How to Stay Safe</h2>
-              </div>
-              <ul className="report-tips">
-                {result.tips.map((tip, index) => (
-                  <li key={tip}>
-                    <strong>{index + 1}</strong>
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          <UrlDetails analysis={result.urlAnalysis} />
+          <section className="report-panel">
+            <div className="section-title compact">
+              <BookOpen size={22} />
+              <h2>How to Stay Safe</h2>
+            </div>
+            <ul className="report-tips">
+              {result.tips.map((tip, index) => (
+                <li key={tip}>
+                  <strong>{index + 1}</strong>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </section>
       </main>
     </div>
@@ -692,18 +612,13 @@ function ProtectedRoute({ auth, children }) {
 }
 
 function AnalyzePage({ auth, onLogout }) {
-  const [analysisMode, setAnalysisMode] = useState('text');
   const [text, setText] = useState('');
-  const [urlText, setUrlText] = useState('');
-  const [urlDescription, setUrlDescription] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleAnalyze = async () => {
-    const payloadText = analysisMode === 'url'
-      ? `${urlText.trim()}\n\n${urlDescription.trim()}`.trim()
-      : text.trim();
+    const payloadText = text.trim();
 
     if (!payloadText) return;
 
@@ -712,8 +627,7 @@ function AnalyzePage({ auth, onLogout }) {
     setResult(null);
 
     try {
-      const endpoint = analysisMode === 'url' ? '/api/analyze-url' : '/api/predict';
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -724,39 +638,41 @@ function AnalyzePage({ auth, onLogout }) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          onLogout();
+          throw new Error('Your session has expired. Please log in again.');
+        }
         throw new Error(errorData.detail || `Server returned status ${response.status}`);
       }
 
       const data = await response.json();
-      const validationFailure = [data.logistic_regression, data.dnn].find(
+      const servedModels = {
+        logistic_regression: data.logistic_regression,
+        svm: data.svm,
+        xgboost: data.xgboost,
+        dnn: data.dnn,
+        rnn: data.rnn,
+        bilstm: data.bilstm,
+      };
+      const modelResults = MODEL_KEYS.map((key) => servedModels[key]).filter(Boolean);
+      const validationFailure = modelResults.find(
         (model) => model?.status === 'invalid_input' || model?.status === 'not_job_related',
       );
       if (validationFailure) {
         throw new Error(validationFailure.message || validationFailure.recommended_action);
       }
 
-      if (analysisMode === 'url') {
-        setResult({
-          mode: 'url',
-          urlAnalysis: data,
-          reasons: data.reasons,
-        });
-        return;
-      }
-
-      const combined = combineModelScores(data.logistic_regression, data.dnn);
+      const combined = combineModelScores(...modelResults);
 
       setResult({
         mode: 'text',
         prediction: combined.prediction,
         riskScore: combined.riskScore,
         riskLevel: combined.riskLevel,
-        reasons: buildReasons(text, data, combined),
+        reasons: buildReasons(payloadText, data, combined),
         tips: SAFETY_TIPS,
-        urlAnalysis: data.url_analysis,
         models: {
-          lr: data.logistic_regression,
-          dnn: data.dnn,
+          ...servedModels,
           combined,
         },
       });
@@ -774,47 +690,20 @@ function AnalyzePage({ auth, onLogout }) {
     setError(null);
   };
 
-  const handleUrlSample = (sampleUrl, sampleDescription) => {
-    setUrlText(sampleUrl);
-    setUrlDescription(sampleDescription);
-    setResult(null);
-    setError(null);
-  };
-
   const handleClear = () => {
     setText('');
-    setUrlText('');
-    setUrlDescription('');
-    setResult(null);
-    setError(null);
-  };
-
-  const handleModeChange = (mode) => {
-    setAnalysisMode(mode);
-    setText('');
-    setUrlText('');
-    setUrlDescription('');
     setResult(null);
     setError(null);
   };
 
   const handleNewScan = () => {
     setText('');
-    setUrlText('');
-    setUrlDescription('');
     setResult(null);
     setError(null);
   };
 
-  const isTextMode = analysisMode === 'text';
-  const hasInput = isTextMode ? Boolean(text.trim()) : Boolean(urlText.trim() && urlDescription.trim());
-  const inputLabel = isTextMode ? 'Job Advertisement Text' : 'Website / Link';
-  const inputPlaceholder = isTextMode
-    ? 'Paste the full job advertisement here...'
-    : 'Paste a website, application link, or job posting URL here...';
-  const loadingMessage = isTextMode
-    ? 'Running Logistic Regression, Deep Neural Network, and URL safety checks...'
-    : 'Checking URL safety signals...';
+  const hasInput = Boolean(text.trim());
+  const loadingMessage = 'Running Logistic Regression and Deep Neural Network checks...';
 
   if (result && !loading) {
     return <ReportPage result={result} onBack={handleNewScan} />;
@@ -829,85 +718,23 @@ function AnalyzePage({ auth, onLogout }) {
         <section className="hero">
           <AnimatedTitle text={HERO_TITLE} />
           <p>
-            Paste any job listing below. Our analyzer scores it with two machine
+            Paste any job listing below. Our analyzer scores it with six machine
             learning models and highlights the risk signals.
           </p>
         </section>
 
         <section className="input-card">
-          <div className="mode-switch" role="tablist" aria-label="Analysis mode">
-            <button
-              type="button"
-              className={analysisMode === 'url' ? 'active' : ''}
-              onClick={() => handleModeChange('url')}
-              aria-selected={analysisMode === 'url'}
-              role="tab"
-              disabled={loading}
-            >
-              <Globe2 size={22} />
-              Website / Link
-            </button>
-            <button
-              type="button"
-              className={analysisMode === 'text' ? 'active' : ''}
-              onClick={() => handleModeChange('text')}
-              aria-selected={analysisMode === 'text'}
-              role="tab"
-              disabled={loading}
-            >
-              <MessageSquareText size={22} />
-              Email / Text
-            </button>
-          </div>
-          <label className="input-label" htmlFor={isTextMode ? 'jobText' : undefined}>
-            {inputLabel}
+          <label className="input-label" htmlFor="jobText">
+            Job Advertisement Text
           </label>
-          {isTextMode ? (
-            <textarea
-              id="jobText"
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              rows={8}
-              placeholder={inputPlaceholder}
-              disabled={loading}
-            />
-          ) : (
-            <div className="url-input-grid">
-              <div className="field-group">
-                <label htmlFor="jobUrl">
-                  Job Post URL <span>*</span>
-                </label>
-                <div className="url-field-shell">
-                  <Globe2 size={22} />
-                  <input
-                    id="jobUrl"
-                    type="url"
-                    value={urlText}
-                    onChange={(event) => setUrlText(event.target.value)}
-                    placeholder="https://linkedin.com/jobs/..."
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div className="field-group">
-                <div className="field-label-row">
-                  <label htmlFor="jobDescription">
-                    Job Description <span>*</span>
-                  </label>
-                  <small>{urlDescription.length}/100 min</small>
-                </div>
-                <textarea
-                  id="jobDescription"
-                  value={urlDescription}
-                  onChange={(event) => setUrlDescription(event.target.value)}
-                  rows={5}
-                  placeholder="Paste the job description here to improve URL analysis accuracy..."
-                  disabled={loading}
-                />
-              </div>
-            </div>
-          )}
+          <textarea
+            id="jobText"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            rows={8}
+            placeholder="Paste the full job advertisement here..."
+            disabled={loading}
+          />
           <div className="input-actions">
             <button
               id="btn-analyze"
@@ -917,58 +744,25 @@ function AnalyzePage({ auth, onLogout }) {
               disabled={!hasInput || loading}
             >
               {loading ? <Loader2 size={22} className="spin-icon" /> : <Search size={22} />}
-              {loading ? 'Analyzing' : isTextMode ? 'Analyze Text' : 'Analyze Link'}
+              {loading ? 'Analyzing' : 'Analyze Text'}
             </button>
 
-            {isTextMode ? (
-              <>
-                <button
-                  type="button"
-                  className="btn-sample"
-                  onClick={() => handleSample(SAMPLES[1].text)}
-                  disabled={loading}
-                >
-                  Load fake sample
-                </button>
-                <button
-                  type="button"
-                  className="btn-sample"
-                  onClick={() => handleSample(SAMPLES[0].text)}
-                  disabled={loading}
-                >
-                  Load legit sample
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="btn-sample"
-                  onClick={() =>
-                    handleUrlSample(
-                      'http://bit.ly/apply-job-now',
-                      'URGENT HIRING! Work from home, no experience required. Earn $500 per day. Send CV through WhatsApp and pay a small registration fee before starting.',
-                    )
-                  }
-                  disabled={loading}
-                >
-                  Load risky link
-                </button>
-                <button
-                  type="button"
-                  className="btn-sample"
-                  onClick={() =>
-                    handleUrlSample(
-                      'https://www.linkedin.com/jobs/',
-                      'Senior Software Engineer role with clear requirements, listed responsibilities, standard interview process, and official company recruiting workflow.',
-                    )
-                  }
-                  disabled={loading}
-                >
-                  Load safe link
-                </button>
-              </>
-            )}
+            <button
+              type="button"
+              className="btn-sample"
+              onClick={() => handleSample(SAMPLES[1].text)}
+              disabled={loading}
+            >
+              Load fake sample
+            </button>
+            <button
+              type="button"
+              className="btn-sample"
+              onClick={() => handleSample(SAMPLES[0].text)}
+              disabled={loading}
+            >
+              Load legit sample
+            </button>
 
             {hasInput && (
               <button type="button" className="btn-clear" onClick={handleClear} disabled={loading}>
@@ -999,11 +793,7 @@ function AnalyzePage({ auth, onLogout }) {
         {!result && !loading && !error && (
           <section className="empty-state">
             <Gift size={30} />
-            <p>
-              {isTextMode
-                ? 'Paste a job advertisement and run both models to see separate risk scores.'
-                : 'Paste a website or application link to check URL safety signals.'}
-            </p>
+            <p>Paste a job advertisement and run all six models to see separate risk scores.</p>
           </section>
         )}
       </main>

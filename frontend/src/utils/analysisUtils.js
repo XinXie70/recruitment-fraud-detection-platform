@@ -49,16 +49,18 @@ export const SAMPLES = [
  * - When models disagree, blend with max score (60% avg + 40% max) to stay cautious.
  * - Risk tiers align with the reference UI: low < 30, medium 30–59, high ≥ 60.
  */
-export function combineModelScores(lr, dnn) {
-  const lrProb = lr.risk_score;
-  const dnnProb = dnn.risk_score;
-  const bothFake = lr.prediction === 'fake' && dnn.prediction === 'fake';
-  const bothReal = lr.prediction === 'real' && dnn.prediction === 'real';
+export function combineModelScores(...modelResults) {
+  const validModels = modelResults.filter((model) => typeof model?.risk_score === 'number');
+  const probabilities = validModels.map((model) => model.risk_score);
+  const fakeCount = validModels.filter((model) => model.prediction === 'fake').length;
+  const realCount = validModels.filter((model) => model.prediction === 'real').length;
+  const bothFake = validModels.length > 0 && fakeCount === validModels.length;
+  const bothReal = validModels.length > 0 && realCount === validModels.length;
   const disagree = !bothFake && !bothReal;
 
-  const weighted = lrProb * 0.4 + dnnProb * 0.6;
-  const cautious = Math.max(lrProb, dnnProb);
-  const combinedProb = disagree ? weighted * 0.6 + cautious * 0.4 : weighted;
+  const average = probabilities.reduce((sum, value) => sum + value, 0) / Math.max(probabilities.length, 1);
+  const cautious = Math.max(...probabilities, 0);
+  const combinedProb = disagree ? average * 0.6 + cautious * 0.4 : average;
 
   const riskScore = Math.round(Math.min(100, Math.max(0, combinedProb * 100)));
   const riskLevel = riskScore >= 60 ? 'high' : riskScore >= 30 ? 'medium' : 'low';
@@ -71,9 +73,10 @@ export function combineModelScores(lr, dnn) {
     riskScore,
     riskLevel,
     prediction,
-    lrProb,
-    dnnProb,
     combinedProb,
+    modelCount: validModels.length,
+    fakeCount,
+    realCount,
     bothFake,
     bothReal,
     disagree,
@@ -84,28 +87,31 @@ export function buildReasons(text, apiResults, combined) {
   const matched = RED_FLAGS.filter((f) => f.pattern.test(text));
   const reasons = matched.map((f) => f.reason);
 
-  const lr = apiResults.lr || apiResults.logistic_regression;
-  const dnn = apiResults.dnn;
-  const lrPct = Math.round(lr.risk_score * 100);
-  const dnnPct = Math.round(dnn.risk_score * 100);
+  const modelEntries = [
+    ['LR', apiResults.lr || apiResults.logistic_regression],
+    ['SVM', apiResults.svm],
+    ['XGBoost', apiResults.xgboost],
+    ['DNN', apiResults.dnn],
+    ['RNN', apiResults.rnn],
+    ['BiLSTM', apiResults.bilstm],
+  ].filter(([, model]) => typeof model?.risk_score === 'number');
+  const modelSummary = modelEntries
+    .map(([label, model]) => `${label}: ${Math.round(model.risk_score * 100)}%`)
+    .join(', ');
 
   if (combined.bothFake) {
     reasons.unshift(
-      `Both ML models flagged this posting (LR: ${lrPct}%, DNN: ${dnnPct}% fraud probability).`,
+      `All ${combined.modelCount} ML models flagged this posting (${modelSummary} fraud probability).`,
     );
   } else if (combined.bothReal) {
     if (reasons.length === 0) {
-      reasons.push('Both ML models classify this listing as likely legitimate.');
+      reasons.push(`All ${combined.modelCount} ML models classify this listing as likely legitimate.`);
       reasons.push(`Combined fraud probability is ${combined.riskScore}/100.`);
     }
   } else if (combined.disagree) {
     reasons.unshift(
-      `Models disagree — LR: ${lrPct}% vs DNN: ${dnnPct}%. Combined score uses a cautious blend.`,
+      `Models disagree — ${modelSummary}. Combined score uses a cautious blend.`,
     );
-  }
-
-  if (apiResults.url_analysis?.reasons?.length) {
-    reasons.push(...apiResults.url_analysis.reasons);
   }
 
   if (reasons.length === 0) {

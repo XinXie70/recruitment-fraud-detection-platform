@@ -28,10 +28,20 @@ from models import User
 from url_analyzer import analyze_urls
 
 try:
-    from final_model_pipelines.predict_all import predict_with_all_models
+    from final_model_pipelines.lr_pipeline.predict import predict_job_posting as predict_lr
+    from final_model_pipelines.svm_pipeline.predict import predict_job_posting as predict_svm
+    from final_model_pipelines.xgboost_pipeline.predict import predict_job_posting as predict_xgboost
+    from final_model_pipelines.dnn_pipeline.predict import predict_job_posting as predict_dnn
+    from final_model_pipelines.rnn_pipeline.predict import predict_job_posting as predict_rnn
+    from final_model_pipelines.bilstm_pipeline.predict import predict_job_posting as predict_bilstm
 except ImportError as e:
     try:
-        from model.final_model_pipelines.predict_all import predict_with_all_models
+        from model.final_model_pipelines.lr_pipeline.predict import predict_job_posting as predict_lr
+        from model.final_model_pipelines.svm_pipeline.predict import predict_job_posting as predict_svm
+        from model.final_model_pipelines.xgboost_pipeline.predict import predict_job_posting as predict_xgboost
+        from model.final_model_pipelines.dnn_pipeline.predict import predict_job_posting as predict_dnn
+        from model.final_model_pipelines.rnn_pipeline.predict import predict_job_posting as predict_rnn
+        from model.final_model_pipelines.bilstm_pipeline.predict import predict_job_posting as predict_bilstm
     except ImportError:
         raise ImportError(
             "Could not import final_model_pipelines. Please ensure python paths "
@@ -58,9 +68,24 @@ def _init_database() -> None:
 
 
 def _warm_up_models() -> None:
-    predict_with_all_models(
-        "Software engineer role with clear requirements, company benefits, and standard interview process."
-    )
+    sample = "Software engineer role with clear requirements, company benefits, and standard interview process."
+    predict_lr(sample)
+    predict_svm(sample)
+    predict_xgboost(sample)
+    predict_dnn(sample)
+    predict_rnn(sample)
+    predict_bilstm(sample)
+
+
+def predict_with_served_models(input_text: str) -> dict:
+    return {
+        "logistic_regression": predict_lr(input_text),
+        "svm": predict_svm(input_text),
+        "xgboost": predict_xgboost(input_text),
+        "dnn": predict_dnn(input_text),
+        "rnn": predict_rnn(input_text),
+        "bilstm": predict_bilstm(input_text),
+    }
 
 
 @asynccontextmanager
@@ -140,7 +165,11 @@ class UrlAnalysis(BaseModel):
 
 class PredictionResponse(BaseModel):
     logistic_regression: ModelPrediction
+    svm: ModelPrediction
+    xgboost: ModelPrediction
     dnn: ModelPrediction
+    rnn: ModelPrediction
+    bilstm: ModelPrediction
     url_analysis: UrlAnalysis
 
 
@@ -181,7 +210,7 @@ def predict_job(
         raise HTTPException(status_code=503, detail="Prediction models are not ready.")
 
     try:
-        model_results = predict_with_all_models(payload.text)
+        model_results = predict_with_served_models(payload.text)
         return {
             **model_results,
             "url_analysis": analyze_urls(payload.text),

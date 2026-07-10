@@ -1,9 +1,8 @@
 """
-Basic input validation before job-description relevance filtering and model inference.
+Basic Input Validation — runs before job-description relevance filtering and model inference.
 
-This layer checks whether user input is syntactically valid text. It does not
-judge whether the content is a job posting; that is handled by
-job_description_filter.py.
+Checks whether user input is syntactically valid text (type, length, format).
+Does NOT judge whether the content is a job posting; see job_description_filter.py.
 """
 
 from __future__ import annotations
@@ -15,8 +14,8 @@ MIN_ENGLISH_WORDS = 8
 _MIN_LETTER_RATIO = 0.35
 
 _CODE_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
-    re.compile(pattern, re.IGNORECASE | re.MULTILINE)
-    for pattern in (
+    re.compile(p, re.IGNORECASE | re.MULTILINE)
+    for p in (
         r"```",
         r"^\s*def\s+\w+\s*\(",
         r"^\s*function\s+\w+\s*\(",
@@ -33,8 +32,8 @@ _CODE_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
 )
 
 _CHAT_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
-    re.compile(pattern, re.IGNORECASE)
-    for pattern in (
+    re.compile(p, re.IGNORECASE)
+    for p in (
         r"^(?:hi|hello|hey|thanks|thank you|lol|haha|ok|yes|no|bye)[\s!.?]*$",
         r"^(?:how are you|what's up|good morning|good night)[\s!.?]*$",
         r"^(?:asdf|qwerty|test test|lorem ipsum)[\s!.?]*$",
@@ -56,7 +55,7 @@ def _letter_ratio(text: str) -> float:
     compact = re.sub(r"\s+", "", text)
     if not compact:
         return 0.0
-    letters = sum(1 for char in compact if char.isalpha())
+    letters = sum(1 for ch in compact if ch.isalpha())
     return letters / len(compact)
 
 
@@ -72,7 +71,9 @@ def _looks_like_gibberish(text: str) -> bool:
     if not words:
         return True
 
-    short_weird = sum(1 for word in words if len(word) <= 3 and not re.search(r"[aeiouAEIOU]", word))
+    short_weird = sum(
+        1 for w in words if len(w) <= 3 and not re.search(r"[aeiouAEIOU]", w)
+    )
     return short_weird / len(words) > 0.6
 
 
@@ -87,15 +88,24 @@ def _looks_like_chat_or_noise(text: str) -> bool:
 
     words = _WORD_PATTERN.findall(stripped)
     if len(words) <= 12:
-        lowered = stripped.lower()
         casual_markers = ("lol", "haha", "btw", "omg", "idk", "tbh", "brb")
+        lowered = stripped.lower()
         if any(marker in lowered for marker in casual_markers):
             return True
     return False
 
 
 def validate_input_text(text: str) -> dict[str, Any]:
-    """Basic text validity check."""
+    """
+    Basic text validity check (layer 1).
+
+    Returns:
+        {
+            "is_valid": bool,
+            "status": "valid" / "invalid_input",
+            "reason": str,
+        }
+    """
     if not isinstance(text, str):
         return {
             "is_valid": False,
