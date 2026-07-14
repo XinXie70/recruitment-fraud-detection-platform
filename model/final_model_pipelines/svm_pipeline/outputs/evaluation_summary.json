@@ -2,117 +2,126 @@
   "model": "SVM",
   "evaluation_type": "binary_classification_primary",
   "risk_mapping_thresholds": {
-    "low_threshold": 0.31,
-    "high_threshold": 0.81,
+    "low_threshold": 0.19,
+    "high_threshold": 0.87,
     "tuned_on": "validation",
-    "optimization_score": 0.8141,
-    "binary_f1_at_low_threshold": 0.7135,
-    "binary_recall_at_low_threshold": 0.7011,
+    "optimization_score": 0.8545,
+    "binary_f1_at_low_threshold": 0.7018,
+    "binary_recall_at_low_threshold": 0.8451,
     "note": "Thresholds are for risk_mapping layer only. Binary classification metrics use LOW as fake/real decision boundary."
   },
   "binary_metrics": [
     {
-      "accuracy": 0.9725950782997763,
-      "precision": 0.7261904761904762,
-      "recall": 0.7011494252873564,
-      "f1": 0.7134502923976608,
+      "accuracy": 0.967741935483871,
+      "precision": 0.6,
+      "recall": 0.8450704225352113,
+      "f1": 0.7017543859649122,
       "split": "Validation",
-      "decision_threshold": 0.31,
-      "high_threshold_risk_mapping": 0.81
+      "decision_threshold": 0.19,
+      "high_threshold_risk_mapping": 0.87
     },
     {
-      "accuracy": 0.9790268456375839,
-      "precision": 0.7816091954022989,
-      "recall": 0.7861271676300579,
-      "f1": 0.7838616714697406,
+      "accuracy": 0.9645793801391525,
+      "precision": 0.578125,
+      "recall": 0.7816901408450704,
+      "f1": 0.6646706586826348,
       "split": "Test",
-      "decision_threshold": 0.31,
-      "high_threshold_risk_mapping": 0.81
+      "decision_threshold": 0.19,
+      "high_threshold_risk_mapping": 0.87
     }
   ],
   "tier_statistics_supplementary": [
     {
       "tier_statistics": {
         "Likely Legitimate": {
-          "total_count": 1704,
-          "fake_job_count": 26,
-          "real_job_count": 1678,
-          "fake_job_ratio_in_tier": 0.0153
+          "total_count": 1481,
+          "fake_job_count": 11,
+          "real_job_count": 1470,
+          "fake_job_ratio_in_tier": 0.0074
         },
         "Suspicious": {
-          "total_count": 47,
-          "fake_job_count": 25,
-          "real_job_count": 22,
-          "fake_job_ratio_in_tier": 0.5319
+          "total_count": 78,
+          "fake_job_count": 40,
+          "real_job_count": 38,
+          "fake_job_ratio_in_tier": 0.5128
         },
         "Likely Deceptive": {
-          "total_count": 37,
-          "fake_job_count": 36,
-          "real_job_count": 1,
-          "fake_job_ratio_in_tier": 0.973
+          "total_count": 22,
+          "fake_job_count": 20,
+          "real_job_count": 2,
+          "fake_job_ratio_in_tier": 0.9091
         }
       },
       "fraud_coverage_by_tier": {
-        "Likely Legitimate": 0.2989,
-        "Suspicious": 0.2874,
-        "Likely Deceptive": 0.4138
+        "Likely Legitimate": 0.1549,
+        "Suspicious": 0.5634,
+        "Likely Deceptive": 0.2817
       },
-      "overall_fraud_capture_rate": 0.7011,
-      "total_fraud_jobs": 87,
+      "overall_fraud_capture_rate": 0.8451,
+      "total_fraud_jobs": 71,
       "split": "Validation"
     },
     {
       "tier_statistics": {
         "Likely Legitimate": {
-          "total_count": 3402,
-          "fake_job_count": 37,
-          "real_job_count": 3365,
-          "fake_job_ratio_in_tier": 0.0109
+          "total_count": 2970,
+          "fake_job_count": 31,
+          "real_job_count": 2939,
+          "fake_job_ratio_in_tier": 0.0104
         },
         "Suspicious": {
-          "total_count": 103,
-          "fake_job_count": 69,
-          "real_job_count": 34,
-          "fake_job_ratio_in_tier": 0.6699
+          "total_count": 163,
+          "fake_job_count": 82,
+          "real_job_count": 81,
+          "fake_job_ratio_in_tier": 0.5031
         },
         "Likely Deceptive": {
-          "total_count": 71,
-          "fake_job_count": 67,
-          "real_job_count": 4,
-          "fake_job_ratio_in_tier": 0.9437
+          "total_count": 29,
+          "fake_job_count": 29,
+          "real_job_count": 0,
+          "fake_job_ratio_in_tier": 1.0
         }
       },
       "fraud_coverage_by_tier": {
-        "Likely Legitimate": 0.2139,
-        "Suspicious": 0.3988,
-        "Likely Deceptive": 0.3873
+        "Likely Legitimate": 0.2183,
+        "Suspicious": 0.5775,
+        "Likely Deceptive": 0.2042
       },
-      "overall_fraud_capture_rate": 0.7861,
-      "total_fraud_jobs": 173,
+      "overall_fraud_capture_rate": 0.7817,
+      "total_fraud_jobs": 142,
       "split": "Test"
     }
   ],
   "structured_examples": [
     {
+      "status": "invalid_input",
+      "message": "Input is too short (11 English words; at least 30 required).",
       "model": "SVM",
-      "risk_score": 0.0031,
-      "classification_label": "Likely Legitimate",
-      "prediction": "real",
-      "recommended_action": "Safe"
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
     },
     {
+      "status": "invalid_input",
+      "message": "Input is too short (13 English words; at least 30 required).",
       "model": "SVM",
-      "risk_score": 0.7209,
-      "classification_label": "Suspicious",
-      "prediction": "fake",
-      "recommended_action": "Review Required"
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
     },
     {
+      "status": "invalid_input",
+      "message": "Input is too short (12 English words; at least 30 required).",
       "model": "SVM",
-      "risk_score": 0.0035,
-      "classification_label": "Likely Legitimate",
-      "prediction": "real",
-      "recommended_action": "Safe"
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
     }
   ]
 }

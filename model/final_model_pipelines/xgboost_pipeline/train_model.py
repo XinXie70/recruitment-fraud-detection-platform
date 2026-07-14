@@ -53,8 +53,17 @@ def train() -> Path:
         eval_metric="logloss",
         random_state=RANDOM_STATE,
         n_jobs=-1,
+        tree_method="hist",
+        device="cuda",
     )
-    model.fit(x_train, y_train)
+    try:
+        model.fit(x_train, y_train)
+        print("XGBoost training device: cuda")
+    except Exception as exc:  # noqa: BLE001 - fall back if GPU build/runtime unavailable
+        print(f"XGBoost CUDA unavailable ({exc}); falling back to CPU.")
+        model.set_params(device="cpu")
+        model.fit(x_train, y_train)
+        print("XGBoost training device: cpu")
 
     SAVED_MODEL_DIR.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, SAVED_MODEL_DIR / "model.joblib")

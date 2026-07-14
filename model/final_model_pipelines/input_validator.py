@@ -10,8 +10,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
-MIN_ENGLISH_WORDS = 8
-_MIN_LETTER_RATIO = 0.35
+MIN_ENGLISH_WORDS = 30
+_MIN_LETTER_RATIO = 0.45
 
 _CODE_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
     re.compile(p, re.IGNORECASE | re.MULTILINE)

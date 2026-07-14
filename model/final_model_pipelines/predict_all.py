@@ -13,6 +13,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from final_model_pipelines.bert_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as bert_predict_batch,
+    predict_job_posting as bert_predict,
+)
 from final_model_pipelines.bilstm_pipeline.predict import (  # noqa: E402
     predict_batch_job_postings as bilstm_predict_batch,
     predict_job_posting as bilstm_predict,
@@ -28,6 +32,10 @@ from final_model_pipelines.lr_pipeline.predict import (  # noqa: E402
 from final_model_pipelines.rnn_pipeline.predict import (  # noqa: E402
     predict_batch_job_postings as rnn_predict_batch,
     predict_job_posting as rnn_predict,
+)
+from final_model_pipelines.roberta_pipeline.predict import (  # noqa: E402
+    predict_batch_job_postings as roberta_predict_batch,
+    predict_job_posting as roberta_predict,
 )
 from final_model_pipelines.svm_pipeline.predict import (  # noqa: E402
     predict_batch_job_postings as svm_predict_batch,
@@ -52,6 +60,8 @@ def predict_with_all_models(input_text: str) -> dict:
         "dnn": _strip_model_key(dnn_predict(input_text)),
         "rnn": _strip_model_key(rnn_predict(input_text)),
         "bilstm": _strip_model_key(bilstm_predict(input_text)),
+        "bert": _strip_model_key(bert_predict(input_text)),
+        "roberta": _strip_model_key(roberta_predict(input_text)),
     }
 
 
@@ -63,6 +73,8 @@ def predict_batch_with_all_models(input_texts: list[str]) -> list[dict]:
     dnn_results = dnn_predict_batch(input_texts)
     rnn_results = rnn_predict_batch(input_texts)
     bilstm_results = bilstm_predict_batch(input_texts)
+    bert_results = bert_predict_batch(input_texts)
+    roberta_results = roberta_predict_batch(input_texts)
     return [
         {
             "logistic_regression": _strip_model_key(lr),
@@ -71,9 +83,18 @@ def predict_batch_with_all_models(input_texts: list[str]) -> list[dict]:
             "dnn": _strip_model_key(dnn),
             "rnn": _strip_model_key(rnn),
             "bilstm": _strip_model_key(bilstm),
+            "bert": _strip_model_key(bert),
+            "roberta": _strip_model_key(roberta),
         }
-        for lr, svm, xgb, dnn, rnn, bilstm in zip(
-            lr_results, svm_results, xgb_results, dnn_results, rnn_results, bilstm_results
+        for lr, svm, xgb, dnn, rnn, bilstm, bert, roberta in zip(
+            lr_results,
+            svm_results,
+            xgb_results,
+            dnn_results,
+            rnn_results,
+            bilstm_results,
+            bert_results,
+            roberta_results,
         )
     ]
 

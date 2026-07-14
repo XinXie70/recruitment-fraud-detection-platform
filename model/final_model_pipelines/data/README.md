@@ -4,7 +4,9 @@ Place the raw job posting dataset `DataSet.csv` in this directory, or at the rep
 
 Running `python final_model_pipelines/prepare_data.py` will automatically generate:
 
-- `cleaned_data.csv` — cleaned data (includes `combined_text`)
+- `cleaned_data.csv` — cleaned + deduplicated data (includes `combined_text`)
 - `splits/train.csv`, `val.csv`, `test.csv` — stratified splits
+
+Use `--force` to delete existing outputs and rebuild from `DataSet.csv`.
 
 If `DataSet.csv` is large, you may add it to `.gitignore` and have team members place it locally.

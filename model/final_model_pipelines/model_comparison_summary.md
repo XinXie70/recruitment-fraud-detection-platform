@@ -5,7 +5,7 @@
 ```
 Job posting text (combined_text)
     ↓
-Binary classifier (LR / SVM / XGBoost / DNN / RNN / Bi-LSTM)  ——  training target: real vs fake
+Binary classifier (LR / SVM / XGBoost / DNN / RNN / Bi-LSTM / BERT / RoBERTa)  ——  training target: real vs fake
     ↓
 risk_score                  ——  raw model output (fake job probability)
     ↓
@@ -28,6 +28,8 @@ Likely Legitimate / Suspicious / Likely Deceptive  ——  frontend display
 | DNN | BoW + StandardScaler | Class Weighting | Dense 512→256, Sigmoid |
 | RNN | Tokenized Sequences | Class Weighting | Embedding → LSTM → Sigmoid |
 | Bi-LSTM | Tokenized Sequences | Class Weighting | Embedding → Bi-LSTM → Sigmoid |
+| BERT | WordPiece (max_len=256) | Class Weighting | bert-base-uncased fine-tune → Softmax |
+| RoBERTa | BPE (max_len=256) | Class Weighting | roberta-base fine-tune → Softmax |
 
 All models share:
 - Shared text cleaning (`text_utils.py`) and stratified train/val/test split (`data_split.py`)
@@ -52,6 +54,10 @@ python final_model_pipelines/rnn_pipeline/train_model.py
 python final_model_pipelines/rnn_pipeline/evaluate_model.py
 python final_model_pipelines/bilstm_pipeline/train_model.py
 python final_model_pipelines/bilstm_pipeline/evaluate_model.py
+python final_model_pipelines/bert_pipeline/train_model.py
+python final_model_pipelines/bert_pipeline/evaluate_model.py
+python final_model_pipelines/roberta_pipeline/train_model.py
+python final_model_pipelines/roberta_pipeline/evaluate_model.py
 
 # Aggregate Test-set comparison
 python final_model_pipelines/compare_all_models.py
@@ -65,5 +71,6 @@ from final_model_pipelines.predict_all import predict_with_all_models
 
 - **Low-latency API**: Logistic Regression or SVM
 - **Tabular / tree-based baseline**: XGBoost
-- **High-recall screening**: DNN or sequence models (RNN / Bi-LSTM)
+- **High-recall screening**: DNN, sequence models (RNN / Bi-LSTM), or Transformers (BERT / RoBERTa)
+- **Transformer baselines** (GPU preferred): BERT / RoBERTa
 - **Dashboard side-by-side comparison**: `predict_all.py` or `compare_all_models.py`

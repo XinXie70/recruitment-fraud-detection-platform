@@ -2,61 +2,61 @@
   {
     "tier_statistics": {
       "Likely Legitimate": {
-        "total_count": 1669,
-        "fake_job_count": 12,
-        "real_job_count": 1657,
-        "fake_job_ratio_in_tier": 0.0072
+        "total_count": 1471,
+        "fake_job_count": 19,
+        "real_job_count": 1452,
+        "fake_job_ratio_in_tier": 0.0129
       },
       "Suspicious": {
-        "total_count": 84,
-        "fake_job_count": 41,
-        "real_job_count": 43,
-        "fake_job_ratio_in_tier": 0.4881
+        "total_count": 89,
+        "fake_job_count": 31,
+        "real_job_count": 58,
+        "fake_job_ratio_in_tier": 0.3483
       },
       "Likely Deceptive": {
-        "total_count": 35,
-        "fake_job_count": 34,
-        "real_job_count": 1,
-        "fake_job_ratio_in_tier": 0.9714
-      }
-    },
-    "fraud_coverage_by_tier": {
-      "Likely Legitimate": 0.1379,
-      "Suspicious": 0.4713,
-      "Likely Deceptive": 0.3908
-    },
-    "overall_fraud_capture_rate": 0.8621,
-    "total_fraud_jobs": 87,
-    "split": "Validation"
-  },
-  {
-    "tier_statistics": {
-      "Likely Legitimate": {
-        "total_count": 3356,
-        "fake_job_count": 22,
-        "real_job_count": 3334,
-        "fake_job_ratio_in_tier": 0.0066
-      },
-      "Suspicious": {
-        "total_count": 138,
-        "fake_job_count": 69,
-        "real_job_count": 69,
-        "fake_job_ratio_in_tier": 0.5
-      },
-      "Likely Deceptive": {
-        "total_count": 82,
-        "fake_job_count": 82,
+        "total_count": 21,
+        "fake_job_count": 21,
         "real_job_count": 0,
         "fake_job_ratio_in_tier": 1.0
       }
     },
     "fraud_coverage_by_tier": {
-      "Likely Legitimate": 0.1272,
-      "Suspicious": 0.3988,
-      "Likely Deceptive": 0.474
+      "Likely Legitimate": 0.2676,
+      "Suspicious": 0.4366,
+      "Likely Deceptive": 0.2958
     },
-    "overall_fraud_capture_rate": 0.8728,
-    "total_fraud_jobs": 173,
+    "overall_fraud_capture_rate": 0.7324,
+    "total_fraud_jobs": 71,
+    "split": "Validation"
+  },
+  {
+    "tier_statistics": {
+      "Likely Legitimate": {
+        "total_count": 2939,
+        "fake_job_count": 26,
+        "real_job_count": 2913,
+        "fake_job_ratio_in_tier": 0.0088
+      },
+      "Suspicious": {
+        "total_count": 184,
+        "fake_job_count": 77,
+        "real_job_count": 107,
+        "fake_job_ratio_in_tier": 0.4185
+      },
+      "Likely Deceptive": {
+        "total_count": 39,
+        "fake_job_count": 39,
+        "real_job_count": 0,
+        "fake_job_ratio_in_tier": 1.0
+      }
+    },
+    "fraud_coverage_by_tier": {
+      "Likely Legitimate": 0.1831,
+      "Suspicious": 0.5423,
+      "Likely Deceptive": 0.2746
+    },
+    "overall_fraud_capture_rate": 0.8169,
+    "total_fraud_jobs": 142,
     "split": "Test"
   }
 ]

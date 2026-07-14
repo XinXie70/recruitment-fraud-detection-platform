@@ -1,343 +1,276 @@
 """
-Job Description Relevance Filter — decides whether text looks like a job posting.
+Job Description Relevance Filter - lightweight layer-2 gate.
 
 This module is independent from basic input validation (input_validator.py).
-It does NOT judge whether a posting is fake or real; only whether the topic is job-related.
+It does NOT judge whether a posting is fake or real. It only blocks text when it
+is clearly non-recruitment content and has no job/recruitment signal. Ambiguous
+or job-related text should pass through to the fake-job classifier.
+
+Layer-2 keyword and regex rules are loaded from:
+  input validation--data/job_relevance_keywords.csv
 """
 
 from __future__ import annotations
 
+import csv
 import re
+from pathlib import Path
 from typing import Any
 
-MIN_JOB_RELEVANCE_SCORE = 0.4
-WARNING_RELEVANCE_SCORE = 0.55
-
-_JOB_TITLE_ROLE_KW: tuple[str, ...] = (
-    "job",
-    "role",
-    "position",
-    "title",
-    "opening",
-    "vacancy",
-    "opportunity",
-)
-_JOB_COMPANY_KW: tuple[str, ...] = (
-    "company",
-    "employer",
-    "organization",
-    "organisation",
-    "firm",
-    "agency",
-)
-_JOB_RESPONSIBILITIES_KW: tuple[str, ...] = (
-    "responsibilities",
-    "responsibility",
-    "duties",
-    "duty",
-    "you will",
-    "you'll",
-)
-_JOB_REQUIREMENTS_KW: tuple[str, ...] = (
-    "requirements",
-    "requirement",
-    "qualifications",
-    "qualification",
-    "must have",
-    "required",
-    "preferred",
-)
-_JOB_SKILLS_KW: tuple[str, ...] = (
-    "skills",
-    "skill",
-    "experience",
-    "experienced",
-    "proficient",
-    "knowledge of",
-)
-_JOB_COMPENSATION_KW: tuple[str, ...] = (
-    "salary",
-    "compensation",
-    "benefits",
-    "benefit",
-    "package",
-    "pay",
-    "wage",
-)
-_JOB_EMPLOYMENT_TYPE_KW: tuple[str, ...] = (
-    "full-time",
-    "full time",
-    "part-time",
-    "part time",
-    "contract",
-    "permanent",
-    "temporary",
-    "internship",
-    "intern",
-)
-_JOB_LOCATION_KW: tuple[str, ...] = (
-    "location",
-    "remote",
-    "onsite",
-    "on-site",
-    "on site",
-    "hybrid",
-    "office",
-    "based in",
-)
-_JOB_HIRING_ACTION_KW: tuple[str, ...] = (
-    "apply",
-    "candidate",
-    "hiring",
-    "recruitment",
-    "recruit",
-    "interview",
-    "resume",
-    "résumé",
-    " cv ",
-)
-
-_JOB_CATEGORY_KEYWORDS: dict[str, tuple[str, ...]] = {
-    "title_role": _JOB_TITLE_ROLE_KW,
-    "company": _JOB_COMPANY_KW,
-    "responsibilities": _JOB_RESPONSIBILITIES_KW,
-    "requirements": _JOB_REQUIREMENTS_KW,
-    "skills_experience": _JOB_SKILLS_KW,
-    "compensation": _JOB_COMPENSATION_KW,
-    "employment_type": _JOB_EMPLOYMENT_TYPE_KW,
-    "location": _JOB_LOCATION_KW,
-    "hiring_action": _JOB_HIRING_ACTION_KW,
-}
-
-_STRUCTURE_FIELD_KW: tuple[str, ...] = (
-    "responsibilities",
-    "requirements",
-    "benefits",
-    "qualifications",
-    "duties",
-)
-
-_JOB_TITLE_WORDS: tuple[str, ...] = (
-    "engineer",
-    "developer",
-    "manager",
-    "assistant",
-    "analyst",
-    "consultant",
-    "intern",
-    "officer",
-    "specialist",
-    "sales",
-    "marketing",
-    "teacher",
-    "nurse",
-    "designer",
-    "administrator",
-    "coordinator",
-    "director",
-    "executive",
-    "technician",
-    "accountant",
-    "clerk",
-    "representative",
-    "supervisor",
-    "architect",
-    "scientist",
-    "researcher",
-)
-
-_HIRING_ACTION_WORDS: tuple[str, ...] = (
-    "hiring",
-    "apply",
-    "candidate",
-    "recruitment",
-    "recruit",
-    "interview",
-    "resume",
-    "full-time",
-    "full time",
-    "part-time",
-    "part time",
-    "remote",
-)
-
-_JOB_PHRASE_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
-    re.compile(p, re.IGNORECASE)
-    for p in (
-        r"\bwe(?:'re| are) looking for\b",
-        r"\bthe ideal candidate\b",
-        r"\bresponsibilities include\b",
-        r"\brequirements include\b",
-        r"\byou will be responsible\b",
-        r"\bjoin our team\b",
-        r"\babout (?:the |this )?role\b",
-        r"\bjob description\b",
-        r"\bposition summary\b",
-        r"\bwhat you(?:'ll| will) do\b",
-        r"\bwho you are\b",
-    )
-)
-
-_NEGATIVE_TOPIC_KW: tuple[str, ...] = (
-    "news",
-    "article",
-    "report",
-    "government",
-    "election",
-    "war",
-    "movie",
-    "film",
-    "recipe",
-    "travel",
-    "hotel",
-    "restaurant",
-    "product review",
-    "research paper",
-    "abstract",
-    "introduction",
-    "methodology",
-    "conclusion",
-    "tutorial",
-    "ingredients",
-    "tablespoon",
-    "protagonist",
-    "screenplay",
-    "box office",
-    "itinerary",
-    "sightseeing",
-    "political",
-    "parliament",
-    "essay",
-    "thesis",
-    "dissertation",
-    "bibliography",
-    "figure 1",
-    "figure 2",
-    "api documentation",
-    "documentation for",
-    "release notes",
-    "changelog",
-)
-
 _WORD_PATTERN = re.compile(r"[a-zA-Z]+")
+_OPENING_WORDS = 28
+_KEYWORD_CSV_NAME = "job_relevance_keywords.csv"
 
 _NOT_JOB_RELATED_REASON = (
-    "Input text is valid English text but does not appear to be a job posting "
-    "or job description."
+    "Input text is valid English text, matches an obvious non-recruitment "
+    "topic, and contains no job or recruitment signal."
 )
-_WARNING_REASON = (
-    "Input may be a job posting, but it lacks common job description fields. "
-    "Prediction may be less reliable."
-)
+
+
+def _keyword_csv_path() -> Path:
+    root = Path(__file__).resolve().parent
+    candidates = [
+        path
+        for path in root.iterdir()
+        if path.is_dir() and path.name.startswith("input validation")
+    ]
+    if not candidates:
+        raise FileNotFoundError("Could not find input validation data directory.")
+    path = candidates[0] / _KEYWORD_CSV_NAME
+    if not path.exists():
+        raise FileNotFoundError(f"Could not find layer-2 keyword CSV: {path}")
+    return path
+
+
+def _load_keyword_rules() -> dict[str, Any]:
+    terms: dict[str, list[str]] = {
+        "role": [],
+        "broad_role": [],
+        "hiring_action": [],
+    }
+    detail_terms: dict[str, list[str]] = {}
+    regex_patterns: dict[str, list[re.Pattern[str]]] = {
+        "job_phrase": [],
+        "news_or_article": [],
+        "forum_or_discussion": [],
+        "technical_or_general": [],
+    }
+
+    with _keyword_csv_path().open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get("layer") != "layer_2":
+                continue
+
+            category = (row.get("category") or "").strip()
+            match_type = (row.get("match_type") or "").strip()
+            value = (row.get("keyword_or_pattern") or "").strip()
+            polarity = (row.get("polarity") or "").strip()
+            if not category or not match_type or not value:
+                continue
+
+            if match_type == "regex":
+                flags = re.IGNORECASE
+                if category == "forum_or_discussion":
+                    flags |= re.MULTILINE
+                regex_patterns.setdefault(category, []).append(re.compile(value, flags))
+                continue
+
+            if match_type != "term":
+                continue
+
+            if polarity == "positive" and category in terms:
+                terms[category].append(value)
+            elif polarity == "positive":
+                detail_terms.setdefault(category, []).append(value)
+
+    return {
+        "role_terms": tuple(terms["role"]),
+        "broad_role_terms": tuple(terms["broad_role"]),
+        "hiring_action_terms": tuple(terms["hiring_action"]),
+        "detail_terms": {key: tuple(values) for key, values in detail_terms.items()},
+        "job_phrase_patterns": tuple(regex_patterns["job_phrase"]),
+        "news_or_article_patterns": tuple(regex_patterns["news_or_article"]),
+        "forum_or_discussion_patterns": tuple(regex_patterns["forum_or_discussion"]),
+        "technical_or_general_patterns": tuple(regex_patterns["technical_or_general"]),
+    }
+
+
+_RULES = _load_keyword_rules()
+_ROLE_TERMS: tuple[str, ...] = _RULES["role_terms"]
+_BROAD_ROLE_TERMS: tuple[str, ...] = _RULES["broad_role_terms"]
+_JOB_ACTION_TERMS: tuple[str, ...] = _RULES["hiring_action_terms"]
+_DETAIL_CATEGORIES: dict[str, tuple[str, ...]] = _RULES["detail_terms"]
+_JOB_PHRASE_PATTERNS: tuple[re.Pattern[str], ...] = _RULES["job_phrase_patterns"]
+_NEWS_OR_ARTICLE_PATTERNS: tuple[re.Pattern[str], ...] = _RULES[
+    "news_or_article_patterns"
+]
+_FORUM_OR_DISCUSSION_PATTERNS: tuple[re.Pattern[str], ...] = _RULES[
+    "forum_or_discussion_patterns"
+]
+_OTHER_NON_JOB_PATTERNS: tuple[re.Pattern[str], ...] = _RULES[
+    "technical_or_general_patterns"
+]
 
 
 def _count_english_words(text: str) -> int:
     return len(_WORD_PATTERN.findall(text))
 
 
-def _count_keyword_hits(text: str, keywords: tuple[str, ...]) -> int:
-    lowered = f" {text.lower()} "
-    return sum(1 for kw in keywords if kw in lowered)
+def _contains_term(text: str, term: str) -> bool:
+    if " " in term or term.startswith("."):
+        return term in text
+    return bool(re.search(rf"\b{re.escape(term)}s?\b", text))
 
 
-def _count_category_hits(text: str) -> dict[str, int]:
-    return {
-        category: _count_keyword_hits(text, keywords)
-        for category, keywords in _JOB_CATEGORY_KEYWORDS.items()
-    }
-
-
-def _count_distinct_job_categories(text: str) -> int:
-    return sum(1 for hits in _count_category_hits(text).values() if hits > 0)
-
-
-def _count_structure_fields(text: str) -> int:
+def _count_terms(text: str, terms: tuple[str, ...]) -> int:
     lowered = text.lower()
-    return sum(1 for field in _STRUCTURE_FIELD_KW if field in lowered)
+    return sum(1 for term in terms if _contains_term(lowered, term.lower()))
 
 
-def _count_job_title_words(text: str) -> int:
-    lowered = text.lower()
-    return sum(
-        1
-        for title in _JOB_TITLE_WORDS
-        if re.search(rf"\b{re.escape(title)}\b", lowered)
-    )
+def _opening_text(text: str) -> str:
+    return " ".join(_WORD_PATTERN.findall(text.lower())[:_OPENING_WORDS])
 
 
-def _count_hiring_action_words(text: str) -> int:
-    lowered = f" {text.lower()} "
-    return sum(1 for word in _HIRING_ACTION_WORDS if word in lowered)
+def _has_opening_role_signal(text: str) -> bool:
+    opening = _opening_text(text)
+    if not opening:
+        return False
+    if re.search(r"\b(?:job|jobs|position|role)\b", opening) and _count_terms(
+        opening, _ROLE_TERMS + _BROAD_ROLE_TERMS
+    ):
+        return True
+    return _count_terms(opening, _ROLE_TERMS) > 0
 
 
 def _count_job_phrases(text: str) -> int:
     return sum(1 for pattern in _JOB_PHRASE_PATTERNS if pattern.search(text))
 
 
-def _count_negative_topics(text: str) -> int:
+def _count_detail_categories(text: str) -> dict[str, int]:
     lowered = text.lower()
-    return sum(1 for topic in _NEGATIVE_TOPIC_KW if topic in lowered)
+    return {
+        category: _count_terms(lowered, terms)
+        for category, terms in _DETAIL_CATEGORIES.items()
+    }
 
 
-def compute_keyword_score(text: str) -> float:
-    """Proportion of job element categories present in the text."""
-    categories_hit = _count_distinct_job_categories(text)
-    return round(min(categories_hit / len(_JOB_CATEGORY_KEYWORDS), 1.0), 4)
+def _count_distinct_detail_categories(text: str) -> int:
+    return sum(1 for hits in _count_detail_categories(text).values() if hits > 0)
 
 
-def compute_job_relevance_score(text: str) -> float:
-    """
-    Composite job-relevance score in [0, 1].
+def _has_money_signal(text: str) -> bool:
+    lowered = text.lower()
+    return bool(re.search(r"(?:\$|£|€)\s?\d|\b(?:usd|aud|cad|gbp)\b", lowered))
 
-    Combines keyword coverage, structure fields, title words, hiring actions,
-    job-description phrasing, and penalties for non-job topics.
-    """
-    keyword_score = compute_keyword_score(text)
-    structure_hits = _count_structure_fields(text)
-    structure_score = min(structure_hits / 2.0, 1.0)
 
-    title_hits = _count_job_title_words(text)
-    title_score = min(title_hits / 2.0, 1.0)
+def _count_context_patterns(text: str, patterns: tuple[re.Pattern[str], ...]) -> int:
+    return sum(1 for pattern in patterns if pattern.search(text))
 
-    action_hits = _count_hiring_action_words(text)
-    action_score = min(action_hits / 3.0, 1.0)
 
-    phrase_hits = _count_job_phrases(text)
-    phrase_score = min(phrase_hits / 2.0, 1.0)
+def _is_non_job_context(text: str) -> bool:
+    return (
+        _count_context_patterns(text, _NEWS_OR_ARTICLE_PATTERNS)
+        + _count_context_patterns(text, _FORUM_OR_DISCUSSION_PATTERNS)
+        + _count_context_patterns(text, _OTHER_NON_JOB_PATTERNS)
+    ) > 0
 
-    negative_hits = _count_negative_topics(text)
-    negative_penalty = min(negative_hits * 0.08, 0.45)
 
-    word_count = _count_english_words(text)
-    category_hits = _count_distinct_job_categories(text)
-    if word_count >= 50 and category_hits <= 1 and negative_hits >= 2:
-        negative_penalty = min(negative_penalty + 0.25, 0.55)
-    if word_count >= 80 and category_hits <= 2 and action_hits == 0 and phrase_hits == 0:
-        negative_penalty = min(negative_penalty + 0.15, 0.55)
-
-    raw_score = (
-        0.30 * keyword_score
-        + 0.20 * structure_score
-        + 0.15 * title_score
-        + 0.15 * action_score
-        + 0.20 * phrase_score
+def _has_any_job_signal(
+    *,
+    text: str,
+    role_hits: int,
+    action_hits: int,
+    phrase_hits: int,
+    detail_hits: dict[str, int],
+    opening_role_signal: bool,
+    non_job_context: bool,
+) -> bool:
+    """Return True when text has any job/recruitment signal worth passing on."""
+    employment_signal = bool(
+        re.search(
+            r"\b(?:full[- ]time|part[- ]time|internship|permanent|temporary)\b",
+            text.lower(),
+        )
+    )
+    strong_detail_signal = any(
+        detail_hits.get(category, 0) > 0
+        for category in (
+            "responsibilities",
+            "requirements",
+            "employment_type",
+            "compensation",
+            "company",
+            "location",
+        )
+    )
+    protected_job_signal = (
+        action_hits > 0
+        or phrase_hits > 0
+        or opening_role_signal
+        or employment_signal
+        or detail_hits.get("compensation", 0) > 0
+        or _has_money_signal(text)
+    )
+    if non_job_context:
+        return protected_job_signal
+    return (
+        role_hits > 0
+        or action_hits > 0
+        or phrase_hits > 0
+        or strong_detail_signal
+        or opening_role_signal
+        or _has_money_signal(text)
     )
 
-    hiring_kw_hits = _count_keyword_hits(text, _JOB_HIRING_ACTION_KW)
-    has_role_signal = category_hits >= 1 and (
-        _count_keyword_hits(text, _JOB_TITLE_ROLE_KW) > 0
-        or title_hits > 0
-        or _count_keyword_hits(text, _JOB_EMPLOYMENT_TYPE_KW) > 0
-    )
-    has_hiring_signal = action_hits >= 1 or hiring_kw_hits > 0
-    if has_role_signal and has_hiring_signal and (title_hits >= 1 or action_hits >= 2):
-        raw_score = max(raw_score, 0.42)
-    elif hiring_kw_hits >= 2 and category_hits >= 2:
-        raw_score = max(raw_score, 0.42)
-    elif category_hits >= 3 and (action_hits >= 1 or phrase_hits >= 1):
-        raw_score = max(raw_score, 0.41)
 
-    return round(max(0.0, min(1.0, raw_score - negative_penalty)), 4)
+def explain_job_relevance(text: str) -> dict[str, Any]:
+    """
+    Explain the job-relevance decision.
+
+    The layer is a conservative gate: it fails only when obvious non-recruitment
+    context is present and no job/recruitment signal is present.
+    """
+    stripped = text.strip()
+    role_hits = _count_terms(stripped, _ROLE_TERMS)
+    broad_role_hits = _count_terms(stripped, _BROAD_ROLE_TERMS)
+    action_hits = _count_terms(stripped, _JOB_ACTION_TERMS)
+    phrase_hits = _count_job_phrases(stripped)
+    detail_hits = _count_detail_categories(stripped)
+    detail_categories = sum(1 for hits in detail_hits.values() if hits > 0)
+    opening_role_signal = _has_opening_role_signal(stripped)
+    news_context_hits = _count_context_patterns(stripped, _NEWS_OR_ARTICLE_PATTERNS)
+    forum_context_hits = _count_context_patterns(stripped, _FORUM_OR_DISCUSSION_PATTERNS)
+    other_non_job_hits = _count_context_patterns(stripped, _OTHER_NON_JOB_PATTERNS)
+    non_job_context = news_context_hits + forum_context_hits + other_non_job_hits > 0
+    has_job_signal = _has_any_job_signal(
+        text=stripped,
+        role_hits=role_hits,
+        action_hits=action_hits,
+        phrase_hits=phrase_hits,
+        detail_hits=detail_hits,
+        opening_role_signal=opening_role_signal,
+        non_job_context=non_job_context,
+    )
+    return {
+        "role_hits": role_hits,
+        "broad_role_hits": broad_role_hits,
+        "action_hits": action_hits,
+        "phrase_hits": phrase_hits,
+        "detail_hits": detail_hits,
+        "detail_categories": detail_categories,
+        "opening_role_signal": opening_role_signal,
+        "news_context_hits": news_context_hits,
+        "forum_context_hits": forum_context_hits,
+        "other_non_job_hits": other_non_job_hits,
+        "non_job_context": non_job_context,
+        "has_job_signal": has_job_signal,
+        "final_gate_rule": (
+            "fail only when non_job_context is true and has_job_signal is false; "
+            "otherwise success"
+        ),
+        "word_count": _count_english_words(stripped),
+    }
 
 
 def check_job_description_relevance(text: str) -> dict[str, Any]:
@@ -345,38 +278,22 @@ def check_job_description_relevance(text: str) -> dict[str, Any]:
     Determine whether text is job-posting / job-description related.
 
     Expects text that has already passed basic input validation.
-
-    Returns:
-        {
-            "is_job_related": bool,
-            "status": "valid" / "not_job_related" / "success_with_warning",
-            "reason": str,
-            "job_relevance_score": float,
-        }
     """
     stripped = text.strip()
-    job_relevance_score = compute_job_relevance_score(stripped)
-    structure_hits = _count_structure_fields(stripped)
+    explanation = explain_job_relevance(stripped)
+    should_fail = explanation["non_job_context"] and not explanation["has_job_signal"]
 
-    if job_relevance_score < MIN_JOB_RELEVANCE_SCORE:
+    if should_fail:
         return {
             "is_job_related": False,
-            "status": "not_job_related",
+            "status": "fail",
             "reason": _NOT_JOB_RELATED_REASON,
-            "job_relevance_score": job_relevance_score,
-        }
-
-    if job_relevance_score < WARNING_RELEVANCE_SCORE or structure_hits < 2:
-        return {
-            "is_job_related": True,
-            "status": "success_with_warning",
-            "reason": _WARNING_REASON,
-            "job_relevance_score": job_relevance_score,
+            "relevance_explanation": explanation,
         }
 
     return {
         "is_job_related": True,
-        "status": "valid",
+        "status": "success",
         "reason": "",
-        "job_relevance_score": job_relevance_score,
+        "relevance_explanation": explanation,
     }

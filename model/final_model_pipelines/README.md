@@ -1,6 +1,6 @@
 # Fake Job Detection — Final Model Pipelines
 
-Six **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, and Bi-LSTM — with input validation and three-tier risk mapping post-processing.
+Eight **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, Bi-LSTM, BERT, and RoBERTa — with input validation and three-tier risk mapping post-processing.
 
 > **Note:** Training, evaluation, and prediction are fully self-contained within `final_model_pipelines/` and **do not depend** on `data_cleaning/`. Only `DataSet.csv` is required (see "Data Preparation" below).
 
@@ -23,7 +23,7 @@ final_model_pipelines/
 ├── compare_all_models.py
 ├── data_diagnostics.py       ← imbalance / missingness / shortcut-risk report
 ├── input_validator.py        ← layer 1: basic text validity
-├── job_description_filter.py ← layer 2: job-posting relevance scoring
+├── job_description_filter.py ← layer 2: lightweight non-recruitment gate
 ├── validation_pipeline.py    ← pre-prediction validation + API response shaping
 ├── risk_mapping.py
 ├── lr_pipeline/
@@ -31,7 +31,10 @@ final_model_pipelines/
 ├── xgboost_pipeline/
 ├── dnn_pipeline/
 ├── rnn_pipeline/
-└── bilstm_pipeline/
+├── bilstm_pipeline/
+├── bert_pipeline/
+├── roberta_pipeline/
+└── transformer_common.py   ← shared HuggingFace train/infer helpers
 ```
 
 ---
@@ -105,7 +108,13 @@ cd datapreprocessing
 python final_model_pipelines/prepare_data.py
 ```
 
-This automatically performs: HTML cleaning → `combined_text` → save `data/cleaned_data.csv` → stratified split to `data/splits/`.
+This automatically performs: HTML cleaning → `combined_text` → dedupe by normalized `combined_text` (keep the row with more non-empty text fields) → save `data/cleaned_data.csv` → stratified split to `data/splits/`.
+
+Rebuild from scratch (recommended after changing cleaning/dedupe logic):
+
+```bash
+python final_model_pipelines/prepare_data.py --force
+```
 
 ### Dataset Diagnostics and Imbalance
 
@@ -158,17 +167,16 @@ python final_model_pipelines/predict_all.py
 Every prediction first passes the validation layer:
 
 1. `input_validator.py` rejects empty text, URL-only input, gibberish, code snippets, and very short casual text.
-2. `job_description_filter.py` checks whether valid text looks like a job posting.
+2. `job_description_filter.py` rejects only obvious non-recruitment text with no job/recruitment signal.
 3. The selected model runs only when validation passes.
 
-Rejected inputs return `status` values such as `invalid_input` or `not_job_related` with `risk_score`, `classification_label`, and `prediction` set to `null`.
+Rejected inputs return `status` values such as `invalid_input` for layer-1 failures or `fail` for layer-2 job-relevance failures, with `risk_score`, `classification_label`, and `prediction` set to `null`.
 
 ### Single-model response
 
 ```json
 {
   "status": "success",
-  "job_relevance_score": 0.8117,
   "model": "Logistic Regression",
   "risk_score": 0.7694,
   "classification_label": "Suspicious",
@@ -179,9 +187,8 @@ Rejected inputs return `status` values such as `invalid_input` or `not_job_relat
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `status` | string | `success`, `success_with_warning`, `invalid_input`, or `not_job_related` |
+| `status` | string | `success` for model predictions, `fail` for layer-2 validation rejection, or `invalid_input` for layer-1 rejection |
 | `message` | string/null | Warning or rejection reason when applicable |
-| `job_relevance_score` | float | Job-posting relevance score from the validation layer |
 | `model` | string | Model display name |
 | `risk_score` | float | Predicted fake job probability, 0~1; higher means more suspicious |
 | `classification_label` | string | `Likely Legitimate` / `Suspicious` / `Likely Deceptive` |
@@ -253,8 +260,16 @@ python final_model_pipelines/rnn_pipeline/evaluate_model.py
 python final_model_pipelines/bilstm_pipeline/train_model.py
 python final_model_pipelines/bilstm_pipeline/evaluate_model.py
 
+python final_model_pipelines/bert_pipeline/train_model.py
+python final_model_pipelines/bert_pipeline/evaluate_model.py
+
+python final_model_pipelines/roberta_pipeline/train_model.py
+python final_model_pipelines/roberta_pipeline/evaluate_model.py
+
 python final_model_pipelines/compare_all_models.py
 ```
+
+Transformer pipelines need PyTorch + Hugging Face deps (`bert_pipeline/requirements.txt` or root `requirements.txt`). First run downloads `bert-base-uncased` / `roberta-base` weights.
 
 Data and splits are stored under `final_model_pipelines/data/`; no `data_cleaning/` dependency.
 
@@ -265,8 +280,9 @@ Data and splits are stored under `final_model_pipelines/data/`; no `data_cleanin
 | Scenario | Recommendation |
 |----------|----------------|
 | Production API / low latency | **SVM** or **Logistic Regression** |
-| Strongest current test F1 | **Bi-LSTM** |
-| High-recall screening | **Logistic Regression**, **DNN**, **XGBoost**, or **Bi-LSTM** depending on the precision trade-off |
+| Strongest classical/neural baseline | **Bi-LSTM** (see latest `compare_all_models` after adding Transformers) |
+| Transformer baselines | **BERT** / **RoBERTa** (GPU preferred; slower on CPU) |
+| High-recall screening | **Logistic Regression**, **DNN**, **XGBoost**, **Bi-LSTM**, or Transformers depending on the precision trade-off |
 | Dashboard side-by-side comparison | `predict_with_all_models` |
 
 See [`model_comparison_summary.md`](model_comparison_summary.md) for details.
@@ -281,8 +297,8 @@ A: Run `pip install -e ".[inference]"` from the repository root, or set `PYTHONP
 **Q: `FileNotFoundError: model not found`**
 A: Ensure each selected pipeline has its `saved_model/` artifacts present (`model.joblib` or `model.keras`, vectorizer/tokenizer, threshold files, etc.).
 
-**Q: I only want to deploy LR/SVM/XGBoost without TensorFlow**
-A: Call the selected non-neural pipeline directly. `predict_all.py` imports the neural models too and therefore requires TensorFlow.
+**Q: I only want to deploy LR/SVM/XGBoost without TensorFlow / PyTorch**
+A: Call the selected classical pipeline directly. `predict_all.py` imports neural and Transformer models and therefore requires TensorFlow + torch/transformers.
 
 **Q: Is low precision expected?**
 A: The current threshold strategy favors **high recall (fewer missed fake jobs)**, so the Suspicious tier may be large and should be paired with manual review. See each pipeline's `outputs/evaluation_results.csv`.
@@ -293,3 +309,5 @@ A: The current threshold strategy favors **high recall (fewer missed fake jobs)*
 
 - [LR Pipeline README](lr_pipeline/README.md)
 - [DNN Pipeline README](dnn_pipeline/README.md)
+- [BERT Pipeline README](bert_pipeline/README.md)
+- [RoBERTa Pipeline README](roberta_pipeline/README.md)

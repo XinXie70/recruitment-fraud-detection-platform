@@ -1,23 +1,32 @@
 [
   {
+    "status": "invalid_input",
+    "message": "Input is too short (11 English words; at least 30 required).",
     "model": "Logistic Regression",
-    "risk_score": 0.0735,
-    "classification_label": "Likely Legitimate",
-    "prediction": "real",
-    "recommended_action": "Safe"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   },
   {
+    "status": "invalid_input",
+    "message": "Input is too short (13 English words; at least 30 required).",
     "model": "Logistic Regression",
-    "risk_score": 0.9017,
-    "classification_label": "Suspicious",
-    "prediction": "fake",
-    "recommended_action": "Review Required"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   },
   {
+    "status": "invalid_input",
+    "message": "Input is too short (12 English words; at least 30 required).",
     "model": "Logistic Regression",
-    "risk_score": 0.0444,
-    "classification_label": "Likely Legitimate",
-    "prediction": "real",
-    "recommended_action": "Safe"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   }
 ]

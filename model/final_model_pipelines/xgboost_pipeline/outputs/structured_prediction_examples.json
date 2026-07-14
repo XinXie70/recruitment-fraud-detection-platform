@@ -1,23 +1,32 @@
 [
   {
+    "status": "invalid_input",
+    "message": "Input is too short (11 English words; at least 30 required).",
     "model": "XGBoost",
-    "risk_score": 0.1999,
-    "classification_label": "Suspicious",
-    "prediction": "fake",
-    "recommended_action": "Review Required"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   },
   {
+    "status": "invalid_input",
+    "message": "Input is too short (13 English words; at least 30 required).",
     "model": "XGBoost",
-    "risk_score": 0.8364,
-    "classification_label": "Suspicious",
-    "prediction": "fake",
-    "recommended_action": "Review Required"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   },
   {
+    "status": "invalid_input",
+    "message": "Input is too short (12 English words; at least 30 required).",
     "model": "XGBoost",
-    "risk_score": 0.2237,
-    "classification_label": "Suspicious",
-    "prediction": "fake",
-    "recommended_action": "Review Required"
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
   }
 ]

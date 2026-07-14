@@ -40,6 +40,47 @@ def preprocess_raw_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def normalize_combined_text_key(text: str) -> str:
+    """Normalize combined_text for exact-duplicate matching across rows."""
+    return re.sub(r"\s+", " ", str(text or "")).strip().lower()
+
+
+def _nonempty_text_field_count(df: pd.DataFrame) -> pd.Series:
+    richness = pd.Series(0, index=df.index, dtype=int)
+    for field in TEXT_FIELDS:
+        if field in df.columns:
+            richness = richness + df[field].fillna("").astype(str).str.strip().ne("").astype(int)
+    return richness
+
+
+def deduplicate_by_combined_text(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Drop rows with identical normalized combined_text.
+
+    When duplicates exist, keep the row with the most non-empty text fields
+    (title / company_profile / description / requirements / benefits). Ties keep
+    the earlier row in the current frame order.
+    """
+    if TEXT_COL not in df.columns:
+        raise ValueError(f"Expected column {TEXT_COL!r} before deduplication.")
+
+    work = df.copy()
+    before = len(work)
+    work["_dedup_key"] = work[TEXT_COL].map(normalize_combined_text_key)
+    work["_richness"] = _nonempty_text_field_count(work)
+    work = work.sort_values("_richness", ascending=False, kind="mergesort")
+    work = work.drop_duplicates(subset=["_dedup_key"], keep="first")
+    work = work.sort_index()
+    work = work.drop(columns=["_dedup_key", "_richness"])
+    removed = before - len(work)
+    if removed:
+        print(
+            f"Deduplicated combined_text: removed {removed} duplicate rows "
+            f"({before} → {len(work)})"
+        )
+    return work.reset_index(drop=True)
+
+
 def prepare_text_from_input(input_text: str) -> str:
     """Apply the same cleaning as training for a single prediction input."""
     return clean_html(input_text)

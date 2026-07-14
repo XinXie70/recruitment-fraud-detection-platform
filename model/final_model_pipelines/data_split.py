@@ -17,7 +17,10 @@ from final_model_pipelines.shared_config import (
     VAL_SIZE,
     resolve_raw_data_path,
 )
-from final_model_pipelines.text_utils import preprocess_raw_dataframe
+from final_model_pipelines.text_utils import (
+    deduplicate_by_combined_text,
+    preprocess_raw_dataframe,
+)
 
 
 def _fraud_ratio(df: pd.DataFrame, label_col: str = LABEL_COL) -> float:
@@ -89,29 +92,76 @@ def split_and_save(
     return train_df, val_df, test_df
 
 
-def load_or_create_splits() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def _split_paths() -> tuple[Path, Path, Path]:
+    return SPLIT_DIR / "train.csv", SPLIT_DIR / "val.csv", SPLIT_DIR / "test.csv"
+
+
+def clear_prepared_artifacts(*, clear_cleaned: bool = True) -> None:
+    """Remove cached splits (and optionally cleaned_data.csv) so prepare_data can rebuild."""
+    for path in _split_paths():
+        if not path.exists():
+            continue
+        try:
+            path.unlink()
+            print(f"Removed: {path}")
+        except OSError as exc:
+            print(f"Could not remove {path} ({exc}); will overwrite on save.")
+    if clear_cleaned and CLEANED_DATA_PATH.exists():
+        try:
+            CLEANED_DATA_PATH.unlink()
+            print(f"Removed: {CLEANED_DATA_PATH}")
+        except OSError as exc:
+            print(f"Could not remove {CLEANED_DATA_PATH} ({exc}); will overwrite on save.")
+
+
+def build_cleaned_dataframe(raw_df: pd.DataFrame | None = None) -> pd.DataFrame:
     """
-    Load train / val / test; if missing, clean from raw CSV and split automatically.
+    Clean raw rows, build combined_text, then deduplicate by normalized text.
+
+    Preference on duplicate keys: keep the row with more non-empty text fields.
+    """
+    if raw_df is None:
+        raw_path = resolve_raw_data_path()
+        print(f"Cleaning raw data: {raw_path}")
+        raw_df = pd.read_csv(raw_path)
+    df = preprocess_raw_dataframe(raw_df)
+    return deduplicate_by_combined_text(df)
+
+
+def load_or_create_splits(
+    *,
+    force: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Load train / val / test; if missing (or force=True), clean, dedupe, and split.
 
     Data flow:
-      DataSet.csv → clean → cleaned_data.csv → stratified split → train/val/test.csv
+      DataSet.csv → clean → combined_text → dedupe → cleaned_data.csv
+        → stratified split → train/val/test.csv
     """
-    train_path = SPLIT_DIR / "train.csv"
-    val_path = SPLIT_DIR / "val.csv"
-    test_path = SPLIT_DIR / "test.csv"
+    train_path, val_path, test_path = _split_paths()
 
-    if train_path.exists() and val_path.exists() and test_path.exists():
+    if force:
+        clear_prepared_artifacts(clear_cleaned=True)
+
+    if (
+        not force
+        and train_path.exists()
+        and val_path.exists()
+        and test_path.exists()
+    ):
         return pd.read_csv(train_path), pd.read_csv(val_path), pd.read_csv(test_path)
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    if CLEANED_DATA_PATH.exists():
-        df = pd.read_csv(CLEANED_DATA_PATH)
+    # Always rebuild from raw when forcing, or when cleaned_data is missing.
+    if force or not CLEANED_DATA_PATH.exists():
+        df = build_cleaned_dataframe()
     else:
-        raw_path = resolve_raw_data_path()
-        print(f"Cleaning raw data: {raw_path}")
-        df = preprocess_raw_dataframe(pd.read_csv(raw_path))
-        df.to_csv(CLEANED_DATA_PATH, index=False)
-        print(f"Saved cleaned data: {CLEANED_DATA_PATH}")
+        print(f"Loading cleaned data: {CLEANED_DATA_PATH}")
+        df = deduplicate_by_combined_text(pd.read_csv(CLEANED_DATA_PATH))
+
+    df.to_csv(CLEANED_DATA_PATH, index=False)
+    print(f"Saved cleaned data: {CLEANED_DATA_PATH} ({len(df)} rows)")
 
     return split_and_save(df, output_dir=SPLIT_DIR)

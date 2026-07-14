@@ -24,6 +24,8 @@ MODEL_PIPELINES = [
     ("DNN", PIPELINES_ROOT / "dnn_pipeline"),
     ("RNN", PIPELINES_ROOT / "rnn_pipeline"),
     ("Bi-LSTM", PIPELINES_ROOT / "bilstm_pipeline"),
+    ("BERT", PIPELINES_ROOT / "bert_pipeline"),
+    ("RoBERTa", PIPELINES_ROOT / "roberta_pipeline"),
 ]
 
 COMPARISON_OUTPUT_DIR = PIPELINES_ROOT / "comparison_outputs"

@@ -1,10 +1,10 @@
 """
-Pre-prediction validation pipeline — orchestrates input validation and job-description filtering.
+Pre-prediction validation pipeline.
 
 Flow:
-  1. input_validator.validate_input_text()      — basic text validity
-  2. job_description_filter.check_job_description_relevance() — job-topic relevance
-  3. Model inference (only if both stages pass)
+  1. input_validator.validate_input_text() checks basic text validity.
+  2. job_description_filter.check_job_description_relevance() checks job-topic relevance.
+  3. Model inference runs only when both stages pass.
 """
 
 from __future__ import annotations
@@ -22,9 +22,8 @@ def validate_job_input(text: str) -> dict[str, Any]:
     Returns:
         {
             "is_valid": bool,
-            "status": "valid" / "invalid_input" / "not_job_related" / "success_with_warning",
+            "status": "success" / "fail" / "invalid_input",
             "reason": str,
-            "job_relevance_score": float,
         }
     """
     input_result = validate_input_text(text)
@@ -33,7 +32,7 @@ def validate_job_input(text: str) -> dict[str, Any]:
             "is_valid": False,
             "status": input_result["status"],
             "reason": input_result["reason"],
-            "job_relevance_score": 0.0,
+            "relevance_explanation": None,
         }
 
     relevance_result = check_job_description_relevance(text)
@@ -42,23 +41,23 @@ def validate_job_input(text: str) -> dict[str, Any]:
             "is_valid": False,
             "status": relevance_result["status"],
             "reason": relevance_result["reason"],
-            "job_relevance_score": relevance_result["job_relevance_score"],
+            "relevance_explanation": relevance_result.get("relevance_explanation"),
         }
 
     return {
         "is_valid": True,
         "status": relevance_result["status"],
         "reason": relevance_result["reason"],
-        "job_relevance_score": relevance_result["job_relevance_score"],
+        "relevance_explanation": relevance_result.get("relevance_explanation"),
     }
 
 
 def build_rejection_response(model_name: str, validation: dict[str, Any]) -> dict[str, Any]:
-    """Structured response when validation fails — model is not invoked."""
+    """Structured response when validation fails and model inference is skipped."""
     status = validation.get("status", "invalid_input")
     recommended_action = (
         "Please enter a valid job posting or job description."
-        if status == "not_job_related"
+        if status == "fail"
         else "Please enter a valid job description."
     )
     return {
@@ -69,7 +68,7 @@ def build_rejection_response(model_name: str, validation: dict[str, Any]) -> dic
         "risk_score": None,
         "prediction": None,
         "recommended_action": recommended_action,
-        "job_relevance_score": validation.get("job_relevance_score"),
+        "relevance_explanation": validation.get("relevance_explanation"),
     }
 
 
@@ -77,16 +76,9 @@ def apply_validation_to_prediction(
     validation: dict[str, Any],
     prediction: dict[str, Any],
 ) -> dict[str, Any]:
-    """Attach status / warning fields to a successful model prediction."""
-    if validation.get("status") == "success_with_warning":
-        return {
-            "status": "success_with_warning",
-            "message": validation["reason"],
-            "job_relevance_score": validation.get("job_relevance_score"),
-            **prediction,
-        }
+    """Attach validation fields to a successful model prediction."""
     return {
         "status": "success",
-        "job_relevance_score": validation.get("job_relevance_score"),
+        "relevance_explanation": validation.get("relevance_explanation"),
         **prediction,
     }
