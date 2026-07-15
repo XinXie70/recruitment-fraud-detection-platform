@@ -28,7 +28,15 @@ build/
 *.sqlite
 *.sqlite3
 
-# Raw local data can be large; keep processed examples only when intentionally tracked.
-DataSet.csv
-model/final_model_pipelines/data/DataSet.csv
+# Raw local data elsewhere can be large; final_model_pipelines/data/ must stay tracked.
 modelversion1/data/DataSet.csv
+
+# Model training intermediates (final weights live under */saved_model/; results under */outputs/)
+**/__pycache__/
+**/training_logs/
+**/checkpoints/
+**/checkpoint-*/
+**/wandb/
+**/mlruns/
+*.ckpt
+*.log

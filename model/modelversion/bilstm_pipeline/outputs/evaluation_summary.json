@@ -1,0 +1,127 @@
+{
+  "model": "Bi-LSTM",
+  "evaluation_type": "binary_classification_primary",
+  "risk_mapping_thresholds": {
+    "low_threshold": 0.21,
+    "high_threshold": 0.95,
+    "tuned_on": "validation",
+    "optimization_score": 0.87,
+    "binary_f1_at_low_threshold": 0.7815,
+    "binary_recall_at_low_threshold": 0.831,
+    "note": "Thresholds are for risk_mapping layer only. Binary classification metrics use LOW as fake/real decision boundary."
+  },
+  "binary_metrics": [
+    {
+      "accuracy": 0.9791271347248577,
+      "precision": 0.7375,
+      "recall": 0.8309859154929577,
+      "f1": 0.7814569536423841,
+      "split": "Validation",
+      "decision_threshold": 0.21,
+      "high_threshold_risk_mapping": 0.95
+    },
+    {
+      "accuracy": 0.9759645793801391,
+      "precision": 0.7088607594936709,
+      "recall": 0.7887323943661971,
+      "f1": 0.7466666666666667,
+      "split": "Test",
+      "decision_threshold": 0.21,
+      "high_threshold_risk_mapping": 0.95
+    }
+  ],
+  "tier_statistics_supplementary": [
+    {
+      "tier_statistics": {
+        "Likely Legitimate": {
+          "total_count": 1501,
+          "fake_job_count": 12,
+          "real_job_count": 1489,
+          "fake_job_ratio_in_tier": 0.008
+        },
+        "Suspicious": {
+          "total_count": 37,
+          "fake_job_count": 19,
+          "real_job_count": 18,
+          "fake_job_ratio_in_tier": 0.5135
+        },
+        "Likely Deceptive": {
+          "total_count": 43,
+          "fake_job_count": 40,
+          "real_job_count": 3,
+          "fake_job_ratio_in_tier": 0.9302
+        }
+      },
+      "fraud_coverage_by_tier": {
+        "Likely Legitimate": 0.169,
+        "Suspicious": 0.2676,
+        "Likely Deceptive": 0.5634
+      },
+      "overall_fraud_capture_rate": 0.831,
+      "total_fraud_jobs": 71,
+      "split": "Validation"
+    },
+    {
+      "tier_statistics": {
+        "Likely Legitimate": {
+          "total_count": 3004,
+          "fake_job_count": 30,
+          "real_job_count": 2974,
+          "fake_job_ratio_in_tier": 0.01
+        },
+        "Suspicious": {
+          "total_count": 71,
+          "fake_job_count": 29,
+          "real_job_count": 42,
+          "fake_job_ratio_in_tier": 0.4085
+        },
+        "Likely Deceptive": {
+          "total_count": 87,
+          "fake_job_count": 83,
+          "real_job_count": 4,
+          "fake_job_ratio_in_tier": 0.954
+        }
+      },
+      "fraud_coverage_by_tier": {
+        "Likely Legitimate": 0.2113,
+        "Suspicious": 0.2042,
+        "Likely Deceptive": 0.5845
+      },
+      "overall_fraud_capture_rate": 0.7887,
+      "total_fraud_jobs": 142,
+      "split": "Test"
+    }
+  ],
+  "structured_examples": [
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (11 English words; at least 30 required).",
+      "model": "Bi-LSTM",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    },
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (13 English words; at least 30 required).",
+      "model": "Bi-LSTM",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    },
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (12 English words; at least 30 required).",
+      "model": "Bi-LSTM",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "status": "invalid_input",
+    "message": "Input is too short (11 English words; at least 30 required).",
+    "model": "RoBERTa",
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
+  },
+  {
+    "status": "invalid_input",
+    "message": "Input is too short (13 English words; at least 30 required).",
+    "model": "RoBERTa",
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
+  },
+  {
+    "status": "invalid_input",
+    "message": "Input is too short (12 English words; at least 30 required).",
+    "model": "RoBERTa",
+    "classification_label": null,
+    "risk_score": null,
+    "prediction": null,
+    "recommended_action": "Please enter a valid job description.",
+    "relevance_explanation": null
+  }
+]

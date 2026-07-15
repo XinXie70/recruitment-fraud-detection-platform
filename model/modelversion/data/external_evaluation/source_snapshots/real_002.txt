@@ -1,0 +1,10 @@
+Sample ID: real_002
+Label: legitimate
+Source site: https://au.seek.com
+Original posting URL: https://au.seek.com/job/92969424
+Collected at: 2026-07-14
+Text SHA-256: 7933851208851acaf9608935e53fd73aa52819dcad1fef956904176890389d84
+
+--- Captured job-advertisement text ---
+
+Software Engineer - Computer Vision / Perception. Employer: Opus Recruitment Solutions. Software Engineer - Computer Vision / Perception $110,000 - $150,000 Plus Super Computer Vision / Perception 📍 Sydney The Opportunity Join a cutting-edge robotics company building AI-powered perception systems deployed on real vessels . This is a rare chance to take computer vision models from development through to live, real-world operation in challenging maritime environments. Apply Now - work on real world AI systems, deploy on operational vessels and champion complex solutions in dynamic environments What You’ll Do Build and deploy computer vision models (detection, tracking, classification) Develop real-time perception pipelines across multi-camera and sensor systems Work on sensor fusion (camera, radar, thermal) Optimise models for GPU/edge deployment (CUDA, TensorRT, ONNX) Validate systems in simulation and real-world sea trials Tech C++, Python, ROS2, PyTorch/TensorFlow, Linux, OpenCV, GStreamer/RTSP Your Background Strong experience in computer vision / machine learning Solid Python & C++ Experience deploying models beyond research (real-world or production environments) Exposure to robotics, multi-sensor systems, or real-time pipelines is a plus Software Engineer - Computer Vision / Perception $110,000 - $150,000 Plus Super
