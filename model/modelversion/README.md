@@ -15,13 +15,15 @@ final_model_pipelines/
 ├── data/                     ← data directory
 │   ├── DataSet.csv           ← raw data (or place at repository root)
 │   ├── cleaned_data.csv
-│   └── splits/               ← train / val / test
+│   ├── splits/               ← train / val / test
+│   └── external_evaluation/  ← held-out modern evaluation dataset (never train on it)
 ├── shared_config.py
 ├── text_utils.py
 ├── data_split.py
 ├── predict_all.py
 ├── compare_all_models.py
 ├── data_diagnostics.py       ← imbalance / missingness / shortcut-risk report
+├── evaluate_external_dataset.py ← evaluate all eight models on external data
 ├── input_validator.py        ← layer 1: basic text validity
 ├── job_description_filter.py ← layer 2: lightweight non-recruitment gate
 ├── validation_pipeline.py    ← pre-prediction validation + API response shaping
@@ -115,6 +117,21 @@ Rebuild from scratch (recommended after changing cleaning/dedupe logic):
 ```bash
 python final_model_pipelines/prepare_data.py --force
 ```
+
+### External Evaluation Dataset
+
+`data/external_evaluation/external_evaluation.csv` contains 50 current legitimate
+job advertisements and 50 AI-synthetic fraudulent advertisements. This dataset is
+strictly evaluation-only: do not merge it into EMSCAD or use it for training,
+feature selection, threshold tuning, or model selection.
+
+Run all eight saved models from the repository root:
+
+```bash
+python3 model/modelversion/evaluate_external_dataset.py
+```
+
+Results are written to `model/modelversion/external_evaluation_outputs/`.
 
 ### Dataset Diagnostics and Imbalance
 
