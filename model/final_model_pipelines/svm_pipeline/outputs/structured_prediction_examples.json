@@ -1,0 +1,23 @@
+[
+  {
+    "model": "SVM",
+    "risk_score": 0.0031,
+    "classification_label": "Likely Legitimate",
+    "prediction": "real",
+    "recommended_action": "Safe"
+  },
+  {
+    "model": "SVM",
+    "risk_score": 0.7209,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  },
+  {
+    "model": "SVM",
+    "risk_score": 0.0035,
+    "classification_label": "Likely Legitimate",
+    "prediction": "real",
+    "recommended_action": "Safe"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "version": "ensemble-v2-eight-model-dev-fallback",
+  "fitted": false,
+  "weight_source": "development_equal_weights_replace_with_fit_ensemble_output",
+  "low_threshold": 0.3,
+  "high_threshold": 0.6,
+  "models": {
+    "logistic_regression": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "svm": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "xgboost": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "dnn": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "rnn": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "bilstm": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "bert": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    },
+    "roberta": {
+      "weight": 0.125,
+      "calibration": {"type": "identity"}
+    }
+  }
+}

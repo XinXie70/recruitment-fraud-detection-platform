@@ -1,0 +1,23 @@
+[
+  {
+    "model": "RNN",
+    "risk_score": 0.3959,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  },
+  {
+    "model": "RNN",
+    "risk_score": 0.3959,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  },
+  {
+    "model": "RNN",
+    "risk_score": 0.3959,
+    "classification_label": "Suspicious",
+    "prediction": "fake",
+    "recommended_action": "Review Required"
+  }
+]

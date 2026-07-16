@@ -1,0 +1,14 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+.DS_Store
+.env
+.env.*
+
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+backend/__pycache__
+model/**/__pycache__

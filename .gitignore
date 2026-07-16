@@ -1,42 +1,19 @@
-# OS / editor files
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Python
+.venv/
 __pycache__/
 *.py[cod]
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.venv/
-venv/
-env/
 
-# Node / frontend
 node_modules/
 dist/
-build/
 .vite/
-
-# Local runtime files
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
 *.db
 *.sqlite
 *.sqlite3
 
-# Raw local data elsewhere can be large; final_model_pipelines/data/ must stay tracked.
-modelversion1/data/DataSet.csv
-
-# Model training intermediates (final weights live under */saved_model/; results under */outputs/)
-**/__pycache__/
-**/training_logs/
-**/checkpoints/
-**/checkpoint-*/
-**/wandb/
-**/mlruns/
-*.ckpt
-*.log
+.DS_Store
+.env
+.env.*
+work/
