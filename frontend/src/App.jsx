@@ -27,26 +27,15 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
-import {
-  SAMPLES,
-  SAFETY_TIPS,
-  combineModelScores,
-  buildReasons,
-} from './utils/analysisUtils';
+import { SAMPLES } from './utils/analysisUtils';
+import { analyzeJobText } from './features/analysis/api';
+import ExplanationText from './features/analysis/ExplanationText';
+import GentleGuidance from './features/analysis/GentleGuidance';
+import ModelContributions from './features/analysis/ModelContributions';
+import EducationLibrary from './features/education/EducationLibrary';
 import './App.css';
 
 const AUTH_STORAGE_KEY = 'fake_job_auth';
-
-const MODEL_LABELS = {
-  logistic_regression: 'Logistic Regression',
-  svm: 'SVM',
-  xgboost: 'XGBoost',
-  dnn: 'Deep Neural Network',
-  rnn: 'RNN',
-  bilstm: 'Bi-LSTM',
-};
-
-const MODEL_KEYS = ['logistic_regression', 'svm', 'xgboost', 'dnn', 'rnn', 'bilstm'];
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
 
@@ -86,69 +75,19 @@ function AnimatedTitle({ text }) {
   );
 }
 
-function levelFromClassification(label) {
-  if (label === 'Likely Deceptive') return 'high';
-  if (label === 'Suspicious') return 'medium';
-  return 'low';
-}
-
 function riskLabel(level) {
   if (level === 'high') return 'High Risk';
   if (level === 'medium') return 'Medium Risk';
   return 'Low Risk';
 }
 
-function combinedClassification(level) {
-  if (level === 'high') return 'Likely Deceptive';
-  if (level === 'medium') return 'Suspicious';
-  return 'Likely Legitimate';
-}
-
-function modelScoreCards(models) {
-  return MODEL_KEYS
-    .filter((key) => models[key])
-    .map((key) => ({
-      key,
-      title: MODEL_LABELS[key],
-      score: Math.round(models[key].risk_score * 100),
-      classification: models[key].classification_label,
-      action: models[key].recommended_action,
-      level: levelFromClassification(models[key].classification_label),
-    }));
-}
-
-function modelScoreBars(result) {
-  return modelScoreCards(result.models);
-}
-
-function ScoreBar({ item }) {
-  return (
-    <div className="report-score-bar">
-      <div className="report-score-row">
-        <span>{item.title}</span>
-        <strong>
-          {item.score}
-          <em>{item.classification}</em>
-        </strong>
-      </div>
-      <div className="report-score-track">
-        <div className={`report-score-fill ${item.level}`} style={{ width: `${item.score}%` }} />
-      </div>
-    </div>
-  );
-}
-
 function ReportPage({ result, onBack }) {
-  const riskLevel = result.riskLevel;
-  const score = result.riskScore;
-  const verdict = combinedClassification(riskLevel);
+  const riskLevel = result.ensemble.risk_level;
+  const score = Math.round(result.ensemble.risk_score * 100);
+  const verdict = result.ensemble.classification_label;
   const scanType = 'Text / Email Scan';
-  const confidence = Math.max(score, Math.round(result.models.combined.combinedProb * 100));
   const caseId = `TXT-${String(score).padStart(3, '0')}`;
-  const scoreItems = modelScoreBars(result);
-  const signalCount = result.reasons.length;
-  const isHigh = riskLevel === 'high';
-  const isMedium = riskLevel === 'medium';
+  const evidence = result.xai?.items || [];
 
   return (
     <div className={`report-page ${riskLevel}`}>
@@ -188,23 +127,19 @@ function ReportPage({ result, onBack }) {
               <span />
               {riskLabel(riskLevel)}
             </div>
-            <p>
-              {isHigh
-                ? 'High-confidence fraud indicators were detected.'
-                : isMedium
-                  ? 'Elevated signals require careful review.'
-                  : 'No major danger signals were detected.'}
-            </p>
+            <p>{result.gentle_ai.summary}</p>
 
             <div className="report-confidence">
               <div>
-                <span>Analysis Confidence</span>
-                <strong>{confidence}%</strong>
+                <span>Ensemble Risk Score</span>
+                <strong>{score}%</strong>
               </div>
               <div className="report-score-track">
-                <div className={`report-score-fill ${riskLevel}`} style={{ width: `${confidence}%` }} />
+                <div className={`report-score-fill ${riskLevel}`} style={{ width: `${score}%` }} />
               </div>
-              <small>Based on {scoreItems.length} detection layer(s) and {signalCount} signal(s).</small>
+              <small>
+                {result.ensemble.active_model_count} active model(s), version {result.ensemble.version}
+              </small>
             </div>
           </section>
 
@@ -227,80 +162,66 @@ function ReportPage({ result, onBack }) {
               </div>
               <div>
                 <h2>
-                  {riskLevel === 'high'
-                    ? 'Immediate Action Required'
-                    : riskLevel === 'medium'
-                      ? 'Review Before Proceeding'
-                      : 'Proceed With Standard Caution'}
+                  {result.ensemble.recommended_action}
                 </h2>
-                <p>
-                  {riskLevel === 'high'
-                    ? 'Stop communication, do not send documents, money, or banking details.'
-                    : riskLevel === 'medium'
-                      ? 'Verify the company, domain, and contact channel before applying.'
-                      : 'Continue to verify the employer through official channels.'}
-                </p>
+                <p>Guidance is based only on the ensemble result and structured XAI evidence.</p>
               </div>
             </div>
-
-            <ol className="report-action-list">
-              {result.reasons.slice(0, 4).map((reason, index) => (
-                <li key={reason}>
-                  <strong>{String(index + 1).padStart(2, '0')}</strong>
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ol>
+            <GentleGuidance guidance={result.gentle_ai} />
           </section>
 
           <section className="report-panel">
             <div className="report-panel-header">
               <div className="section-title compact">
                 <Activity size={22} />
-                <h2>Model Score Breakdown</h2>
+                <h2>Ensemble Model Contributions</h2>
                 <span className="classification-note">
-                  3 classes: Likely Legitimate / Suspicious / Likely Deceptive
+                  Calibrated score x effective weight = final contribution
                 </span>
               </div>
             </div>
-            <div className="report-score-bars">
-              {scoreItems.map((item) => (
-                <ScoreBar key={item.key} item={item} />
-              ))}
-            </div>
+            <ModelContributions members={result.member_outputs} />
           </section>
 
           <section className="report-panel">
             <div className="report-panel-header">
               <div className="section-title compact">
                 <Info size={22} />
-                <h2>Detected Risk Signals</h2>
+                <h2>Why the Ensemble Produced This Score</h2>
               </div>
-              <span>{result.reasons.length} findings</span>
+              <span>{result.xai.method.replaceAll('_', ' ')}</span>
             </div>
-            <ul className="report-signal-list">
-              {result.reasons.map((reason, index) => (
-                <li key={reason} className={riskLevel}>
-                  <div>
-                    {index === 0 && <strong>Model consensus</strong>}
-                    <span>{reason}</span>
-                  </div>
-                  <b>{index === 0 ? 'Primary' : riskLabel(riskLevel)}</b>
-                </li>
-              ))}
-            </ul>
+            {result.xai.status === 'success' ? (
+              <>
+                <div className="evidence-legend">
+                  <span className="raises_risk">Raises risk</span>
+                  <span className="lowers_risk">Lowers risk</span>
+                </div>
+                <ExplanationText text={result.inputText} items={evidence} />
+                <ul className="report-signal-list">
+                  {result.gentle_ai.evidence_explanations.map((item) => (
+                    <li key={`${item.start}-${item.end}`} className={riskLevel}>
+                      <div><strong>{item.text}</strong><span>{item.explanation}</span></div>
+                      <b>{item.direction === 'raises_risk' ? 'Raises' : 'Lowers'}</b>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p>{result.xai.message || 'The explanation is temporarily unavailable.'}</p>
+            )}
           </section>
 
           <section className="report-panel">
             <div className="section-title compact">
               <BookOpen size={22} />
-              <h2>How to Stay Safe</h2>
+              <h2>URL Analysis</h2>
             </div>
             <ul className="report-tips">
-              {result.tips.map((tip, index) => (
-                <li key={tip}>
+              {result.url_analysis.reasons.map((reason, index) => (
+                <li key={`${reason}-${index}`}>
                   <strong>{index + 1}</strong>
-                  <span>{tip}</span>
+                  <span>{reason}</span>
                 </li>
               ))}
             </ul>
@@ -451,6 +372,10 @@ function Navigation({ auth, onLogout }) {
           <Link to="/analyze" className="nav-link">
             <Briefcase size={18} />
             <span>Analyze</span>
+          </Link>
+          <Link to="/learn" className="nav-link">
+            <BookOpen size={18} />
+            <span>Learn</span>
           </Link>
           {auth ? (
             <>
@@ -611,6 +536,18 @@ function ProtectedRoute({ auth, children }) {
   return children;
 }
 
+function LearnPage({ auth, onLogout }) {
+  return (
+    <div className="app">
+      <MeteorBackground />
+      <Navigation auth={auth} onLogout={onLogout} />
+      <main className="app-main learn-main">
+        <EducationLibrary />
+      </main>
+    </div>
+  );
+}
+
 function AnalyzePage({ auth, onLogout }) {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
@@ -627,57 +564,13 @@ function AnalyzePage({ auth, onLogout }) {
     setResult(null);
 
     try {
-      const response = await fetch('/api/predict', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.access_token}`,
-        },
-        body: JSON.stringify({ text: payloadText }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        if (response.status === 401) {
-          onLogout();
-          throw new Error('Your session has expired. Please log in again.');
-        }
-        throw new Error(errorData.detail || `Server returned status ${response.status}`);
-      }
-
-      const data = await response.json();
-      const servedModels = {
-        logistic_regression: data.logistic_regression,
-        svm: data.svm,
-        xgboost: data.xgboost,
-        dnn: data.dnn,
-        rnn: data.rnn,
-        bilstm: data.bilstm,
-      };
-      const modelResults = MODEL_KEYS.map((key) => servedModels[key]).filter(Boolean);
-      const validationFailure = modelResults.find(
-        (model) => model?.status === 'invalid_input' || model?.status === 'not_job_related',
-      );
-      if (validationFailure) {
-        throw new Error(validationFailure.message || validationFailure.recommended_action);
-      }
-
-      const combined = combineModelScores(...modelResults);
-
-      setResult({
-        mode: 'text',
-        prediction: combined.prediction,
-        riskScore: combined.riskScore,
-        riskLevel: combined.riskLevel,
-        reasons: buildReasons(payloadText, data, combined),
-        tips: SAFETY_TIPS,
-        models: {
-          ...servedModels,
-          combined,
-        },
-      });
+      const data = await analyzeJobText(payloadText, auth.access_token);
+      setResult({ ...data, inputText: payloadText });
     } catch (err) {
       console.error(err);
+      if (err.status === 401) {
+        onLogout();
+      }
       setError(err.message || 'An unexpected error occurred while contacting the server.');
     } finally {
       setLoading(false);
@@ -703,7 +596,7 @@ function AnalyzePage({ auth, onLogout }) {
   };
 
   const hasInput = Boolean(text.trim());
-  const loadingMessage = 'Running Logistic Regression and Deep Neural Network checks...';
+  const loadingMessage = 'Running the backend ensemble and preparing an explanation...';
 
   if (result && !loading) {
     return <ReportPage result={result} onBack={handleNewScan} />;
@@ -718,8 +611,8 @@ function AnalyzePage({ auth, onLogout }) {
         <section className="hero">
           <AnimatedTitle text={HERO_TITLE} />
           <p>
-            Paste any job listing below. Our analyzer scores it with six machine
-            learning models and highlights the risk signals.
+            Paste any job listing below. Our backend ensemble scores it and highlights
+            the model-derived risk signals.
           </p>
         </section>
 
@@ -793,7 +686,7 @@ function AnalyzePage({ auth, onLogout }) {
         {!result && !loading && !error && (
           <section className="empty-state">
             <Gift size={30} />
-            <p>Paste a job advertisement and run all six models to see separate risk scores.</p>
+            <p>Paste a job advertisement to see the ensemble result and available model scores.</p>
           </section>
         )}
       </main>
@@ -832,6 +725,14 @@ function AppShell() {
         element={
           <ProtectedRoute auth={auth}>
             <AnalyzePage auth={auth} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/learn"
+        element={
+          <ProtectedRoute auth={auth}>
+            <LearnPage auth={auth} onLogout={handleLogout} />
           </ProtectedRoute>
         }
       />

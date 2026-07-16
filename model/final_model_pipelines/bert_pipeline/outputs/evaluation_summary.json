@@ -1,0 +1,127 @@
+{
+  "model": "BERT",
+  "evaluation_type": "binary_classification_primary",
+  "risk_mapping_thresholds": {
+    "low_threshold": 0.15,
+    "high_threshold": 0.77,
+    "tuned_on": "validation",
+    "optimization_score": 0.8728,
+    "binary_f1_at_low_threshold": 0.8212,
+    "binary_recall_at_low_threshold": 0.8732,
+    "note": "Thresholds are for risk_mapping layer only. Binary classification metrics use LOW as fake/real decision boundary."
+  },
+  "binary_metrics": [
+    {
+      "accuracy": 0.9829222011385199,
+      "precision": 0.775,
+      "recall": 0.8732394366197183,
+      "f1": 0.8211920529801324,
+      "split": "Validation",
+      "decision_threshold": 0.15,
+      "high_threshold_risk_mapping": 0.77
+    },
+    {
+      "accuracy": 0.9822896900695762,
+      "precision": 0.8028169014084507,
+      "recall": 0.8028169014084507,
+      "f1": 0.8028169014084507,
+      "split": "Test",
+      "decision_threshold": 0.15,
+      "high_threshold_risk_mapping": 0.77
+    }
+  ],
+  "tier_statistics_supplementary": [
+    {
+      "tier_statistics": {
+        "Likely Legitimate": {
+          "total_count": 1501,
+          "fake_job_count": 9,
+          "real_job_count": 1492,
+          "fake_job_ratio_in_tier": 0.006
+        },
+        "Suspicious": {
+          "total_count": 11,
+          "fake_job_count": 4,
+          "real_job_count": 7,
+          "fake_job_ratio_in_tier": 0.3636
+        },
+        "Likely Deceptive": {
+          "total_count": 69,
+          "fake_job_count": 58,
+          "real_job_count": 11,
+          "fake_job_ratio_in_tier": 0.8406
+        }
+      },
+      "fraud_coverage_by_tier": {
+        "Likely Legitimate": 0.1268,
+        "Suspicious": 0.0563,
+        "Likely Deceptive": 0.8169
+      },
+      "overall_fraud_capture_rate": 0.8732,
+      "total_fraud_jobs": 71,
+      "split": "Validation"
+    },
+    {
+      "tier_statistics": {
+        "Likely Legitimate": {
+          "total_count": 3020,
+          "fake_job_count": 28,
+          "real_job_count": 2992,
+          "fake_job_ratio_in_tier": 0.0093
+        },
+        "Suspicious": {
+          "total_count": 19,
+          "fake_job_count": 6,
+          "real_job_count": 13,
+          "fake_job_ratio_in_tier": 0.3158
+        },
+        "Likely Deceptive": {
+          "total_count": 123,
+          "fake_job_count": 108,
+          "real_job_count": 15,
+          "fake_job_ratio_in_tier": 0.878
+        }
+      },
+      "fraud_coverage_by_tier": {
+        "Likely Legitimate": 0.1972,
+        "Suspicious": 0.0423,
+        "Likely Deceptive": 0.7606
+      },
+      "overall_fraud_capture_rate": 0.8028,
+      "total_fraud_jobs": 142,
+      "split": "Test"
+    }
+  ],
+  "structured_examples": [
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (11 English words; at least 30 required).",
+      "model": "BERT",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    },
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (13 English words; at least 30 required).",
+      "model": "BERT",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    },
+    {
+      "status": "invalid_input",
+      "message": "Input is too short (12 English words; at least 30 required).",
+      "model": "BERT",
+      "classification_label": null,
+      "risk_score": null,
+      "prediction": null,
+      "recommended_action": "Please enter a valid job description.",
+      "relevance_explanation": null
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 # Fake Job Detection — Final Model Pipelines
 
-Six **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, and Bi-LSTM — with input validation and three-tier risk mapping post-processing.
+Eight **text-only** fake job detection models — Logistic Regression, SVM, XGBoost, DNN, RNN, Bi-LSTM, BERT, and RoBERTa — with input validation and three-tier risk mapping post-processing.
+
+> **Artifact status:** the supplied BERT and RoBERTa `model.safetensors` files are Git LFS pointer files, not the trained weights. The backend detects this before import and runs a clearly marked degraded ensemble until the model team retrieves the real artifacts. Do not overwrite the six existing real model artifacts with pointer files from another branch.
 
 > **Note:** Training, evaluation, and prediction are fully self-contained within `final_model_pipelines/` and **do not depend** on `data_cleaning/`. Only `DataSet.csv` is required (see "Data Preparation" below).
 
@@ -15,10 +17,12 @@ final_model_pipelines/
 ├── data/                     ← data directory
 │   ├── DataSet.csv           ← raw data (or place at repository root)
 │   ├── cleaned_data.csv
-│   └── splits/               ← train / val / test
+│   ├── splits/               ← train / val / test
+│   └── external_evaluation/  ← evaluation only; never training/tuning
 ├── shared_config.py
 ├── text_utils.py
 ├── data_split.py
+├── transformer_common.py     ← shared BERT / RoBERTa helpers
 ├── predict_all.py
 ├── compare_all_models.py
 ├── data_diagnostics.py       ← imbalance / missingness / shortcut-risk report
@@ -31,7 +35,10 @@ final_model_pipelines/
 ├── xgboost_pipeline/
 ├── dnn_pipeline/
 ├── rnn_pipeline/
-└── bilstm_pipeline/
+├── bilstm_pipeline/
+├── bert_pipeline/
+├── roberta_pipeline/
+└── ensemble_pipeline/        ← backend ensemble config + fitting script
 ```
 
 ---
@@ -88,6 +95,8 @@ pip install -r final_model_pipelines/requirements.txt
 ```
 
 For a lighter deployment, install only the selected model's requirements, for example `lr_pipeline/requirements.txt` or `svm_pipeline/requirements.txt`.
+
+BERT and RoBERTa additionally require PyTorch, Transformers, and Accelerate. The backend aggregate requirements include them, but inference still needs the real Git LFS model weights.
 
 ---
 
@@ -188,7 +197,7 @@ Rejected inputs return `status` values such as `invalid_input` or `not_job_relat
 | `prediction` | string | Backend binary label: `real` (prob < LOW) or `fake` (prob ≥ LOW) |
 | `recommended_action` | string | `Safe` / `Review Required` / `High Risk Warning` |
 
-### Dual-model response (`predict_all.py`)
+### Eight-model response (`predict_all.py`)
 
 ```json
 {
@@ -253,10 +262,20 @@ python final_model_pipelines/rnn_pipeline/evaluate_model.py
 python final_model_pipelines/bilstm_pipeline/train_model.py
 python final_model_pipelines/bilstm_pipeline/evaluate_model.py
 
+python final_model_pipelines/bert_pipeline/train_model.py
+python final_model_pipelines/bert_pipeline/evaluate_model.py
+
+python final_model_pipelines/roberta_pipeline/train_model.py
+python final_model_pipelines/roberta_pipeline/evaluate_model.py
+
 python final_model_pipelines/compare_all_models.py
 ```
 
 Data and splits are stored under `final_model_pipelines/data/`; no `data_cleaning/` dependency.
+
+### External evaluation set
+
+`data/external_evaluation/external_evaluation.csv` contains 50 current legitimate and 50 synthetic fraudulent samples. It is a final out-of-dataset behavioural check only. Never merge it into EMSCAD or use it for training, feature selection, prompt refinement, calibration, ensemble weights, or threshold selection. See the README and source manifest inside that directory.
 
 ---
 
@@ -281,8 +300,11 @@ A: Run `pip install -e ".[inference]"` from the repository root, or set `PYTHONP
 **Q: `FileNotFoundError: model not found`**
 A: Ensure each selected pipeline has its `saved_model/` artifacts present (`model.joblib` or `model.keras`, vectorizer/tokenizer, threshold files, etc.).
 
-**Q: I only want to deploy LR/SVM/XGBoost without TensorFlow**
-A: Call the selected non-neural pipeline directly. `predict_all.py` imports the neural models too and therefore requires TensorFlow.
+**Q: The API reports `artifact_unavailable` for BERT or RoBERTa**
+A: `model.safetensors` is still a small Git LFS pointer. Run `git lfs pull` in the original model repository, or ask the model owner for the real 400+ MB artifact. The backend will keep serving a degraded result from the available models meanwhile.
+
+**Q: I only want to deploy LR/SVM/XGBoost without TensorFlow/PyTorch**
+A: Call the selected non-neural pipeline directly. `predict_all.py` eagerly imports every model; the backend instead uses lazy Model Adapters so unavailable optional runtimes can be reported per member.
 
 **Q: Is low precision expected?**
 A: The current threshold strategy favors **high recall (fewer missed fake jobs)**, so the Suspicious tier may be large and should be paired with manual review. See each pipeline's `outputs/evaluation_results.csv`.
