@@ -1,14 +1,45 @@
 .git
+.gitattributes
 .venv
 __pycache__
 *.py[cod]
 .DS_Store
 .env
 .env.*
+*.md
+LICENSE
 
+# Dev tooling
+.vscode
+*.code-workspace
+tests/
+
+# Frontend
 frontend/node_modules
 frontend/dist
 frontend/.vite
 
+# Backend
 backend/__pycache__
+backend/**/__pycache__
+
+# Model - exclude duplicates and dev artifacts
+model/modelversion/
 model/**/__pycache__
+model/**/outputs/
+model/**/comparison_outputs/
+model/**/*.md
+model/**/*.png
+model/**/*.csv
+model/**/requirements.txt
+model/**/input_validator.py
+model/**/data_diagnostics.py
+model/**/data_split.py
+model/**/prepare_data.py
+model/**/compare_all_models.py
+model/**/predict_all.py
+model/**/validation_pipeline.py
+model/**/retrain_all_models.py
+model/**/retrain_remaining.py
+model/**/evaluate_external_dataset.py
+model/**/job_description_filter.py

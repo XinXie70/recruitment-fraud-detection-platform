@@ -212,20 +212,6 @@ function ReportPage({ result, onBack }) {
             )}
           </section>
 
-          <section className="report-panel">
-            <div className="section-title compact">
-              <BookOpen size={22} />
-              <h2>URL Analysis</h2>
-            </div>
-            <ul className="report-tips">
-              {result.url_analysis.reasons.map((reason, index) => (
-                <li key={`${reason}-${index}`}>
-                  <strong>{index + 1}</strong>
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
         </section>
       </main>
     </div>
