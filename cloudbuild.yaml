@@ -1,18 +1,18 @@
 # ============================================================
-# Google Cloud Build — 自动构建并部署后端到 Cloud Run
+# Google Cloud Build — Auto build & deploy backend to Cloud Run
 #
-# 前置准备（仅需一次）:
-#   1. 在 Supabase (supabase.com) 创建免费 PostgreSQL 数据库
-#   2. 在 Secret Manager 创建以下密钥:
-#      - DATABASE_URL_PRODUCTION  (Supabase 连接串)
+# One-time prerequisites:
+#   1. Create a free PostgreSQL database on Supabase (supabase.com)
+#   2. Create the following secrets in Secret Manager:
+#      - DATABASE_URL_PRODUCTION  (Supabase connection string)
 #      - SECRET_KEY_PRODUCTION
-#   3. 给 Cloud Build 服务账号授权访问 Secret Manager
+#   3. Grant Cloud Build service account access to Secret Manager
 #
-# 触发方式: 推送到 main 分支自动部署，或手动触发
+# Trigger: push to main branch auto-deploys, or trigger manually
 # ============================================================
 
 steps:
-  # --- 1. 构建 Docker 镜像 ---
+  # --- 1. Build Docker image ---
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build'
     args:
@@ -25,14 +25,14 @@ steps:
       - 'backend/Dockerfile.cloudrun'
       - '.'
 
-  # --- 2. 推送镜像到 Artifact Registry ---
+  # --- 2. Push image to Artifact Registry ---
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push'
     args:
       - 'push'
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
 
-  # --- 3. 部署到 Cloud Run ---
+  # --- 3. Deploy to Cloud Run ---
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy'
     entrypoint: 'bash'
@@ -62,7 +62,7 @@ steps:
           --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest \
           --set-secrets=ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES:latest
 
-# --- 可替换参数（可在触发时覆盖） ---
+# --- Substitutable parameters (can override on trigger) ---
 substitutions:
   _REGION: "asia-southeast1"
   _SERVICE_NAME: "almond-backend"
@@ -81,11 +81,11 @@ substitutions:
   _MODEL_MAX_WORKERS: "3"
   _CORS_ORIGINS: "*"
 
-# 只构建后端（忽略 frontend/ model/ tests/ 的变化）
+# Only build backend (ignore changes in frontend/ model/ tests/)
 options:
   logging: CLOUD_LOGGING_ONLY
 
-# Artifact Registry 存放镜像
+# Artifact Registry stores images
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'

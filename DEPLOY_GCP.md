@@ -1,35 +1,35 @@
-# 谷歌云部署指南 — 后端（数据库使用 Supabase 免费 PostgreSQL）
+# Google Cloud Deployment Guide — Backend (Database uses Supabase Free PostgreSQL)
 
-> 只部署后端（FastAPI + Gunicorn）到 Cloud Run，数据库使用 Supabase 免费托管 PostgreSQL，前端不部署。
+> Deploy only the backend (FastAPI + Gunicorn) to Cloud Run. Database uses Supabase free hosted PostgreSQL. Frontend is not deployed.
 
-## 📋 架构
+## 📋 Architecture
 
 ```
-用户/前端 → Cloud Run (backend) → Supabase (免费 PostgreSQL)
+User/Frontend → Cloud Run (backend) → Supabase (free PostgreSQL)
                 ↕
-         Model Inference Server (已有的，不在这里部署)
+         Model Inference Server (existing, not deployed here)
 ```
 
-## 🚀 一次性准备（~15 分钟）
+## 🚀 One-Time Setup (~15 min)
 
-### 1. 创建 Supabase 免费数据库（5 分钟）
+### 1. Create Supabase Free Database (5 min)
 
-1. 打开 [supabase.com](https://supabase.com) 注册/登录
-2. 点击 **New project**
-3. 填写项目名（如 `almond-db`），设置数据库密码（记下来！）
-4. Region 选择 **ap-southeast-1 (Singapore)** 或 **us-west-1**（靠近你的 Cloud Run 区域）
-5. 选择 **Free plan**，点击 Create project
-6. 等待创建完成（约 2 分钟）
-7. 进入 **Settings → Database**，找到 **Connection string**
-8. 选择 **URI** 标签，复制连接串，格式如下：
+1. Open [supabase.com](https://supabase.com) and sign up / log in
+2. Click **New project**
+3. Fill in the project name (e.g. `almond-db`), set a database password (write it down!)
+4. Select Region **ap-southeast-1 (Singapore)** or **us-west-1** (close to your Cloud Run region)
+5. Choose **Free plan**, click Create project
+6. Wait for creation to complete (~2 min)
+7. Go to **Settings → Database**, find **Connection string**
+8. Select **URI** tab, copy the connection string. Format:
 
 ```
 postgresql://postgres.[PROJECT_REF]:[YOUR_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 ```
 
-> ⚠️ **重要**: 使用 **Session Pooler** 连接（端口 6543），而不是直连（端口 5432），因为 Cloud Run 是无服务器的，连接池更合适。
+> ⚠️ **Important**: Use **Session Pooler** connection (port 6543), not direct connection (port 5432), because Cloud Run is serverless and connection pooling is more appropriate.
 
-### 2. 安装 gcloud CLI 并登录
+### 2. Install gcloud CLI and Login
 
 ```bash
 brew install google-cloud-sdk
@@ -38,7 +38,7 @@ gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
 ```
 
-### 3. 启用必要的 API
+### 3. Enable Required APIs
 
 ```bash
 gcloud services enable \
@@ -48,7 +48,7 @@ gcloud services enable \
   secretmanager.googleapis.com
 ```
 
-### 4. 创建 Artifact Registry（存放 Docker 镜像）
+### 4. Create Artifact Registry (stores Docker images)
 
 ```bash
 gcloud artifacts repositories create almond-repo \
@@ -56,14 +56,14 @@ gcloud artifacts repositories create almond-repo \
   --location=asia-southeast1
 ```
 
-### 5. 在 Secret Manager 中存储密钥
+### 5. Store Secrets in Secret Manager
 
 ```bash
-# SECRET_KEY（用 Python 生成一个随机字符串）
+# SECRET_KEY (generate a random string with Python)
 python3 -c "import secrets; print(secrets.token_urlsafe(64))" | \
   gcloud secrets create SECRET_KEY_PRODUCTION --data-file=-
 
-# DATABASE_URL — 替换为你的 Supabase 连接串
+# DATABASE_URL — replace with your Supabase connection string
 echo -n "postgresql+psycopg2://postgres.xxxxx:YOUR_PASSWORD@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres" | \
   gcloud secrets create DATABASE_URL_PRODUCTION --data-file=-
 
@@ -71,7 +71,7 @@ echo -n "postgresql+psycopg2://postgres.xxxxx:YOUR_PASSWORD@aws-0-ap-southeast-1
 echo -n "10080" | gcloud secrets create ACCESS_TOKEN_EXPIRE_MINUTES --data-file=-
 ```
 
-### 6. 授予 Cloud Run 访问 Secret Manager 的权限
+### 6. Grant Cloud Run Access to Secret Manager
 
 ```bash
 PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) --format='value(projectNumber)')
@@ -84,22 +84,21 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 
 ---
 
-## 🔧 部署
+## 🔧 Deployment
 
-### 方式一：Cloud Build 自动部署（推荐）
+### Method 1: Cloud Build Auto-Deploy (Recommended)
 
-修改 `cloudbuild.yaml` 中的 `${_INSTANCE_CONNECTION_NAME}` 和 `${_MODEL_SERVER_URL}` 为你实际的
-值，然后推送代码即可触发自动构建部署。
+Modify `${_MODEL_SERVER_URL}` in `cloudbuild.yaml` with your actual value, then push code to trigger automatic build and deployment.
 
-### 方式二：手动构建部署
+### Method 2: Manual Build and Deploy
 
 ```bash
-# 1. 构建镜像
+# 1. Build image
 gcloud builds submit \
   --config=cloudbuild.yaml \
   --substitutions=_MODEL_SERVER_URL="https://your-model-server.com"
 
-# 2. 或者只用 Docker 手动部署
+# 2. Or deploy manually with Docker only
 docker build -f backend/Dockerfile.cloudrun -t gcr.io/YOUR_PROJECT/backend .
 docker push gcr.io/YOUR_PROJECT/backend
 
@@ -116,39 +115,39 @@ gcloud run deploy almond-backend \
 
 ---
 
-## ✅ 验证部署
+## ✅ Verify Deployment
 
 ```bash
-# 获取服务 URL
+# Get service URL
 gcloud run services describe almond-backend \
   --region=asia-southeast1 \
   --format='value(status.url)'
 
-# 健康检查
+# Health check
 curl https://YOUR_SERVICE_URL/api/health
 
-# 预期返回:
+# Expected response:
 # {"status":"healthy","service":"fake_job_detection_api","model_ready":true}
 ```
 
 ---
 
-## 📊 费用估算
+## 📊 Cost Estimate
 
-| 服务 | 配置 | 月费（约） |
+| Service | Config | Monthly Cost (~) |
 |------|------|-----------|
-| Cloud Run | 0.5 vCPU, 256MB, 按量 | $0 — 免费额度内 |
-| Supabase | 免费套餐 (500MB DB) | **$0** |
-| Secret Manager | 3 个密钥 | $0 |
-| Artifact Registry | 少量镜像 | ~$0 |
-| **合计** | | **$0/月 🎉** |
+| Cloud Run | 0.5 vCPU, 256MB, pay-per-use | $0 — within free tier |
+| Supabase | Free plan (500MB DB) | **$0** |
+| Secret Manager | 3 secrets | $0 |
+| Artifact Registry | Small images | ~$0 |
+| **Total** | | **$0/month 🎉** |
 
 ---
 
-## 🔒 安全注意事项
+## 🔒 Security Notes
 
-1. **Supabase 连接串包含密码** — 务必通过 Secret Manager 存储，不要硬编码
-2. **Secret Manager 存储所有密钥** — 不要在代码或环境变量中硬编码
-3. **Cloud Run 自动 HTTPS** — 不需要自己配置 TLS 证书
-4. **设置 CORS_ORIGINS** — 限制允许访问的前端域名
-5. **Supabase 免费套餐限制** — 500MB 数据库、2 个项目、每周备份、暂停后需手动恢复
+1. **Supabase connection string contains password** — Always store via Secret Manager, never hardcode
+2. **Secret Manager stores all secrets** — Never hardcode in code or environment variables
+3. **Cloud Run auto-HTTPS** — No need to configure TLS certificates yourself
+4. **Set CORS_ORIGINS** — Restrict allowed frontend domains
+5. **Supabase free plan limits** — 500MB database, 2 projects, weekly backups, manual recovery after pausing

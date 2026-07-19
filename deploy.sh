@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ============================================================
-# 生产环境一键部署脚本 — 后端 + 前端 + 数据库
-# （模型推理已拆分到独立服务器，本脚本不部署模型服务）
+# Production one-click deployment script — Backend + Frontend + Database
+# (Model inference is split to a separate server; this script does not deploy model services)
 #
-# 用法: chmod +x deploy.sh && ./deploy.sh
+# Usage: chmod +x deploy.sh && ./deploy.sh
 # ============================================================
 
 set -euo pipefail
@@ -14,36 +14,36 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo -e "${GREEN}============================================${NC}"
-echo -e "${GREEN}  Fake Job Detection — 后端+前端+数据库部署${NC}"
+echo -e "${GREEN}  Fake Job Detection — Backend+Frontend+DB Deployment${NC}"
 echo -e "${GREEN}============================================${NC}"
 
-# 1. 检查 .env 文件
+# 1. Check .env file
 if [ ! -f .env ]; then
     if [ -f .env.prod ]; then
-        echo -e "${YELLOW}[!] .env 不存在，从 .env.prod 复制...${NC}"
+        echo -e "${YELLOW}[!] .env not found, copying from .env.prod...${NC}"
         cp .env.prod .env
-        echo -e "${RED}[⚠] 请先编辑 .env 文件，修改数据库密码和 SECRET_KEY！${NC}"
-        echo -e "${RED}    如果使用远程模型服务器，还需设置 MODEL_SERVER_URL${NC}"
-        echo -e "${RED}    编辑完成后重新运行: ./deploy.sh${NC}"
+        echo -e "${RED}[⚠] Please edit .env first — update DB password and SECRET_KEY!${NC}"
+        echo -e "${RED}    If using a remote model server, also set MODEL_SERVER_URL${NC}"
+        echo -e "${RED}    After editing, re-run: ./deploy.sh${NC}"
         exit 1
     else
-        echo -e "${RED}[✗] .env.prod 也不存在，请先创建 .env 文件${NC}"
+        echo -e "${RED}[✗] .env.prod not found either. Please create .env first${NC}"
         exit 1
     fi
 fi
 
-# 2. 检查 Docker
+# 2. Check Docker
 if ! command -v docker &>/dev/null; then
-    echo -e "${RED}[✗] 未找到 Docker，请先安装 Docker${NC}"
+    echo -e "${RED}[✗] Docker not found. Please install Docker first${NC}"
     exit 1
 fi
 
 if ! docker compose version &>/dev/null && ! docker-compose version &>/dev/null; then
-    echo -e "${RED}[✗] 未找到 Docker Compose，请先安装${NC}"
+    echo -e "${RED}[✗] Docker Compose not found. Please install it first${NC}"
     exit 1
 fi
 
-# 3. 确定 compose 命令
+# 3. Determine compose command
 if docker compose version &>/dev/null 2>&1; then
     COMPOSE_CMD="docker compose"
 else
@@ -69,31 +69,33 @@ docker pull nginx:1.27-alpine
 echo -e "${GREEN}[2/5] Building backend image (${BACKEND_DOCKERFILE})...${NC}"
 $COMPOSE_CMD -f docker-compose.prod.yml build backend
 
-echo -e "${GREEN}[3/5] 构建前端镜像...${NC}"
+echo -e "${GREEN}[3/5] Building frontend image...${NC}"
 $COMPOSE_CMD -f docker-compose.prod.yml build frontend
 
-# 7. 启动服务
-echo -e "${GREEN}[4/5] 启动所有服务...${NC}"
+# 7. Start services
+
+echo -e "${GREEN}[4/5] Starting all services...${NC}"
 $COMPOSE_CMD -f docker-compose.prod.yml up -d
 
-# 8. 等待健康检查
-echo -e "${GREEN}[5/5] 等待服务就绪...${NC}"
+# 8. Wait for health check
+
+echo -e "${GREEN}[5/5] Waiting for services to be ready...${NC}"
 sleep 5
 
-# 显示状态
+# Show status
 echo ""
 echo -e "${GREEN}============================================${NC}"
-echo -e "${GREEN}  部署完成！${NC}"
+echo -e "${GREEN}  Deployment complete!${NC}"
 echo -e "${GREEN}============================================${NC}"
 echo ""
-echo -e "前端页面:    http://localhost"
-echo -e "后端 API:    http://localhost:8000"
-echo -e "API 文档:    http://localhost:8000/docs"
-echo -e "健康检查:    http://localhost:8000/health"
+echo -e "Frontend:     http://localhost"
+echo -e "Backend API:  http://localhost:8000"
+echo -e "API Docs:     http://localhost:8000/docs"
+echo -e "Health Check: http://localhost:8000/health"
 echo ""
-echo -e "${YELLOW}常用命令:${NC}"
-echo -e "  查看日志:  $COMPOSE_CMD -f docker-compose.prod.yml logs -f"
-echo -e "  查看状态:  $COMPOSE_CMD -f docker-compose.prod.yml ps"
-echo -e "  重启服务:  $COMPOSE_CMD -f docker-compose.prod.yml restart"
-echo -e "  停止服务:  $COMPOSE_CMD -f docker-compose.prod.yml down"
-echo -e "  完全清理:  $COMPOSE_CMD -f docker-compose.prod.yml down -v"
+echo -e "${YELLOW}Common commands:${NC}"
+echo -e "  View logs:    $COMPOSE_CMD -f docker-compose.prod.yml logs -f"
+echo -e "  View status:  $COMPOSE_CMD -f docker-compose.prod.yml ps"
+echo -e "  Restart:      $COMPOSE_CMD -f docker-compose.prod.yml restart"
+echo -e "  Stop:         $COMPOSE_CMD -f docker-compose.prod.yml down"
+echo -e "  Full cleanup: $COMPOSE_CMD -f docker-compose.prod.yml down -v"
