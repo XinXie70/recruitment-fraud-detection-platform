@@ -10,6 +10,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Callable, Protocol, Sequence
 
+import httpx
 
 logger = logging.getLogger("fake_job_detection_api.models")
 
@@ -155,6 +156,77 @@ class ModelAdapter:
         return self.predict_raw_batch([text])[0]
 
 
+#: Map from repository model keys to the deployed model server's keys.
+#: Only ``logistic_regression`` differs; the other seven are identical.
+_REMOTE_MODEL_KEY_MAP: dict[str, str] = {
+    "logistic_regression": "lr",
+    "svm": "svm",
+    "xgboost": "xgboost",
+    "dnn": "dnn",
+    "rnn": "rnn",
+    "bilstm": "bilstm",
+    "bert": "bert",
+    "roberta": "roberta",
+}
+
+
+class HttpModelAdapter:
+    """Remote model adapter that calls the standalone Model Inference Server.
+
+    Activated when ``MODEL_SERVER_URL`` is set.  Each adapter sends requests to
+    ``POST /predict/batch`` with ``{"texts": [...], "model": "<key>"}``.
+    """
+
+    def __init__(self, key: str, display_name: str, base_url: str):
+        self.key = key
+        self.display_name = display_name
+        self._base_url = base_url.rstrip("/")
+        self._remote_key = _REMOTE_MODEL_KEY_MAP.get(key, key)
+        self._client: httpx.Client | None = None
+
+    @property
+    def client(self) -> httpx.Client:
+        if self._client is None:
+            self._client = httpx.Client(
+                timeout=httpx.Timeout(
+                    connect=10.0,
+                    read=float(os.getenv("MODEL_SERVER_TIMEOUT", "120")),
+                    write=10.0,
+                    pool=10.0,
+                )
+            )
+        return self._client
+
+    def predict_raw(self, text: str) -> float:
+        return self.predict_raw_batch([text])[0]
+
+    def predict_raw_batch(self, texts: Sequence[str]) -> list[float]:
+        if not texts:
+            return []
+        try:
+            resp = self.client.post(
+                f"{self._base_url}/predict/batch",
+                json={"texts": list(texts), "model": self._remote_key},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("status") != "success":
+                raise RuntimeError(
+                    f"Model {self.key} returned error: {data.get('error', 'unknown')}"
+                )
+            scores = data.get("scores", [])
+            return [float(s) for s in scores]
+        except httpx.HTTPError as exc:
+            raise RuntimeError(
+                f"HTTP error calling model server for {self.key}: {exc}"
+            ) from exc
+
+    def close(self) -> None:
+        if self._client is not None:
+            self._client.close()
+            self._client = None
+
+
 class ModelRegistry:
     def __init__(
         self,
@@ -167,7 +239,20 @@ class ModelRegistry:
 
     @classmethod
     def default(cls) -> "ModelRegistry":
-        return cls([ModelAdapter(spec) for spec in DEFAULT_MODEL_SPECS])
+        model_server_url = os.getenv("MODEL_SERVER_URL", "").strip()
+        if model_server_url:
+            logger.info(
+                "Using remote model server at %s (MODEL_SERVER_URL is set)",
+                model_server_url,
+            )
+            adapters: list[RawProbabilityAdapter] = [
+                HttpModelAdapter(spec.key, spec.display_name, model_server_url)
+                for spec in DEFAULT_MODEL_SPECS
+            ]
+        else:
+            logger.info("Using local model pipelines (MODEL_SERVER_URL not set)")
+            adapters = [ModelAdapter(spec) for spec in DEFAULT_MODEL_SPECS]
+        return cls(adapters)
 
     def warm_up(self, sample: str, model_keys: Sequence[str]) -> dict[str, str | None]:
         outcomes: dict[str, str | None] = {}
