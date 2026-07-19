@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
@@ -42,10 +44,9 @@ def _save_analysis(
     text: str,
     result: AnalysisResponse,
 ) -> AnalysisHistory:
-    snippet = text[:500] if len(text) > 500 else text
     history = AnalysisHistory(
         user_id=user_id,
-        input_text=snippet,
+        input_text=text,
         risk_score=result.ensemble.risk_score,
         risk_level=result.ensemble.risk_level,
         classification_label=result.ensemble.classification_label,
@@ -150,6 +151,18 @@ def get_education_item(
 # ---------------------------------------------------------------------------
 
 
+def _to_history_item(row: AnalysisHistory) -> AnalysisHistoryItem:
+    text = row.input_text or ""
+    return AnalysisHistoryItem(
+        id=row.id,
+        risk_score=row.risk_score,
+        risk_level=row.risk_level,
+        classification_label=row.classification_label,
+        input_text_snippet=text[:200] if len(text) > 200 else text,
+        created_at=row.created_at.isoformat(),
+    )
+
+
 @router.get("/api/v1/history", response_model=AnalysisHistoryListResponse)
 def get_user_history(
     limit: int = Query(default=20, ge=1, le=100),
@@ -172,17 +185,7 @@ def get_user_history(
     )
     return AnalysisHistoryListResponse(
         total=total or 0,
-        items=[
-            AnalysisHistoryItem(
-                id=row.id,
-                risk_score=row.risk_score,
-                risk_level=row.risk_level,
-                classification_label=row.classification_label,
-                input_text_snippet=row.input_text[:200] if len(row.input_text) > 200 else row.input_text,
-                created_at=row.created_at.isoformat(),
-            )
-            for row in rows
-        ],
+        items=[_to_history_item(row) for row in rows],
     )
 
 
@@ -212,17 +215,24 @@ def get_analysis_detail(
 # ---------------------------------------------------------------------------
 
 
-def _require_admin(current_user: User) -> None:
-    if not getattr(current_user, "is_admin", False):
+def _require_admin(current_user: User, db: Session) -> None:
+    user = db.get(User, current_user.id)
+    if user is None or not getattr(user, "is_admin", False):
         raise HTTPException(status_code=403, detail="Admin access required.")
 
 
-@router.get("/api/v1/admin/stats", response_model=AdminStatsResponse)
-def admin_stats(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> AdminStatsResponse:
-    _require_admin(current_user)
+_admin_cache: dict = {}
+_admin_cache_lock = threading.Lock()
+_ADMIN_CACHE_TTL = 60  # seconds
+
+
+def _get_cached_admin_stats(db: Session) -> AdminStatsResponse:
+    now = time.time()
+    with _admin_cache_lock:
+        cached = _admin_cache.get("stats")
+        if cached and (now - cached["ts"]) < _ADMIN_CACHE_TTL:
+            return cached["data"]
+
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     total_users = db.query(func.count(User.id)).scalar() or 0
     total_analyses = db.query(func.count(AnalysisHistory.id)).scalar() or 0
@@ -244,23 +254,25 @@ def admin_stats(
         .limit(10)
         .all()
     )
-    return AdminStatsResponse(
+    result = AdminStatsResponse(
         total_users=total_users,
         total_analyses=total_analyses,
         analyses_today=analyses_today,
         risk_distribution=risk_distribution,
-        recent_analyses=[
-            AnalysisHistoryItem(
-                id=row.id,
-                risk_score=row.risk_score,
-                risk_level=row.risk_level,
-                classification_label=row.classification_label,
-                input_text_snippet=row.input_text[:200] if len(row.input_text) > 200 else row.input_text,
-                created_at=row.created_at.isoformat(),
-            )
-            for row in recent
-        ],
+        recent_analyses=[_to_history_item(row) for row in recent],
     )
+    with _admin_cache_lock:
+        _admin_cache["stats"] = {"ts": now, "data": result}
+    return result
+
+
+@router.get("/api/v1/admin/stats", response_model=AdminStatsResponse)
+def admin_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AdminStatsResponse:
+    _require_admin(current_user, db)
+    return _get_cached_admin_stats(db)
 
 
 @router.get("/api/v1/admin/analyses", response_model=AnalysisHistoryListResponse)
@@ -271,7 +283,7 @@ def admin_analyses(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> AnalysisHistoryListResponse:
-    _require_admin(current_user)
+    _require_admin(current_user, db)
     query = db.query(AnalysisHistory)
     if risk_level:
         query = query.filter(AnalysisHistory.risk_level == risk_level)
@@ -284,15 +296,5 @@ def admin_analyses(
     )
     return AnalysisHistoryListResponse(
         total=total,
-        items=[
-            AnalysisHistoryItem(
-                id=row.id,
-                risk_score=row.risk_score,
-                risk_level=row.risk_level,
-                classification_label=row.classification_label,
-                input_text_snippet=row.input_text[:200] if len(row.input_text) > 200 else row.input_text,
-                created_at=row.created_at.isoformat(),
-            )
-            for row in rows
-        ],
+        items=[_to_history_item(row) for row in rows],
     )

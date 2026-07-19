@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, JSON, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -37,7 +37,9 @@ class AnalysisHistory(Base):
     risk_score: Mapped[float] = mapped_column(Float, nullable=False)
     risk_level: Mapped[str] = mapped_column(String(20), nullable=False)
     classification_label: Mapped[str] = mapped_column(String(50), nullable=False)
-    result_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    result_json: Mapped[dict | None] = mapped_column(
+        JSON().with_variant(JSONB(), "postgresql"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -45,3 +47,8 @@ class AnalysisHistory(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="analyses")
+
+    __table_args__ = (
+        Index("idx_analysis_history_user_created", "user_id", "created_at"),
+        Index("idx_analysis_history_risk_level", "risk_level"),
+    )

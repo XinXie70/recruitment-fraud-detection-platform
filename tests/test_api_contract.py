@@ -1,17 +1,33 @@
+from unittest.mock import MagicMock
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from auth import get_current_user
+from database import Base, engine
 from routers.analysis import get_analysis_service, router
 
 from test_analysis_contract import build_service
 
 
-def test_versioned_analysis_endpoint_matches_the_response_contract():
+def _mock_user():
+    user = MagicMock()
+    user.id = 1
+    user.is_admin = False
+    return user
+
+
+def _setup_app() -> FastAPI:
+    Base.metadata.create_all(bind=engine)
     app = FastAPI()
     app.include_router(router)
-    app.dependency_overrides[get_current_user] = lambda: object()
+    app.dependency_overrides[get_current_user] = _mock_user
     app.dependency_overrides[get_analysis_service] = build_service
+    return app
+
+
+def test_versioned_analysis_endpoint_matches_the_response_contract():
+    app = _setup_app()
     client = TestClient(app)
 
     response = client.post(
@@ -83,10 +99,7 @@ def test_versioned_analysis_endpoint_matches_the_response_contract():
 
 
 def test_legacy_predict_path_uses_the_same_backend_contract():
-    app = FastAPI()
-    app.include_router(router)
-    app.dependency_overrides[get_current_user] = lambda: object()
-    app.dependency_overrides[get_analysis_service] = build_service
+    app = _setup_app()
     client = TestClient(app)
 
     response = client.post(

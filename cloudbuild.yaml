@@ -1,0 +1,91 @@
+# ============================================================
+# Google Cloud Build — 自动构建并部署后端到 Cloud Run
+#
+# 前置准备（仅需一次）:
+#   1. 在 Supabase (supabase.com) 创建免费 PostgreSQL 数据库
+#   2. 在 Secret Manager 创建以下密钥:
+#      - DATABASE_URL_PRODUCTION  (Supabase 连接串)
+#      - SECRET_KEY_PRODUCTION
+#   3. 给 Cloud Build 服务账号授权访问 Secret Manager
+#
+# 触发方式: 推送到 main 分支自动部署，或手动触发
+# ============================================================
+
+steps:
+  # --- 1. 构建 Docker 镜像 ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'
+      - '-f'
+      - 'backend/Dockerfile.cloudrun'
+      - '.'
+
+  # --- 2. 推送镜像到 Artifact Registry ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+
+  # --- 3. 部署到 Cloud Run ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy ${_SERVICE_NAME} \
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA} \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --cpu=${_CPU} \
+          --memory=${_MEMORY} \
+          --min-instances=${_MIN_INSTANCES} \
+          --max-instances=${_MAX_INSTANCES} \
+          --concurrency=${_CONCURRENCY} \
+          --timeout=${_REQUEST_TIMEOUT} \
+          --set-env-vars=ENVIRONMENT=production \
+          --set-env-vars=LOG_LEVEL=${_LOG_LEVEL} \
+          --set-env-vars=MODEL_SERVER_URL=${_MODEL_SERVER_URL} \
+          --set-env-vars=MODEL_SERVER_TIMEOUT=${_MODEL_SERVER_TIMEOUT} \
+          --set-env-vars=MAX_INPUT_CHARS=${_MAX_INPUT_CHARS} \
+          --set-env-vars=MODEL_TIMEOUT_SECONDS=${_MODEL_TIMEOUT_SECONDS} \
+          --set-env-vars=MODEL_MAX_WORKERS=${_MODEL_MAX_WORKERS} \
+          --set-env-vars=CORS_ORIGINS=${_CORS_ORIGINS} \
+          --set-secrets=DATABASE_URL=DATABASE_URL_PRODUCTION:latest \
+          --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest \
+          --set-secrets=ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES:latest
+
+# --- 可替换参数（可在触发时覆盖） ---
+substitutions:
+  _REGION: "asia-southeast1"
+  _SERVICE_NAME: "almond-backend"
+  _REPOSITORY: "almond-repo"
+  _CPU: "1"
+  _MEMORY: "512Mi"
+  _MIN_INSTANCES: "0"
+  _MAX_INSTANCES: "5"
+  _CONCURRENCY: "80"
+  _REQUEST_TIMEOUT: "300s"
+  _LOG_LEVEL: "INFO"
+  _MODEL_SERVER_URL: ""
+  _MODEL_SERVER_TIMEOUT: "120"
+  _MAX_INPUT_CHARS: "50000"
+  _MODEL_TIMEOUT_SECONDS: "30"
+  _MODEL_MAX_WORKERS: "3"
+  _CORS_ORIGINS: "*"
+
+# 只构建后端（忽略 frontend/ model/ tests/ 的变化）
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+# Artifact Registry 存放镜像
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'

@@ -378,3 +378,12 @@ class ModelRegistry:
         finally:
             executor.shutdown(wait=False, cancel_futures=True)
         return outputs
+
+    def shutdown(self) -> None:
+        """Close any persistent resources (e.g. HTTP clients held by adapters)."""
+        for adapter in self.adapters.values():
+            if hasattr(adapter, "close"):
+                try:
+                    adapter.close()
+                except Exception:
+                    pass

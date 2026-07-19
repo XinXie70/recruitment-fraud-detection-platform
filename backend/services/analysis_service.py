@@ -119,3 +119,10 @@ class AnalysisService:
             gentle_ai=gentle_result,
             url_analysis=url_result,
         )
+
+    def shutdown(self) -> None:
+        """Release resources held by the ensemble registry (e.g. HTTP clients)."""
+        try:
+            self.ensemble.shutdown()
+        except Exception:
+            pass

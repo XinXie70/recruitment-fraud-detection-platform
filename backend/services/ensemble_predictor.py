@@ -271,3 +271,7 @@ class EnsemblePredictor:
             members=members,
             score_batch=score_batch,
         )
+
+    def shutdown(self) -> None:
+        """Release registry resources (e.g. HTTP client connections)."""
+        self.registry.shutdown()

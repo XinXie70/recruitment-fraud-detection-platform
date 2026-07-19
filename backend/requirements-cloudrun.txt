@@ -1,5 +1,5 @@
-# Minimal dependencies for backend when using a remote model server.
-# Does NOT include TensorFlow, PyTorch, transformers, or any ML libraries.
+# Minimal dependencies for Cloud Run backend.
+# Uses psycopg2 with Unix socket for Cloud SQL connections.
 fastapi>=0.100.0
 uvicorn[standard]>=0.22.0
 gunicorn>=22.0.0

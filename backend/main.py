@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+import time
+import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -13,7 +15,7 @@ for import_path in (BACKEND_DIR, PROJECT_ROOT, MODEL_DIR):
     if str(import_path) not in sys.path:
         sys.path.insert(0, str(import_path))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -23,7 +25,10 @@ from routers.analysis import analysis_service, router as analysis_router
 
 
 logger = logging.getLogger("fake_job_detection_api")
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s [%(levelname)s] %(name)s request_id=%(request_id)s %(message)s",
+)
 
 DEFAULT_CORS_ORIGINS = "http://127.0.0.1:5190,http://localhost:5190"
 CORS_ORIGINS = [
@@ -33,16 +38,50 @@ CORS_ORIGINS = [
 ]
 
 
+def _validate_secret_key() -> None:
+    secret = os.getenv("SECRET_KEY", "")
+    if not secret or secret == "change-this-secret-key-for-local-development":
+        logger.critical(
+            "SECRET_KEY is using the default placeholder. "
+            "Set a strong random SECRET_KEY environment variable in production."
+        )
+        if os.getenv("ENVIRONMENT", "").lower() == "production":
+            sys.exit(1)
+
+
 def _init_database() -> None:
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception:
+        logger.exception("Database initialisation failed – aborting startup.")
+        sys.exit(1)
+
+
+_request_id_context: dict[int, str] = {}
+
+
+def _set_request_id() -> str:
+    import threading
+    rid = uuid.uuid4().hex[:12]
+    _request_id_context[threading.get_ident()] = rid
+    return rid
+
+
+class RequestIDFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        import threading
+        record.request_id = _request_id_context.get(threading.get_ident(), "-")
+        return True
+
+
+for handler in logging.getLogger().handlers:
+    handler.addFilter(RequestIDFilter())
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        _init_database()
-    except Exception:
-        logger.exception("Database initialisation failed.")
+    _validate_secret_key()
+    _init_database()
 
     outcomes = analysis_service.warm_up()
     failed = {key: error for key, error in outcomes.items() if error}
@@ -51,6 +90,12 @@ async def lifespan(app: FastAPI):
     else:
         logger.error("No ensemble model could be loaded: %s", failed)
     yield
+    # --- graceful shutdown ---
+    logger.info("Shutting down – cleaning up model executors.")
+    try:
+        analysis_service.shutdown()
+    except Exception:
+        logger.exception("Error during model executor shutdown.")
 
 
 app = FastAPI(
@@ -69,6 +114,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    rid = _set_request_id()
+    start = time.time()
+    response = await call_next(request)
+    duration_ms = (time.time() - start) * 1000
+    response.headers["X-Request-ID"] = rid
+    logger.info(
+        "%s %s -> %d (%.1fms)",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration_ms,
+    )
+    return response
+
+
 app.include_router(auth_router)
 app.include_router(analysis_router)
 

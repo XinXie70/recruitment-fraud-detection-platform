@@ -8,14 +8,22 @@ __pycache__
 .env.*
 *.md
 LICENSE
+*.log
+*.egg-info
+dist
+build
 
 # Dev tooling
 .vscode
 *.code-workspace
 tests/
+.pytest_cache
+.mypy_cache
+.ruff_cache
 
 # Frontend
 frontend/node_modules
+node_modules
 frontend/dist
 frontend/.vite
 
