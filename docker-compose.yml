@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,7 +18,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: ${BACKEND_DOCKERFILE:-backend/Dockerfile}
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/fake_job_detection
       SECRET_KEY: dev-local-secret-key
@@ -31,6 +31,8 @@ services:
       OLLAMA_ENABLED: "false"
       OLLAMA_BASE_URL: http://host.docker.internal:11434
       OLLAMA_MODEL: ""
+      MODEL_SERVER_URL: ${MODEL_SERVER_URL:-}
+      MODEL_SERVER_TIMEOUT: ${MODEL_SERVER_TIMEOUT:-120}
     ports:
       - "8000:8000"
     depends_on:
