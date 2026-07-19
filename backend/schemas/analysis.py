@@ -95,3 +95,28 @@ class AnalysisResponse(BaseModel):
 class EducationListResponse(BaseModel):
     api_version: Literal["1.0"] = API_VERSION
     items: list[EducationItem]
+
+
+class AnalysisHistoryItem(BaseModel):
+    id: int
+    risk_score: float
+    risk_level: str
+    classification_label: str
+    input_text_snippet: str
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+
+class AnalysisHistoryListResponse(BaseModel):
+    total: int
+    items: list[AnalysisHistoryItem]
+
+
+class AdminStatsResponse(BaseModel):
+    total_users: int
+    total_analyses: int
+    analyses_today: int
+    risk_distribution: dict[str, int]
+    recent_analyses: list[AnalysisHistoryItem]
