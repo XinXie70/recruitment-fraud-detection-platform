@@ -29,10 +29,6 @@ export default function Navigation({ auth, onLogout }) {
               </Link>
             </>
           )}
-          <Link to="/education" className="nav-link">
-            <BookOpen size={18} />
-            <span>Learn</span>
-          </Link>
           {auth ? (
             <>
               <span className="nav-user">{auth.user.username}</span>
