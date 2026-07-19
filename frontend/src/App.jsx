@@ -33,6 +33,8 @@ import ExplanationText from './features/analysis/ExplanationText';
 import GentleGuidance from './features/analysis/GentleGuidance';
 import ModelContributions from './features/analysis/ModelContributions';
 import EducationLibrary from './features/education/EducationLibrary';
+import DashboardPage from './components/DashboardPage';
+import AdminDashboard from './components/AdminDashboard';
 import './App.css';
 
 const AUTH_STORAGE_KEY = 'fake_job_auth';
@@ -719,6 +721,18 @@ function AppShell() {
         element={
           <ProtectedRoute auth={auth}>
             <LearnPage auth={auth} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute auth={auth}>
+            {auth?.user?.is_admin ? (
+              <AdminDashboard auth={auth} onLogout={handleLogout} />
+            ) : (
+              <DashboardPage auth={auth} onLogout={handleLogout} />
+            )}
           </ProtectedRoute>
         }
       />
