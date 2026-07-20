@@ -1,0 +1,7 @@
+{
+  "feature_method": "TF-IDF",
+  "imbalance_method": "scale_pos_weight",
+  "scale_pos_weight": 6,
+  "text_col": "combined_text",
+  "label_col": "fraudulent"
+}

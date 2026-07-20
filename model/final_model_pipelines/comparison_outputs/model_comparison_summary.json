@@ -1,0 +1,67 @@
+{
+  "comparison_split": "Test",
+  "models_compared": [
+    "Bi-LSTM",
+    "SVM",
+    "XGBoost",
+    "DNN",
+    "Logistic Regression",
+    "RNN"
+  ],
+  "ranked_by_f1": [
+    {
+      "model": "Bi-LSTM",
+      "accuracy": 0.985738255033557,
+      "precision": 0.8388888888888889,
+      "recall": 0.8728323699421965,
+      "f1": 0.8555240793201133,
+      "decision_threshold": 0.67,
+      "high_threshold_risk_mapping": 0.93
+    },
+    {
+      "model": "SVM",
+      "accuracy": 0.979026845637584,
+      "precision": 0.7816091954022989,
+      "recall": 0.7861271676300579,
+      "f1": 0.7838616714697406,
+      "decision_threshold": 0.31,
+      "high_threshold_risk_mapping": 0.81
+    },
+    {
+      "model": "XGBoost",
+      "accuracy": 0.9745525727069352,
+      "precision": 0.6863636363636364,
+      "recall": 0.8728323699421965,
+      "f1": 0.7684478371501272,
+      "decision_threshold": 0.17,
+      "high_threshold_risk_mapping": 0.93
+    },
+    {
+      "model": "DNN",
+      "accuracy": 0.970357941834452,
+      "precision": 0.645021645021645,
+      "recall": 0.861271676300578,
+      "f1": 0.7376237623762376,
+      "decision_threshold": 0.33,
+      "high_threshold_risk_mapping": 0.91
+    },
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.9175055928411632,
+      "precision": 0.3613636363636364,
+      "recall": 0.9190751445086706,
+      "f1": 0.5187601957585645,
+      "decision_threshold": 0.19,
+      "high_threshold_risk_mapping": 0.91
+    },
+    {
+      "model": "RNN",
+      "accuracy": 0.756152125279642,
+      "precision": 0.1317175974710221,
+      "recall": 0.7225433526011561,
+      "f1": 0.2228163992869875,
+      "decision_threshold": 0.17,
+      "high_threshold_risk_mapping": 0.95
+    }
+  ]
+}

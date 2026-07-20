@@ -1,0 +1,73 @@
+# =============================================================================
+# Keep tracked (do NOT ignore):
+#   - Pipeline source code (*.py, README.md, requirements.txt, etc.)
+#   - Final model weights & inference artifacts:  */saved_model/
+#   - Final evaluation / comparison results:     */outputs/, comparison_outputs/
+# Ignore: training intermediates, caches, logs, checkpoints, temp & raw data.
+# =============================================================================
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ----- IDE / OS -----
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ----- Jupyter -----
+.ipynb_checkpoints/
+
+# ----- Training logs & runtime logs -----
+training_logs/
+*.log
+logs/
+**/lightning_logs/
+**/tensorboard/
+**/tb_logs/
+events.out.tfevents.*
+
+# ----- Checkpoints & training intermediates (not final saved_model/) -----
+**/checkpoints/
+**/checkpoint-*/
+**/runs/
+**/wandb/
+**/mlruns/
+**/optuna/
+*.ckpt
+# Intermediate torch dumps outside saved_model (final HF weights use .safetensors)
+*.pt
+*.pth
+
+# ----- Caches -----
+.cache/
+**/huggingface/
+**/transformers_cache/
+**/torch_extensions/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.joblib.lock
+
+# ----- Temp / scratch -----
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# ----- Data: keep ALL of data/ and input validation——data/ tracked -----
+# Do NOT ignore DataSet.csv, cleaned_data.csv, splits/, or validation_raw/

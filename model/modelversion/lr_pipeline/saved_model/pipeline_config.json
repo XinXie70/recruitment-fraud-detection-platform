@@ -1,0 +1,10 @@
+{
+  "feature_method": "TF-IDF",
+  "imbalance_method": "Class Weighting",
+  "class_weight": {
+    "0": 1,
+    "1": 6
+  },
+  "text_col": "combined_text",
+  "label_col": "fraudulent"
+}
