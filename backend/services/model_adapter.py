@@ -210,12 +210,32 @@ class HttpModelAdapter:
             )
             resp.raise_for_status()
             data = resp.json()
-            if data.get("status") != "success":
+            results = data.get("results")
+
+            if not isinstance(results, list) or len(results) != len(texts):
                 raise RuntimeError(
-                    f"Model {self.key} returned error: {data.get('error', 'unknown')}"
+                    f"Model {self.key} returned an invalid batch response."
                 )
-            scores = data.get("scores", [])
-            return [float(s) for s in scores]
+
+            scores: list[float] = []
+
+            for result in results:
+                if result.get("status") != "success":
+                    status = result.get("status", "error")
+                    message = result.get("message", "No error message provided.")
+                    raise RuntimeError(
+                        f"Model {self.key} returned {status}: {message}"
+                    )
+
+                risk_score = result.get("risk_score")
+                if risk_score is None:
+                    raise RuntimeError(
+                        f"Model {self.key} returned no risk score."
+                    )
+
+                scores.append(float(risk_score))
+
+            return scores
         except httpx.HTTPError as exc:
             raise RuntimeError(
                 f"HTTP error calling model server for {self.key}: {exc}"
