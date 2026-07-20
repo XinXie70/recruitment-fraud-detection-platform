@@ -274,7 +274,7 @@ export default function DashboardPage({ auth, onLogout }) {
                 </div>
                 <ArrowRight size={18} />
               </button>
-              <button className="dash-action-btn" onClick={() => navigate('/education')}>
+              <button className="dash-action-btn" onClick={() => navigate('/learn')}>
                 <BookOpen size={20} />
                 <div>
                   <strong>Learn to Spot Scams</strong>
@@ -282,14 +282,7 @@ export default function DashboardPage({ auth, onLogout }) {
                 </div>
                 <ArrowRight size={18} />
               </button>
-              <button className="dash-action-btn" onClick={() => navigate('/admin')}>
-                <Shield size={20} />
-                <div>
-                  <strong>Model Research</strong>
-                  <span>View model performance metrics</span>
-                </div>
-                <ArrowRight size={18} />
-              </button>
+              
             </div>
           </div>
 

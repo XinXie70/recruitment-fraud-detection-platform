@@ -36,7 +36,7 @@ import EducationLibrary from './features/education/EducationLibrary';
 import DashboardPage from './components/DashboardPage';
 import AdminDashboard from './components/AdminDashboard';
 import './App.css';
-
+import SharedNavigation from './components/Navigation';
 const AUTH_STORAGE_KEY = 'fake_job_auth';
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
@@ -346,51 +346,6 @@ function MeteorBackground() {
   return <canvas className="meteor-canvas" ref={canvasRef} aria-hidden="true" />;
 }
 
-function Navigation({ auth, onLogout }) {
-  return (
-    <nav className="app-nav">
-      <div className="app-nav-inner">
-        <Link to="/analyze" className="nav-brand" aria-label="FakeJobDetect home">
-          <div className="nav-logo">
-            <ShieldAlert size={22} />
-          </div>
-          <span className="nav-brand-text">FakeJobDetect</span>
-        </Link>
-        <div className="nav-actions">
-          <Link to="/analyze" className="nav-link">
-            <Briefcase size={18} />
-            <span>Analyze</span>
-          </Link>
-          <Link to="/learn" className="nav-link">
-            <BookOpen size={18} />
-            <span>Learn</span>
-          </Link>
-          {auth ? (
-            <>
-              <span className="nav-user">{auth.user.username}</span>
-              <button type="button" className="nav-button" onClick={onLogout}>
-                <LogOut size={18} />
-                <span>Log out</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="nav-link">
-                <LogIn size={18} />
-                <span>Log in</span>
-              </Link>
-              <Link to="/register" className="nav-button">
-                <UserPlus size={18} />
-                <span>Register</span>
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-}
-
 function AuthPage({ mode, onAuth, auth, onLogout }) {
   const isRegister = mode === 'register';
   const navigate = useNavigate();
@@ -441,7 +396,7 @@ function AuthPage({ mode, onAuth, auth, onLogout }) {
   return (
     <div className="app">
       <MeteorBackground />
-      <Navigation auth={auth} onLogout={onLogout} />
+      <SharedNavigation auth={auth} onLogout={onLogout} />
       <main className="app-main auth-main">
         <section className="auth-panel">
           <div className="section-title">
@@ -528,7 +483,7 @@ function LearnPage({ auth, onLogout }) {
   return (
     <div className="app">
       <MeteorBackground />
-      <Navigation auth={auth} onLogout={onLogout} />
+      <SharedNavigation auth={auth} onLogout={onLogout} />
       <main className="app-main learn-main">
         <EducationLibrary />
       </main>
@@ -593,7 +548,7 @@ function AnalyzePage({ auth, onLogout }) {
   return (
     <div className="app">
       <MeteorBackground />
-      <Navigation auth={auth} onLogout={onLogout} />
+      <SharedNavigation auth={auth} onLogout={onLogout} />
 
       <main className="app-main">
         <section className="hero">
