@@ -23,9 +23,9 @@ export default function Navigation({ auth, onLogout }) {
                 <LayoutDashboard size={18} />
                 <span>Dashboard</span>
               </Link>
-              <Link to="/learn" className="nav-link">
+              <Link to="/education" className="nav-link">
                 <BookOpen size={18} />
-                <span>Learn</span>
+                <span>Education</span>
               </Link>
             </>
           )}

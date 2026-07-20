@@ -38,6 +38,33 @@ import AdminDashboard from './components/AdminDashboard';
 import './App.css';
 import SharedNavigation from './components/Navigation';
 const AUTH_STORAGE_KEY = 'fake_job_auth';
+const HISTORY_STORAGE_KEY = 'fake_job_history';
+
+function saveAnalysisHistory(result) {
+  try {
+    const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+    const history = raw ? JSON.parse(raw) : [];
+
+    const entry = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      riskLevel: result.ensemble.risk_level,
+      riskScore: Math.round(result.ensemble.risk_score * 100),
+      prediction: result.ensemble.classification_label,
+      modelCount: result.ensemble.active_model_count,
+      inputText: result.inputText,
+    };
+
+    const updatedHistory = [entry, ...history].slice(0, 50);
+
+    window.localStorage.setItem(
+      HISTORY_STORAGE_KEY,
+      JSON.stringify(updatedHistory),
+    );
+  } catch (error) {
+    console.error('Failed to save analysis history:', error);
+  }
+}
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
 
@@ -508,7 +535,10 @@ function AnalyzePage({ auth, onLogout }) {
 
     try {
       const data = await analyzeJobText(payloadText, auth.access_token);
-      setResult({ ...data, inputText: payloadText });
+      const completedResult = { ...data, inputText: payloadText };
+
+      setResult(completedResult);
+      saveAnalysisHistory(completedResult);
     } catch (err) {
       console.error(err);
       if (err.status === 401) {
@@ -672,12 +702,16 @@ function AppShell() {
         }
       />
       <Route
-        path="/learn"
+        path="/education"
         element={
           <ProtectedRoute auth={auth}>
             <LearnPage auth={auth} onLogout={handleLogout} />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/learn"
+        element={<Navigate to="/education" replace />}
       />
       <Route
         path="/dashboard"

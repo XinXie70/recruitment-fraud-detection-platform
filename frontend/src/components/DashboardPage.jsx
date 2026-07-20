@@ -19,14 +19,6 @@ function loadHistory() {
   }
 }
 
-function saveHistory(entry) {
-  const history = loadHistory();
-  history.unshift({ ...entry, id: Date.now(), date: new Date().toISOString() });
-  if (history.length > 50) history.pop();
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  return history;
-}
-
 export default function DashboardPage({ auth, onLogout }) {
   const navigate = useNavigate();
   const [history, setHistory] = useState(loadHistory);
@@ -45,14 +37,6 @@ export default function DashboardPage({ auth, onLogout }) {
   useEffect(() => {
     const h = loadHistory();
     setHistory(h);
-  }, []);
-
-  useEffect(() => {
-    window.__saveAnalysisHistory = (entry) => {
-      const updated = saveHistory(entry);
-      setHistory([...updated]);
-    };
-    return () => { delete window.__saveAnalysisHistory; };
   }, []);
 
   const riskLevelLabel = (level) => {
@@ -274,10 +258,10 @@ export default function DashboardPage({ auth, onLogout }) {
                 </div>
                 <ArrowRight size={18} />
               </button>
-              <button className="dash-action-btn" onClick={() => navigate('/learn')}>
+              <button className="dash-action-btn" onClick={() => navigate('/education')}>
                 <BookOpen size={20} />
                 <div>
-                  <strong>Learn to Spot Scams</strong>
+                  <strong>Education Centre</strong>
                   <span>Educational resources & red flags guide</span>
                 </div>
                 <ArrowRight size={18} />
