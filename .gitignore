@@ -1,19 +1,24 @@
+# Large datasets are kept locally and rebuilt by the pipeline.
+data/raw/*.csv
+data/processed/*.csv
+data/splits/*.csv
+!data/splits/split_assignments_v1.csv
+
+# Trained models and experiment outputs
+models/
+checkpoints/
+outputs/
+*.joblib
+*.pkl
+*.pt
+*.pth
+
+# Local environments and temporary files
 .venv/
+venv/
 __pycache__/
 *.py[cod]
-
-node_modules/
-dist/
-.vite/
-.pytest_cache/
-.coverage
-htmlcov/
-*.log
-*.db
-*.sqlite
-*.sqlite3
-
 .DS_Store
-.env
-.env.*
-work/
+.ipynb_checkpoints/
+.idea/
+.vscode/
