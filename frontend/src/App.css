@@ -3039,3 +3039,44 @@ button.nav-button {
     padding: 0 20px 20px;
   }
 }
+/* Friendly partial-result and service-state feedback */
+
+.partial-result-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--warn-line);
+  border-radius: 14px;
+  background: rgba(255, 246, 235, 0.96);
+  color: var(--text);
+}
+
+.partial-result-notice > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--warn);
+}
+
+.partial-result-notice strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.partial-result-notice p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.model-contribution:not(.success) {
+  border-color: var(--warn-line);
+  background: rgba(255, 246, 235, 0.72);
+}
+
+@media (max-width: 720px) {
+  .partial-result-notice {
+    padding: 14px;
+  }
+}
