@@ -140,18 +140,20 @@ these same files. The integrity check is saved to:
 data/diagnostics/split_report_v1.md
 ```
 
-The small file `data/splits/split_assignments_v1.csv` is stored in GitHub. It
-freezes the agreed assignment of every `record_id` so all team members rebuild
-exactly the same Train, Validation, and Test sets.
+The fixed `train.csv`, `validation.csv`, and `test.csv` files are stored in
+GitHub so team members can use the same data directly. The additional file
+`data/splits/split_assignments_v1.csv` records the agreed assignment of every
+`record_id` and makes the split reproducible.
 
 Expected SHA-256 values for the raw, processed, and split files are recorded in
 `data/checksums_v1.txt` for team verification.
 
 ## Files stored in GitHub
 
-GitHub contains the pipeline code, documentation, reports, and the fixed split
-assignment file. Raw data, processed data, full split CSV files, trained model
-files, and local Python environments are excluded by `.gitignore`.
+GitHub contains the pipeline code, documentation, reports, the fixed split
+assignment file, and the three final split CSV files. Raw data, intermediate
+processed data, trained model files, and local Python environments are excluded
+by `.gitignore`.
 
 To rebuild the shared data after placing `emscad_v1.csv` in `data/raw/`, run:
 

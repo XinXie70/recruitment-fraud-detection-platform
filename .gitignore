@@ -1,8 +1,6 @@
 # Large datasets are kept locally and rebuilt by the pipeline.
 data/raw/*.csv
 data/processed/*.csv
-data/splits/*.csv
-!data/splits/split_assignments_v1.csv
 
 # Trained models and experiment outputs
 models/
