@@ -199,18 +199,30 @@ function ReportPage({ result, onBack }) {
             <GentleGuidance guidance={result.gentle_ai} />
           </section>
 
-          <section className="report-panel">
-            <div className="report-panel-header">
+          <details className="report-panel technical-details">
+            <summary className="technical-details-summary">
               <div className="section-title compact">
                 <Activity size={22} />
-                <h2>Ensemble Model Contributions</h2>
-                <span className="classification-note">
-                  Calibrated score x effective weight = final contribution
-                </span>
+                <div>
+                  <h2>Eight-Model Technical Details</h2>
+                  <span className="classification-note">
+                    Scores, weights and contributions
+                  </span>
+                </div>
               </div>
-            </div>
-            <ModelContributions members={result.member_outputs} />
-          </section>
+
+    <span className="technical-details-action">
+      Expand details
+    </span>
+  </summary>
+
+  <div className="technical-details-content">
+    <p className="classification-note">
+      Calibrated score × effective weight = final contribution
+    </p>
+    <ModelContributions members={result.member_outputs} />
+  </div>
+</details>
 
           <section className="report-panel">
             <div className="report-panel-header">
