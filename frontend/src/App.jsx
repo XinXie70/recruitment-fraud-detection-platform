@@ -249,7 +249,16 @@ function ReportPage({ result, onBack }) {
                 </ul>
               </>
             ) : (
-              <p>{result.xai.message || 'The explanation is temporarily unavailable.'}</p>
+              <div className="partial-result-notice" role="status">
+                <AlertTriangle size={20} />
+                <div>
+                  <strong>Explanation temporarily unavailable</strong>
+                  <p>
+                    The ensemble risk result is still available, but the detailed explanation
+                    could not be generated. You can continue using the model scores above.
+                  </p>
+                </div>
+              </div>
             )}
           </section>
 
