@@ -75,8 +75,10 @@ class AnalysisService:
 
     def warm_up(self) -> dict[str, str | None]:
         sample = (
-            "Software engineer role with clear requirements, company benefits, "
-            "and a standard interview process."
+            "We are hiring a software engineer to join our established technology "
+            "company. The successful candidate will develop web applications, review "
+            "code, work with product teams, receive a competitive salary, complete "
+            "formal interviews, and work from our Sydney office."
         )
         self.warm_up_outcomes = self.ensemble.warm_up(sample)
         self.ready = any(error is None for error in self.warm_up_outcomes.values())
