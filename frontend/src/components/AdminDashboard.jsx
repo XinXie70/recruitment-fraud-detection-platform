@@ -97,7 +97,7 @@ export default function AdminDashboard({ auth, onLogout }) {
           <div>
             <h1 className="admin-title">
               <Cpu size={28} />
-              Model Performance Dashboard
+              Admin & Research Dashboard
             </h1>
             <p>Comprehensive evaluation metrics for all 8 deployed ML models.</p>
           </div>
