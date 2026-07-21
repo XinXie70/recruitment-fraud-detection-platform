@@ -210,12 +210,15 @@ class HttpModelAdapter:
             )
             resp.raise_for_status()
             data = resp.json()
-            if data.get("status") != "success":
-                raise RuntimeError(
-                    f"Model {self.key} returned error: {data.get('error', 'unknown')}"
-                )
-            scores = data.get("scores", [])
-            return [float(s) for s in scores]
+            results = data.get("results", [])
+            scores: list[float] = []
+            for result in results:
+                if result.get("status") != "success":
+                    raise RuntimeError(
+                        f"Model {self.key} returned error: {result.get('message', 'unknown')}"
+                    )
+                scores.append(float(result.get("risk_score", 0)))
+            return scores
         except httpx.HTTPError as exc:
             raise RuntimeError(
                 f"HTTP error calling model server for {self.key}: {exc}"
