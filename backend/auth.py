@@ -115,15 +115,22 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
             detail="Email or username is already registered.",
         )
 
-    user = User(
-        email=payload.email,
-        username=payload.username,
-        password_hash=hash_password(payload.password),
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
+    try:
+        user = User(
+            email=payload.email,
+            username=payload.username,
+            password_hash=hash_password(payload.password),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {exc}",
+        )
 
 
 @router.post("/login", response_model=TokenResponse)
