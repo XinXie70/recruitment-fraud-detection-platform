@@ -41,7 +41,13 @@ export default function AuthPage({ mode, onAuth, auth, onLogout }) {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.detail || 'Authentication failed.');
+        // FastAPI returns 422 as array of {loc, msg}, others as string
+        const detail = data.detail;
+        if (Array.isArray(detail)) {
+          const messages = detail.map((e) => e.msg).join('; ');
+          throw new Error(messages || 'Validation failed.');
+        }
+        throw new Error(detail || 'Authentication failed.');
       }
       onAuth(data);
       navigate(destination, { replace: true });
