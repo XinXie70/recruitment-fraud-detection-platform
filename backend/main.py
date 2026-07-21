@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -37,6 +38,19 @@ def _init_database() -> None:
     Base.metadata.create_all(bind=engine)
 
 
+def _warm_up_models_background() -> None:
+    """Load ML models in a background thread so auth endpoints are available immediately."""
+    try:
+        outcomes = analysis_service.warm_up()
+        failed = {key: error for key, error in outcomes.items() if error}
+        if analysis_service.ready:
+            logger.info("Ensemble runtime is ready. Failed members: %s", failed or "none")
+        else:
+            logger.error("No ensemble model could be loaded: %s", failed)
+    except Exception:
+        logger.exception("Background model warm-up failed.")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -44,12 +58,10 @@ async def lifespan(app: FastAPI):
     except Exception:
         logger.exception("Database initialisation failed.")
 
-    outcomes = analysis_service.warm_up()
-    failed = {key: error for key, error in outcomes.items() if error}
-    if analysis_service.ready:
-        logger.info("Ensemble runtime is ready. Failed members: %s", failed or "none")
-    else:
-        logger.error("No ensemble model could be loaded: %s", failed)
+    # Start model warm-up in background — do NOT block app startup.
+    # Auth endpoints (/api/auth/*) are available immediately.
+    # Analysis endpoints return 503 until models are ready.
+    threading.Thread(target=_warm_up_models_background, daemon=True).start()
     yield
 
 
