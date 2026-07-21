@@ -1,42 +1,44 @@
-# XAI 与 Gentle AI 独立模块
+# XAI & Gentle AI — Independent Module
 
-这个目录是 XAI/Gentle AI 负责人的独立代码范围。其他组员应从
-`xai_gentle/__init__.py` 使用公开接口，不要直接依赖内部文件。
+This directory is the independent code scope for the XAI/Gentle AI lead.
+Other team members should use the public interface from
+`xai_gentle/__init__.py` — do not depend on internal files directly.
 
 ```python
 from backend.xai_gentle import GentleAIService, RiskContext, XAIService
 ```
 
-## 文件
+## Files
 
-- `contracts.py`：你的稳定输入输出，包括 `RiskContext`、`XAIResult` 和
-  `GentleAIResult`。
-- `xai_service.py`：解释正式 ensemble scorer，生成 SHAP 或 occlusion 证据。
-- `gentle_ai_service.py`：读取结构化证据，可选调用本地 Ollama 改写。
-- `gentle_fallback.py`：Ollama 不可用时使用的确定性模板。
-- `knowledge/education_en.json`：本地教育知识库。
+- `contracts.py`: Stable input/output contracts including `RiskContext`, `XAIResult`,
+  and `GentleAIResult`.
+- `xai_service.py`: Explains the formal ensemble scorer, generating SHAP or occlusion evidence.
+- `gentle_ai_service.py`: Reads structured evidence, optionally calls local Ollama for rewriting.
+- `gentle_fallback.py`: Deterministic templates used when Ollama is unavailable.
+- `knowledge/education_en.json`: Local education knowledge base.
 
-## 与其他组员的边界
+## Boundaries with Other Team Members
 
-XAI 的公开调用：
+XAI public API:
 
 ```python
 XAIService.explain(text, score_batch, expected_output) -> XAIResult
 ```
 
-它不 import 任何具体模型或 EnsemblePredictor，只调用后端提供的
-`score_batch`。
+It does not import any concrete model or EnsemblePredictor — it only calls the
+`score_batch` provided by the backend.
 
-Gentle AI 的公开调用：
+Gentle AI public API:
 
 ```python
 GentleAIService.generate(risk, xai) -> GentleAIResult
 ```
 
-`risk` 是只有四个字段的 `RiskContext`。Gentle AI 不接收模型、原始 scorer
-或完整 EnsembleResult，因此不能重新判断真假。
+`risk` is a `RiskContext` with only four fields. Gentle AI does not receive the model,
+the raw scorer, or the full EnsembleResult, so it cannot re-judge real vs. fake.
 
-唯一后端集成点是 `backend/services/analysis_service.py`。你的独立测试命令：
+The only backend integration point is `backend/services/analysis_service.py`.
+Independent test command:
 
 ```bash
 python -m pytest -q tests/xai_gentle

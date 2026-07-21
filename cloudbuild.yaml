@@ -144,7 +144,7 @@ substitutions:
 options:
   logging: CLOUD_LOGGING_ONLY
 
-# Artifact Registry 存放镜像
+# Artifact Registry — store images
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'

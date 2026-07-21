@@ -1,38 +1,40 @@
-# 谷歌云部署指南 — 前后端分开部署（数据库使用 Supabase 免费 PostgreSQL）
+# Google Cloud Deployment Guide — Frontend + Backend (Supabase Free PostgreSQL)
 
-> 前端（React + Nginx）和后端（FastAPI + Gunicorn）分别部署到 Cloud Run，数据库使用 Supabase 免费托管 PostgreSQL。
+> Frontend (React + Nginx) and Backend (FastAPI + Gunicorn) deployed separately to Cloud Run.
+> Database uses Supabase free hosted PostgreSQL.
 
-## 📋 架构
+## Architecture
 
 ```
-用户 → Cloud Run (frontend, Nginx)  ──/api/*──→  Cloud Run (backend, FastAPI)  →  Supabase (免费 PostgreSQL)
+User → Cloud Run (frontend, Nginx)  ──/api/*──→  Cloud Run (backend, FastAPI)  →  Supabase (free PostgreSQL)
                                                        ↕
-                                                Model Inference Server (已有的)
+                                                Model Inference Server (existing)
 ```
 
-- **前端** `almond-frontend`: Nginx 提供静态文件 + 反向代理 `/api/*` 到后端
-- **后端** `almond-backend`: FastAPI + Gunicorn，处理业务逻辑
+- **Frontend** `almond-frontend`: Nginx serves static files + reverse proxies `/api/*` to backend
+- **Backend** `almond-backend`: FastAPI + Gunicorn, handles business logic
 
-## 🚀 一次性准备（~15 分钟）
+## One-Time Setup (~15 min)
 
-### 1. 创建 Supabase 免费数据库（5 分钟）
+### 1. Create Supabase Free Database (5 min)
 
-1. 打开 [supabase.com](https://supabase.com) 注册/登录
-2. 点击 **New project**
-3. 填写项目名（如 `almond-db`），设置数据库密码（记下来！）
-4. Region 选择 **ap-southeast-1 (Singapore)** 或 **us-west-1**（靠近你的 Cloud Run 区域）
-5. 选择 **Free plan**，点击 Create project
-6. 等待创建完成（约 2 分钟）
-7. 进入 **Settings → Database**，找到 **Connection string**
-8. 选择 **URI** 标签，复制连接串，格式如下：
+1. Open [supabase.com](https://supabase.com), sign up / log in
+2. Click **New project**
+3. Enter project name (e.g. `almond-db`), set a database password (save it!)
+4. Choose region **ap-southeast-1 (Singapore)** or **us-west-1** (near your Cloud Run region)
+5. Select **Free plan**, click Create project
+6. Wait for creation (~2 min)
+7. Go to **Settings → Database**, find **Connection string**
+8. Select the **URI** tab, copy the connection string:
 
 ```
 postgresql://postgres.[PROJECT_REF]:[YOUR_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 ```
 
-> ⚠️ **重要**: 使用 **Session Pooler** 连接（端口 6543），而不是直连（端口 5432），因为 Cloud Run 是无服务器的，连接池更合适。
+> ⚠️ **Important**: Use **Session Pooler** (port 6543), not direct connection (port 5432).
+> Cloud Run is serverless — pooled connections are preferred.
 
-### 2. 安装 gcloud CLI 并登录
+### 2. Install gcloud CLI and Log In
 
 ```bash
 brew install google-cloud-sdk
@@ -41,7 +43,7 @@ gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
 ```
 
-### 3. 启用必要的 API
+### 3. Enable Required APIs
 
 ```bash
 gcloud services enable \
@@ -51,7 +53,7 @@ gcloud services enable \
   secretmanager.googleapis.com
 ```
 
-### 4. 创建 Artifact Registry（存放 Docker 镜像）
+### 4. Create Artifact Registry (stores Docker images)
 
 ```bash
 gcloud artifacts repositories create almond-repo \
@@ -59,14 +61,14 @@ gcloud artifacts repositories create almond-repo \
   --location=asia-southeast1
 ```
 
-### 5. 在 Secret Manager 中存储密钥
+### 5. Store Secrets in Secret Manager
 
 ```bash
-# SECRET_KEY（用 Python 生成一个随机字符串）
+# SECRET_KEY (generate a random string with Python)
 python3 -c "import secrets; print(secrets.token_urlsafe(64))" | \
   gcloud secrets create SECRET_KEY_PRODUCTION --data-file=-
 
-# DATABASE_URL — 替换为你的 Supabase 连接串
+# DATABASE_URL — replace with your Supabase connection string
 echo -n "postgresql+psycopg2://postgres.xxxxx:YOUR_PASSWORD@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres" | \
   gcloud secrets create DATABASE_URL_PRODUCTION --data-file=-
 
@@ -74,7 +76,7 @@ echo -n "postgresql+psycopg2://postgres.xxxxx:YOUR_PASSWORD@aws-0-ap-southeast-1
 echo -n "10080" | gcloud secrets create ACCESS_TOKEN_EXPIRE_MINUTES --data-file=-
 ```
 
-### 6. 授予 Cloud Run 访问 Secret Manager 的权限
+### 6. Grant Cloud Run Access to Secret Manager
 
 ```bash
 PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) --format='value(projectNumber)')
@@ -87,18 +89,18 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 
 ---
 
-## 🔧 部署
+## Deployment
 
-### 方式一：Cloud Build 自动部署（推荐）
+### Method 1: Cloud Build Auto Deploy (recommended)
 
-直接推送到 `main` 分支，`cloudbuild.yaml` 会自动：
-1. 构建 + 部署后端 `almond-backend`
-2. 获取后端 URL
-3. 构建 + 部署前端 `almond-frontend`（自动注入 `BACKEND_URL`）
+Push to `main` branch. `cloudbuild.yaml` will automatically:
+1. Build + deploy backend `almond-backend`
+2. Get the backend URL
+3. Build + deploy frontend `almond-frontend` (auto-injects `BACKEND_URL`)
 
-### 方式二：手动分开部署
+### Method 2: Manual Separate Deployment
 
-**先部署后端:**
+**Deploy backend first:**
 ```bash
 docker build -f backend/Dockerfile.cloudrun -t gcr.io/YOUR_PROJECT/backend .
 docker push gcr.io/YOUR_PROJECT/backend
@@ -114,18 +116,18 @@ gcloud run deploy almond-backend \
   --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest
 ```
 
-**再部署前端:**
+**Then deploy frontend:**
 ```bash
-# 获取后端 URL
+# Get backend URL
 BACKEND_URL=$(gcloud run services describe almond-backend \
   --region=asia-southeast1 \
   --format='value(status.url)')
 
-# 构建前端镜像
+# Build frontend image
 docker build -f frontend/Dockerfile.prod -t gcr.io/YOUR_PROJECT/frontend .
 docker push gcr.io/YOUR_PROJECT/frontend
 
-# 部署前端，注入 BACKEND_URL
+# Deploy frontend, inject BACKEND_URL
 gcloud run deploy almond-frontend \
   --image=gcr.io/YOUR_PROJECT/frontend \
   --region=asia-southeast1 \
@@ -138,10 +140,10 @@ gcloud run deploy almond-frontend \
 
 ---
 
-## ✅ 验证部署
+## Verify Deployment
 
 ```bash
-# 获取服务 URL
+# Get service URLs
 gcloud run services describe almond-backend \
   --region=asia-southeast1 \
   --format='value(status.url)'
@@ -150,34 +152,34 @@ gcloud run services describe almond-frontend \
   --region=asia-southeast1 \
   --format='value(status.url)'
 
-# 后端健康检查
+# Backend health check
 curl https://BACKEND_URL/api/health
-# 预期: {"status":"healthy","service":"fake_job_detection_api","model_ready":true}
+# Expected: {"status":"healthy","service":"fake_job_detection_api","model_ready":true}
 
-# 前端（通过 nginx 代理到后端）
+# Frontend (via nginx proxy to backend)
 curl https://FRONTEND_URL/api/health
-# 预期: 同上
+# Expected: same as above
 ```
 
 ---
 
-## 📊 费用估算
+## Cost Estimate
 
-| 服务 | 配置 | 月费（约） |
-|------|------|-----------|
-| Cloud Run (backend) | 1 vCPU, 512MB, 按量 | $0 — 免费额度内 |
-| Cloud Run (frontend) | 1 vCPU, 256MB, 按量 | $0 — 免费额度内 |
-| Supabase | 免费套餐 (500MB DB) | **$0** |
-| Secret Manager | 3 个密钥 | $0 |
-| Artifact Registry | 少量镜像 | ~$0 |
-| **合计** | | **$0/月 🎉** |
+| Service | Config | Monthly (approx) |
+|---------|--------|------------------|
+| Cloud Run (backend) | 1 vCPU, 512MB, pay-per-use | $0 — within free tier |
+| Cloud Run (frontend) | 1 vCPU, 256MB, pay-per-use | $0 — within free tier |
+| Supabase | Free plan (500MB DB) | **$0** |
+| Secret Manager | 3 secrets | $0 |
+| Artifact Registry | Small amount of images | ~$0 |
+| **Total** | | **$0/month 🎉** |
 
 ---
 
-## 🔒 安全注意事项
+## Security Notes
 
-1. **Supabase 连接串包含密码** — 务必通过 Secret Manager 存储，不要硬编码
-2. **Secret Manager 存储所有密钥** — 不要在代码或环境变量中硬编码
-3. **Cloud Run 自动 HTTPS** — 不需要自己配置 TLS 证书
-4. **前端 Nginx 反向代理** — 浏览器通过前端同域访问 `/api/*`，无需 CORS 配置
-5. **Supabase 免费套餐限制** — 500MB 数据库、2 个项目、每周备份、暂停后需手动恢复
+1. **Supabase connection string contains a password** — always store via Secret Manager, never hardcode
+2. **Store all secrets in Secret Manager** — never hardcode in code or env vars
+3. **Cloud Run auto HTTPS** — no need to configure TLS certificates manually
+4. **Frontend Nginx reverse proxy** — browser accesses `/api/*` through the same frontend domain, no CORS needed
+5. **Supabase free tier limits** — 500MB database, 2 projects, weekly backups, manual recovery after pause
