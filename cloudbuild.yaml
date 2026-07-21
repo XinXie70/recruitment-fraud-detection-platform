@@ -1,20 +1,22 @@
 # ============================================================
-# Google Cloud Build — 自动构建并部署后端到 Cloud Run
+# Google Cloud Build — Auto build & deploy frontend + backend to Cloud Run
 #
-# 前置准备（仅需一次）:
-#   1. 在 Supabase (supabase.com) 创建免费 PostgreSQL 数据库
-#   2. 在 Secret Manager 创建以下密钥:
-#      - DATABASE_URL_PRODUCTION  (Supabase 连接串)
+# One-time setup:
+#   1. Create a free PostgreSQL database on Supabase (supabase.com)
+#   2. Create secrets in Secret Manager:
+#      - DATABASE_URL_PRODUCTION  (Supabase connection string)
 #      - SECRET_KEY_PRODUCTION
-#   3. 给 Cloud Build 服务账号授权访问 Secret Manager
+#   3. Grant Cloud Build service account access to Secret Manager
 #
-# 触发方式: 推送到 main 分支自动部署，或手动触发
+# Trigger: push to main branch (auto), or manual trigger
 # ============================================================
 
 steps:
-  # --- 1. 构建 Docker 镜像 ---
+  # ==================== Backend ====================
+
+  # --- 1. Build backend Docker image ---
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'build'
+    id: 'build-backend'
     args:
       - 'build'
       - '-t'
@@ -25,21 +27,21 @@ steps:
       - 'backend/Dockerfile.cloudrun'
       - '.'
 
-  # --- 2. 推送镜像到 Artifact Registry ---
+  # --- 2. Push backend image ---
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'push'
+    id: 'push-backend'
     args:
       - 'push'
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
 
-  # --- 3. 部署到 Cloud Run ---
+  # --- 3. Deploy backend to Cloud Run ---
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy'
+    id: 'deploy-backend'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud run deploy ${_SERVICE_NAME} \
+        gcloud run deploy ${_BACKEND_SERVICE_NAME} \
           --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA} \
           --region=${_REGION} \
           --platform=managed \
@@ -62,10 +64,68 @@ steps:
           --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest \
           --set-secrets=ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES:latest
 
-# --- 可替换参数（可在触发时覆盖） ---
+  # --- 4. Get backend URL ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'get-backend-url'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BACKEND_URL=$(gcloud run services describe ${_BACKEND_SERVICE_NAME} \
+          --region=${_REGION} \
+          --platform=managed \
+          --format='value(status.url)')
+        echo "Backend URL: $BACKEND_URL"
+        echo "$BACKEND_URL" > /workspace/backend_url.txt
+
+  # ==================== Frontend ====================
+
+  # --- 5. Build frontend Docker image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:latest'
+      - '-f'
+      - 'frontend/Dockerfile.prod'
+      - '.'
+
+  # --- 6. Push frontend image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+
+  # --- 7. Deploy frontend to Cloud Run ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-frontend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        gcloud run deploy ${_FRONTEND_SERVICE_NAME} \
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA} \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --cpu=1 \
+          --memory=256Mi \
+          --min-instances=${_MIN_INSTANCES} \
+          --max-instances=${_MAX_INSTANCES} \
+          --concurrency=${_CONCURRENCY} \
+          --timeout=60s \
+          --set-env-vars=BACKEND_URL=$${BACKEND_URL}
+
+# --- Substitutions (override on manual trigger) ---
 substitutions:
   _REGION: "asia-southeast1"
-  _SERVICE_NAME: "almond-backend"
+  _BACKEND_SERVICE_NAME: "almond-backend"
+  _FRONTEND_SERVICE_NAME: "almond-frontend"
   _REPOSITORY: "almond-repo"
   _CPU: "1"
   _MEMORY: "512Mi"
@@ -81,7 +141,6 @@ substitutions:
   _MODEL_MAX_WORKERS: "3"
   _CORS_ORIGINS: "*"
 
-# 只构建后端（忽略 frontend/ model/ tests/ 的变化）
 options:
   logging: CLOUD_LOGGING_ONLY
 
@@ -89,3 +148,5 @@ options:
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:latest'

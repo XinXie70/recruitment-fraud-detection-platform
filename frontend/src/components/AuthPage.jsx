@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogIn, Loader2, UserPlus } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
+import { apiUrl } from '../utils/api';
 
 export default function AuthPage({ mode, onAuth, auth, onLogout }) {
   const isRegister = mode === 'register';
@@ -27,7 +28,7 @@ export default function AuthPage({ mode, onAuth, auth, onLogout }) {
     setError(null);
     setLoading(true);
 
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+    const endpoint = isRegister ? apiUrl('/api/auth/register') : apiUrl('/api/auth/login');
     const payload = isRegister
       ? { email: form.email, username: form.username, password: form.password }
       : { identifier: form.identifier, password: form.password };

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
+import { apiUrl } from '../utils/api';
 
 const MODEL_METRICS = [
   { model: 'Bi-LSTM', accuracy: 0.9857, precision: 0.8389, recall: 0.8728, f1: 0.8555, threshold: 0.67, category: 'dl' },
@@ -52,7 +53,7 @@ export default function AdminDashboard({ auth, onLogout }) {
   const [viewMode, setViewMode] = useState('ranking');
 
   useEffect(() => {
-    fetch('/api/health')
+    fetch(apiUrl('/api/health'))
       .then((r) => r.json())
       .then((d) => setHealthStatus(d))
       .catch(() => setHealthStatus({ status: 'unreachable' }));

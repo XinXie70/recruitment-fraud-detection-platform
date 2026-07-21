@@ -5,6 +5,7 @@ import MeteorBackground from './MeteorBackground';
 import AnimatedTitle from './AnimatedTitle';
 import ReportPage from './ReportPage';
 import { SAMPLES, SAFETY_TIPS, combineModelScores, buildReasons } from '../utils/analysisUtils';
+import { apiUrl } from '../utils/api';
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
 
@@ -25,7 +26,7 @@ export default function AnalyzePage({ auth, onLogout }) {
     setResult(null);
 
     try {
-      const response = await fetch('/api/predict', {
+      const response = await fetch(apiUrl('/api/predict'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

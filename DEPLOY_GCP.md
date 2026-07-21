@@ -1,14 +1,17 @@
-# 谷歌云部署指南 — 后端（数据库使用 Supabase 免费 PostgreSQL）
+# 谷歌云部署指南 — 前后端分开部署（数据库使用 Supabase 免费 PostgreSQL）
 
-> 只部署后端（FastAPI + Gunicorn）到 Cloud Run，数据库使用 Supabase 免费托管 PostgreSQL，前端不部署。
+> 前端（React + Nginx）和后端（FastAPI + Gunicorn）分别部署到 Cloud Run，数据库使用 Supabase 免费托管 PostgreSQL。
 
 ## 📋 架构
 
 ```
-用户/前端 → Cloud Run (backend) → Supabase (免费 PostgreSQL)
-                ↕
-         Model Inference Server (已有的，不在这里部署)
+用户 → Cloud Run (frontend, Nginx)  ──/api/*──→  Cloud Run (backend, FastAPI)  →  Supabase (免费 PostgreSQL)
+                                                       ↕
+                                                Model Inference Server (已有的)
 ```
+
+- **前端** `almond-frontend`: Nginx 提供静态文件 + 反向代理 `/api/*` 到后端
+- **后端** `almond-backend`: FastAPI + Gunicorn，处理业务逻辑
 
 ## 🚀 一次性准备（~15 分钟）
 
@@ -88,18 +91,15 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 
 ### 方式一：Cloud Build 自动部署（推荐）
 
-修改 `cloudbuild.yaml` 中的 `${_INSTANCE_CONNECTION_NAME}` 和 `${_MODEL_SERVER_URL}` 为你实际的
-值，然后推送代码即可触发自动构建部署。
+直接推送到 `main` 分支，`cloudbuild.yaml` 会自动：
+1. 构建 + 部署后端 `almond-backend`
+2. 获取后端 URL
+3. 构建 + 部署前端 `almond-frontend`（自动注入 `BACKEND_URL`）
 
-### 方式二：手动构建部署
+### 方式二：手动分开部署
 
+**先部署后端:**
 ```bash
-# 1. 构建镜像
-gcloud builds submit \
-  --config=cloudbuild.yaml \
-  --substitutions=_MODEL_SERVER_URL="https://your-model-server.com"
-
-# 2. 或者只用 Docker 手动部署
 docker build -f backend/Dockerfile.cloudrun -t gcr.io/YOUR_PROJECT/backend .
 docker push gcr.io/YOUR_PROJECT/backend
 
@@ -114,6 +114,28 @@ gcloud run deploy almond-backend \
   --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest
 ```
 
+**再部署前端:**
+```bash
+# 获取后端 URL
+BACKEND_URL=$(gcloud run services describe almond-backend \
+  --region=asia-southeast1 \
+  --format='value(status.url)')
+
+# 构建前端镜像
+docker build -f frontend/Dockerfile.prod -t gcr.io/YOUR_PROJECT/frontend .
+docker push gcr.io/YOUR_PROJECT/frontend
+
+# 部署前端，注入 BACKEND_URL
+gcloud run deploy almond-frontend \
+  --image=gcr.io/YOUR_PROJECT/frontend \
+  --region=asia-southeast1 \
+  --platform=managed \
+  --allow-unauthenticated \
+  --cpu=1 \
+  --memory=256Mi \
+  --set-env-vars=BACKEND_URL="${BACKEND_URL}"
+```
+
 ---
 
 ## ✅ 验证部署
@@ -124,11 +146,17 @@ gcloud run services describe almond-backend \
   --region=asia-southeast1 \
   --format='value(status.url)'
 
-# 健康检查
-curl https://YOUR_SERVICE_URL/api/health
+gcloud run services describe almond-frontend \
+  --region=asia-southeast1 \
+  --format='value(status.url)'
 
-# 预期返回:
-# {"status":"healthy","service":"fake_job_detection_api","model_ready":true}
+# 后端健康检查
+curl https://BACKEND_URL/api/health
+# 预期: {"status":"healthy","service":"fake_job_detection_api","model_ready":true}
+
+# 前端（通过 nginx 代理到后端）
+curl https://FRONTEND_URL/api/health
+# 预期: 同上
 ```
 
 ---
@@ -137,7 +165,8 @@ curl https://YOUR_SERVICE_URL/api/health
 
 | 服务 | 配置 | 月费（约） |
 |------|------|-----------|
-| Cloud Run | 0.5 vCPU, 256MB, 按量 | $0 — 免费额度内 |
+| Cloud Run (backend) | 1 vCPU, 512MB, 按量 | $0 — 免费额度内 |
+| Cloud Run (frontend) | 1 vCPU, 256MB, 按量 | $0 — 免费额度内 |
 | Supabase | 免费套餐 (500MB DB) | **$0** |
 | Secret Manager | 3 个密钥 | $0 |
 | Artifact Registry | 少量镜像 | ~$0 |
@@ -150,5 +179,5 @@ curl https://YOUR_SERVICE_URL/api/health
 1. **Supabase 连接串包含密码** — 务必通过 Secret Manager 存储，不要硬编码
 2. **Secret Manager 存储所有密钥** — 不要在代码或环境变量中硬编码
 3. **Cloud Run 自动 HTTPS** — 不需要自己配置 TLS 证书
-4. **设置 CORS_ORIGINS** — 限制允许访问的前端域名
+4. **前端 Nginx 反向代理** — 浏览器通过前端同域访问 `/api/*`，无需 CORS 配置
 5. **Supabase 免费套餐限制** — 500MB 数据库、2 个项目、每周备份、暂停后需手动恢复

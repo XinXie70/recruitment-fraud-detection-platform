@@ -1,3 +1,5 @@
+import { apiUrl } from '../../utils/api';
+
 function errorMessage(data, fallback) {
   if (typeof data?.detail === 'string') return data.detail;
   if (typeof data?.detail?.message === 'string') return data.detail.message;
@@ -5,7 +7,7 @@ function errorMessage(data, fallback) {
 }
 
 export async function analyzeJobText(text, accessToken) {
-  const response = await fetch('/api/v1/analyze', {
+  const response = await fetch(apiUrl('/api/v1/analyze'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -24,7 +26,7 @@ export async function analyzeJobText(text, accessToken) {
 
 export async function fetchEducation(topic) {
   const query = topic ? `?topic=${encodeURIComponent(topic)}` : '';
-  const response = await fetch(`/api/v1/education${query}`);
+  const response = await fetch(apiUrl(`/api/v1/education${query}`));
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(errorMessage(data, 'Educational materials are unavailable.'));
