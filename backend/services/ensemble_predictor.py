@@ -100,9 +100,40 @@ class EnsembleComputation:
 
 
 def default_config_path() -> Path:
-    project_root = Path(__file__).resolve().parents[2]
+    """Resolve the default ensemble config path.
+
+    Tries ``ENSEMBLE_CONFIG_PATH`` env var first, then walks up from this
+    file's directory to locate the project root (``.../capstone-project-*/``)
+    and appends the known relative path.
+    """
+    if env_path := os.getenv("ENSEMBLE_CONFIG_PATH"):
+        return Path(env_path)
+
+    # Walk upward from this file until we find a directory containing both
+    # a "backend/" and "model/" folder (the project root).
+    candidate = Path(__file__).resolve().parent
+    for _ in range(6):  # safety limit — should never need more than 3-4 levels
+        if (candidate / "backend").is_dir() and (candidate / "model").is_dir():
+            return (
+                candidate
+                / "model"
+                / "final_model_pipelines"
+                / "ensemble_pipeline"
+                / "saved_model"
+                / "ensemble_config.json"
+            )
+        candidate = candidate.parent
+
+    # Ultimate fallback — keep the original heuristic but log a warning
+    import warnings
+
+    fallback = Path(__file__).resolve().parents[2]
+    warnings.warn(
+        f"Could not auto-detect project root; using fallback {fallback}",
+        stacklevel=2,
+    )
     return (
-        project_root
+        fallback
         / "model"
         / "final_model_pipelines"
         / "ensemble_pipeline"
@@ -142,8 +173,7 @@ class EnsemblePredictor:
 
     @classmethod
     def from_environment(cls, registry: ModelRegistry) -> "EnsemblePredictor":
-        configured_path = os.getenv("ENSEMBLE_CONFIG_PATH")
-        path = Path(configured_path) if configured_path else default_config_path()
+        path = default_config_path()
         return cls(registry=registry, config=EnsembleConfig.load(path))
 
     @property
