@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AlertTriangle, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2,
+  AlertTriangle, ArrowLeft, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2,
   DollarSign, FileText, Globe, HelpCircle, Lightbulb,
   Lock, Mail, MessageCircle, RefreshCw, Search, Shield, ShieldAlert,
   ThumbsUp, Zap,
@@ -171,6 +171,15 @@ export default function EducationPage({ auth, onLogout }) {
       <Navigation auth={auth} onLogout={onLogout} />
 
       <main className="app-main edu-main">
+        <button
+          type="button"
+          className="edu-back-result"
+          onClick={() => navigate('/analyze')}
+        >
+          <ArrowLeft size={19} />
+          Back to analysis result
+        </button>
+
         {/* Hero */}
         <section className="edu-hero">
           <div className="edu-hero-icon">

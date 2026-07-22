@@ -39,6 +39,7 @@ import './App.css';
 import SharedNavigation from './components/Navigation';
 const AUTH_STORAGE_KEY = 'fake_job_auth';
 const HISTORY_STORAGE_KEY = 'fake_job_history';
+const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
 
 function saveAnalysisHistory(result) {
   try {
@@ -53,6 +54,7 @@ function saveAnalysisHistory(result) {
       prediction: result.ensemble.classification_label,
       modelCount: result.ensemble.active_model_count,
       inputText: result.inputText,
+      analysisResult: result,
     };
 
     const updatedHistory = [entry, ...history].slice(0, 50);
@@ -540,8 +542,17 @@ function LearnPage({ auth, onLogout }) {
 }
 
 function AnalyzePage({ auth, onLogout }) {
-  const [text, setText] = useState('');
-  const [result, setResult] = useState(null);
+  const location = useLocation();
+  const restoredResult = location.state?.analysisResult || (() => {
+    try {
+      const raw = window.sessionStorage.getItem(LAST_ANALYSIS_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const [text, setText] = useState(restoredResult?.inputText || '');
+  const [result, setResult] = useState(restoredResult);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -559,6 +570,10 @@ function AnalyzePage({ auth, onLogout }) {
       const completedResult = { ...data, inputText: payloadText };
 
       setResult(completedResult);
+      window.sessionStorage.setItem(
+        LAST_ANALYSIS_STORAGE_KEY,
+        JSON.stringify(completedResult),
+      );
       saveAnalysisHistory(completedResult);
     } catch (err) {
       console.error(err);
@@ -584,6 +599,7 @@ function AnalyzePage({ auth, onLogout }) {
   };
 
   const handleNewScan = () => {
+    window.sessionStorage.removeItem(LAST_ANALYSIS_STORAGE_KEY);
     setText('');
     setResult(null);
     setError(null);

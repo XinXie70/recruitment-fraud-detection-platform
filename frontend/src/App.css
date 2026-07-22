@@ -2924,6 +2924,43 @@ button.nav-button {
   cursor: pointer;
 }
 
+.dash-view-result,
+.edu-back-result {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(50, 92, 111, 0.22);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dash-view-result {
+  min-width: 86px;
+  padding: 8px 10px;
+}
+
+.dash-view-result:hover:not(:disabled),
+.edu-back-result:hover {
+  background: rgba(50, 92, 111, 0.08);
+}
+
+.dash-view-result:disabled {
+  border-color: rgba(80, 65, 50, 0.12);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.edu-back-result {
+  margin-bottom: 18px;
+  padding: 10px 14px;
+}
+
 .dash-date,
 .dash-model-count {
   white-space: nowrap;

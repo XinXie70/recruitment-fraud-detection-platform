@@ -22,7 +22,6 @@ function loadHistory() {
 export default function DashboardPage({ auth, onLogout }) {
   const navigate = useNavigate();
   const [history, setHistory] = useState(loadHistory);
-  const [selectedEntry, setSelectedEntry] = useState(null);
 
   const stats = useMemo(() => {
     const h = history;
@@ -72,7 +71,12 @@ export default function DashboardPage({ auth, onLogout }) {
   const handleClearHistory = () => {
     localStorage.removeItem(HISTORY_KEY);
     setHistory([]);
-    setSelectedEntry(null);
+  };
+
+  const handleViewResult = (entry) => {
+    if (!entry.analysisResult) return;
+    window.sessionStorage.setItem('fake_job_last_analysis', JSON.stringify(entry.analysisResult));
+    navigate('/analyze', { state: { analysisResult: entry.analysisResult } });
   };
 
   return (
@@ -331,15 +335,14 @@ export default function DashboardPage({ auth, onLogout }) {
                       <th>Risk Level</th>
                       <th>Verdict</th>
                       <th>Models</th>
-                      <th></th>
+                      <th>Result</th>
                     </tr>
                   </thead>
                   <tbody>
                     {history.slice(0, 15).map((entry) => (
                       <tr
                         key={entry.id}
-                        className={`dash-history-row ${selectedEntry?.id === entry.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
+                        className="dash-history-row"
                       >
                         <td className="dash-date">
                           <Calendar size={14} />
@@ -361,49 +364,23 @@ export default function DashboardPage({ auth, onLogout }) {
                           {entry.modelCount || 8} models
                         </td>
                         <td>
-                          <Eye size={16} className="dash-view-icon" />
+                          <button
+                            type="button"
+                            className="dash-view-result"
+                            onClick={() => handleViewResult(entry)}
+                            disabled={!entry.analysisResult}
+                            title={entry.analysisResult ? 'Open full analysis result' : 'Full result was not saved for this older scan'}
+                            aria-label={entry.analysisResult ? 'Open full analysis result' : 'Full result unavailable for this older scan'}
+                          >
+                            <Eye size={16} />
+                            <span>{entry.analysisResult ? 'View' : 'Unavailable'}</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {/* Expanded detail panel */}
-              {selectedEntry && (
-                <div className="dash-detail-panel">
-                  <div className="dash-detail-header">
-                    <h3>Scan Detail</h3>
-                    <span className={`dash-level-badge ${riskLevelClass(selectedEntry.riskLevel)}`}>
-                      {riskLevelLabel(selectedEntry.riskLevel)} — {selectedEntry.riskScore}/100
-                    </span>
-                  </div>
-                  <div className="dash-detail-grid">
-                    <div className="dash-detail-item">
-                      <span>Verdict</span>
-                      <strong>{selectedEntry.prediction || 'N/A'}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Models Used</span>
-                      <strong>{selectedEntry.modelCount || 8}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Scan Date</span>
-                      <strong>{formatDate(selectedEntry.date)}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Risk Level</span>
-                      <strong className={`text-${riskLevelClass(selectedEntry.riskLevel)}`}>
-                        {riskLevelLabel(selectedEntry.riskLevel)}
-                      </strong>
-                    </div>
-                  </div>
-                  <button className="btn-analyze" style={{ marginTop: '18px', minHeight: '46px', fontSize: '0.95rem', padding: '0 22px' }} onClick={() => navigate('/analyze')}>
-                    <Search size={18} />
-                    Run Another Scan
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <div className="dash-empty">
@@ -420,4 +397,3 @@ export default function DashboardPage({ auth, onLogout }) {
     </div>
   );
 }
-
