@@ -50,6 +50,8 @@ Make sure `frontend/Dockerfile.prod` and `frontend/docker-entrypoint.sh` are pus
 |----------------|---------------------------------------------------------------------|
 | `BACKEND_URL`  | `https://capstone-project-26t2-9900-h09c-almond.onrender.com`      |
 
+> ⚠️ **Important**: If re-deploying the backend, use `backend/Dockerfile.remote` (slim, no ML deps) instead of `backend/Dockerfile`. The full ML Dockerfile (TensorFlow/PyTorch) will OOM on Render's free tier (512 MB RAM). Set `MODEL_SERVER_URL` to your model inference server, or deploy models separately.
+
 5. Click **Create Web Service**
 
 ---

@@ -39,7 +39,10 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # CORS
     # ------------------------------------------------------------------
-    cors_origins: str = "http://127.0.0.1:5190,http://localhost:5190"
+    cors_origins: str = (
+        "http://127.0.0.1:5190,http://localhost:5190,"
+        "https://capstone-project-26t2-9900-h09calmond.onrender.com"
+    )
 
     # ------------------------------------------------------------------
     # Model / Ensemble
