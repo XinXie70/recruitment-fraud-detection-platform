@@ -4,7 +4,7 @@ from typing import Literal
 
 from config import settings
 from pydantic import BaseModel, Field, field_validator, model_validator
-from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
+from xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
 API_VERSION = "1.0"

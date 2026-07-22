@@ -12,7 +12,7 @@ from services.cache import TTLCache
 from services.ensemble_predictor import EnsemblePredictor
 from services.model_adapter import ModelRegistry
 from url_analyzer import analyze_urls
-from backend.xai_gentle import GentleAIService, RiskContext, XAIService
+from xai_gentle import GentleAIService, RiskContext, XAIService
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
 
