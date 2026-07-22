@@ -5,8 +5,7 @@ import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from config import settings
-
+# ── sys.path setup must happen BEFORE any local imports ──────────────
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 MODEL_DIR = PROJECT_ROOT / "model"
@@ -14,6 +13,8 @@ MODEL_DIR = PROJECT_ROOT / "model"
 for import_path in (BACKEND_DIR, PROJECT_ROOT, MODEL_DIR):
     if str(import_path) not in sys.path:
         sys.path.insert(0, str(import_path))
+
+from config import settings
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
