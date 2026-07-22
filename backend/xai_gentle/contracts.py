@@ -4,6 +4,9 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
+# Reusable type alias — keep in sync with EducationItem.topic
+EducationTopic = Literal["fake_jobs", "misinformation", "phishing", "scam_patterns"]
+
 
 class RiskContext(BaseModel):
     """Stable ensemble fields Gentle AI is allowed to read."""

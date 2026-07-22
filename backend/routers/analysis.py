@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -16,7 +15,8 @@ from schemas.analysis import (
 from services.analysis_service import AnalysisService, InputRejectedError
 from services.ensemble_predictor import EnsembleUnavailableError
 from url_analyzer import analyze_urls
-from backend.xai_gentle import EducationItem
+from xai_gentle import EducationItem
+from xai_gentle.contracts import EducationTopic
 
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
@@ -69,7 +69,7 @@ def predict_compatibility(
     current_user: User = Depends(get_current_user),
     service: AnalysisService = Depends(get_analysis_service),
 ) -> AnalysisResponse:
-    """Backward-compatible route used by the existing React application."""
+    """Backward-compatible alias for /api/v1/analyze (used by legacy React frontend)."""
     return _run_analysis(payload, service)
 
 
@@ -86,9 +86,6 @@ def analyze_url_payload(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="URL analysis failed. Please try again later.",
         ) from exc
-
-
-EducationTopic = Literal["fake_jobs", "misinformation", "phishing", "scam_patterns"]
 
 
 @router.get("/api/v1/education", response_model=EducationListResponse)

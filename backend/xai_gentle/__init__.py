@@ -2,6 +2,7 @@
 
 from .contracts import (
     EducationItem,
+    EducationTopic,
     EvidenceSpan,
     GentleAIResult,
     GentleEvidenceExplanation,
@@ -13,6 +14,7 @@ from .xai_service import BatchScorer, XAIService
 
 __all__ = [
     "BatchScorer",
+    "EducationTopic",
     "EducationItem",
     "EvidenceSpan",
     "GentleAIResult",
