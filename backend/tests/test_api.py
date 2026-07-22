@@ -1,0 +1,68 @@
+"""Tests for core API endpoints."""
+
+from __future__ import annotations
+
+
+class TestHealthEndpoints:
+    def test_health_returns_ok(self, client):
+        resp = client.get("/api/health")
+        # 200 = healthy, 503 = degraded (models not fully loaded).
+        # Both are valid depending on model artifact availability.
+        assert resp.status_code in (200, 503)
+        data = resp.json()
+        assert "status" in data
+        assert "ensemble" in data
+
+    def test_ready_returns_503_when_models_not_warm(self, client):
+        resp = client.get("/api/ready")
+        # Models are not warmed up in test — expect 503
+        assert resp.status_code == 503
+
+
+class TestAuthEndpoints:
+    def test_register_creates_user(self, client):
+        resp = client.post("/api/auth/register", json={
+            "email": "new@example.com",
+            "username": "newuser",
+            "password": "securepass123",
+        })
+        assert resp.status_code == 201
+        data = resp.json()
+        assert "access_token" in data
+        assert data["user"]["email"] == "new@example.com"
+
+    def test_register_duplicate_rejected(self, client):
+        payload = {"email": "dup@example.com", "username": "dupuser", "password": "securepass123"}
+        client.post("/api/auth/register", json=payload)
+        resp = client.post("/api/auth/register", json=payload)
+        assert resp.status_code == 409
+
+    def test_login_returns_token(self, auth_headers):
+        assert auth_headers["Authorization"].startswith("Bearer ")
+
+    def test_me_returns_user(self, client, auth_headers):
+        resp = client.get("/api/auth/me", headers=auth_headers)
+        assert resp.status_code == 200
+        assert resp.json()["username"] == "testuser"
+
+    def test_invalid_login_rejected(self, client):
+        resp = client.post("/api/auth/login", json={
+            "identifier": "nobody", "password": "wrong",
+        })
+        assert resp.status_code == 401
+
+
+class TestAnalysisEndpoints:
+    def test_analyze_requires_auth(self, client):
+        resp = client.post("/api/v1/analyze", json={"text": "test"})
+        assert resp.status_code == 401
+
+    def test_empty_text_rejected(self, client, auth_headers):
+        resp = client.post("/api/v1/analyze", json={"text": ""}, headers=auth_headers)
+        assert resp.status_code == 422
+
+
+class TestAdminEndpoints:
+    def test_non_admin_rejected(self, client, auth_headers):
+        resp = client.get("/api/admin/stats", headers=auth_headers)
+        assert resp.status_code == 403

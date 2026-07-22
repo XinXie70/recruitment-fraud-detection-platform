@@ -1,7 +1,7 @@
-import os
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from config import settings
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -11,11 +11,12 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
+from rate_limit import limiter
 
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-for-local-development")
+SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "120"))
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -103,7 +104,8 @@ def get_current_user(
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit(settings.rate_limit_auth_register)
+def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
     existing = (
         db.query(User)
         .filter(or_(User.email == payload.email, User.username == payload.username))
@@ -134,7 +136,8 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit(settings.rate_limit_auth_login)
+def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     identifier = payload.identifier.strip()
     user = (
         db.query(User)

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
+from config import settings
 from pydantic import BaseModel, Field
 
 from .contracts import (
@@ -39,19 +39,14 @@ class GentleAIService:
         path = knowledge_path or default_knowledge_path()
         raw_items = json.loads(path.read_text(encoding="utf-8"))
         self.items = [EducationItem.model_validate(item) for item in raw_items]
-        configured_enabled = os.getenv("OLLAMA_ENABLED", "false").lower() in {
-            "1",
-            "true",
-            "yes",
-        }
         self.ollama_enabled = (
-            configured_enabled if ollama_enabled is None else ollama_enabled
+            settings.ollama_enabled if ollama_enabled is None else ollama_enabled
         )
         self.ollama_base_url = (
-            ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+            ollama_base_url or settings.ollama_base_url
         ).rstrip("/")
-        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "")
-        self.ollama_timeout = ollama_timeout or float(os.getenv("OLLAMA_TIMEOUT", "8"))
+        self.ollama_model = ollama_model or settings.ollama_model
+        self.ollama_timeout = ollama_timeout or settings.ollama_timeout
 
     def list_items(self, topic: str | None = None) -> list[EducationItem]:
         if topic is None:

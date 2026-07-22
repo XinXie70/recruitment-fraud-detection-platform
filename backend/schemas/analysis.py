@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import os
 from typing import Literal
 
+from config import settings
 from pydantic import BaseModel, Field, field_validator, model_validator
 from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
 API_VERSION = "1.0"
-MAX_INPUT_CHARS = int(os.getenv("MAX_INPUT_CHARS", "50000"))
+MAX_INPUT_CHARS = settings.max_input_chars
 
 
 class AnalysisRequest(BaseModel):
