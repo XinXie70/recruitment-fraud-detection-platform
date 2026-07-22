@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import math
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Sequence
+
+from config import settings
 
 from final_model_pipelines.risk_mapping import apply_risk_mapping
 
@@ -106,7 +107,7 @@ def default_config_path() -> Path:
     file's directory to locate the project root (``.../capstone-project-*/``)
     and appends the known relative path.
     """
-    if env_path := os.getenv("ENSEMBLE_CONFIG_PATH"):
+    if env_path := settings.ensemble_config_path:
         return Path(env_path)
 
     # Walk upward from this file until we find a directory containing both
@@ -167,9 +168,7 @@ class EnsemblePredictor:
         self.registry = registry
         self.config = config
         self.config.validate()
-        self.timeout_seconds = timeout_seconds or float(
-            os.getenv("MODEL_TIMEOUT_SECONDS", "30")
-        )
+        self.timeout_seconds = timeout_seconds or settings.model_timeout_seconds
 
     @classmethod
     def from_environment(cls, registry: ModelRegistry) -> "EnsemblePredictor":

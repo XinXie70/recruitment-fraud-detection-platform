@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from auth import get_current_user
-from models import User
+from config import settings
+from database import get_db
+from dependencies import get_analysis_service
+from middleware import get_request_id
+from models import AnalysisHistory, User
+from rate_limit import limiter
 from schemas.analysis import (
     AnalysisRequest,
     AnalysisResponse,
@@ -21,14 +27,43 @@ from xai_gentle.contracts import EducationTopic
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
 router = APIRouter(tags=["analysis"])
-analysis_service = AnalysisService.from_environment()
 
 
-def get_analysis_service() -> AnalysisService:
-    return analysis_service
+def _save_history(
+    text: str,
+    result: AnalysisResponse,
+    user_id: int,
+    db,
+) -> None:
+    """Persist analysis result to history table."""
+    try:
+        import hashlib
+
+        history = AnalysisHistory(
+            user_id=user_id,
+            input_preview=text[:500],
+            input_hash=hashlib.sha256(text.encode()).hexdigest(),
+            risk_score=result.ensemble.risk_score,
+            risk_level=result.ensemble.risk_level,
+            status=result.status,
+            ensemble_available=sum(
+                1 for m in result.member_outputs if m.status == "success"
+            ),
+            ensemble_total=len(result.member_outputs),
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(history)
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception("Failed to persist analysis history")
 
 
-def _run_analysis(payload: AnalysisRequest, service: AnalysisService) -> AnalysisResponse:
+def _run_analysis(
+    payload: AnalysisRequest,
+    service: AnalysisService,
+    request_id: str,
+) -> AnalysisResponse:
     try:
         return service.analyze(payload.text)
     except InputRejectedError as exc:
@@ -41,13 +76,19 @@ def _run_analysis(payload: AnalysisRequest, service: AnalysisService) -> Analysi
             },
         ) from exc
     except EnsembleUnavailableError as exc:
-        logger.exception("No ensemble member was available.")
+        logger.error(
+            "No ensemble member available",
+            extra={"request_id": request_id},
+        )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         ) from exc
     except Exception as exc:
-        logger.exception("Analysis failed.")
+        logger.exception(
+            "Analysis failed",
+            extra={"request_id": request_id},
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Analysis failed. Please try again later.",
@@ -55,22 +96,34 @@ def _run_analysis(payload: AnalysisRequest, service: AnalysisService) -> Analysi
 
 
 @router.post("/api/v1/analyze", response_model=AnalysisResponse)
+@limiter.limit(settings.rate_limit_analyze)
 def analyze_v1(
+    request: Request,
     payload: AnalysisRequest,
     current_user: User = Depends(get_current_user),
     service: AnalysisService = Depends(get_analysis_service),
+    request_id: str = Depends(get_request_id),
+    db=Depends(get_db),
 ) -> AnalysisResponse:
-    return _run_analysis(payload, service)
+    result = _run_analysis(payload, service, request_id)
+    _save_history(payload.text, result, current_user.id, db)
+    return result
 
 
 @router.post("/api/predict", response_model=AnalysisResponse)
+@limiter.limit(settings.rate_limit_analyze)
 def predict_compatibility(
+    request: Request,
     payload: AnalysisRequest,
     current_user: User = Depends(get_current_user),
     service: AnalysisService = Depends(get_analysis_service),
+    request_id: str = Depends(get_request_id),
+    db=Depends(get_db),
 ) -> AnalysisResponse:
     """Backward-compatible alias for /api/v1/analyze (used by legacy React frontend)."""
-    return _run_analysis(payload, service)
+    result = _run_analysis(payload, service, request_id)
+    _save_history(payload.text, result, current_user.id, db)
+    return result
 
 
 @router.post("/api/analyze-url", response_model=URLAnalysis)

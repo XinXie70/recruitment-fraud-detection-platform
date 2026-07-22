@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import math
-import os
 import re
 from dataclasses import dataclass
 from typing import Callable, Sequence
+
+from config import settings
 
 from .contracts import EvidenceSpan, XAIResult
 
@@ -147,15 +148,10 @@ class XAIService:
         max_segments: int | None = None,
         max_evals: int | None = None,
     ):
-        configured_shap = os.getenv("XAI_USE_SHAP", "true").lower() in {
-            "1",
-            "true",
-            "yes",
-        }
-        self.prefer_shap = configured_shap if prefer_shap is None else prefer_shap
-        self.max_items = max_items or int(os.getenv("XAI_MAX_ITEMS", "10"))
-        self.max_segments = max_segments or int(os.getenv("XAI_MAX_SEGMENTS", "80"))
-        self.max_evals = max_evals or int(os.getenv("XAI_MAX_EVALS", "200"))
+        self.prefer_shap = prefer_shap if prefer_shap is not None else settings.xai_use_shap
+        self.max_items = max_items or settings.xai_max_items
+        self.max_segments = max_segments or settings.xai_max_segments
+        self.max_evals = max_evals or settings.xai_max_evals
 
     def explain(
         self,
