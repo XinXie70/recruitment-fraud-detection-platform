@@ -97,34 +97,28 @@ def admin_users(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    query = db.query(User)
-    total = query.count()
-
-    users = (
-        query.order_by(User.created_at.desc())
+    total = db.query(func.count(User.id)).scalar() or 0
+    users_with_counts = (
+        db.query(User, func.count(AnalysisHistory.id).label("analysis_count"))
+        .outerjoin(AnalysisHistory, AnalysisHistory.user_id == User.id)
+        .group_by(User.id)
+        .order_by(User.created_at.desc())
         .offset(page.offset)
         .limit(page.limit)
         .all()
     )
 
-    items: list[dict] = []
-    for user in users:
-        analysis_count = (
-            db.query(func.count(AnalysisHistory.id))
-            .filter(AnalysisHistory.user_id == user.id)
-            .scalar()
-            or 0
-        )
-        items.append(
-            AdminUserItem(
-                id=user.id,
-                email=user.email,
-                username=user.username,
-                is_admin=user.is_admin,
-                analysis_count=analysis_count,
-                created_at=user.created_at,
-            ).model_dump()
-        )
+    items = [
+        AdminUserItem(
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            is_admin=user.is_admin,
+            analysis_count=analysis_count,
+            created_at=user.created_at,
+        ).model_dump()
+        for user, analysis_count in users_with_counts
+    ]
 
     total_pages = max(1, (total + page.size - 1) // page.size)
     return PaginatedResponse(

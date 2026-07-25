@@ -26,7 +26,11 @@ from slowapi.errors import RateLimitExceeded
 from auth import router as auth_router
 from database import Base, engine, SessionLocal
 from dependencies import get_analysis_service
-from middleware import RequestBodyGuardMiddleware, RequestIDMiddleware
+from middleware import (
+    RequestBodyGuardMiddleware,
+    RequestIDMiddleware,
+    SecurityHeadersMiddleware,
+)
 from rate_limit import limiter
 from routers.admin import router as admin_router
 from routers.analysis import router as analysis_router
@@ -148,6 +152,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Routers
 app.include_router(auth_router)

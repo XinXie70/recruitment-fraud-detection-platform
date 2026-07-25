@@ -41,6 +41,17 @@ class TestAuthEndpoints:
         resp = client.post("/api/auth/register", json=payload)
         assert resp.status_code == 409
 
+    def test_register_rejects_password_over_bcrypt_byte_limit(self, client):
+        resp = client.post(
+            "/api/auth/register",
+            json={
+                "email": "long-password@example.com",
+                "username": "long-password",
+                "password": "密" * 25,
+            },
+        )
+        assert resp.status_code == 422
+
     def test_login_returns_token(self, auth_headers):
         assert auth_headers["Authorization"].startswith("Bearer ")
 
