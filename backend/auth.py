@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from config import settings
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -19,6 +20,8 @@ from rate_limit import limiter
 SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
+JWT_ISSUER = settings.jwt_issuer
+JWT_AUDIENCE = settings.jwt_audience
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -29,7 +32,7 @@ logger = logging.getLogger("fake_job_detection_api.auth")
 class RegisterRequest(BaseModel):
     email: str = Field(..., min_length=5, max_length=255)
     username: str = Field(..., min_length=3, max_length=80)
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=8, max_length=30)
 
     @field_validator("email")
     @classmethod
@@ -47,10 +50,25 @@ class RegisterRequest(BaseModel):
             raise ValueError("Username can only contain letters, numbers, hyphens, and underscores.")
         return cleaned
 
+    @field_validator("password")
+    @classmethod
+    def password_must_meet_policy(cls, value: str) -> str:
+        if not any("A" <= char <= "Z" for char in value):
+            raise ValueError("Password must contain an uppercase letter.")
+        if not any("a" <= char <= "z" for char in value):
+            raise ValueError("Password must contain a lowercase letter.")
+        if not any("0" <= char <= "9" for char in value):
+            raise ValueError("Password must contain a number.")
+        # bcrypt only processes 72 bytes. Checking encoded length prevents
+        # multi-byte passwords from reaching the hasher and raising a 500.
+        if len(value.encode("utf-8")) > 72:
+            raise ValueError("Password must not exceed 72 UTF-8 bytes.")
+        return value
+
 
 class LoginRequest(BaseModel):
     identifier: str = Field(..., min_length=3, max_length=255)
-    password: str = Field(..., min_length=1, max_length=128)
+    password: str = Field(..., min_length=1, max_length=30)
 
 
 class UserResponse(BaseModel):
@@ -74,8 +92,16 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(user: User) -> str:
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": str(user.id), "exp": expires_at}
+    issued_at = datetime.now(timezone.utc)
+    expires_at = issued_at + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {
+        "sub": str(user.id),
+        "iat": issued_at,
+        "exp": expires_at,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "jti": str(uuid4()),
+    }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -93,7 +119,13 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
         user_id = payload.get("sub")
         if user_id is None:
             raise credentials_error

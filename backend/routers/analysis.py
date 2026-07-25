@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 from datetime import datetime, timezone
 
@@ -37,8 +38,6 @@ def _save_history(
 ) -> None:
     """Persist analysis result to history table."""
     try:
-        import hashlib
-
         history = AnalysisHistory(
             user_id=user_id,
             input_preview=text[:500],
@@ -68,7 +67,7 @@ def _run_analysis(
         return service.analyze(payload.text)
     except InputRejectedError as exc:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=422,
             detail={
                 "status": exc.status,
                 "message": exc.reason,

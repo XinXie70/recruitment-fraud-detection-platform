@@ -10,7 +10,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from auth import get_current_user
@@ -48,34 +48,28 @@ def admin_stats(
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
 
     total_users = db.query(func.count(User.id)).scalar() or 0
-    total_analyses = db.query(func.count(AnalysisHistory.id)).scalar() or 0
-    analyses_today = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.created_at >= today)
-        .scalar()
-        or 0
-    )
-    avg_risk = (
-        db.query(func.avg(AnalysisHistory.risk_score)).scalar() or 0.0
-    )
-    high_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "high")
-        .scalar()
-        or 0
-    )
-    medium_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "medium")
-        .scalar()
-        or 0
-    )
-    low_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "low")
-        .scalar()
-        or 0
-    )
+    (
+        total_analyses,
+        analyses_today,
+        avg_risk,
+        high_risk,
+        medium_risk,
+        low_risk,
+    ) = db.query(
+        func.count(AnalysisHistory.id),
+        func.sum(case((AnalysisHistory.created_at >= today, 1), else_=0)),
+        func.avg(AnalysisHistory.risk_score),
+        func.sum(case((AnalysisHistory.risk_level == "high", 1), else_=0)),
+        func.sum(case((AnalysisHistory.risk_level == "medium", 1), else_=0)),
+        func.sum(case((AnalysisHistory.risk_level == "low", 1), else_=0)),
+    ).one()
+
+    total_analyses = total_analyses or 0
+    analyses_today = analyses_today or 0
+    avg_risk = avg_risk or 0.0
+    high_risk = high_risk or 0
+    medium_risk = medium_risk or 0
+    low_risk = low_risk or 0
 
     return AdminStats(
         total_users=total_users,
@@ -97,34 +91,28 @@ def admin_users(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_admin),
 ):
-    query = db.query(User)
-    total = query.count()
-
-    users = (
-        query.order_by(User.created_at.desc())
+    total = db.query(func.count(User.id)).scalar() or 0
+    users_with_counts = (
+        db.query(User, func.count(AnalysisHistory.id).label("analysis_count"))
+        .outerjoin(AnalysisHistory, AnalysisHistory.user_id == User.id)
+        .group_by(User.id)
+        .order_by(User.created_at.desc())
         .offset(page.offset)
         .limit(page.limit)
         .all()
     )
 
-    items: list[dict] = []
-    for user in users:
-        analysis_count = (
-            db.query(func.count(AnalysisHistory.id))
-            .filter(AnalysisHistory.user_id == user.id)
-            .scalar()
-            or 0
-        )
-        items.append(
-            AdminUserItem(
-                id=user.id,
-                email=user.email,
-                username=user.username,
-                is_admin=user.is_admin,
-                analysis_count=analysis_count,
-                created_at=user.created_at,
-            ).model_dump()
-        )
+    items = [
+        AdminUserItem(
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            is_admin=user.is_admin,
+            analysis_count=analysis_count,
+            created_at=user.created_at,
+        ).model_dump()
+        for user, analysis_count in users_with_counts
+    ]
 
     total_pages = max(1, (total + page.size - 1) // page.size)
     return PaginatedResponse(

@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 import threading
 from contextlib import asynccontextmanager
@@ -26,7 +25,11 @@ from slowapi.errors import RateLimitExceeded
 from auth import router as auth_router
 from database import Base, engine, SessionLocal
 from dependencies import get_analysis_service
-from middleware import RequestBodyGuardMiddleware, RequestIDMiddleware
+from middleware import (
+    RequestBodyGuardMiddleware,
+    RequestIDMiddleware,
+    SecurityHeadersMiddleware,
+)
 from rate_limit import limiter
 from routers.admin import router as admin_router
 from routers.analysis import router as analysis_router
@@ -39,7 +42,7 @@ from services.resilience import ServiceStatus, SystemHealth
 class _JsonFormatter(logging.Formatter):
     """Emit log records as JSON lines for Cloud Run / structured log ingestion."""
     def format(self, record: logging.LogRecord) -> str:
-        import json, time as _time
+        import json
         payload = {
             "timestamp": self.formatTime(record),
             "level": record.levelname,
@@ -148,6 +151,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Routers
 app.include_router(auth_router)

@@ -6,15 +6,16 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import uuid
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from config import settings
 
 logger = logging.getLogger("fake_job_detection_api")
+_SAFE_REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
 # ---------------------------------------------------------------------------
 # Request ID middleware
@@ -25,7 +26,12 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     """Attach a unique request-id to every response and log context."""
 
     async def dispatch(self, request: Request, call_next):
-        request_id = request.headers.get("X-Request-ID", str(uuid.uuid4())[:8])
+        supplied_request_id = request.headers.get("X-Request-ID", "")
+        request_id = (
+            supplied_request_id
+            if _SAFE_REQUEST_ID.fullmatch(supplied_request_id)
+            else str(uuid.uuid4())[:8]
+        )
         request.state.request_id = request_id
 
         logger.info(
@@ -39,6 +45,24 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
+        return response
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Apply baseline browser security headers to every API response."""
+
+    async def dispatch(self, request: Request, call_next):
+        response: Response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        if request.url.path.startswith("/api/auth"):
+            response.headers["Cache-Control"] = "no-store"
+        if request.url.scheme == "https":
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains"
+            )
         return response
 
 

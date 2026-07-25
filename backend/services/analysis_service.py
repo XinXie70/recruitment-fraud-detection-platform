@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import hashlib
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable
 
 from final_model_pipelines.validation_pipeline import validate_job_input
@@ -117,11 +116,10 @@ class AnalysisService:
         url_failed = False
         try:
             url_result = URLAnalysis.model_validate(self.url_analyzer(text))
-        except Exception as exc:
+        except Exception:
+            logger.exception("URL analysis failed")
             url_failed = True
-            url_result = empty_url_analysis(
-                f"URL analysis was unavailable: {type(exc).__name__}: {exc}"
-            )
+            url_result = empty_url_analysis("URL analysis is temporarily unavailable.")
 
         degraded = (
             computation.ensemble.status == "degraded"
