@@ -8,7 +8,8 @@ models are:
 
 - Logistic Regression
 - Linear SVM
-- DistilRoBERTa
+- BERT (fine-tune; None / Class weight)
+- DNN + TF-IDF (train-only StratifiedGroupKFold)
 
 At the current stage, no models are trained. The goal is to prepare one shared
 data pipeline so that all models use the same data and evaluation rules.
