@@ -5,24 +5,30 @@ the measured performance of the same model.
 
 The required experiment inputs are included in compressed form:
 
-- `data/processed/emscad_condition_a_with_exact_duplicates_v1.csv.gz`
-- `data/processed/emscad_conditions_b_c_exact_deduplicated_grouped_v1.csv.gz`
+- `data/processed/emscad_condition_a_no_dedup_input_v1.csv.gz`
+- `data/processed/emscad_conditions_b_c_exact_dedup_grouped_input_v1.csv.gz`
 
 Pandas reads these files directly; no manual extraction is required.
 
-Condition A uses all 17,880 processed EMSCAD rows, keeps exact duplicates, and
-applies an ordinary stratified random 70/15/15 split. It is a diagnostic
-experiment and does not read or modify the official Train, Validation, or Test
-files.
+## A = No dedup + Random split
 
-Condition B uses the 15,807 rows remaining after exact deduplication. It still
-uses an ordinary stratified random 70/15/15 split, deliberately ignoring the
-near-duplicate `group_id`. This separates the effect of removing exact
-duplicates from the effect of enforcing group-aware splitting.
+Condition A uses all 17,880 processed EMSCAD rows, keeps exact duplicates, and
+applies an ordinary stratified random 70/15/15 split.
+
+## B = Exact dedup + Random split
+
+Condition B uses the 15,807 rows remaining after exact deduplication and applies
+an ordinary stratified random 70/15/15 split. It deliberately ignores the
+near-duplicate `group_id`.
+
+## C = Exact dedup + Group-aware split
 
 Condition C uses the same 15,807-row input as Condition B, but allocates whole
-near-duplicate groups to the 70/15/15 partitions. Linear SVM calibration is
-also group-aware within diagnostic Train.
+near-duplicate groups to the 70/15/15 partitions. Linear SVM calibration is also
+group-aware within diagnostic Train.
+
+All three conditions are diagnostic experiments and do not read or modify the
+official Train, Validation, or Test files.
 
 Run Condition A from the project root:
 

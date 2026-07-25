@@ -25,7 +25,7 @@ INPUT_FILE = (
     PROJECT_DIR
     / "data"
     / "processed"
-    / "emscad_conditions_b_c_exact_deduplicated_grouped_v1.csv.gz"
+    / "emscad_conditions_b_c_exact_dedup_grouped_input_v1.csv.gz"
 )
 RESULT_FILE = REPORT_DIR / "condition_b_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_b_lr_summary.md"

@@ -34,7 +34,7 @@ INPUT_FILE = (
     PROJECT_DIR
     / "data"
     / "processed"
-    / "emscad_condition_a_with_exact_duplicates_v1.csv.gz"
+    / "emscad_condition_a_no_dedup_input_v1.csv.gz"
 )
 REPORT_DIR = PROJECT_DIR / "reports/experiments/split_leakage"
 RESULT_FILE = REPORT_DIR / "condition_a_lr_results.csv"
