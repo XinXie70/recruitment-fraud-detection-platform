@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 import threading
 from contextlib import asynccontextmanager
@@ -43,7 +42,7 @@ from services.resilience import ServiceStatus, SystemHealth
 class _JsonFormatter(logging.Formatter):
     """Emit log records as JSON lines for Cloud Run / structured log ingestion."""
     def format(self, record: logging.LogRecord) -> str:
-        import json, time as _time
+        import json
         payload = {
             "timestamp": self.formatTime(record),
             "level": record.levelname,
