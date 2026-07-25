@@ -30,7 +30,12 @@ from sklearn.pipeline import Pipeline
 
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
-INPUT_FILE = PROJECT_DIR / "data/processed/emscad_processed_v1.csv.gz"
+INPUT_FILE = (
+    PROJECT_DIR
+    / "data"
+    / "processed"
+    / "emscad_condition_a_with_exact_duplicates_v1.csv.gz"
+)
 REPORT_DIR = PROJECT_DIR / "reports/experiments/split_leakage"
 RESULT_FILE = REPORT_DIR / "condition_a_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_a_lr_summary.md"

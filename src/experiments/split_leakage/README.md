@@ -5,8 +5,8 @@ the measured performance of the same model.
 
 The required experiment inputs are included in compressed form:
 
-- `data/processed/emscad_processed_v1.csv.gz`
-- `data/processed/emscad_grouped_v1.csv.gz`
+- `data/processed/emscad_condition_a_with_exact_duplicates_v1.csv.gz`
+- `data/processed/emscad_conditions_b_c_exact_deduplicated_grouped_v1.csv.gz`
 
 Pandas reads these files directly; no manual extraction is required.
 
