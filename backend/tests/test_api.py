@@ -75,6 +75,17 @@ class TestAuthEndpoints:
 
     def test_login_returns_token(self, auth_headers):
         assert auth_headers["Authorization"].startswith("Bearer ")
+        token = auth_headers["Authorization"].removeprefix("Bearer ")
+        claims = jwt.decode(
+            token,
+            settings.secret_key,
+            algorithms=["HS256"],
+            audience=settings.jwt_audience,
+            issuer=settings.jwt_issuer,
+        )
+        assert claims["sub"]
+        assert claims["iat"] < claims["exp"]
+        assert claims["jti"]
 
     def test_me_returns_user(self, client, auth_headers):
         resp = client.get("/api/auth/me", headers=auth_headers)
@@ -96,6 +107,22 @@ class TestAuthEndpoints:
         resp = client.get(
             "/api/auth/me",
             headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 401
+
+    def test_token_for_wrong_audience_is_rejected(self, client, auth_headers):
+        token = auth_headers["Authorization"].removeprefix("Bearer ")
+        claims = jwt.get_unverified_claims(token)
+        claims["aud"] = "different-client"
+        wrong_audience_token = jwt.encode(
+            claims,
+            settings.secret_key,
+            algorithm="HS256",
+        )
+
+        resp = client.get(
+            "/api/auth/me",
+            headers={"Authorization": f"Bearer {wrong_audience_token}"},
         )
         assert resp.status_code == 401
 
@@ -135,3 +162,51 @@ class TestAdminEndpoints:
     def test_non_admin_rejected(self, client, auth_headers):
         resp = client.get("/api/admin/stats", headers=auth_headers)
         assert resp.status_code == 403
+
+    def test_admin_dashboard_queries(self, client, auth_headers, db_session):
+        from models import AnalysisHistory, User
+
+        user = db_session.query(User).filter(User.username == "testuser").one()
+        user.is_admin = True
+        db_session.add_all(
+            [
+                AnalysisHistory(
+                    user_id=user.id,
+                    input_preview="First listing",
+                    input_hash="a" * 64,
+                    risk_score=0.9,
+                    risk_level="high",
+                    status="success",
+                    ensemble_available=8,
+                    ensemble_total=8,
+                ),
+                AnalysisHistory(
+                    user_id=user.id,
+                    input_preview="Second listing",
+                    input_hash="b" * 64,
+                    risk_score=0.2,
+                    risk_level="low",
+                    status="success",
+                    ensemble_available=7,
+                    ensemble_total=8,
+                ),
+            ]
+        )
+        db_session.commit()
+
+        stats = client.get("/api/admin/stats", headers=auth_headers)
+        assert stats.status_code == 200
+        assert stats.json()["total_analyses"] == 2
+        assert stats.json()["high_risk_count"] == 1
+        assert stats.json()["low_risk_count"] == 1
+
+        users = client.get("/api/admin/users", headers=auth_headers)
+        assert users.status_code == 200
+        assert users.json()["items"][0]["analysis_count"] == 2
+
+        analyses = client.get(
+            f"/api/admin/analyses?user_id={user.id}",
+            headers=auth_headers,
+        )
+        assert analyses.status_code == 200
+        assert analyses.json()["total"] == 2

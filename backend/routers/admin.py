@@ -10,7 +10,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from auth import get_current_user
@@ -48,34 +48,28 @@ def admin_stats(
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
 
     total_users = db.query(func.count(User.id)).scalar() or 0
-    total_analyses = db.query(func.count(AnalysisHistory.id)).scalar() or 0
-    analyses_today = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.created_at >= today)
-        .scalar()
-        or 0
-    )
-    avg_risk = (
-        db.query(func.avg(AnalysisHistory.risk_score)).scalar() or 0.0
-    )
-    high_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "high")
-        .scalar()
-        or 0
-    )
-    medium_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "medium")
-        .scalar()
-        or 0
-    )
-    low_risk = (
-        db.query(func.count(AnalysisHistory.id))
-        .filter(AnalysisHistory.risk_level == "low")
-        .scalar()
-        or 0
-    )
+    (
+        total_analyses,
+        analyses_today,
+        avg_risk,
+        high_risk,
+        medium_risk,
+        low_risk,
+    ) = db.query(
+        func.count(AnalysisHistory.id),
+        func.sum(case((AnalysisHistory.created_at >= today, 1), else_=0)),
+        func.avg(AnalysisHistory.risk_score),
+        func.sum(case((AnalysisHistory.risk_level == "high", 1), else_=0)),
+        func.sum(case((AnalysisHistory.risk_level == "medium", 1), else_=0)),
+        func.sum(case((AnalysisHistory.risk_level == "low", 1), else_=0)),
+    ).one()
+
+    total_analyses = total_analyses or 0
+    analyses_today = analyses_today or 0
+    avg_risk = avg_risk or 0.0
+    high_risk = high_risk or 0
+    medium_risk = medium_risk or 0
+    low_risk = low_risk or 0
 
     return AdminStats(
         total_users=total_users,

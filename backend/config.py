@@ -16,10 +16,13 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    app_env: Literal["development", "test", "production"] = "development"
+
     # ------------------------------------------------------------------
     # Database
     # ------------------------------------------------------------------
@@ -35,6 +38,8 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     secret_key: str = "change-this-secret-key-for-local-development"
     access_token_expire_minutes: int = 120
+    jwt_issuer: str = "fake-job-detection-api"
+    jwt_audience: str = "fake-job-detection-client"
 
     # ------------------------------------------------------------------
     # CORS
@@ -97,6 +102,17 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    @model_validator(mode="after")
+    def production_secrets_are_safe(self) -> "Settings":
+        if self.app_env != "production":
+            return self
+        if (
+            self.secret_key == "change-this-secret-key-for-local-development"
+            or len(self.secret_key.encode("utf-8")) < 32
+        ):
+            raise ValueError("Production SECRET_KEY must contain at least 32 bytes.")
+        return self
 
     @property
     def cors_origin_list(self) -> list[str]:

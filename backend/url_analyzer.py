@@ -4,6 +4,8 @@ from ipaddress import ip_address
 from typing import Any
 from urllib.parse import urlparse
 
+import tldextract
+
 
 URL_PATTERN = re.compile(
     r"\b(?:https?://|www\.)[^\s<>()\"']+|\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:/[^\s<>()\"']*)?"
@@ -58,6 +60,7 @@ RECRUITING_DOMAIN_KEYWORDS = {
     "recruit",
     "recruitment",
 }
+_TLD_EXTRACT = tldextract.TLDExtract(suffix_list_urls=())
 
 
 @dataclass(frozen=True)
@@ -75,10 +78,13 @@ def _normalize_candidate(candidate: str) -> str:
 
 
 def _registered_domain(hostname: str) -> str:
-    parts = hostname.lower().strip(".").split(".")
-    if len(parts) >= 2:
-        return ".".join(parts[-2:])
-    return hostname.lower()
+    normalized = hostname.lower().strip(".")
+    if _is_ip_address(normalized):
+        return normalized
+    extracted = _TLD_EXTRACT(normalized)
+    if extracted.domain and extracted.suffix:
+        return f"{extracted.domain}.{extracted.suffix}"
+    return normalized
 
 
 def _risk_level(score: float) -> str:

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from config import settings
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -19,6 +20,8 @@ from rate_limit import limiter
 SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
+JWT_ISSUER = settings.jwt_issuer
+JWT_AUDIENCE = settings.jwt_audience
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -89,8 +92,16 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(user: User) -> str:
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": str(user.id), "exp": expires_at}
+    issued_at = datetime.now(timezone.utc)
+    expires_at = issued_at + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {
+        "sub": str(user.id),
+        "iat": issued_at,
+        "exp": expires_at,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "jti": str(uuid4()),
+    }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -108,7 +119,13 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
         user_id = payload.get("sub")
         if user_id is None:
             raise credentials_error
