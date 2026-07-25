@@ -37,6 +37,12 @@ INPUT_FILE = (
     / "emscad_condition_a_no_dedup_input_v1.csv.gz"
 )
 REPORT_DIR = PROJECT_DIR / "reports/experiments/split_leakage"
+ASSIGNMENT_FILE = (
+    PROJECT_DIR
+    / "data"
+    / "experiment_splits"
+    / "condition_a_no_dedup_random_split_assignments_v1.csv.gz"
+)
 RESULT_FILE = REPORT_DIR / "condition_a_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_a_lr_summary.md"
 
@@ -196,6 +202,41 @@ def split_indices(labels, seed):
     return train_indices, validation_indices, holdout_indices
 
 
+def load_saved_split_indices(data, assignment_file, seed):
+    """Load one seed from a shared record-level split assignment."""
+    assignments = pd.read_csv(assignment_file)
+    required = {"record_id", "seed", "split"}
+    missing = required - set(assignments.columns)
+    if missing:
+        raise ValueError(
+            f"{assignment_file.name} is missing columns: {sorted(missing)}"
+        )
+
+    selected = assignments[assignments["seed"] == seed]
+    if len(selected) != len(data):
+        raise ValueError(
+            f"Seed {seed} in {assignment_file.name} has "
+            f"{len(selected):,} rows; expected {len(data):,}"
+        )
+    if selected["record_id"].duplicated().any():
+        raise ValueError(f"Seed {seed} contains duplicate record_id values")
+    if set(selected["split"]) != {"train", "validation", "holdout"}:
+        raise ValueError(f"Seed {seed} does not contain all three splits")
+
+    split_by_record = selected.set_index("record_id")["split"]
+    split_names = data["record_id"].map(split_by_record)
+    if split_names.isna().any():
+        raise ValueError(
+            f"Seed {seed} assignment does not match the input dataset"
+        )
+
+    return (
+        np.flatnonzero(split_names.eq("train")),
+        np.flatnonzero(split_names.eq("validation")),
+        np.flatnonzero(split_names.eq("holdout")),
+    )
+
+
 def create_summary(data, results, total_exact_groups, rows_in_exact_groups):
     metric_columns = [
         "pr_auc",
@@ -300,8 +341,8 @@ def main():
     rows = []
 
     for seed in SEEDS:
-        train_indices, validation_indices, holdout_indices = split_indices(
-            data["label"], seed
+        train_indices, validation_indices, holdout_indices = (
+            load_saved_split_indices(data, ASSIGNMENT_FILE, seed)
         )
 
         model = build_model(seed)

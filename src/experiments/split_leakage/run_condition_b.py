@@ -14,9 +14,9 @@ from run_condition_a import (
     SEEDS,
     build_model,
     evaluate,
+    load_saved_split_indices,
     normalise_for_exact_match,
     select_f1_threshold,
-    split_indices,
 )
 
 
@@ -26,6 +26,12 @@ INPUT_FILE = (
     / "data"
     / "processed"
     / "emscad_conditions_b_c_exact_dedup_grouped_input_v1.csv.gz"
+)
+ASSIGNMENT_FILE = (
+    PROJECT_DIR
+    / "data"
+    / "experiment_splits"
+    / "condition_b_exact_dedup_random_split_assignments_v1.csv.gz"
 )
 RESULT_FILE = REPORT_DIR / "condition_b_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_b_lr_summary.md"
@@ -227,8 +233,8 @@ def run_model(data, model_name, model_builder):
     rows = []
 
     for seed in SEEDS:
-        train_indices, validation_indices, holdout_indices = split_indices(
-            data["label"], seed
+        train_indices, validation_indices, holdout_indices = (
+            load_saved_split_indices(data, ASSIGNMENT_FILE, seed)
         )
         model = model_builder(data.loc[train_indices, "label"].to_numpy(), seed)
         model.fit(

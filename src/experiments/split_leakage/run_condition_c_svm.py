@@ -9,7 +9,7 @@ from sklearn.svm import LinearSVC
 
 from run_condition_a import REPORT_DIR
 from run_condition_b import load_data
-from run_condition_c import build_group_data, create_summary, run_model
+from run_condition_c import create_summary, run_model
 
 
 RESULT_FILE = REPORT_DIR / "condition_c_svm_results.csv"
@@ -167,11 +167,9 @@ def save_abc_summary(combined, c_lr_results):
 
 def main():
     data = load_data()
-    group_data = build_group_data(data)
 
     results = run_model(
         data,
-        group_data,
         "linear_svm",
         build_group_calibrated_model,
     )

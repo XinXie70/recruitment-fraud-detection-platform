@@ -16,6 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 
 from run_condition_a import (
+    ASSIGNMENT_FILE,
     CONDITION_NAME,
     INPUT_FILE,
     REPORT_DIR,
@@ -24,7 +25,7 @@ from run_condition_a import (
     exact_overlap_stats,
     normalise_for_exact_match,
     select_f1_threshold,
-    split_indices,
+    load_saved_split_indices,
 )
 
 
@@ -204,8 +205,8 @@ def main():
 
     rows = []
     for seed in SEEDS:
-        train_indices, validation_indices, holdout_indices = split_indices(
-            data["label"], seed
+        train_indices, validation_indices, holdout_indices = (
+            load_saved_split_indices(data, ASSIGNMENT_FILE, seed)
         )
         train_labels = data.loc[train_indices, "label"].to_numpy()
         model = build_calibrated_model(train_labels, seed)

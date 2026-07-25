@@ -16,6 +16,7 @@ from run_condition_a import (
     SEEDS,
     build_model,
     evaluate,
+    load_saved_split_indices,
     select_f1_threshold,
 )
 from run_condition_b import load_data
@@ -28,6 +29,12 @@ from analyse_split_options import allocate_groups  # noqa: E402
 
 RESULT_FILE = REPORT_DIR / "condition_c_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_c_lr_summary.md"
+ASSIGNMENT_FILE = (
+    PROJECT_DIR
+    / "data"
+    / "experiment_splits"
+    / "condition_c_exact_dedup_group_aware_split_assignments_v1.csv.gz"
+)
 CONDITION_NAME = "C: exact dedup + group-aware split"
 RATIOS = [0.70, 0.15, 0.15]
 
@@ -183,11 +190,11 @@ def create_summary(
     output_file.write_text("\n".join(lines), encoding="utf-8")
 
 
-def run_model(data, group_data, model_name, model_builder):
+def run_model(data, model_name, model_builder):
     rows = []
     for seed in SEEDS:
         train_indices, validation_indices, holdout_indices = (
-            group_split_indices(data, group_data, seed)
+            load_saved_split_indices(data, ASSIGNMENT_FILE, seed)
         )
         train_labels = data.loc[train_indices, "label"].to_numpy()
         train_groups = data.loc[train_indices, "group_id"].to_numpy()
@@ -249,11 +256,9 @@ def run_model(data, group_data, model_name, model_builder):
 
 def main():
     data = load_data()
-    group_data = build_group_data(data)
 
     results = run_model(
         data,
-        group_data,
         "logistic_regression",
         lambda _labels, _groups, seed: build_model(seed),
     )

@@ -10,6 +10,16 @@ The required experiment inputs are included in compressed form:
 
 Pandas reads these files directly; no manual extraction is required.
 
+The exact seeds 0–9 assignments shared by all models are stored in:
+
+- `data/experiment_splits/condition_a_no_dedup_random_split_assignments_v1.csv.gz`
+- `data/experiment_splits/condition_b_exact_dedup_random_split_assignments_v1.csv.gz`
+- `data/experiment_splits/condition_c_exact_dedup_group_aware_split_assignments_v1.csv.gz`
+
+Each assignment file contains `record_id`, `seed`, and `split`. The model
+scripts load these saved assignments, ensuring that every model uses the same
+diagnostic Train, Validation and Holdout records.
+
 ## A = No dedup + Random split
 
 Condition A uses all 17,880 processed EMSCAD rows, keeps exact duplicates, and
@@ -49,6 +59,12 @@ Run Condition C:
 ```bash
 .venv/bin/python src/experiments/split_leakage/run_condition_c.py
 .venv/bin/python src/experiments/split_leakage/run_condition_c_svm.py
+```
+
+Recreate the shared assignment files if the split logic intentionally changes:
+
+```bash
+.venv/bin/python src/experiments/split_leakage/create_split_assignments.py
 ```
 
 Create the experiment figures and paper summary table:
