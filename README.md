@@ -11,8 +11,35 @@ models are:
 - BERT (fine-tune; None / Class weight)
 - DNN + TF-IDF (train-only StratifiedGroupKFold)
 
-At the current stage, no models are trained. The goal is to prepare one shared
-data pipeline so that all models use the same data and evaluation rules.
+## Runnable model pack (BERT + DNN)
+
+After cloning, pull large weights with Git LFS, then use these three folders
+together with `data/splits/`:
+
+| Folder | Contents |
+|---|---|
+| `model_code/` | BERT + DNN source |
+| `model_weights/` | Checkpoints / Keras / TF-IDF / SVD |
+| `model_results/` | Metrics, predictions, figures |
+
+Quick start: see [`model_code/README.md`](model_code/README.md).
+
+```powershell
+git lfs install
+git lfs pull
+. E:\ml\activate.ps1
+
+# BERT evaluate saved class-weighted model
+cd model_code\bert
+python evaluate_bert.py
+
+# DNN evaluate saved model (from project root)
+cd ..\..
+python model_code\dnn\evaluate_saved.py
+```
+
+At the current stage the shared data pipeline is complete, and the BERT / DNN
+packs above are the retained runnable experiments.
 
 ## Dataset
 
