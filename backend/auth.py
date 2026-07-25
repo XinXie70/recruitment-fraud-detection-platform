@@ -29,7 +29,7 @@ logger = logging.getLogger("fake_job_detection_api.auth")
 class RegisterRequest(BaseModel):
     email: str = Field(..., min_length=5, max_length=255)
     username: str = Field(..., min_length=3, max_length=80)
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=8, max_length=30)
 
     @field_validator("email")
     @classmethod
@@ -49,7 +49,13 @@ class RegisterRequest(BaseModel):
 
     @field_validator("password")
     @classmethod
-    def password_must_fit_bcrypt(cls, value: str) -> str:
+    def password_must_meet_policy(cls, value: str) -> str:
+        if not any("A" <= char <= "Z" for char in value):
+            raise ValueError("Password must contain an uppercase letter.")
+        if not any("a" <= char <= "z" for char in value):
+            raise ValueError("Password must contain a lowercase letter.")
+        if not any("0" <= char <= "9" for char in value):
+            raise ValueError("Password must contain a number.")
         # bcrypt only processes 72 bytes. Checking encoded length prevents
         # multi-byte passwords from reaching the hasher and raising a 500.
         if len(value.encode("utf-8")) > 72:
@@ -59,7 +65,7 @@ class RegisterRequest(BaseModel):
 
 class LoginRequest(BaseModel):
     identifier: str = Field(..., min_length=3, max_length=255)
-    password: str = Field(..., min_length=1, max_length=128)
+    password: str = Field(..., min_length=1, max_length=30)
 
 
 class UserResponse(BaseModel):

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from jose import jwt
 
 from config import settings
@@ -28,7 +29,7 @@ class TestAuthEndpoints:
         resp = client.post("/api/auth/register", json={
             "email": "new@example.com",
             "username": "newuser",
-            "password": "securepass123",
+            "password": "Securepass123",
         })
         assert resp.status_code == 201
         data = resp.json()
@@ -36,7 +37,7 @@ class TestAuthEndpoints:
         assert data["user"]["email"] == "new@example.com"
 
     def test_register_duplicate_rejected(self, client):
-        payload = {"email": "dup@example.com", "username": "dupuser", "password": "securepass123"}
+        payload = {"email": "dup@example.com", "username": "dupuser", "password": "Securepass123"}
         client.post("/api/auth/register", json=payload)
         resp = client.post("/api/auth/register", json=payload)
         assert resp.status_code == 409
@@ -48,6 +49,26 @@ class TestAuthEndpoints:
                 "email": "long-password@example.com",
                 "username": "long-password",
                 "password": "密" * 25,
+            },
+        )
+        assert resp.status_code == 422
+
+    @pytest.mark.parametrize(
+        "password",
+        [
+            "lowercase123",
+            "UPPERCASE123",
+            "NoNumbersHere",
+            "ValidPassword1234567890123456789",
+        ],
+    )
+    def test_register_rejects_password_that_breaks_policy(self, client, password):
+        resp = client.post(
+            "/api/auth/register",
+            json={
+                "email": "policy@example.com",
+                "username": "policy-user",
+                "password": password,
             },
         )
         assert resp.status_code == 422
@@ -92,7 +113,7 @@ class TestAuthEndpoints:
             json={
                 "email": "failure@example.com",
                 "username": "failure-user",
-                "password": "securepass123",
+                "password": "Securepass123",
             },
         )
 

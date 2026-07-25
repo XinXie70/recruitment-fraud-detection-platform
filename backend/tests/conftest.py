@@ -89,11 +89,11 @@ def auth_headers(client):
     client.post("/api/auth/register", json={
         "email": "test@example.com",
         "username": "testuser",
-        "password": "testpass123",
+        "password": "Testpass123",
     })
     resp = client.post("/api/auth/login", json={
         "identifier": "testuser",
-        "password": "testpass123",
+        "password": "Testpass123",
     })
     token = resp.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
