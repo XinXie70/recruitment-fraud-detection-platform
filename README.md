@@ -65,7 +65,8 @@ npm run build
 ```
 
 Husky and lint-staged automatically format and lint staged frontend files before
-each commit. GitHub Actions also runs linting, tests, and a production build.
+each commit. GitHub Actions runs the backend test suite as well as frontend
+linting, tests, and a production build.
 
 ## Shared rules
 
