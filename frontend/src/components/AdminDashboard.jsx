@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  Activity, Award, BarChart3, Brain, Cpu, Database,
-  Layers, Server, Shield, TrendingUp, Zap,
+  Award, BarChart3, Brain, Cpu, Database,
+  Layers, Server, Zap,
   ChevronDown, ChevronUp, RefreshCw, Target, GitBranch,
-  Gauge, Crosshair, Star, ArrowUpRight, Percent,
+  Gauge, Crosshair, Percent,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
@@ -46,7 +45,6 @@ const METRIC_LABELS = {
 };
 
 export default function AdminDashboard({ auth, onLogout }) {
-  const navigate = useNavigate();
   const [expandedModel, setExpandedModel] = useState(null);
   const [healthStatus, setHealthStatus] = useState(null);
   const [activeMetric, setActiveMetric] = useState('f1');

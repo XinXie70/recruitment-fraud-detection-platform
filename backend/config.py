@@ -80,6 +80,7 @@ class Settings(BaseSettings):
     # Cache
     # ------------------------------------------------------------------
     analysis_cache_ttl_seconds: int = 300  # 5 minutes
+    analysis_cache_max_entries: int = 1024
 
     # ------------------------------------------------------------------
     # Rate Limiting

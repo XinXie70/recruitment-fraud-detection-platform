@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Activity, AlertTriangle, ArrowRight, BarChart3, BookOpen, Briefcase,
-  Calendar, CheckCircle2, Clock, Search, Shield, ShieldAlert,
+  Calendar, CheckCircle2, Clock, Search, ShieldAlert,
   TrendingUp, Zap, Trash2, PieChart, Target, Eye,
 } from 'lucide-react';
 import Navigation from './Navigation';
@@ -34,11 +34,6 @@ export default function DashboardPage({ auth, onLogout }) {
     return { total: h.length, high, medium, low, avgScore, lastScan };
   }, [history]);
 
-  useEffect(() => {
-    const h = loadHistory();
-    setHistory(h);
-  }, []);
-
   const riskLevelLabel = (level) => {
     if (level === 'high') return 'High Risk';
     if (level === 'medium') return 'Medium Risk';
@@ -64,10 +59,6 @@ export default function DashboardPage({ auth, onLogout }) {
   const safePercent = stats.total > 0 ? Math.round((stats.low / stats.total) * 100) : 0;
   const suspiciousPercent = stats.total > 0 ? Math.round((stats.medium / stats.total) * 100) : 0;
   const deceptivePercent = stats.total > 0 ? Math.round((stats.high / stats.total) * 100) : 0;
-
-  const donutDash = stats.total > 0
-    ? `${Math.round((stats.low / stats.total) * 283)} ${Math.round((stats.medium / stats.total) * 283)} ${Math.round((stats.high / stats.total) * 283)}`
-    : '0 0 283';
 
   const handleClearHistory = () => {
     localStorage.removeItem(HISTORY_KEY);
@@ -420,4 +411,3 @@ export default function DashboardPage({ auth, onLogout }) {
     </div>
   );
 }
-
