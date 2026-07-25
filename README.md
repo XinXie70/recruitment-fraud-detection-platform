@@ -45,6 +45,28 @@ Dataset background: Vidros et al. (2017), *Automatic Detection of Online
 Recruitment Frauds: Characteristics, Methods, and a Public Dataset*.
 https://doi.org/10.3390/fi9010006
 
+## Frontend development
+
+The frontend requires Node.js 20.19 or a compatible newer release. With `nvm`:
+
+```bash
+nvm use
+cd frontend
+npm ci
+npm run dev
+```
+
+Before opening a pull request, run:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+Husky and lint-staged automatically format and lint staged frontend files before
+each commit. GitHub Actions also runs linting, tests, and a production build.
+
 ## Shared rules
 
 - Use the same basic text cleaning for every model.

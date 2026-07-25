@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AlertTriangle, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2,
+  AlertTriangle, BarChart3, BookOpen, Brain, CheckCircle2,
   DollarSign, FileText, Globe, HelpCircle, Lightbulb,
   Lock, Mail, MessageCircle, RefreshCw, Search, Shield, ShieldAlert,
   ThumbsUp, Zap,

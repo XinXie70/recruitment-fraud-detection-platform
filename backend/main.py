@@ -179,7 +179,7 @@ def health_check(request: Request):
             "ensemble": {
                 "available": health.ensemble_members_available,
                 "total": health.ensemble_members_total,
-                "failed_members": health.failed_members,
+                "failed_members": sorted(health.failed_members),
             },
             "database_connected": health.database_connected,
             "ollama_available": health.ollama_available,

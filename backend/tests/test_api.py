@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from jose import jwt
+
+from config import settings
+
 
 class TestHealthEndpoints:
     def test_health_returns_ok(self, client):
@@ -49,6 +53,18 @@ class TestAuthEndpoints:
         resp = client.post("/api/auth/login", json={
             "identifier": "nobody", "password": "wrong",
         })
+        assert resp.status_code == 401
+
+    def test_non_numeric_token_subject_is_rejected(self, client):
+        token = jwt.encode(
+            {"sub": "not-a-user-id"},
+            settings.secret_key,
+            algorithm="HS256",
+        )
+        resp = client.get(
+            "/api/auth/me",
+            headers={"Authorization": f"Bearer {token}"},
+        )
         assert resp.status_code == 401
 
 

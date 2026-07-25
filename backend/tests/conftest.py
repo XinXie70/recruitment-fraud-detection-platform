@@ -1,8 +1,9 @@
 """
-Shared test fixtures — FastAPI TestClient, real database (Supabase / local PG).
+Shared test fixtures — FastAPI TestClient with an isolated test database.
 
-Uses the configured ``DATABASE_URL`` (from .env or config.py).
-Set ``TEST_DATABASE_URL`` to override for CI / isolated test runs.
+Tests never fall back to the application ``DATABASE_URL``. Set
+``TEST_DATABASE_URL`` to use a dedicated CI database; otherwise a temporary
+SQLite database is created for the test session.
 
 Usage::
 
@@ -13,18 +14,24 @@ Usage::
 from __future__ import annotations
 
 import os
+import tempfile
+from pathlib import Path
 
 import pytest
 
-# Optionally override the database URL for tests.
-_test_db_url = os.getenv("TEST_DATABASE_URL")
-if _test_db_url:
-    os.environ["DATABASE_URL"] = _test_db_url
+# Select the test database before importing application configuration. Never
+# allow a test run to silently connect to the development or production DB.
+_temporary_db_dir: tempfile.TemporaryDirectory[str] | None = None
+_test_db_url = os.getenv("TEST_DATABASE_URL", "").strip()
+if not _test_db_url:
+    _temporary_db_dir = tempfile.TemporaryDirectory(prefix="fake-job-api-tests-")
+    test_db_path = Path(_temporary_db_dir.name) / "test.db"
+    _test_db_url = f"sqlite:///{test_db_path}"
+os.environ["DATABASE_URL"] = _test_db_url
 
 # Disable rate limiting during tests.
 os.environ["RATE_LIMIT_ENABLED"] = "false"
 
-from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
@@ -32,28 +39,6 @@ from database import Base, engine, get_db
 
 # Ensure all tables (including new models) exist on the test database.
 Base.metadata.create_all(bind=engine)
-
-# Add any missing columns to existing tables (non-destructive).
-from sqlalchemy import inspect, text as sa_text
-inspector = inspect(engine)
-if "analysis_history" in inspector.get_table_names():
-    existing_cols = {c["name"] for c in inspector.get_columns("analysis_history")}
-    missing_cols = {
-        "input_preview": "VARCHAR(500) NOT NULL DEFAULT ''",
-        "input_hash": "VARCHAR(64) NOT NULL DEFAULT ''",
-        "status": "VARCHAR(20) NOT NULL DEFAULT 'success'",
-        "ensemble_available": "INTEGER NOT NULL DEFAULT 0",
-        "ensemble_total": "INTEGER NOT NULL DEFAULT 8",
-    }
-    with engine.connect() as conn:
-        for col_name, col_def in missing_cols.items():
-            if col_name not in existing_cols:
-                conn.execute(sa_text(
-                    f'ALTER TABLE analysis_history ADD COLUMN {col_name} {col_def}'
-                ))
-                print(f"  🔧 Added missing column: analysis_history.{col_name}")
-        conn.commit()
-
 
 # ---------------------------------------------------------------------------
 # Per-test DB session (transactional rollback)

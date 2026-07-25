@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
 from config import settings
@@ -7,6 +8,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -21,6 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+logger = logging.getLogger("fake_job_detection_api.auth")
 
 
 class RegisterRequest(BaseModel):
@@ -94,10 +97,11 @@ def get_current_user(
         user_id = payload.get("sub")
         if user_id is None:
             raise credentials_error
-    except JWTError as exc:
+        user_id = int(user_id)
+    except (JWTError, TypeError, ValueError) as exc:
         raise credentials_error from exc
 
-    user = db.get(User, int(user_id))
+    user = db.get(User, user_id)
     if user is None:
         raise credentials_error
     return user
@@ -127,12 +131,19 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
         db.commit()
         db.refresh(user)
         return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
-    except Exception as exc:
+    except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username is already registered.",
+        ) from exc
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Registration failed")
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Registration failed: {exc}",
-        )
+            detail="Registration failed. Please try again later.",
+        ) from exc
 
 
 @router.post("/login", response_model=TokenResponse)

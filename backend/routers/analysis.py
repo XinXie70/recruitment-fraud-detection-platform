@@ -82,7 +82,7 @@ def _run_analysis(
         )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
+            detail="Prediction service is temporarily unavailable.",
         ) from exc
     except Exception as exc:
         logger.exception(
