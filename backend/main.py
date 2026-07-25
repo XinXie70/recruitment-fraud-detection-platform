@@ -83,14 +83,17 @@ def _init_database() -> None:
 
 def _check_database() -> bool:
     """Ping the database to verify connectivity."""
+    db = None
     try:
         db = SessionLocal()
         from sqlalchemy import text
         db.execute(text("SELECT 1"))
-        db.close()
         return True
     except Exception:
         return False
+    finally:
+        if db is not None:
+            db.close()
 
 
 def _warm_up_models_background() -> None:

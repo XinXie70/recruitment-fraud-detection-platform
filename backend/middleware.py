@@ -56,7 +56,7 @@ _JSON_METHODS = {"POST", "PUT", "PATCH"}
 
 
 class RequestBodyGuardMiddleware:
-    """Enforce Content-Type, max body size, and log body summaries at ASGI level.
+    """Enforce Content-Type and maximum body size at ASGI level.
 
     Applied *before* Pydantic validation so malformed / oversized payloads are
     rejected early with a clear error, without touching the route handlers.
@@ -71,14 +71,12 @@ class RequestBodyGuardMiddleware:
             return
 
         method = scope.get("method", "")
-        path = scope.get("path", "")
-
         # Only enforce for JSON-bearing methods
         if method not in _JSON_METHODS:
             await self.app(scope, receive, send)
             return
 
-        # Collect body (up to the cap) for validation + logging
+        # Collect body (up to the cap) for validation.
         body_chunks: list[bytes] = []
         total = 0
         more_body = True
@@ -110,17 +108,8 @@ class RequestBodyGuardMiddleware:
                 )
                 return
 
-        # Log body summary (truncated, for debugging)
-        if body:
-            try:
-                body_str = body.decode("utf-8", errors="replace")[:500]
-                request_id = "unknown"
-                logger.info(
-                    "request.body",
-                    extra={"path": path, "method": method, "body_len": total, "body_preview": body_str},
-                )
-            except Exception:
-                pass
+        # Never log request bodies: authentication payloads and analyzed job
+        # advertisements can contain passwords or other sensitive data.
 
         # Reconstruct receive so downstream can read the body
         async def _wrapped_receive() -> Message:
@@ -155,4 +144,3 @@ class RequestBodyGuardMiddleware:
             ],
         })
         await send({"type": "http.response.body", "body": body})
-
