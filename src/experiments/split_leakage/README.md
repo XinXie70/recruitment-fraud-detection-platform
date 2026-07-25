@@ -3,6 +3,13 @@
 This experiment studies whether duplicate handling and split strategy change
 the measured performance of the same model.
 
+The required experiment inputs are included in compressed form:
+
+- `data/processed/emscad_processed_v1.csv.gz`
+- `data/processed/emscad_grouped_v1.csv.gz`
+
+Pandas reads these files directly; no manual extraction is required.
+
 Condition A uses all 17,880 processed EMSCAD rows, keeps exact duplicates, and
 applies an ordinary stratified random 70/15/15 split. It is a diagnostic
 experiment and does not read or modify the official Train, Validation, or Test

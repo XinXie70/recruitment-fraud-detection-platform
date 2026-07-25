@@ -23,13 +23,28 @@ from run_condition_b import load_data
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(PROJECT_DIR / "src/data_pipeline"))
-from analyse_split_options import allocate_groups, load_groups  # noqa: E402
+from analyse_split_options import allocate_groups  # noqa: E402
 
 
 RESULT_FILE = REPORT_DIR / "condition_c_lr_results.csv"
 SUMMARY_FILE = REPORT_DIR / "condition_c_lr_summary.md"
 CONDITION_NAME = "C: exact dedup + group-aware split"
 RATIOS = [0.70, 0.15, 0.15]
+
+
+def build_group_data(data):
+    """Create the small group summary required by the shared allocator."""
+    group_data = []
+    for group_id, rows in data.groupby("group_id", sort=False):
+        labels = rows["label"].unique()
+        if len(labels) != 1:
+            raise ValueError(f"Group contains different labels: {group_id}")
+        group_data.append({
+            "group_id": group_id,
+            "label": int(labels[0]),
+            "size": len(rows),
+        })
+    return group_data
 
 
 def group_split_indices(data, group_data, seed):
@@ -234,9 +249,7 @@ def run_model(data, group_data, model_name, model_builder):
 
 def main():
     data = load_data()
-    group_data, expected_rows = load_groups()
-    if expected_rows != len(data):
-        raise ValueError("Group allocator input does not match Condition C data")
+    group_data = build_group_data(data)
 
     results = run_model(
         data,
