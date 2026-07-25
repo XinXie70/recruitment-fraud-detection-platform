@@ -1,0 +1,31 @@
+{
+  "model_name": "dnn_fraud_train_cv",
+  "external_csv": "F:\\final-version\\independent_ml_workflow\\external_evaluation_v2.csv",
+  "n_samples": 100,
+  "threshold": 0.7700000000000002,
+  "metrics": {
+    "fraud_precision": 1.0,
+    "fraud_recall": 0.14,
+    "fraud_f1": 0.24561403508771928,
+    "roc_auc": 0.8176000000000001,
+    "pr_auc": 0.8586843729619297,
+    "balanced_accuracy": 0.5700000000000001,
+    "accuracy": 0.57,
+    "fraud_rate": 0.5,
+    "threshold": 0.7700000000000002,
+    "n_samples": 100.0,
+    "n_fraud": 50.0
+  },
+  "confusion_matrix": {
+    "tn": 50,
+    "fp": 0,
+    "fn": 43,
+    "tp": 7
+  },
+  "training_config_snapshot": {
+    "final_threshold": 0.7700000000000002,
+    "sampling_scheme": "A",
+    "tfidf_max_features": 8000,
+    "svd_n_components": 300
+  }
+}

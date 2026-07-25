@@ -1,0 +1,55 @@
+========================================================================
+数据完整性检查报告（train-only StratifiedGroupKFold 版本）
+========================================================================
+
+[CV 数据范围] train_only
+  - StratifiedGroupKFold / OOF / 阈值搜索：仅 train.csv
+  - validation.csv：不参与 CV，仅用于最终模型重训
+  - test.csv：完全独立，仅最终评估一次
+
+[train.csv]
+  样本数量: 11064
+  字段: ['record_id', 'combined_text', 'label', 'group_id']
+
+[validation.csv]
+  样本数量: 2371
+  字段: ['record_id', 'combined_text', 'label', 'group_id']
+
+[test.csv]
+  样本数量: 2372
+  字段: ['record_id', 'combined_text', 'label', 'group_id']
+
+[CV 集 cv_train_df（仅 train.csv，已清洗）]
+  样本数量: 11064
+  欺诈样本数量: 498
+  非欺诈样本数量: 10566
+  欺诈样本比例: 0.045011
+  唯一分组数量: 10286
+  每组样本数分布: min=1, p50=1.0, mean=1.08, max=31
+
+[固定验证集 validation.csv（已清洗，不参与 CV）]
+  样本数量: 2371
+  欺诈样本数量: 107
+  非欺诈样本数量: 2264
+  欺诈样本比例: 0.045129
+  唯一分组数量: 2235
+  每组样本数分布: min=1, p50=1.0, mean=1.06, max=14
+
+[最终重训集 final_training_df（train + validation）]
+  样本数量: 13435
+  欺诈样本数量: 605
+  非欺诈样本数量: 12830
+  欺诈样本比例: 0.045032
+  唯一分组数量: 12521
+  每组样本数分布: min=1, p50=1.0, mean=1.07, max=31
+
+[测试集 test.csv（已清洗）]
+  样本数量: 2372
+  欺诈样本数量: 107
+  非欺诈样本数量: 2265
+  欺诈样本比例: 0.045110
+  唯一分组数量: 2152
+  每组样本数分布: min=1, p50=1.0, mean=1.10, max=82
+
+[字段兼容性]
+  三文件字段一致/兼容: train=['record_id', 'combined_text', 'label', 'group_id'], validation=['record_id', 'combined_text', 'label', 'group_id'], test=['record_id', 'combined_text', 'label', 'group_id']

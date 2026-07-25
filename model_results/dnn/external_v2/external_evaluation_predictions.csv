@@ -1,0 +1,101 @@
+record_id,model_name,fraud_score,threshold,prediction,true_label,source_type,scenario
+real_001,dnn_fraud_train_cv,0.0025027432,0.7700000000000002,0,0,real_web,SEEK | Springtek | Start your Tech Career - Junior Software Engineer
+real_002,dnn_fraud_train_cv,0.00035386666,0.7700000000000002,0,0,real_web,SEEK | Opus Recruitment Solutions | Software Engineer - Computer Vision / Perception
+real_003,dnn_fraud_train_cv,0.00021697166,0.7700000000000002,0,0,real_web,SEEK | Moneyspot Financial | Junior Software Engineer
+real_004,dnn_fraud_train_cv,0.00034255278,0.7700000000000002,0,0,real_web,SEEK | ITSM | Software Engineer (Full Stack - React/C#)
+real_005,dnn_fraud_train_cv,0.00018908734,0.7700000000000002,0,0,real_web,SEEK | HCL Australia Services Pty Ltd | Software Engineer
+real_006,dnn_fraud_train_cv,0.0007646315,0.7700000000000002,0,0,real_web,SEEK | iasset.com Pty Ltd | Software Developer (Jnr)
+real_007,dnn_fraud_train_cv,0.00044914053,0.7700000000000002,0,0,real_web,SEEK | Private Advertiser | Remote Software Engineer / Systems Administrator
+real_008,dnn_fraud_train_cv,0.0006703771,0.7700000000000002,0,0,real_web,SEEK | Facere AI | Frontend Software Engineer (Product)
+real_009,dnn_fraud_train_cv,0.0012110797,0.7700000000000002,0,0,real_web,SEEK | ScaleUp Recruitment | C# Software Engineer | Global Trading Company
+real_010,dnn_fraud_train_cv,0.0004325667,0.7700000000000002,0,0,real_web,SEEK | Microsoft | Software Engineer II
+real_011,dnn_fraud_train_cv,0.00020412254,0.7700000000000002,0,0,real_web,Lever | objective | Account Director
+real_012,dnn_fraud_train_cv,4.8503898e-05,0.7700000000000002,0,0,real_web,Lever | objective | Account Director - Defence & National Security
+real_013,dnn_fraud_train_cv,5.39472e-05,0.7700000000000002,0,0,real_web,Lever | upguard | Customer Sales Engineer
+real_014,dnn_fraud_train_cv,0.0017988263,0.7700000000000002,0,0,real_web,Lever | upguard | InfoSec Governance Risk and Compliance Lead
+real_015,dnn_fraud_train_cv,0.00035085864,0.7700000000000002,0,0,real_web,Lever | deputy | Account Manager
+real_016,dnn_fraud_train_cv,0.004716459,0.7700000000000002,0,0,real_web,Lever | deputy | Design Systems Engineer
+real_017,dnn_fraud_train_cv,7.3168754e-05,0.7700000000000002,0,0,real_web,Lever | kogan | Business Development Manager
+real_018,dnn_fraud_train_cv,4.6733414e-05,0.7700000000000002,0,0,real_web,Lever | kogan | CRM Coordinator
+real_019,dnn_fraud_train_cv,0.003772715,0.7700000000000002,0,0,real_web,Lever | palantir | Deployment Strategist - AUS Government
+real_020,dnn_fraud_train_cv,0.003772715,0.7700000000000002,0,0,real_web,Lever | palantir | Deployment Strategist - AUS Government
+real_021,dnn_fraud_train_cv,0.00058684783,0.7700000000000002,0,0,real_web,"SmartRecruiters | AECOM | Digital Delivery Lead - Transportation, Australia"
+real_022,dnn_fraud_train_cv,0.00037137594,0.7700000000000002,0,0,real_web,SmartRecruiters | AECOM | Process Lead - Water Treatment
+real_023,dnn_fraud_train_cv,0.00037137594,0.7700000000000002,0,0,real_web,SmartRecruiters | AECOM | Process Lead - Water Treatment
+real_024,dnn_fraud_train_cv,0.0015068644,0.7700000000000002,0,0,real_web,SmartRecruiters | Bilue | AI Data Scientist
+real_025,dnn_fraud_train_cv,0.00043566898,0.7700000000000002,0,0,real_web,SmartRecruiters | Bilue | Senior AI Engineer
+real_026,dnn_fraud_train_cv,0.0020732551,0.7700000000000002,0,0,real_web,SmartRecruiters | Bilue | Senior Service Designer (3 month contract)
+real_027,dnn_fraud_train_cv,0.0019130481,0.7700000000000002,0,0,real_web,SmartRecruiters | Canva | AI Localisation Program Manager - 12 Month Contract 
+real_028,dnn_fraud_train_cv,0.00013780592,0.7700000000000002,0,0,real_web,SmartRecruiters | Canva | Backend Software Engineer - Product & Features (Java) 
+real_029,dnn_fraud_train_cv,0.0013779378,0.7700000000000002,0,0,real_web,SmartRecruiters | Canva | Head of Product Design - Growth
+real_030,dnn_fraud_train_cv,0.0036217629,0.7700000000000002,0,0,real_web,SmartRecruiters | NCS Australia | AI Architect
+real_031,dnn_fraud_train_cv,0.0035807467,0.7700000000000002,0,0,real_web,SmartRecruiters | NCS Australia | AI Architect
+real_032,dnn_fraud_train_cv,0.0023993452,0.7700000000000002,0,0,real_web,SmartRecruiters | NCS Australia | AI Engineer
+real_033,dnn_fraud_train_cv,0.0069594043,0.7700000000000002,0,0,real_web,SmartRecruiters | Qantas Group | A220 First Officer – National Jet Systems
+real_034,dnn_fraud_train_cv,0.0058535566,0.7700000000000002,0,0,real_web,SmartRecruiters | Qantas Group | A220 First Officer – National Jet Systems
+real_035,dnn_fraud_train_cv,0.0067787436,0.7700000000000002,0,0,real_web,SmartRecruiters | Qantas Group | A220 First Officer – National Jet Systems
+real_036,dnn_fraud_train_cv,0.003422221,0.7700000000000002,0,0,real_web,SmartRecruiters | ServiceNow | Senior Advisory AI Foundry Architect 
+real_037,dnn_fraud_train_cv,0.003397671,0.7700000000000002,0,0,real_web,SmartRecruiters | Octopus | Business Development Manager - Octopus Australia
+real_038,dnn_fraud_train_cv,0.0032444966,0.7700000000000002,0,0,real_web,SmartRecruiters | Octopus | Business Development Manager - Octopus Australia
+real_039,dnn_fraud_train_cv,0.071190566,0.7700000000000002,0,0,real_web,SmartRecruiters | Octopus | Senior Project Manager - Octopus Australia
+real_040,dnn_fraud_train_cv,0.0014623252,0.7700000000000002,0,0,real_web,SmartRecruiters | Turner & Townsend | Senior Planner | Major Projects 
+real_041,dnn_fraud_train_cv,0.00059357943,0.7700000000000002,0,0,real_web,Greenhouse | cultureamp | Associate Data Scientist
+real_042,dnn_fraud_train_cv,0.0006021228,0.7700000000000002,0,0,real_web,Greenhouse | cultureamp | Associate Data Scientist
+real_043,dnn_fraud_train_cv,0.00047615607,0.7700000000000002,0,0,real_web,"Greenhouse | cultureamp | Director, Legal"
+real_044,dnn_fraud_train_cv,0.0004836215,0.7700000000000002,0,0,real_web,"Greenhouse | cultureamp | Director, Legal"
+real_045,dnn_fraud_train_cv,0.001172412,0.7700000000000002,0,0,real_web,Greenhouse | cultureamp | Lead Design Technologist
+real_046,dnn_fraud_train_cv,0.004114032,0.7700000000000002,0,0,real_web,Greenhouse | hipagesgroup | Account Manager
+real_047,dnn_fraud_train_cv,0.0008515874,0.7700000000000002,0,0,real_web,Greenhouse | hipagesgroup | Account Manager 
+real_048,dnn_fraud_train_cv,0.00013596292,0.7700000000000002,0,0,real_web,Greenhouse | hipagesgroup | Customer Success Representative
+real_049,dnn_fraud_train_cv,0.0032060076,0.7700000000000002,0,0,real_web,Greenhouse | hipagesgroup | Full Stack Tech Lead
+real_050,dnn_fraud_train_cv,0.0027438863,0.7700000000000002,0,0,real_web,Greenhouse | hipagesgroup | Outbound Sales Consultant
+fake_v2_001,dnn_fraud_train_cv,0.00015559066,0.7700000000000002,0,1,synthetic_ai_v2,warehouse reshipping overpayment
+fake_v2_002,dnn_fraud_train_cv,0.8451251,0.7700000000000002,1,1,synthetic_ai_v2,remote support equipment fee
+fake_v2_003,dnn_fraud_train_cv,0.9071995,0.7700000000000002,1,1,synthetic_ai_v2,data entry training kit fee
+fake_v2_004,dnn_fraud_train_cv,0.00011889258,0.7700000000000002,0,1,synthetic_ai_v2,social media unpaid trial
+fake_v2_005,dnn_fraud_train_cv,0.011297908,0.7700000000000002,0,1,synthetic_ai_v2,virtual assistant banking phishing
+fake_v2_006,dnn_fraud_train_cv,0.0070727505,0.7700000000000002,0,1,synthetic_ai_v2,bookkeeping money mule
+fake_v2_007,dnn_fraud_train_cv,0.017363194,0.7700000000000002,0,1,synthetic_ai_v2,gig driver vehicle deposit
+fake_v2_008,dnn_fraud_train_cv,0.033603687,0.7700000000000002,0,1,synthetic_ai_v2,retail uniform training fee
+fake_v2_009,dnn_fraud_train_cv,0.50459486,0.7700000000000002,0,1,synthetic_ai_v2,medical billing software purchase
+fake_v2_010,dnn_fraud_train_cv,0.00035614756,0.7700000000000002,0,1,synthetic_ai_v2,hr trainee id phishing
+fake_v2_011,dnn_fraud_train_cv,0.72458756,0.7700000000000002,0,1,synthetic_ai_v2,insurance claims equipment overpayment
+fake_v2_012,dnn_fraud_train_cv,0.5754116,0.7700000000000002,0,1,synthetic_ai_v2,real estate key deposit
+fake_v2_013,dnn_fraud_train_cv,0.0345483,0.7700000000000002,0,1,synthetic_ai_v2,event staffing badge fee
+fake_v2_014,dnn_fraud_train_cv,0.0022401838,0.7700000000000002,0,1,synthetic_ai_v2,brand ambassador sample purchase
+fake_v2_015,dnn_fraud_train_cv,0.033349816,0.7700000000000002,0,1,synthetic_ai_v2,mystery shopper cheque
+fake_v2_016,dnn_fraud_train_cv,0.014001144,0.7700000000000002,0,1,synthetic_ai_v2,transcription software license
+fake_v2_017,dnn_fraud_train_cv,0.016745582,0.7700000000000002,0,1,synthetic_ai_v2,translation unpaid test phishing
+fake_v2_018,dnn_fraud_train_cv,0.0057124826,0.7700000000000002,0,1,synthetic_ai_v2,personal assistant gift card task
+fake_v2_019,dnn_fraud_train_cv,0.019216824,0.7700000000000002,0,1,synthetic_ai_v2,crypto trading support deposit
+fake_v2_020,dnn_fraud_train_cv,0.19410267,0.7700000000000002,0,1,synthetic_ai_v2,property management tenant deposit
+fake_v2_021,dnn_fraud_train_cv,0.0018601127,0.7700000000000002,0,1,synthetic_ai_v2,charity donation handling advance
+fake_v2_022,dnn_fraud_train_cv,0.0050549265,0.7700000000000002,0,1,synthetic_ai_v2,construction onboarding ppe fee
+fake_v2_023,dnn_fraud_train_cv,0.011148467,0.7700000000000002,0,1,synthetic_ai_v2,electrician apprentice tools purchase
+fake_v2_024,dnn_fraud_train_cv,0.0072440337,0.7700000000000002,0,1,synthetic_ai_v2,inventory auditor laptop rental
+fake_v2_025,dnn_fraud_train_cv,0.9429408,0.7700000000000002,1,1,synthetic_ai_v2,call centre sim credit fee
+fake_v2_026,dnn_fraud_train_cv,0.0154935345,0.7700000000000002,0,1,synthetic_ai_v2,junior accountant wire training task
+fake_v2_027,dnn_fraud_train_cv,0.00078375905,0.7700000000000002,0,1,synthetic_ai_v2,marketing intern unpaid deliverable phishing
+fake_v2_028,dnn_fraud_train_cv,0.030024659,0.7700000000000002,0,1,synthetic_ai_v2,ecommerce inventory investment
+fake_v2_029,dnn_fraud_train_cv,0.025850793,0.7700000000000002,0,1,synthetic_ai_v2,pharma sales sample kit fee
+fake_v2_030,dnn_fraud_train_cv,0.09385011,0.7700000000000002,0,1,synthetic_ai_v2,grant coordinator processing fee
+fake_v2_031,dnn_fraud_train_cv,0.8043256,0.7700000000000002,1,1,synthetic_ai_v2,research recruiter data harvesting
+fake_v2_032,dnn_fraud_train_cv,0.8109093,0.7700000000000002,1,1,synthetic_ai_v2,reservations software fee
+fake_v2_033,dnn_fraud_train_cv,0.0014694689,0.7700000000000002,0,1,synthetic_ai_v2,tutoring platform credits
+fake_v2_034,dnn_fraud_train_cv,0.00010270157,0.7700000000000002,0,1,synthetic_ai_v2,modelling portfolio fee
+fake_v2_035,dnn_fraud_train_cv,0.005218502,0.7700000000000002,0,1,synthetic_ai_v2,logistics customs duty advance
+fake_v2_036,dnn_fraud_train_cv,0.008782919,0.7700000000000002,0,1,synthetic_ai_v2,ux research unpaid test banking
+fake_v2_037,dnn_fraud_train_cv,0.001078695,0.7700000000000002,0,1,synthetic_ai_v2,it helpdesk tools purchase
+fake_v2_038,dnn_fraud_train_cv,0.88857883,0.7700000000000002,1,1,synthetic_ai_v2,payroll reroute bec
+fake_v2_039,dnn_fraud_train_cv,0.0358463,0.7700000000000002,0,1,synthetic_ai_v2,saas customer success unpaid trial
+fake_v2_040,dnn_fraud_train_cv,0.0014572236,0.7700000000000002,0,1,synthetic_ai_v2,warehouse team lead equipment deposit
+fake_v2_041,dnn_fraud_train_cv,0.0020780466,0.7700000000000002,0,1,synthetic_ai_v2,graphic design unpaid test portfolio
+fake_v2_042,dnn_fraud_train_cv,0.9667925,0.7700000000000002,1,1,synthetic_ai_v2,medical clinic admin data phishing
+fake_v2_043,dnn_fraud_train_cv,0.001848624,0.7700000000000002,0,1,synthetic_ai_v2,field sales fuel advance
+fake_v2_044,dnn_fraud_train_cv,0.0048940885,0.7700000000000002,0,1,synthetic_ai_v2,online tutor certification fee
+fake_v2_045,dnn_fraud_train_cv,0.048617866,0.7700000000000002,0,1,synthetic_ai_v2,junior data analyst software license
+fake_v2_046,dnn_fraud_train_cv,0.004135633,0.7700000000000002,0,1,synthetic_ai_v2,community manager verification phishing
+fake_v2_047,dnn_fraud_train_cv,0.00094134605,0.7700000000000002,0,1,synthetic_ai_v2,freight dispatcher bond advance
+fake_v2_048,dnn_fraud_train_cv,0.00061639585,0.7700000000000002,0,1,synthetic_ai_v2,junior recruiter database fee
+fake_v2_049,dnn_fraud_train_cv,0.21978214,0.7700000000000002,0,1,synthetic_ai_v2,personal shopper gift card advance
+fake_v2_050,dnn_fraud_train_cv,0.0010365241,0.7700000000000002,0,1,synthetic_ai_v2,bookkeeping trainee software license
