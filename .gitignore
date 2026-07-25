@@ -1,9 +1,10 @@
-# Large datasets are kept locally and rebuilt by the pipeline.
+# Uncompressed datasets stay local. Compressed experiment inputs may be tracked.
 data/raw/*.csv
 data/processed/*.csv
 
 # Trained models and experiment outputs
-models/
+/models/
+artifacts/
 checkpoints/
 outputs/
 *.joblib
