@@ -60,7 +60,8 @@ def test_ollama_failure_is_contained(monkeypatch) -> None:
     )
     result = service.generate(_risk(), _xai())
     assert result.status == "fallback"
-    assert "RuntimeError" in result.message
+    assert result.message == "Local template guidance used because Ollama was unavailable."
+    assert "offline" not in result.message
 
 
 @pytest.mark.parametrize(

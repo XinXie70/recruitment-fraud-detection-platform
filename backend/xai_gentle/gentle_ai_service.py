@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from config import settings
@@ -15,6 +16,7 @@ from .contracts import (
 )
 from .gentle_fallback import build_template_guidance
 
+logger = logging.getLogger("fake_job_detection_api.gentle_ai")
 
 class OllamaRewrite(BaseModel):
     summary: str = Field(..., min_length=1)
@@ -80,11 +82,9 @@ class GentleAIService:
 
         try:
             return self._rewrite_with_ollama(template)
-        except Exception as exc:
-            template.message = (
-                "Local template guidance used because Ollama was unavailable or "
-                f"returned invalid output: {type(exc).__name__}: {exc}"
-            )
+        except Exception:
+            logger.warning("Ollama rewrite failed", exc_info=True)
+            template.message = "Local template guidance used because Ollama was unavailable."
             return template
 
     def _rewrite_with_ollama(self, template: GentleAIResult) -> GentleAIResult:
