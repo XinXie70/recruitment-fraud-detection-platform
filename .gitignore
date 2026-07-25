@@ -3,7 +3,8 @@ data/raw/*.csv
 data/processed/*.csv
 
 # Trained models and experiment outputs
-models/
+/models/
+artifacts/
 checkpoints/
 outputs/
 *.joblib

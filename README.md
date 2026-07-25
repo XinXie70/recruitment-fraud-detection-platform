@@ -163,3 +163,35 @@ python3 src/data_pipeline/prepare_data.py
 python3 src/data_pipeline/group_duplicates.py
 python3 src/data_pipeline/create_splits.py
 ```
+
+## Logistic Regression baseline
+
+Create the local environment and install the project dependencies:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Train the baseline:
+
+```bash
+.venv/bin/python src/models/logistic_regression/train_baseline.py
+```
+
+The baseline uses group-aware cross-validation inside Train and selects its
+threshold on Validation. It does not read Test. Results are saved under
+`reports/models/logistic_regression/`.
+
+## Linear SVM baseline
+
+Train the baseline:
+
+```bash
+.venv/bin/python src/models/linear_svm/train_baseline.py
+```
+
+The SVM uses the same group-aware Train cross-validation and Validation
+threshold rule as Logistic Regression. Its decision scores are converted to
+0–1 fraud scores using group-aware sigmoid calibration fitted on Train only.
+Results are saved under `reports/models/linear_svm/`.
