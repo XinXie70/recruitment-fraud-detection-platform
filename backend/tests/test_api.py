@@ -67,6 +67,27 @@ class TestAuthEndpoints:
         )
         assert resp.status_code == 401
 
+    def test_registration_does_not_leak_internal_database_error(
+        self, client, monkeypatch
+    ):
+        from sqlalchemy.orm import Session
+
+        def fail_commit(_session):
+            raise RuntimeError("database-password=do-not-leak")
+
+        monkeypatch.setattr(Session, "commit", fail_commit)
+        resp = client.post(
+            "/api/auth/register",
+            json={
+                "email": "failure@example.com",
+                "username": "failure-user",
+                "password": "securepass123",
+            },
+        )
+
+        assert resp.status_code == 500
+        assert "do-not-leak" not in resp.text
+
 
 class TestAnalysisEndpoints:
     def test_analyze_requires_auth(self, client):
