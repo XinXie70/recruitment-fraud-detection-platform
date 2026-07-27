@@ -23,5 +23,7 @@
     "pandas": "3.0.5",
     "numpy": "2.5.1"
   },
-  "test_used": false
+  "test_used": true,
+  "test_evaluated_at_utc": "2026-07-27T05:02:28.828912+00:00",
+  "test_sha256": "85457e3dc60c05a68aaea9e9f433b2fb8bc9cb775dbf0221d61efe2e1cbd6257"
 }
