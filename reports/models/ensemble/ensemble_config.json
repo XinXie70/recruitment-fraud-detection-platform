@@ -1,0 +1,17 @@
+{
+  "method": "weighted_average",
+  "base_models": [
+    "linear_svm_baseline",
+    "bert_class_weighted"
+  ],
+  "weights": {
+    "linear_svm_baseline": 0.30000000000000004,
+    "bert_class_weighted": 0.7
+  },
+  "threshold_selection": "max_fraud_f1_on_validation",
+  "selected_threshold": 0.7100000000000001,
+  "validation_input_files": {
+    "linear_svm": "F:\\final-version\\capstone-project-26t2-9900-h09c-almond\\reports\\models\\linear_svm\\validation_predictions.csv",
+    "bert_class_weighted": "F:\\final-version\\capstone-project-26t2-9900-h09c-almond\\reports\\models\\bert\\validation_predictions.csv"
+  }
+}
