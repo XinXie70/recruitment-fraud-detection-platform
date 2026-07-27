@@ -1,0 +1,17 @@
+2026-07-25 18:23:25 | INFO | ======== Environment ========
+2026-07-25 18:23:25 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-25 18:23:25 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-25 18:23:25 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-25 18:23:25 | INFO | Transformers version   : 5.13.1
+2026-07-25 18:23:25 | INFO | CUDA available         : True
+2026-07-25 18:23:25 | INFO | PyTorch CUDA version   : 12.8
+2026-07-25 18:23:25 | INFO | cuDNN version          : 91900
+2026-07-25 18:23:25 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-25 18:23:25 | INFO | GPU count              : 1
+2026-07-25 18:23:25 | INFO | Current training device: cuda
+2026-07-25 18:23:25 | INFO | =============================
+2026-07-25 18:23:39 | INFO | Test fraud_f1=0.8060 fraud_recall=0.7570 pr_auc=0.8708 accuracy=0.9836
+Fraud F1: 0.8060
+Fraud Recall: 0.7570
+PR-AUC: 0.8708
+Threshold: 0.0500

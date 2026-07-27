@@ -1,0 +1,2 @@
+Model,Imbalance method,Accuracy,Fraud Precision,Fraud Recall,Fraud F1,Macro F1,ROC-AUC,PR-AUC,Inference time (s),Notes
+BERT,Class weight,0.9888143176733781,0.9629629629629629,0.8,0.8739495798319328,0.9340485316249012,0.9841828430190499,0.9194840294204041,13.007728399999905,run=bert_class_weighted; thr=0.8000; best_epoch=3

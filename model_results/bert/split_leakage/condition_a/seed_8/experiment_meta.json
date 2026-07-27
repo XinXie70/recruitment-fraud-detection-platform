@@ -1,0 +1,23 @@
+{
+  "condition": "A",
+  "condition_label": "A: no dedup + stratified random split",
+  "seed": 8,
+  "assignment_file": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\experiment_splits\\condition_a_no_dedup_random_split_assignments_v1.csv.gz",
+  "input_file": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\processed\\emscad_condition_a_no_dedup_input_v1.csv.gz",
+  "weights_dir": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\model_weights\\bert\\split_leakage\\condition_a\\seed_8\\bert_class_weighted\\best",
+  "results_dir": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\model_results\\bert\\split_leakage\\condition_a\\seed_8",
+  "sample_counts": {
+    "train": {
+      "n": 12516,
+      "fraud": 606
+    },
+    "validation": {
+      "n": 2682,
+      "fraud": 130
+    },
+    "test": {
+      "n": 2682,
+      "fraud": 130
+    }
+  }
+}

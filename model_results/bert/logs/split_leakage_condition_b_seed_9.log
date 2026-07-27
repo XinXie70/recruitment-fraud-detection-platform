@@ -1,0 +1,33 @@
+2026-07-26 16:19:53 | INFO | ======== Environment ========
+2026-07-26 16:19:53 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-26 16:19:53 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-26 16:19:53 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-26 16:19:53 | INFO | Transformers version   : 5.13.1
+2026-07-26 16:19:53 | INFO | CUDA available         : True
+2026-07-26 16:19:53 | INFO | PyTorch CUDA version   : 12.8
+2026-07-26 16:19:53 | INFO | cuDNN version          : 91900
+2026-07-26 16:19:53 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-26 16:19:53 | INFO | GPU count              : 1
+2026-07-26 16:19:53 | INFO | Current training device: cuda
+2026-07-26 16:19:53 | INFO | =============================
+2026-07-26 16:19:53 | INFO | Using caller-provided splits: train=11064 validation=2371 test=2372
+2026-07-26 16:19:57 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 550.381, 'median': 508.0, 'p90': 923.0, 'p95': 1080.1499999999992, 'p99': 1421.2399999999943, 'pct_over_128': 0.9686666666666667, 'pct_over_256': 0.8723333333333333, 'pct_over_512': 0.49433333333333335, 'recommended_max_length': 256, 'recommendation_reason': 'Measured train token lengths: median≈508, 87.2% >256, 49.4% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off.'}
+2026-07-26 16:19:57 | INFO | Saved data_quality_report.json
+2026-07-26 16:19:57 | INFO | Train-only class weights: [0.5235661555934128, 11.108433734939759]
+2026-07-26 16:19:58 | INFO | Start fine-tuning: model=bert-base-uncased use_class_weights=True max_length=256 batch=8 accum=2
+2026-07-26 16:23:22 | INFO | Epoch 1 | train_loss=0.5175 val_loss=0.5132 fraud_f1=0.6135 fraud_recall=0.4673 pr_auc=0.7150
+2026-07-26 16:23:41 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.6135)
+2026-07-26 16:27:05 | INFO | Epoch 2 | train_loss=0.2631 val_loss=0.2924 fraud_f1=0.7805 fraud_recall=0.7477 pr_auc=0.7980
+2026-07-26 16:27:24 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.7805)
+2026-07-26 16:30:47 | INFO | Epoch 3 | train_loss=0.1290 val_loss=0.3093 fraud_f1=0.8113 fraud_recall=0.8037 pr_auc=0.8097
+2026-07-26 16:31:07 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.8113)
+2026-07-26 16:34:30 | INFO | Epoch 4 | train_loss=0.0532 val_loss=0.3100 fraud_f1=0.8358 fraud_recall=0.7850 pr_auc=0.8147
+2026-07-26 16:34:49 | INFO | New best checkpoint saved at epoch 4 (fraud_f1=0.8358)
+2026-07-26 16:38:12 | INFO | Epoch 5 | train_loss=0.0217 val_loss=0.3477 fraud_f1=0.8317 fraud_recall=0.7850 pr_auc=0.7928
+2026-07-26 16:38:12 | INFO | No improvement. Patience left: 1
+2026-07-26 16:38:12 | INFO | Loading best checkpoint from F:\final-version-1\capstone-project-26t2-9900-h09c-almond\model_weights\bert\split_leakage\condition_b\seed_9\bert_class_weighted\best
+2026-07-26 16:38:25 | INFO | Validation threshold selected on validation only: 0.7000 (fraud_f1=0.8442)
+2026-07-26 16:38:38 | INFO | Test fraud_f1=0.8159 fraud_recall=0.7664 pr_auc=0.8356
+2026-07-26 16:38:38 | INFO | Done. Artifacts under F:\final-version-1\capstone-project-26t2-9900-h09c-almond\model_weights\bert\split_leakage\condition_b\seed_9\bert_class_weighted and F:\final-version-1\capstone-project-26t2-9900-h09c-almond\model_results\bert\split_leakage\condition_b\seed_9
+2026-07-26 16:38:38 | INFO | Finished condition=B seed=9 fraud_f1=0.8159 pr_auc=0.8356
+2026-07-26 16:38:38 | INFO | === Train condition C seed 0 ===

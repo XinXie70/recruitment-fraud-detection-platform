@@ -1,0 +1,181 @@
+{
+  "split_files": {
+    "train": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\train.csv",
+    "validation": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\validation.csv",
+    "test": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\test.csv"
+  },
+  "per_split": {
+    "train": {
+      "n_samples": 12516,
+      "n_legitimate": 11910,
+      "n_fraudulent": 606,
+      "class_ratio_legitimate": 0.951581975071908,
+      "class_ratio_fraudulent": 0.048418024928092045,
+      "label_counts": {
+        "0": 11910,
+        "1": 606
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 1243,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2701.3024129114733,
+        "median": 2561.0,
+        "min": 26,
+        "max": 14927,
+        "p90": 4635.0,
+        "p95": 5353.0,
+        "p99": 6889.100000000002
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 8081,
+      "company_unique": 3346
+    },
+    "validation": {
+      "n_samples": 2682,
+      "n_legitimate": 2552,
+      "n_fraudulent": 130,
+      "class_ratio_legitimate": 0.9515287099179717,
+      "class_ratio_fraudulent": 0.048471290082028336,
+      "label_counts": {
+        "0": 2552,
+        "1": 130
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 178,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2704.470917225951,
+        "median": 2552.0,
+        "min": 23,
+        "max": 9954,
+        "p90": 4677.8,
+        "p95": 5575.499999999998,
+        "p99": 6996.610000000001
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 2080,
+      "company_unique": 1232
+    },
+    "test": {
+      "n_samples": 2682,
+      "n_legitimate": 2552,
+      "n_fraudulent": 130,
+      "class_ratio_legitimate": 0.9515287099179717,
+      "class_ratio_fraudulent": 0.048471290082028336,
+      "label_counts": {
+        "0": 2552,
+        "1": 130
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 151,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2706.17225950783,
+        "median": 2556.0,
+        "min": 89,
+        "max": 11296,
+        "p90": 4590.500000000002,
+        "p95": 5280.699999999999,
+        "p99": 7019.170000000002
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 2079,
+      "company_unique": 1192
+    }
+  },
+  "cross_split_checks": {
+    "identical_text_train_validation": 213,
+    "identical_text_train_test": 228,
+    "identical_text_validation_test": 94,
+    "identical_id_train_validation": 0,
+    "identical_id_train_test": 0,
+    "identical_id_validation_test": 0,
+    "note": "Cross-split overlaps are reported for awareness only. This module never reassigns rows across splits.",
+    "company_title_overlap_train_validation": 364,
+    "company_title_overlap_train_test": 379,
+    "company_title_overlap_validation_test": 162
+  },
+  "policy": {
+    "no_resplit": true,
+    "no_merge": true,
+    "no_cross_validation": true,
+    "oversample_train_only": true
+  },
+  "token_length_stats_train": {
+    "n_texts_measured": 3000,
+    "mean": 530.2023333333333,
+    "median": 487.0,
+    "p90": 895.0,
+    "p95": 1039.2499999999986,
+    "p99": 1369.0099999999998,
+    "pct_over_128": 0.9663333333333334,
+    "pct_over_256": 0.847,
+    "pct_over_512": 0.465,
+    "recommended_max_length": 256,
+    "recommendation_reason": "Measured train token lengths: median≈487, 84.7% >256, 46.5% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off."
+  }
+}

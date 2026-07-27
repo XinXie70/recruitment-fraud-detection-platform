@@ -1,0 +1,394 @@
+2026-07-24 05:50:30 | INFO | === BERT fine-tune: no class weights ===
+2026-07-24 05:50:30 | INFO | ======== Environment ========
+2026-07-24 05:50:30 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 05:50:30 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 05:50:30 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 05:50:30 | INFO | Transformers version   : 5.13.1
+2026-07-24 05:50:30 | INFO | CUDA available         : True
+2026-07-24 05:50:30 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 05:50:30 | INFO | cuDNN version          : 91900
+2026-07-24 05:50:30 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 05:50:30 | INFO | GPU count              : 1
+2026-07-24 05:50:30 | INFO | Current training device: cuda
+2026-07-24 05:50:30 | INFO | =============================
+2026-07-24 05:50:30 | INFO | Loading fixed splits (no re-split, no CV, no merge).
+2026-07-24 05:50:40 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 552.4346666666667, 'median': 504.5, 'p90': 921.0, 'p95': 1069.0499999999997, 'p99': 1445.169999999996, 'pct_over_128': 0.9713333333333334, 'pct_over_256': 0.866, 'pct_over_512': 0.4846666666666667, 'recommended_max_length': 256, 'recommendation_reason': 'Measured train token lengths: median≈504, 86.6% >256, 48.5% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off.'}
+2026-07-24 05:50:40 | INFO | Saved data_quality_report.json
+2026-07-24 05:50:40 | INFO | Train-only class weights: [0.5235661555934128, 11.108433734939759]
+2026-07-24 05:50:41 | INFO | Start fine-tuning: model=bert-base-uncased use_class_weights=False max_length=256 batch=8 accum=2
+2026-07-24 05:53:57 | INFO | Epoch 1 | train_loss=0.1717 val_loss=0.1128 fraud_f1=0.5526 fraud_recall=0.3925 pr_auc=0.7651
+2026-07-24 05:53:58 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.5526)
+2026-07-24 05:57:13 | INFO | Epoch 2 | train_loss=0.0589 val_loss=0.0970 fraud_f1=0.8075 fraud_recall=0.8037 pr_auc=0.8336
+2026-07-24 05:57:14 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.8075)
+2026-07-24 06:00:28 | INFO | Epoch 3 | train_loss=0.0259 val_loss=0.1055 fraud_f1=0.8103 fraud_recall=0.7383 pr_auc=0.8503
+2026-07-24 06:00:29 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.8103)
+2026-07-24 06:03:42 | INFO | Epoch 4 | train_loss=0.0063 val_loss=0.1275 fraud_f1=0.8081 fraud_recall=0.7477 pr_auc=0.8197
+2026-07-24 06:03:42 | INFO | No improvement. Patience left: 1
+2026-07-24 06:06:55 | INFO | Epoch 5 | train_loss=0.0011 val_loss=0.1336 fraud_f1=0.8100 fraud_recall=0.7570 pr_auc=0.8398
+2026-07-24 06:06:55 | INFO | No improvement. Patience left: 0
+2026-07-24 06:06:55 | INFO | Early stopping at epoch 5
+2026-07-24 06:06:55 | INFO | Loading best checkpoint from F:\final-version\independent_ml_workflow\models\bert\checkpoints\bert_finetuned\bert_no_class_weight\best
+2026-07-24 06:07:07 | INFO | Validation threshold selected on validation only: 0.0500 (fraud_f1=0.8259)
+2026-07-24 06:07:19 | INFO | Test fraud_f1=0.8060 fraud_recall=0.7570 pr_auc=0.8708
+2026-07-24 06:07:19 | INFO | Done. Artifacts under F:\final-version\independent_ml_workflow\models\bert\checkpoints\bert_finetuned\bert_no_class_weight and F:\final-version\independent_ml_workflow\models\bert\results
+2026-07-24 06:07:19 | INFO | === BERT fine-tune: class weights (main) ===
+2026-07-24 06:07:19 | INFO | ======== Environment ========
+2026-07-24 06:07:19 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:07:19 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:07:19 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:07:19 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:07:19 | INFO | CUDA available         : True
+2026-07-24 06:07:19 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:07:19 | INFO | cuDNN version          : 91900
+2026-07-24 06:07:19 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:07:19 | INFO | GPU count              : 1
+2026-07-24 06:07:19 | INFO | Current training device: cuda
+2026-07-24 06:07:19 | INFO | =============================
+2026-07-24 06:07:19 | INFO | Loading fixed splits (no re-split, no CV, no merge).
+2026-07-24 06:07:28 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 552.4346666666667, 'median': 504.5, 'p90': 921.0, 'p95': 1069.0499999999997, 'p99': 1445.169999999996, 'pct_over_128': 0.9713333333333334, 'pct_over_256': 0.866, 'pct_over_512': 0.4846666666666667, 'recommended_max_length': 256, 'recommendation_reason': 'Measured train token lengths: median≈504, 86.6% >256, 48.5% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off.'}
+2026-07-24 06:07:29 | INFO | Saved data_quality_report.json
+2026-07-24 06:07:29 | INFO | Train-only class weights: [0.5235661555934128, 11.108433734939759]
+2026-07-24 06:07:29 | INFO | Start fine-tuning: model=bert-base-uncased use_class_weights=True max_length=256 batch=8 accum=2
+2026-07-24 06:10:43 | INFO | Epoch 1 | train_loss=0.5336 val_loss=0.6018 fraud_f1=0.5298 fraud_recall=0.3738 pr_auc=0.6879
+2026-07-24 06:10:44 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.5298)
+2026-07-24 06:13:58 | INFO | Epoch 2 | train_loss=0.2815 val_loss=0.4021 fraud_f1=0.7763 fraud_recall=0.7944 pr_auc=0.7893
+2026-07-24 06:13:59 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.7763)
+2026-07-24 06:17:12 | INFO | Epoch 3 | train_loss=0.1403 val_loss=0.3908 fraud_f1=0.7980 fraud_recall=0.7383 pr_auc=0.8554
+2026-07-24 06:17:14 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.7980)
+2026-07-24 06:20:26 | INFO | Epoch 4 | train_loss=0.0560 val_loss=0.4288 fraud_f1=0.8000 fraud_recall=0.7664 pr_auc=0.8238
+2026-07-24 06:20:27 | INFO | New best checkpoint saved at epoch 4 (fraud_f1=0.8000)
+2026-07-24 06:23:40 | INFO | Epoch 5 | train_loss=0.0120 val_loss=0.4918 fraud_f1=0.8177 fraud_recall=0.7757 pr_auc=0.8279
+2026-07-24 06:23:41 | INFO | New best checkpoint saved at epoch 5 (fraud_f1=0.8177)
+2026-07-24 06:23:42 | INFO | Loading best checkpoint from F:\final-version\independent_ml_workflow\models\bert\checkpoints\bert_finetuned\bert_class_weighted\best
+2026-07-24 06:23:54 | INFO | Validation threshold selected on validation only: 0.1000 (fraud_f1=0.8195)
+2026-07-24 06:24:06 | INFO | Test fraud_f1=0.8263 fraud_recall=0.8224 pr_auc=0.7942
+2026-07-24 06:24:06 | INFO | Done. Artifacts under F:\final-version\independent_ml_workflow\models\bert\checkpoints\bert_finetuned\bert_class_weighted and F:\final-version\independent_ml_workflow\models\bert\results
+2026-07-24 06:24:06 | INFO | === Extract frozen mean embeddings ===
+2026-07-24 06:24:06 | INFO | ======== Environment ========
+2026-07-24 06:24:06 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:24:06 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:24:06 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:24:06 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:24:06 | INFO | CUDA available         : True
+2026-07-24 06:24:06 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:24:06 | INFO | cuDNN version          : 91900
+2026-07-24 06:24:06 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:24:06 | INFO | GPU count              : 1
+2026-07-24 06:24:06 | INFO | Current training device: cuda
+2026-07-24 06:24:06 | INFO | =============================
+2026-07-24 06:24:12 | INFO | Using frozen pretrained encoder: bert-base-uncased
+2026-07-24 06:24:13 | INFO | Extracting embeddings for split=train (n=11064)
+2026-07-24 06:25:05 | ERROR | run_all_experiments failed:
+Traceback (most recent call last):
+  File "F:\final-version\independent_ml_workflow\models\bert\run_all_experiments.py", line 58, in main
+    run_extraction(
+    ~~~~~~~~~~~~~~^
+        EmbeddingConfig(
+        ^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        )
+        ^
+    )
+    ^
+  File "F:\final-version\independent_ml_workflow\models\bert\extract_embeddings.py", line 207, in run_extraction
+    paths = save_split_artifacts(split_name, payload, cfg, out_dir)
+  File "F:\final-version\independent_ml_workflow\models\bert\extract_embeddings.py", line 127, in save_split_artifacts
+    meta.to_npz(meta_path, index=False)
+    ^^^^^^^^^^^
+  File "E:\ml\venv\Lib\site-packages\pandas\core\generic.py", line 6206, in __getattr__
+    return object.__getattribute__(self, name)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AttributeError: 'DataFrame' object has no attribute 'to_npz'
+
+2026-07-24 06:34:24 | INFO | === Extract frozen mean embeddings ===
+2026-07-24 06:34:24 | INFO | ======== Environment ========
+2026-07-24 06:34:24 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:34:24 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:34:24 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:34:24 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:34:24 | INFO | CUDA available         : True
+2026-07-24 06:34:24 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:34:24 | INFO | cuDNN version          : 91900
+2026-07-24 06:34:24 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:34:24 | INFO | GPU count              : 1
+2026-07-24 06:34:24 | INFO | Current training device: cuda
+2026-07-24 06:34:24 | INFO | =============================
+2026-07-24 06:34:30 | INFO | Using frozen pretrained encoder: bert-base-uncased
+2026-07-24 06:34:32 | INFO | Extracting embeddings for split=train (n=11064)
+2026-07-24 06:35:24 | INFO | Saved train embeddings shape=(11064, 768) -> F:\final-version\independent_ml_workflow\models\bert\cached_features\train_embeddings.npy
+2026-07-24 06:35:24 | INFO | Extracting embeddings for split=validation (n=2371)
+2026-07-24 06:35:35 | INFO | Saved validation embeddings shape=(2371, 768) -> F:\final-version\independent_ml_workflow\models\bert\cached_features\validation_embeddings.npy
+2026-07-24 06:35:35 | INFO | Extracting embeddings for split=test (n=2372)
+2026-07-24 06:35:46 | INFO | Saved test embeddings shape=(2372, 768) -> F:\final-version\independent_ml_workflow\models\bert\cached_features\test_embeddings.npy
+2026-07-24 06:35:46 | INFO | Embedding extraction complete.
+2026-07-24 06:35:46 | INFO | === Head=mlp strategy=none ===
+2026-07-24 06:35:46 | INFO | ======== Environment ========
+2026-07-24 06:35:46 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:35:46 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:35:46 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:35:46 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:35:46 | INFO | CUDA available         : True
+2026-07-24 06:35:46 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:35:46 | INFO | cuDNN version          : 91900
+2026-07-24 06:35:46 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:35:46 | INFO | GPU count              : 1
+2026-07-24 06:35:46 | INFO | Current training device: cuda
+2026-07-24 06:35:46 | INFO | =============================
+2026-07-24 06:35:47 | INFO | Train imbalance strategy=none before={'legitimate_0': 10566, 'fraudulent_1': 498, 'total': 11064} after={'legitimate_0': 10566, 'fraudulent_1': 498, 'total': 11064} notes=No oversampling applied.
+2026-07-24 06:35:49 | INFO | Head epoch 1 | train_loss=0.1674 val_fraud_f1=0.0000 fraud_recall=0.0000 pr_auc=0.2391
+2026-07-24 06:35:49 | INFO | Saved best head checkpoint (fraud_f1=0.0000)
+2026-07-24 06:35:50 | INFO | Head epoch 2 | train_loss=0.1342 val_fraud_f1=0.0000 fraud_recall=0.0000 pr_auc=0.4417
+2026-07-24 06:35:51 | INFO | Head epoch 3 | train_loss=0.1190 val_fraud_f1=0.2857 fraud_recall=0.1682 pr_auc=0.5693
+2026-07-24 06:35:51 | INFO | Saved best head checkpoint (fraud_f1=0.2857)
+2026-07-24 06:35:51 | INFO | Head epoch 4 | train_loss=0.1129 val_fraud_f1=0.5263 fraud_recall=0.3738 pr_auc=0.6182
+2026-07-24 06:35:51 | INFO | Saved best head checkpoint (fraud_f1=0.5263)
+2026-07-24 06:35:52 | INFO | Head epoch 5 | train_loss=0.0983 val_fraud_f1=0.5200 fraud_recall=0.3645 pr_auc=0.6478
+2026-07-24 06:35:52 | INFO | Head epoch 6 | train_loss=0.0944 val_fraud_f1=0.2149 fraud_recall=0.1215 pr_auc=0.5820
+2026-07-24 06:35:53 | INFO | Head epoch 7 | train_loss=0.0890 val_fraud_f1=0.5749 fraud_recall=0.4486 pr_auc=0.6659
+2026-07-24 06:35:53 | INFO | Saved best head checkpoint (fraud_f1=0.5749)
+2026-07-24 06:35:53 | INFO | Head epoch 8 | train_loss=0.0848 val_fraud_f1=0.5909 fraud_recall=0.4860 pr_auc=0.6745
+2026-07-24 06:35:53 | INFO | Saved best head checkpoint (fraud_f1=0.5909)
+2026-07-24 06:35:54 | INFO | Head epoch 9 | train_loss=0.0824 val_fraud_f1=0.5132 fraud_recall=0.3645 pr_auc=0.6673
+2026-07-24 06:35:54 | INFO | Head epoch 10 | train_loss=0.0776 val_fraud_f1=0.5952 fraud_recall=0.4673 pr_auc=0.6618
+2026-07-24 06:35:54 | INFO | Saved best head checkpoint (fraud_f1=0.5952)
+2026-07-24 06:35:54 | INFO | Head epoch 11 | train_loss=0.0710 val_fraud_f1=0.6215 fraud_recall=0.5140 pr_auc=0.6923
+2026-07-24 06:35:54 | INFO | Saved best head checkpoint (fraud_f1=0.6215)
+2026-07-24 06:35:55 | INFO | Head epoch 12 | train_loss=0.0720 val_fraud_f1=0.6162 fraud_recall=0.5327 pr_auc=0.6793
+2026-07-24 06:35:55 | INFO | Head epoch 13 | train_loss=0.0708 val_fraud_f1=0.6044 fraud_recall=0.5140 pr_auc=0.6937
+2026-07-24 06:35:56 | INFO | Head epoch 14 | train_loss=0.0658 val_fraud_f1=0.6243 fraud_recall=0.5514 pr_auc=0.7061
+2026-07-24 06:35:56 | INFO | Saved best head checkpoint (fraud_f1=0.6243)
+2026-07-24 06:35:56 | INFO | Head epoch 15 | train_loss=0.0637 val_fraud_f1=0.6243 fraud_recall=0.5047 pr_auc=0.6931
+2026-07-24 06:35:56 | INFO | Head epoch 16 | train_loss=0.0632 val_fraud_f1=0.5714 fraud_recall=0.4299 pr_auc=0.6532
+2026-07-24 06:35:57 | INFO | Head epoch 17 | train_loss=0.0604 val_fraud_f1=0.6526 fraud_recall=0.5794 pr_auc=0.7095
+2026-07-24 06:35:57 | INFO | Saved best head checkpoint (fraud_f1=0.6526)
+2026-07-24 06:35:57 | INFO | Head epoch 18 | train_loss=0.0570 val_fraud_f1=0.5977 fraud_recall=0.4860 pr_auc=0.6908
+2026-07-24 06:35:58 | INFO | Head epoch 19 | train_loss=0.0616 val_fraud_f1=0.6465 fraud_recall=0.5981 pr_auc=0.7078
+2026-07-24 06:35:58 | INFO | Head epoch 20 | train_loss=0.0554 val_fraud_f1=0.6400 fraud_recall=0.5981 pr_auc=0.7113
+2026-07-24 06:35:58 | INFO | Head epoch 21 | train_loss=0.0562 val_fraud_f1=0.6353 fraud_recall=0.5047 pr_auc=0.7065
+2026-07-24 06:35:59 | INFO | Head epoch 22 | train_loss=0.0571 val_fraud_f1=0.6404 fraud_recall=0.5327 pr_auc=0.7113
+2026-07-24 06:35:59 | INFO | Early stopping at epoch 22
+2026-07-24 06:36:00 | INFO | Validation-selected threshold=0.4000 fraud_f1=0.6564
+2026-07-24 06:36:05 | INFO | Done bert_emb_mlp_none | test fraud_f1=0.6567 fraud_recall=0.6168 pr_auc=0.7345
+2026-07-24 06:36:05 | INFO | === Head=mlp strategy=smote ===
+2026-07-24 06:36:05 | INFO | ======== Environment ========
+2026-07-24 06:36:05 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:36:05 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:36:05 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:36:05 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:36:05 | INFO | CUDA available         : True
+2026-07-24 06:36:05 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:36:05 | INFO | cuDNN version          : 91900
+2026-07-24 06:36:05 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:36:05 | INFO | GPU count              : 1
+2026-07-24 06:36:05 | INFO | Current training device: cuda
+2026-07-24 06:36:05 | INFO | =============================
+2026-07-24 06:36:08 | INFO | Train imbalance strategy=smote before={'legitimate_0': 10566, 'fraudulent_1': 498, 'total': 11064} after={'legitimate_0': 10566, 'fraudulent_1': 10566, 'total': 21132} notes=Standard SMOTE applied on train embeddings only (k_neighbors=5).
+2026-07-24 06:36:09 | INFO | Head epoch 1 | train_loss=0.3275 val_fraud_f1=0.4538 fraud_recall=0.8037 pr_auc=0.6534
+2026-07-24 06:36:09 | INFO | Saved best head checkpoint (fraud_f1=0.4538)
+2026-07-24 06:36:10 | INFO | Head epoch 2 | train_loss=0.1785 val_fraud_f1=0.5962 fraud_recall=0.7383 pr_auc=0.6953
+2026-07-24 06:36:10 | INFO | Saved best head checkpoint (fraud_f1=0.5962)
+2026-07-24 06:36:10 | INFO | Head epoch 3 | train_loss=0.1364 val_fraud_f1=0.5587 fraud_recall=0.8224 pr_auc=0.7188
+2026-07-24 06:36:11 | INFO | Head epoch 4 | train_loss=0.1056 val_fraud_f1=0.5583 fraud_recall=0.8505 pr_auc=0.7276
+2026-07-24 06:36:12 | INFO | Head epoch 5 | train_loss=0.0869 val_fraud_f1=0.6189 fraud_recall=0.7664 pr_auc=0.7273
+2026-07-24 06:36:12 | INFO | Saved best head checkpoint (fraud_f1=0.6189)
+2026-07-24 06:36:12 | INFO | Head epoch 6 | train_loss=0.0753 val_fraud_f1=0.6426 fraud_recall=0.7477 pr_auc=0.7213
+2026-07-24 06:36:12 | INFO | Saved best head checkpoint (fraud_f1=0.6426)
+2026-07-24 06:36:13 | INFO | Head epoch 7 | train_loss=0.0661 val_fraud_f1=0.6014 fraud_recall=0.8037 pr_auc=0.7424
+2026-07-24 06:36:14 | INFO | Head epoch 8 | train_loss=0.0618 val_fraud_f1=0.6878 fraud_recall=0.7103 pr_auc=0.7423
+2026-07-24 06:36:14 | INFO | Saved best head checkpoint (fraud_f1=0.6878)
+2026-07-24 06:36:15 | INFO | Head epoch 9 | train_loss=0.0615 val_fraud_f1=0.6403 fraud_recall=0.7570 pr_auc=0.7426
+2026-07-24 06:36:15 | INFO | Head epoch 10 | train_loss=0.0578 val_fraud_f1=0.6383 fraud_recall=0.8411 pr_auc=0.7617
+2026-07-24 06:36:16 | INFO | Head epoch 11 | train_loss=0.0471 val_fraud_f1=0.6769 fraud_recall=0.8224 pr_auc=0.7762
+2026-07-24 06:36:17 | INFO | Head epoch 12 | train_loss=0.0513 val_fraud_f1=0.6014 fraud_recall=0.8037 pr_auc=0.7597
+2026-07-24 06:36:17 | INFO | Head epoch 13 | train_loss=0.0453 val_fraud_f1=0.6192 fraud_recall=0.8131 pr_auc=0.7684
+2026-07-24 06:36:17 | INFO | Early stopping at epoch 13
+2026-07-24 06:36:18 | INFO | Validation-selected threshold=0.8500 fraud_f1=0.7071
+2026-07-24 06:36:23 | INFO | Done bert_emb_mlp_smote | test fraud_f1=0.7035 fraud_recall=0.6542 pr_auc=0.7880
+2026-07-24 06:36:23 | INFO | === Head=cnn1d strategy=smote ===
+2026-07-24 06:36:23 | INFO | ======== Environment ========
+2026-07-24 06:36:23 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:36:23 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:36:23 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:36:23 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:36:23 | INFO | CUDA available         : True
+2026-07-24 06:36:23 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:36:23 | INFO | cuDNN version          : 91900
+2026-07-24 06:36:23 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:36:23 | INFO | GPU count              : 1
+2026-07-24 06:36:23 | INFO | Current training device: cuda
+2026-07-24 06:36:23 | INFO | =============================
+2026-07-24 06:36:23 | INFO | Train imbalance strategy=smote before={'legitimate_0': 10566, 'fraudulent_1': 498, 'total': 11064} after={'legitimate_0': 10566, 'fraudulent_1': 10566, 'total': 21132} notes=Standard SMOTE applied on train embeddings only (k_neighbors=5).
+2026-07-24 06:36:25 | INFO | Head epoch 1 | train_loss=0.6396 val_fraud_f1=0.1076 fraud_recall=0.9813 pr_auc=0.1536
+2026-07-24 06:36:25 | INFO | Saved best head checkpoint (fraud_f1=0.1076)
+2026-07-24 06:36:26 | INFO | Head epoch 2 | train_loss=0.5609 val_fraud_f1=0.2187 fraud_recall=0.5140 pr_auc=0.1261
+2026-07-24 06:36:26 | INFO | Saved best head checkpoint (fraud_f1=0.2187)
+2026-07-24 06:36:26 | INFO | Head epoch 3 | train_loss=0.5248 val_fraud_f1=0.2105 fraud_recall=0.2056 pr_auc=0.1657
+2026-07-24 06:36:27 | INFO | Head epoch 4 | train_loss=0.5016 val_fraud_f1=0.1360 fraud_recall=0.9533 pr_auc=0.2036
+2026-07-24 06:36:28 | INFO | Head epoch 5 | train_loss=0.4847 val_fraud_f1=0.2729 fraud_recall=0.7103 pr_auc=0.1900
+2026-07-24 06:36:28 | INFO | Saved best head checkpoint (fraud_f1=0.2729)
+2026-07-24 06:36:29 | INFO | Head epoch 6 | train_loss=0.4779 val_fraud_f1=0.0873 fraud_recall=0.9907 pr_auc=0.2178
+2026-07-24 06:36:30 | INFO | Head epoch 7 | train_loss=0.4738 val_fraud_f1=0.1701 fraud_recall=0.9252 pr_auc=0.1929
+2026-07-24 06:36:31 | INFO | Head epoch 8 | train_loss=0.4697 val_fraud_f1=0.1418 fraud_recall=0.0935 pr_auc=0.2058
+2026-07-24 06:36:31 | INFO | Head epoch 9 | train_loss=0.4640 val_fraud_f1=0.0864 fraud_recall=1.0000 pr_auc=0.2567
+2026-07-24 06:36:32 | INFO | Head epoch 10 | train_loss=0.4571 val_fraud_f1=0.0902 fraud_recall=0.0561 pr_auc=0.2022
+2026-07-24 06:36:32 | INFO | Early stopping at epoch 10
+2026-07-24 06:36:33 | INFO | Validation-selected threshold=0.5500 fraud_f1=0.2785
+2026-07-24 06:36:38 | INFO | Done bert_emb_cnn1d_smote | test fraud_f1=0.2505 fraud_recall=0.5607 pr_auc=0.2140
+2026-07-24 06:36:38 | INFO | === Head=cnn2d strategy=smote ===
+2026-07-24 06:36:38 | INFO | ======== Environment ========
+2026-07-24 06:36:38 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:36:38 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:36:38 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:36:38 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:36:38 | INFO | CUDA available         : True
+2026-07-24 06:36:38 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:36:38 | INFO | cuDNN version          : 91900
+2026-07-24 06:36:38 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:36:38 | INFO | GPU count              : 1
+2026-07-24 06:36:38 | INFO | Current training device: cuda
+2026-07-24 06:36:38 | INFO | =============================
+2026-07-24 06:36:38 | INFO | Train imbalance strategy=smote before={'legitimate_0': 10566, 'fraudulent_1': 498, 'total': 11064} after={'legitimate_0': 10566, 'fraudulent_1': 10566, 'total': 21132} notes=Standard SMOTE applied on train embeddings only (k_neighbors=5).
+2026-07-24 06:36:39 | INFO | Head epoch 1 | train_loss=0.4597 val_fraud_f1=0.1272 fraud_recall=0.9813 pr_auc=0.4159
+2026-07-24 06:36:39 | INFO | Saved best head checkpoint (fraud_f1=0.1272)
+2026-07-24 06:36:40 | INFO | Head epoch 2 | train_loss=0.3070 val_fraud_f1=0.0000 fraud_recall=0.0000 pr_auc=0.4017
+2026-07-24 06:36:41 | INFO | Head epoch 3 | train_loss=0.2653 val_fraud_f1=0.5058 fraud_recall=0.6075 pr_auc=0.5117
+2026-07-24 06:36:41 | INFO | Saved best head checkpoint (fraud_f1=0.5058)
+2026-07-24 06:36:42 | INFO | Head epoch 4 | train_loss=0.2442 val_fraud_f1=0.1525 fraud_recall=0.0841 pr_auc=0.4648
+2026-07-24 06:36:43 | INFO | Head epoch 5 | train_loss=0.2313 val_fraud_f1=0.2656 fraud_recall=0.8972 pr_auc=0.5811
+2026-07-24 06:36:44 | INFO | Head epoch 6 | train_loss=0.2146 val_fraud_f1=0.1022 fraud_recall=0.9813 pr_auc=0.5977
+2026-07-24 06:36:45 | INFO | Head epoch 7 | train_loss=0.2022 val_fraud_f1=0.0000 fraud_recall=0.0000 pr_auc=0.4993
+2026-07-24 06:36:46 | INFO | Head epoch 8 | train_loss=0.1964 val_fraud_f1=0.5000 fraud_recall=0.7196 pr_auc=0.5720
+2026-07-24 06:36:46 | INFO | Early stopping at epoch 8
+2026-07-24 06:36:46 | INFO | Validation-selected threshold=0.6000 fraud_f1=0.5370
+2026-07-24 06:36:52 | INFO | Done bert_emb_cnn2d_smote | test fraud_f1=0.4979 fraud_recall=0.5421 pr_auc=0.4331
+2026-07-24 06:36:52 | INFO | === Head=cnn2d strategy=smobd ===
+2026-07-24 06:36:52 | INFO | ======== Environment ========
+2026-07-24 06:36:52 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:36:52 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:36:52 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:36:52 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:36:52 | INFO | CUDA available         : True
+2026-07-24 06:36:52 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:36:52 | INFO | cuDNN version          : 91900
+2026-07-24 06:36:52 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:36:52 | INFO | GPU count              : 1
+2026-07-24 06:36:52 | INFO | Current training device: cuda
+2026-07-24 06:36:52 | INFO | =============================
+2026-07-24 06:36:52 | WARNING | SMOBD implementation unavailable. Refusing to fake SMOBD with SMOTE. This run will record Not available and exit without fabricating metrics.
+2026-07-24 06:36:52 | INFO | All requested experiments finished.
+2026-07-24 06:50:21 | INFO | === RoBERTa fine-tune: no class weights ===
+2026-07-24 06:50:21 | INFO | ======== Environment ========
+2026-07-24 06:50:21 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 06:50:21 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 06:50:21 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 06:50:21 | INFO | Transformers version   : 5.13.1
+2026-07-24 06:50:21 | INFO | CUDA available         : True
+2026-07-24 06:50:21 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 06:50:21 | INFO | cuDNN version          : 91900
+2026-07-24 06:50:21 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 06:50:21 | INFO | GPU count              : 1
+2026-07-24 06:50:21 | INFO | Current training device: cuda
+2026-07-24 06:50:21 | INFO | =============================
+2026-07-24 06:50:21 | INFO | Loading fixed splits (no re-split, no CV, no merge).
+2026-07-24 06:50:30 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 593.9123333333333, 'median': 545.0, 'p90': 989.0999999999999, 'p95': 1144.0, 'p99': 1505.0599999999986, 'pct_over_128': 0.9773333333333334, 'pct_over_256': 0.8836666666666667, 'pct_over_512': 0.556, 'recommended_max_length': 256, 'recommendation_reason': 'Measured train token lengths: median≈545, 88.4% >256, 55.6% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off.'}
+2026-07-24 06:50:30 | INFO | Saved data_quality_report.json
+2026-07-24 06:50:30 | INFO | Train-only class weights: [0.5235661555934128, 11.108433734939759]
+2026-07-24 06:50:32 | INFO | Start fine-tuning: model=roberta-base use_class_weights=False max_length=256 batch=8 accum=2
+2026-07-24 06:53:51 | INFO | Epoch 1 | train_loss=0.1897 val_loss=0.0955 fraud_f1=0.6296 fraud_recall=0.4766 pr_auc=0.7469
+2026-07-24 06:53:53 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.6296)
+2026-07-24 06:57:11 | INFO | Epoch 2 | train_loss=0.0792 val_loss=0.1163 fraud_f1=0.6982 fraud_recall=0.5514 pr_auc=0.8393
+2026-07-24 06:57:13 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.6982)
+2026-07-24 07:00:30 | INFO | Epoch 3 | train_loss=0.0404 val_loss=0.1034 fraud_f1=0.7876 fraud_recall=0.7103 pr_auc=0.8416
+2026-07-24 07:00:32 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.7876)
+2026-07-24 07:03:48 | INFO | Epoch 4 | train_loss=0.0182 val_loss=0.1261 fraud_f1=0.7897 fraud_recall=0.7196 pr_auc=0.8164
+2026-07-24 07:03:50 | INFO | New best checkpoint saved at epoch 4 (fraud_f1=0.7897)
+2026-07-24 07:07:06 | INFO | Epoch 5 | train_loss=0.0061 val_loss=0.1352 fraud_f1=0.7959 fraud_recall=0.7290 pr_auc=0.8355
+2026-07-24 07:07:08 | INFO | New best checkpoint saved at epoch 5 (fraud_f1=0.7959)
+2026-07-24 07:07:08 | INFO | Loading best checkpoint from F:\final-version\independent_ml_workflow\models\bert\checkpoints\roberta_finetuned\roberta_no_class_weight\best
+2026-07-24 07:07:20 | INFO | Validation threshold selected on validation only: 0.0500 (fraud_f1=0.8020)
+2026-07-24 07:07:32 | INFO | Test fraud_f1=0.8000 fraud_recall=0.7850 pr_auc=0.8816
+2026-07-24 07:07:32 | INFO | Done. Artifacts under F:\final-version\independent_ml_workflow\models\bert\checkpoints\roberta_finetuned\roberta_no_class_weight and F:\final-version\independent_ml_workflow\models\bert\results
+2026-07-24 07:07:32 | INFO | === RoBERTa fine-tune: class weights ===
+2026-07-24 07:07:32 | INFO | ======== Environment ========
+2026-07-24 07:07:32 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-24 07:07:32 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-24 07:07:32 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-24 07:07:32 | INFO | Transformers version   : 5.13.1
+2026-07-24 07:07:32 | INFO | CUDA available         : True
+2026-07-24 07:07:32 | INFO | PyTorch CUDA version   : 12.8
+2026-07-24 07:07:32 | INFO | cuDNN version          : 91900
+2026-07-24 07:07:32 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-24 07:07:32 | INFO | GPU count              : 1
+2026-07-24 07:07:32 | INFO | Current training device: cuda
+2026-07-24 07:07:32 | INFO | =============================
+2026-07-24 07:07:32 | INFO | Loading fixed splits (no re-split, no CV, no merge).
+2026-07-24 07:07:41 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 593.9123333333333, 'median': 545.0, 'p90': 989.0999999999999, 'p95': 1144.0, 'p99': 1505.0599999999986, 'pct_over_128': 0.9773333333333334, 'pct_over_256': 0.8836666666666667, 'pct_over_512': 0.556, 'recommended_max_length': 256, 'recommendation_reason': 'Measured train token lengths: median≈545, 88.4% >256, 55.6% >512. Default max_length=256 is chosen for RTX 3060 VRAM headroom with dynamic padding and gradient accumulation; do not jump to 512 without an OOM check. Long ads are truncated — this is an explicit compute/quality trade-off.'}
+2026-07-24 07:07:41 | INFO | Saved data_quality_report.json
+2026-07-24 07:07:41 | INFO | Train-only class weights: [0.5235661555934128, 11.108433734939759]
+2026-07-24 07:07:42 | INFO | Start fine-tuning: model=roberta-base use_class_weights=True max_length=256 batch=8 accum=2
+2026-07-24 07:11:00 | INFO | Epoch 1 | train_loss=0.6883 val_loss=0.3968 fraud_f1=0.4538 fraud_recall=0.5047 pr_auc=0.3899
+2026-07-24 07:11:02 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.4538)
+2026-07-24 07:14:19 | INFO | Epoch 2 | train_loss=0.5112 val_loss=0.4349 fraud_f1=0.6467 fraud_recall=0.5047 pr_auc=0.7074
+2026-07-24 07:14:20 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.6467)
+2026-07-24 07:17:37 | INFO | Epoch 3 | train_loss=0.3215 val_loss=0.3784 fraud_f1=0.7204 fraud_recall=0.7103 pr_auc=0.7927
+2026-07-24 07:17:39 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.7204)
+2026-07-24 07:20:55 | INFO | Epoch 4 | train_loss=0.2230 val_loss=0.4419 fraud_f1=0.7795 fraud_recall=0.7103 pr_auc=0.8116
+2026-07-24 07:20:57 | INFO | New best checkpoint saved at epoch 4 (fraud_f1=0.7795)
+2026-07-24 07:24:14 | INFO | Epoch 5 | train_loss=0.1731 val_loss=0.4046 fraud_f1=0.7960 fraud_recall=0.7477 pr_auc=0.8126
+2026-07-24 07:24:15 | INFO | New best checkpoint saved at epoch 5 (fraud_f1=0.7960)
+2026-07-24 07:24:15 | INFO | Loading best checkpoint from F:\final-version\independent_ml_workflow\models\bert\checkpoints\roberta_finetuned\roberta_class_weighted\best
+2026-07-24 07:24:27 | INFO | Validation threshold selected on validation only: 0.9500 (fraud_f1=0.8000)
+2026-07-24 07:24:39 | INFO | Test fraud_f1=0.7921 fraud_recall=0.7477 pr_auc=0.8283
+2026-07-24 07:24:39 | INFO | Done. Artifacts under F:\final-version\independent_ml_workflow\models\bert\checkpoints\roberta_finetuned\roberta_class_weighted and F:\final-version\independent_ml_workflow\models\bert\results
+2026-07-24 07:24:39 | INFO | RoBERTa base vs class-weight comparison finished.
+2026-07-25 18:22:35 | INFO | ======== Environment ========
+2026-07-25 18:22:35 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-25 18:22:35 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-25 18:22:35 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-25 18:22:35 | INFO | Transformers version   : 5.13.1
+2026-07-25 18:22:35 | INFO | CUDA available         : True
+2026-07-25 18:22:35 | INFO | PyTorch CUDA version   : 12.8
+2026-07-25 18:22:35 | INFO | cuDNN version          : 91900
+2026-07-25 18:22:35 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-25 18:22:35 | INFO | GPU count              : 1
+2026-07-25 18:22:35 | INFO | Current training device: cuda
+2026-07-25 18:22:35 | INFO | =============================
+2026-07-25 18:22:52 | INFO | Test fraud_f1=0.8060 fraud_recall=0.7570 pr_auc=0.8708 accuracy=0.9836
+2026-07-25 18:22:59 | INFO | ======== Environment ========
+2026-07-25 18:22:59 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-25 18:22:59 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-25 18:22:59 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-25 18:22:59 | INFO | Transformers version   : 5.13.1
+2026-07-25 18:22:59 | INFO | CUDA available         : True
+2026-07-25 18:22:59 | INFO | PyTorch CUDA version   : 12.8
+2026-07-25 18:22:59 | INFO | cuDNN version          : 91900
+2026-07-25 18:22:59 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-25 18:22:59 | INFO | GPU count              : 1
+2026-07-25 18:22:59 | INFO | Current training device: cuda
+2026-07-25 18:22:59 | INFO | =============================
+2026-07-25 18:23:25 | INFO | ======== Environment ========
+2026-07-25 18:23:25 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-25 18:23:25 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-25 18:23:25 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-25 18:23:25 | INFO | Transformers version   : 5.13.1
+2026-07-25 18:23:25 | INFO | CUDA available         : True
+2026-07-25 18:23:25 | INFO | PyTorch CUDA version   : 12.8
+2026-07-25 18:23:25 | INFO | cuDNN version          : 91900
+2026-07-25 18:23:25 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-25 18:23:25 | INFO | GPU count              : 1
+2026-07-25 18:23:25 | INFO | Current training device: cuda
+2026-07-25 18:23:25 | INFO | =============================
+2026-07-25 18:23:39 | INFO | Test fraud_f1=0.8060 fraud_recall=0.7570 pr_auc=0.8708 accuracy=0.9836
+2026-07-25 18:23:46 | INFO | ======== Environment ========
+2026-07-25 18:23:46 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-07-25 18:23:46 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-07-25 18:23:46 | INFO | PyTorch version        : 2.11.0+cu128
+2026-07-25 18:23:46 | INFO | Transformers version   : 5.13.1
+2026-07-25 18:23:46 | INFO | CUDA available         : True
+2026-07-25 18:23:46 | INFO | PyTorch CUDA version   : 12.8
+2026-07-25 18:23:46 | INFO | cuDNN version          : 91900
+2026-07-25 18:23:46 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-07-25 18:23:46 | INFO | GPU count              : 1
+2026-07-25 18:23:46 | INFO | Current training device: cuda
+2026-07-25 18:23:46 | INFO | =============================
+2026-07-25 18:24:03 | INFO | Test fraud_f1=0.8263 fraud_recall=0.8224 pr_auc=0.7942 accuracy=0.9844
