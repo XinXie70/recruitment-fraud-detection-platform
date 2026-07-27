@@ -31,7 +31,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[3]
 TRAIN_FILE = PROJECT_DIR / "data/splits/train.csv"
 VALIDATION_FILE = PROJECT_DIR / "data/splits/validation.csv"
 REPORT_DIR = PROJECT_DIR / "reports/models/logistic_regression"
-ARTIFACT_DIR = PROJECT_DIR / "artifacts/logistic_regression"
+ARTIFACT_DIR = PROJECT_DIR / "model_weights/logistic_regression"
 
 SEED = 42
 MODEL_NAME = "logistic_regression_baseline"

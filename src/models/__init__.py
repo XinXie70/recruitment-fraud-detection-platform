@@ -1,1 +1,1 @@
-﻿"""Model packages for BERT/DNN live under model_code/."""
+﻿"""Model packages: LR in src/models/, BERT in model_code/bert/."""

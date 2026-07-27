@@ -10,6 +10,7 @@ checkpoints/
 
 # Generic binary dumps outside the deliverable weight pack
 *.joblib
+!model_weights/**/*.joblib
 *.pt
 *.pth
 *.pkl

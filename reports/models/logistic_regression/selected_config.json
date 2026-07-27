@@ -3,7 +3,7 @@
   "random_seed": 42,
   "selection_metric": "mean 3-fold Train CV PR-AUC",
   "threshold_rule": "maximum fraud F1 on Validation",
-  "best_cross_validation_pr_auc": 0.8507801078268361,
+  "best_cross_validation_pr_auc": 0.8503878034820485,
   "best_parameters": {
     "model__C": 1.0,
     "model__class_weight": "balanced",
@@ -17,12 +17,10 @@
   "validation_rows": 2371,
   "validation_fraud": 107,
   "software": {
-    "python": "3.12.13",
+    "python": "3.13.7",
     "scikit_learn": "1.9.0",
-    "pandas": "3.0.5",
-    "numpy": "2.5.1"
+    "pandas": "3.0.3",
+    "numpy": "2.4.4"
   },
-  "test_used": true,
-  "test_evaluated_at_utc": "2026-07-27T05:02:28.828912+00:00",
-  "test_sha256": "85457e3dc60c05a68aaea9e9f433b2fb8bc9cb775dbf0221d61efe2e1cbd6257"
+  "test_used": false
 }

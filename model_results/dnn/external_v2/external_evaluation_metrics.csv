@@ -1,2 +1,0 @@
-fraud_precision,fraud_recall,fraud_f1,roc_auc,pr_auc,balanced_accuracy,accuracy,fraud_rate,threshold,n_samples,n_fraud,tn,fp,fn,tp
-1.0,0.14,0.24561403508771928,0.8176000000000001,0.8586843729619297,0.5700000000000001,0.57,0.5,0.7700000000000002,100.0,50.0,50.0,0.0,43.0,7.0

@@ -1,12 +1,8 @@
-"""Build an ensemble from locked base-model predictions.
+"""Build LR+BERT ensemble from locked base-model predictions.
 
 Supports two modes:
   --mode validation   Search weights + threshold on validation (default).
   --mode test         Apply locked config from validation to test predictions.
-
-Classic base model can be:
-  --classic-model linear_svm
-  --classic-model logistic_regression
 
 Uses continuous fraud scores. Does not retrain any base model.
 """
@@ -37,22 +33,11 @@ ROOT_TEST_COMPARISON = REPORTS_DIR / "test_comparison.csv"
 WEIGHT_GRID = np.linspace(0.0, 1.0, 21)
 THRESHOLD_GRID = np.linspace(0.01, 0.99, 99)
 
-PAIR_CONFIG = {
-    "linear_svm": {
-        "classic_key": "linear_svm_baseline",
-        "classic_dir": "linear_svm",
-        "ensemble_dir": "ensemble",
-        "model_name": "ensemble_svm_bert_class_weighted",
-        "cv_pr_auc": 0.879317442625282,
-    },
-    "logistic_regression": {
-        "classic_key": "logistic_regression_baseline",
-        "classic_dir": "logistic_regression",
-        "ensemble_dir": "ensemble_lr_bert",
-        "model_name": "ensemble_lr_bert_class_weighted",
-        "cv_pr_auc": 0.8507801078268361,
-    },
-}
+CLASSIC_KEY = "logistic_regression_baseline"
+CLASSIC_DIR = "logistic_regression"
+ENSEMBLE_DIR_NAME = "ensemble_lr_bert"
+MODEL_NAME = "ensemble_lr_bert_class_weighted"
+CV_PR_AUC = 0.8507801078268361
 BERT_KEY = "bert_class_weighted"
 
 
@@ -137,26 +122,26 @@ def select_best_blend(merged: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     return best, pd.DataFrame(candidates)
 
 
-def load_classic_validation_metrics(classic_dir: str) -> dict:
-    path = REPORTS_DIR / classic_dir / "validation_metrics.json"
+def load_classic_validation_metrics() -> dict:
+    path = REPORTS_DIR / CLASSIC_DIR / "validation_metrics.json"
     return json.loads(path.read_text(encoding="utf-8"))["selected_threshold"]
 
 
-def load_bert_validation_metrics() -> dict:
+def load_bert_validation_metrics() -> tuple[str, dict]:
     payload = json.loads(
         (REPORTS_DIR / "bert" / "validation_metrics.json").read_text(encoding="utf-8")
     )
     return payload["model_name"], payload["validation_metrics"]
 
 
-def build_comparison_rows(pair: dict, ensemble_metrics: dict) -> pd.DataFrame:
-    classic_metrics = load_classic_validation_metrics(pair["classic_dir"])
+def build_comparison_rows(ensemble_metrics: dict) -> pd.DataFrame:
+    classic_metrics = load_classic_validation_metrics()
     bert_name, bert_metrics = load_bert_validation_metrics()
 
     rows = [
         {
-            "model": pair["classic_key"],
-            "cv_pr_auc": pair["cv_pr_auc"],
+            "model": CLASSIC_KEY,
+            "cv_pr_auc": CV_PR_AUC,
             "validation_pr_auc": classic_metrics["pr_auc"],
             "validation_roc_auc": classic_metrics["roc_auc"],
             "threshold": classic_metrics["threshold"],
@@ -183,7 +168,7 @@ def build_comparison_rows(pair: dict, ensemble_metrics: dict) -> pd.DataFrame:
             "tp": bert_metrics["confusion_matrix"]["tp"],
         },
         {
-            "model": pair["model_name"],
+            "model": MODEL_NAME,
             "cv_pr_auc": np.nan,
             "validation_pr_auc": ensemble_metrics["pr_auc"],
             "validation_roc_auc": ensemble_metrics["roc_auc"],
@@ -211,11 +196,11 @@ def update_comparison_table(path: Path, rows_to_upsert: pd.DataFrame) -> None:
     updated.to_csv(path, index=False)
 
 
-def build_test_comparison_row(pair: dict, metrics: dict) -> pd.DataFrame:
+def build_test_comparison_row(metrics: dict) -> pd.DataFrame:
     return pd.DataFrame(
         [
             {
-                "model": pair["model_name"],
+                "model": MODEL_NAME,
                 "test_pr_auc": metrics["pr_auc"],
                 "test_roc_auc": metrics["roc_auc"],
                 "threshold": metrics["threshold"],
@@ -231,14 +216,14 @@ def build_test_comparison_row(pair: dict, metrics: dict) -> pd.DataFrame:
     )
 
 
-def run_validation(pair: dict) -> None:
-    ensemble_dir = REPORTS_DIR / pair["ensemble_dir"]
+def run_validation() -> None:
+    ensemble_dir = REPORTS_DIR / ENSEMBLE_DIR_NAME
     ensemble_dir.mkdir(parents=True, exist_ok=True)
 
-    classic_path = REPORTS_DIR / pair["classic_dir"] / "validation_predictions.csv"
+    classic_path = REPORTS_DIR / CLASSIC_DIR / "validation_predictions.csv"
     bert_path = REPORTS_DIR / "bert" / "validation_predictions.csv"
 
-    classic = load_predictions(classic_path, pair["classic_key"])
+    classic = load_predictions(classic_path, CLASSIC_KEY)
     bert = load_predictions(bert_path, BERT_KEY)
     classic = classic.rename(
         columns={
@@ -274,7 +259,7 @@ def run_validation(pair: dict) -> None:
     prediction_frame = pd.DataFrame(
         {
             "record_id": merged["record_id"],
-            "model_name": pair["model_name"],
+            "model_name": MODEL_NAME,
             "fraud_score": ensemble_scores,
             "threshold": best["threshold"],
             "prediction": predictions,
@@ -283,21 +268,21 @@ def run_validation(pair: dict) -> None:
     )
     prediction_frame.to_csv(ensemble_dir / "validation_predictions.csv", index=False)
 
-    comparison = build_comparison_rows(pair, best)
+    comparison = build_comparison_rows(best)
     comparison.to_csv(ensemble_dir / "validation_comparison.csv", index=False)
     update_comparison_table(ROOT_COMPARISON, comparison)
 
     config_payload = {
         "method": "weighted_average",
-        "base_models": [pair["classic_key"], BERT_KEY],
+        "base_models": [CLASSIC_KEY, BERT_KEY],
         "weights": {
-            pair["classic_key"]: best["weight_classic"],
+            CLASSIC_KEY: best["weight_classic"],
             BERT_KEY: best["weight_bert"],
         },
         "threshold_selection": "max_fraud_f1_on_validation",
         "selected_threshold": best["threshold"],
         "validation_input_files": {
-            pair["classic_key"]: str(classic_path),
+            CLASSIC_KEY: str(classic_path),
             BERT_KEY: str(bert_path),
         },
     }
@@ -307,10 +292,10 @@ def run_validation(pair: dict) -> None:
     )
 
     metrics_payload = {
-        "model_name": pair["model_name"],
+        "model_name": MODEL_NAME,
         "method": "weighted_average",
         "weights": {
-            pair["classic_key"]: best["weight_classic"],
+            CLASSIC_KEY: best["weight_classic"],
             BERT_KEY: best["weight_bert"],
         },
         "selected_threshold": best,
@@ -334,7 +319,7 @@ def run_validation(pair: dict) -> None:
 
     print(f"Wrote predictions to {ensemble_dir / 'validation_predictions.csv'}")
     print(
-        f"Selected weights: classic={best['weight_classic']:.2f}, "
+        f"Selected weights: lr={best['weight_classic']:.2f}, "
         f"bert={best['weight_bert']:.2f}"
     )
     print(f"Selected threshold: {best['threshold']:.2f}")
@@ -342,27 +327,27 @@ def run_validation(pair: dict) -> None:
     print(f"Validation fraud F1: {best['fraud_f1']:.4f}")
 
 
-def run_test(pair: dict) -> None:
-    ensemble_dir = REPORTS_DIR / pair["ensemble_dir"]
+def run_test() -> None:
+    ensemble_dir = REPORTS_DIR / ENSEMBLE_DIR_NAME
     config_path = ensemble_dir / "ensemble_config.json"
     if not config_path.exists():
         raise FileNotFoundError(
             "Run --mode validation first to produce ensemble_config.json"
         )
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    w_classic = config["weights"][pair["classic_key"]]
+    w_classic = config["weights"][CLASSIC_KEY]
     w_bert = config["weights"][BERT_KEY]
     threshold = config["selected_threshold"]
 
-    classic_test = REPORTS_DIR / pair["classic_dir"] / "test_predictions.csv"
+    classic_test = REPORTS_DIR / CLASSIC_DIR / "test_predictions.csv"
     bert_test = REPORTS_DIR / "bert" / "test_predictions.csv"
 
     if not classic_test.exists():
-        raise FileNotFoundError(f"Classic test predictions not found: {classic_test}")
+        raise FileNotFoundError(f"LR test predictions not found: {classic_test}")
     if not bert_test.exists():
         raise FileNotFoundError(f"BERT test predictions not found: {bert_test}")
 
-    classic = load_predictions(classic_test, pair["classic_key"]).rename(
+    classic = load_predictions(classic_test, CLASSIC_KEY).rename(
         columns={
             "fraud_score": "fraud_score_classic",
             "true_label": "true_label_classic",
@@ -377,7 +362,7 @@ def run_test(pair: dict) -> None:
     merged = classic.merge(bert, on="record_id", validate="one_to_one")
 
     if not merged["true_label_classic"].equals(merged["true_label_bert"]):
-        raise ValueError("Classic and BERT true_label columns do not match after merge")
+        raise ValueError("LR and BERT true_label columns do not match after merge")
 
     ensemble_scores = (
         w_classic * merged["fraud_score_classic"].to_numpy(dtype=float)
@@ -389,7 +374,7 @@ def run_test(pair: dict) -> None:
     prediction_frame = pd.DataFrame(
         {
             "record_id": merged["record_id"],
-            "model_name": pair["model_name"],
+            "model_name": MODEL_NAME,
             "fraud_score": ensemble_scores,
             "threshold": threshold,
             "prediction": predictions,
@@ -400,10 +385,10 @@ def run_test(pair: dict) -> None:
 
     metrics = calculate_metrics(labels, ensemble_scores, threshold)
     metrics_payload = {
-        "model_name": pair["model_name"],
+        "model_name": MODEL_NAME,
         "method": "weighted_average",
         "weights": {
-            pair["classic_key"]: w_classic,
+            CLASSIC_KEY: w_classic,
             BERT_KEY: w_bert,
         },
         "threshold": threshold,
@@ -414,10 +399,10 @@ def run_test(pair: dict) -> None:
         json.dumps(metrics_payload, indent=2),
         encoding="utf-8",
     )
-    update_comparison_table(ROOT_TEST_COMPARISON, build_test_comparison_row(pair, metrics))
+    update_comparison_table(ROOT_TEST_COMPARISON, build_test_comparison_row(metrics))
 
     print(f"Wrote test predictions to {ensemble_dir / 'test_predictions.csv'}")
-    print(f"Locked weights: classic={w_classic:.2f}, bert={w_bert:.2f}")
+    print(f"Locked weights: lr={w_classic:.2f}, bert={w_bert:.2f}")
     print(f"Locked threshold: {threshold:.2f}")
     print(f"Test PR-AUC: {metrics['pr_auc']:.4f}")
     print(f"Test fraud F1: {metrics['fraud_f1']:.4f}")
@@ -426,26 +411,19 @@ def run_test(pair: dict) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build classic+BERT ensemble")
+    parser = argparse.ArgumentParser(description="Build LR+BERT ensemble")
     parser.add_argument(
         "--mode",
         type=str,
         default="validation",
         choices=["validation", "test"],
     )
-    parser.add_argument(
-        "--classic-model",
-        type=str,
-        default="linear_svm",
-        choices=sorted(PAIR_CONFIG.keys()),
-    )
     args = parser.parse_args()
-    pair = PAIR_CONFIG[args.classic_model]
 
     if args.mode == "validation":
-        run_validation(pair)
+        run_validation()
     else:
-        run_test(pair)
+        run_test()
 
 
 if __name__ == "__main__":

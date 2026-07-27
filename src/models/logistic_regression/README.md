@@ -16,5 +16,5 @@ Run from the project root:
 ```
 
 Outputs are saved under `reports/models/logistic_regression/`. The trained
-model is saved locally under `artifacts/logistic_regression/` and is excluded
+model is saved locally under `model_weights/logistic_regression/` and is excluded
 from Git.
