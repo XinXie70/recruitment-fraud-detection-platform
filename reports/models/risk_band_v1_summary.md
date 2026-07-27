@@ -85,3 +85,21 @@ fraudulent advertisements.
 Compared with Validation, fewer fraudulent advertisements fell into Low
 (2 instead of 10), while High precision decreased from 93.18% to 88.17%.
 The thresholds remain unchanged after this Test evaluation.
+
+## Reproduce the results
+
+Run the Validation step first. It selects the Low/Suspicious boundary using
+the saved Validation predictions and writes the frozen risk-band config:
+
+```bash
+python src/models/build_risk_bands.py --mode validation
+```
+
+Then apply the frozen config to Test:
+
+```bash
+python src/models/build_risk_bands.py --mode test
+```
+
+The Test step only reads the saved thresholds. It does not search for or
+change either boundary.
