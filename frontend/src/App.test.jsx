@@ -19,6 +19,56 @@ const AUTH_RESPONSE = {
   user: { id: 1, email: 'user@example.com', username: 'unit-user', is_admin: false },
 };
 
+const ANALYSIS_RESPONSE = {
+  status: 'success',
+  ensemble: {
+    risk_score: 0.86,
+    classification_label: 'Likely Deceptive',
+    risk_level: 'high',
+    recommended_action: 'High Risk Warning',
+    active_model_count: 1,
+    version: 'ensemble-test',
+  },
+  member_outputs: [
+    {
+      key: 'bert',
+      display_name: 'BERT',
+      status: 'success',
+      raw_score: 0.86,
+      calibrated_score: 0.86,
+      effective_weight: 1,
+      weighted_contribution: 0.86,
+    },
+  ],
+  xai: {
+    status: 'success',
+    method: 'occlusion_fallback',
+    items: [
+      {
+        start: 0,
+        end: 6,
+        text: 'URGENT',
+        direction: 'raises_risk',
+        contribution: 0.2,
+      },
+    ],
+  },
+  gentle_ai: {
+    summary: 'This advertisement contains high-risk signals.',
+    evidence_explanations: [
+      {
+        start: 0,
+        end: 6,
+        text: 'URGENT',
+        direction: 'raises_risk',
+        explanation: 'Pressure language can be a warning sign.',
+      },
+    ],
+    next_steps: ['Do not send money or identity documents.'],
+    disclaimer: 'This result supports, but does not replace, human judgement.',
+  },
+};
+
 beforeEach(() => {
   window.localStorage.clear();
   window.sessionStorage.clear();
@@ -134,4 +184,90 @@ test('shows a recoverable analysis error and re-enables submission', async () =>
     screen.getByText('The analysis service is temporarily unavailable. Please try again shortly.'),
   ).toBeVisible();
   await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze Text' })).toBeEnabled());
+});
+
+test('renders a successful analysis report and stores it in history', async () => {
+  window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
+  window.history.pushState({}, '', '/analyze');
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: vi.fn().mockResolvedValue(ANALYSIS_RESPONSE),
+  });
+  vi.stubGlobal('fetch', fetchMock);
+
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Load fake sample' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
+
+  expect(await screen.findByText('Likely Deceptive')).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
+  expect(screen.getByText('Pressure language can be a warning sign.')).toBeVisible();
+  expect(fetchMock).toHaveBeenCalledWith(
+    '/api/v1/analyze',
+    expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({ Authorization: 'Bearer unit-token' }),
+    }),
+  );
+
+  const savedResult = JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'));
+  const savedHistory = JSON.parse(window.localStorage.getItem('fake_job_history'));
+  expect(savedResult.ensemble.risk_score).toBe(0.86);
+  expect(savedHistory).toHaveLength(1);
+  expect(savedHistory[0]).toMatchObject({
+    riskLevel: 'high',
+    riskScore: 86,
+    prediction: 'Likely Deceptive',
+  });
+});
+
+test('logs out when the analysis API rejects an expired token', async () => {
+  window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
+  window.history.pushState({}, '', '/analyze');
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: vi.fn().mockResolvedValue({ detail: 'Token expired' }),
+    }),
+  );
+
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Load legit sample' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
+
+  expect(await screen.findByRole('heading', { name: 'Log In' })).toBeVisible();
+  expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
+});
+
+test('registers a user with the expected payload', async () => {
+  window.history.pushState({}, '', '/register');
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    status: 201,
+    json: vi.fn().mockResolvedValue(AUTH_RESPONSE),
+  });
+  vi.stubGlobal('fetch', fetchMock);
+
+  render(<App />);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'user@example.com' } });
+  fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'unit-user' } });
+  fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Secure123' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Register' }));
+
+  expect(
+    await screen.findByRole('heading', { name: 'Detect Fake Job Advertisements' }),
+  ).toBeVisible();
+  expect(fetchMock).toHaveBeenCalledWith('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'user@example.com',
+      username: 'unit-user',
+      password: 'Secure123',
+    }),
+  });
 });
