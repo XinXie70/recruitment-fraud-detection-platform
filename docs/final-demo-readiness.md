@@ -30,8 +30,9 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 
 ## Architecture and design evidence
 
-- System context and container/deployment diagrams.
-- A prediction-request sequence diagram.
+- [System context and container/deployment diagrams](architecture/README.md).
+- [Prediction-request sequence diagram](architecture/prediction-sequence.md).
+- [Consolidated Design Justification](design-justification.md).
 - ADR 001: modular monolith instead of microservices.
 - ADR 002: ensemble scoring formula.
 - ADR 003: model warm-up strategy.

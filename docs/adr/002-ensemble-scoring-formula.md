@@ -12,43 +12,49 @@ We have 8 architecturally diverse models (LR, SVM, XGBoost, DNN, RNN, BiLSTM, BE
 
 ## Decision
 
-Use a **two-mode weighted strategy** (`backend/scoring.py`):
+Use the **configuration-driven calibrated weighted ensemble** implemented by
+`backend/services/ensemble_predictor.py`.
 
-**Mode 1 — Models Agree** (all fake or all legitimate):
-```
-Final Score = Average of all model scores
+For every successful model `i`:
+
+```text
+calibrated_i = calibrator_i(raw_probability_i)
+effective_weight_i = configured_weight_i / sum(weights of successful models)
+final_risk = sum(calibrated_i * effective_weight_i)
 ```
 
-**Mode 2 — Models Disagree** (mixed predictions):
-```
-Final Score = α × Average + (1 − α) × Max(Highest Risk)
-```
-
-Where `α = 0.60` (consensus weight), `(1 − α) = 0.40` (caution weight).
-
-Risk tiers:
-- Score < 30 → Low Risk
-- 30 ≤ Score < 60 → Medium Risk
-- Score ≥ 60 → High Risk
+The final probability is mapped to low, medium, or high risk using the low/high
+thresholds stored in the same versioned configuration. If a model fails, its
+weight is redistributed proportionally across successful models. If all models
+fail, the API returns 503 rather than inventing a score.
 
 ## Rationale
 
 1. **Ensemble wisdom**: Averaging across diverse architectures (linear, tree, deep, transformer) reduces variance and guards against individual overfitting.
 
-2. **Asymmetric cost**: In fraud detection, false negatives (missed fake) are far costlier than false positives. The 0.40 caution weight ensures that a single model detecting fraud signals elevates the overall score.
+2. **Asymmetric cost**: Validation-selected thresholds can reflect that false
+   negatives are more costly than false positives without hard-coding UI logic.
 
-3. **Empirical tuning**: Thresholds were derived from validation-set PR-curve optimization (see `structured_output.tune_dual_thresholds()`).
+3. **Operational resilience**: Renormalising successful weights allows an
+   explicitly degraded result when individual models fail.
+
+4. **Separation of code and evidence**: Weights, calibrators, thresholds, fit
+   status, and provenance are stored in a versioned JSON artifact.
 
 ## Alternatives Considered
 
 | Alternative | Why Rejected |
 |-------------|-------------|
-| Pure average (α=1.0) | Too conservative: ignores outlier model signals |
-| Pure max (α=0.0) | Too sensitive: single model noise triggers false alarms |
+| Pure average | Assumes equal model quality and calibration |
+| Maximum model score | Too sensitive to a single noisy member |
 | Learned meta-model | Requires re-training when adding/removing members; harder to interpret |
 
 ## Consequences
 
-- Ensemble is interpretable: the formula used is reported in every response
-- Adding a 9th model requires no code changes (just update `ensemble_config.json`)
-- The 0.40 caution weight means ~40% of borderline cases err toward "suspicious" — acceptable given the domain
+- Ensemble contributions are inspectable in each member output.
+- Models, calibration, weights, and thresholds can change through a reviewed
+  configuration artifact rather than application-code edits.
+- More models increase latency and operational complexity.
+- The checked-in development fallback is equal-weight and marked `fitted:
+  false`; it must be replaced with a validation-fitted locked artifact before
+  claiming empirically optimised production weights.
