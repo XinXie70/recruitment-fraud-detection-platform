@@ -7,12 +7,12 @@ function errorMessage(data, fallback) {
 }
 
 const ANALYSIS_TIMEOUT_MS = 135000;
-export async function analyzeJobText(text, accessToken) {
+async function requestAnalysis(path, text, accessToken) {
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT_MS);
 
   try {
-    const response = await fetch(apiUrl('/api/v1/analyze'), {
+    const response = await fetch(apiUrl(path), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,6 +60,14 @@ export async function analyzeJobText(text, accessToken) {
   } finally {
     window.clearTimeout(timeoutId);
   }
+}
+
+export function analyzeJobText(text, accessToken) {
+  return requestAnalysis('/api/v1/analyze', text, accessToken);
+}
+
+export function analyzeJobScore(text, accessToken) {
+  return requestAnalysis('/api/v1/analyze/score', text, accessToken);
 }
 
 export async function fetchEducation(topic) {

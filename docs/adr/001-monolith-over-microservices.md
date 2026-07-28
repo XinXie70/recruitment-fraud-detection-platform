@@ -11,7 +11,7 @@
 The system serves a single core domain — fake job detection — with these characteristics:
 
 - Single bounded context: job advertisement risk analysis
-- Synchronous request-response flow: submit text → validate → ensemble inference → XAI → response
+- Progressive request-response flow: score first, then load detailed XAI
 - Small team (3–5 developers)
 - Deployed on Cloud Run / Render (serverless, auto-scaling)
 - 8 ML models accessed through a stable adapter interface; they can be loaded
@@ -38,7 +38,7 @@ The backend is a single FastAPI application with clear internal boundaries:
 |-------------|-------------|
 | Microservices (one per model) | Eight independently operated services would add excessive networking and deployment complexity |
 | Separate XAI service | XAI needs direct access to ensemble internals (SHAP values); separating would duplicate model loading |
-| Message queue for async analysis | No async use case; all requests need synchronous responses |
+| Message queue for XAI | The browser can request the second phase directly; a queue would add operational complexity before durable background jobs are required |
 
 ## Consequences
 

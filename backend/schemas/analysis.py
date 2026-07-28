@@ -34,17 +34,16 @@ class ModelMemberOutput(BaseModel):
     effective_weight: float = Field(..., ge=0, le=1)
     weighted_contribution: float = Field(..., ge=0, le=1)
     error: str | None = None
-    error_code: Literal[
-        "not_registered", "artifact_unavailable", "inference_failed", "timeout"
-    ] | None = None
+    error_code: (
+        Literal["not_registered", "artifact_unavailable", "inference_failed", "timeout"]
+        | None
+    ) = None
 
 
 class EnsembleResult(BaseModel):
     status: Literal["success", "degraded"]
     risk_score: float = Field(..., ge=0, le=1)
-    classification_label: Literal[
-        "Likely Legitimate", "Suspicious", "Likely Deceptive"
-    ]
+    classification_label: Literal["Likely Legitimate", "Suspicious", "Likely Deceptive"]
     risk_level: Literal["low", "medium", "high"]
     prediction: Literal["real", "fake"]
     recommended_action: Literal["Safe", "Review Required", "High Risk Warning"]
@@ -84,6 +83,7 @@ class URLAnalysis(BaseModel):
 
 class AnalysisResponse(BaseModel):
     api_version: Literal["1.0"] = API_VERSION
+    phase: Literal["score", "complete"] = "complete"
     status: Literal["success", "degraded"]
     job_relevance_score: float | None = Field(None, ge=0, le=1)
     ensemble: EnsembleResult

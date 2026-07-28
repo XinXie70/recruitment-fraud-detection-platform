@@ -204,6 +204,13 @@ test('renders a successful analysis report and stores it in history', async () =
   expect(screen.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
   expect(screen.getByText('Pressure language can be a warning sign.')).toBeVisible();
   expect(fetchMock).toHaveBeenCalledWith(
+    '/api/v1/analyze/score',
+    expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({ Authorization: 'Bearer unit-token' }),
+    }),
+  );
+  expect(fetchMock).toHaveBeenCalledWith(
     '/api/v1/analyze',
     expect.objectContaining({
       method: 'POST',
@@ -220,6 +227,45 @@ test('renders a successful analysis report and stores it in history', async () =
     riskScore: 86,
     prediction: 'Likely Deceptive',
   });
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+});
+
+test('keeps the risk score visible when detailed explanation loading fails', async () => {
+  window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
+  window.history.pushState({}, '', '/analyze');
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const scoreResponse = {
+    ...ANALYSIS_RESPONSE,
+    phase: 'score',
+    xai: { status: 'unavailable', method: 'unavailable', items: [] },
+  };
+  vi.stubGlobal(
+    'fetch',
+    vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue(scoreResponse),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        json: vi.fn().mockResolvedValue({}),
+      }),
+  );
+
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Load fake sample' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
+
+  expect(await screen.findByText('Likely Deceptive')).toBeVisible();
+  expect(
+    await screen.findByText(
+      'The detailed explanation could not be loaded. The risk score remains available.',
+    ),
+  ).toBeVisible();
+  expect(window.localStorage.getItem('fake_job_history')).toBeNull();
 });
 
 test('logs out when the analysis API rejects an expired token', async () => {
