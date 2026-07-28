@@ -18,17 +18,17 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 
 ## Quality evidence
 
-| Area               | Evidence to prepare                                                   | Current status                                                         |
-| ------------------ | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Backend tests      | Test count and coverage report                                        | 74 tests passed; 90.54% measured locally                               |
-| Frontend tests     | Unit/component coverage report                                        | 11 tests pass; 41.20% statements / 42.41% lines                        |
-| End-to-end tests   | Authentication, analyse, history, admin routing, and failure paths    | 5 Playwright tests pass                                                |
-| Responsive UI      | Phone, tablet, and desktop screenshots                                | Implemented; rehearsal verification required                           |
-| Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; automated 503 path passes; rehearsal still required       |
-| Live status        | Refresh service status without a full page reload                     | Implemented on Admin Dashboard                                         |
-| Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening required                      |
-| Containers         | One-command frontend/backend/database startup                         | Implemented in `compose.yaml`; smoke test required                     |
-| Ensemble release   | Fitted config, provenance, held-out evaluation                        | Follow the [ensemble release checklist](ensemble-release-checklist.md) |
+| Area               | Evidence to prepare                                                   | Current status                                                                                                       |
+| ------------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Backend tests      | Test count and coverage report                                        | 74 tests passed; 90.54% measured locally                                                                             |
+| Frontend tests     | Unit/component coverage report                                        | 11 tests pass; 41.20% statements / 42.41% lines                                                                      |
+| End-to-end tests   | Authentication, analyse, history, admin routing, and failure paths    | 5 Playwright tests pass                                                                                              |
+| Responsive UI      | Phone, tablet, and desktop screenshots                                | Implemented; rehearsal verification required                                                                         |
+| Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; automated 503 path passes; rehearsal still required                                                     |
+| Live status        | Refresh service status without a full page reload                     | Implemented on Admin Dashboard                                                                                       |
+| Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening and [router risk tracking](security/react-router-risk-acceptance.md) remain |
+| Containers         | One-command frontend/backend/database startup                         | Implemented in `compose.yaml`; smoke test required                                                                   |
+| Ensemble release   | Fitted config, provenance, held-out evaluation                        | Follow the [ensemble release checklist](ensemble-release-checklist.md)                                               |
 
 ## Architecture and design evidence
 
