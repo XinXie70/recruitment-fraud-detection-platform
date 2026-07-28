@@ -73,22 +73,50 @@ export default function AuthPage({ mode, onAuth, auth, onLogout }) {
               <>
                 <label>
                   Email
-                  <input name="email" type="email" value={form.email} onChange={handleChange} required autoComplete="email" />
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    autoComplete="email"
+                  />
                 </label>
                 <label>
                   Username
-                  <input name="username" value={form.username} onChange={handleChange} required minLength={3} autoComplete="username" />
+                  <input
+                    name="username"
+                    value={form.username}
+                    onChange={handleChange}
+                    required
+                    minLength={3}
+                    autoComplete="username"
+                  />
                 </label>
               </>
             ) : (
               <label>
                 Email or username
-                <input name="identifier" value={form.identifier} onChange={handleChange} required autoComplete="username" />
+                <input
+                  name="identifier"
+                  value={form.identifier}
+                  onChange={handleChange}
+                  required
+                  autoComplete="username"
+                />
               </label>
             )}
             <label>
               Password
-              <input name="password" type="password" value={form.password} onChange={handleChange} required minLength={isRegister ? 8 : 1} autoComplete={isRegister ? 'new-password' : 'current-password'} />
+              <input
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                minLength={isRegister ? 8 : 1}
+                autoComplete={isRegister ? 'new-password' : 'current-password'}
+              />
             </label>
             {error && <p className="auth-error">{error}</p>}
             <button type="submit" className="btn-analyze" disabled={loading}>

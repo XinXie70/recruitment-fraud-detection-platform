@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, LayoutDashboard, BookOpen, LogIn, LogOut, ShieldAlert, UserPlus } from 'lucide-react';
+import {
+  Briefcase,
+  LayoutDashboard,
+  BookOpen,
+  LogIn,
+  LogOut,
+  ShieldAlert,
+  UserPlus,
+} from 'lucide-react';
 
 export default function Navigation({ auth, onLogout }) {
   return (

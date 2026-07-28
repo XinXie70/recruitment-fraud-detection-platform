@@ -1,9 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Activity, AlertTriangle, ArrowRight, BarChart3, BookOpen, Briefcase,
-  Calendar, CheckCircle2, Clock, Search, ShieldAlert,
-  TrendingUp, Zap, Trash2, PieChart, Target, Eye,
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Briefcase,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Search,
+  ShieldAlert,
+  TrendingUp,
+  Zap,
+  Trash2,
+  PieChart,
+  Target,
+  Eye,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
@@ -22,18 +36,22 @@ function loadHistory() {
 export default function DashboardPage({ auth, onLogout }) {
   const navigate = useNavigate();
   const [history, setHistory] = useState(loadHistory);
-  const [selectedEntry, setSelectedEntry] = useState(null);
 
   const stats = useMemo(() => {
     const h = history;
     const high = h.filter((e) => e.riskLevel === 'high').length;
     const medium = h.filter((e) => e.riskLevel === 'medium').length;
     const low = h.filter((e) => e.riskLevel === 'low').length;
-    const avgScore = h.length > 0 ? Math.round(h.reduce((s, e) => s + (e.riskScore || 0), 0) / h.length) : 0;
+    const avgScore =
+      h.length > 0 ? Math.round(h.reduce((s, e) => s + (e.riskScore || 0), 0) / h.length) : 0;
     const lastScan = h.length > 0 ? h[0].date : null;
     return { total: h.length, high, medium, low, avgScore, lastScan };
   }, [history]);
 
+  useEffect(() => {
+    const h = loadHistory();
+    setHistory(h);
+  }, []);
   const riskLevelLabel = (level) => {
     if (level === 'high') return 'High Risk';
     if (level === 'medium') return 'Medium Risk';
@@ -49,7 +67,10 @@ export default function DashboardPage({ auth, onLogout }) {
   const formatDate = (iso) => {
     try {
       return new Date(iso).toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       });
     } catch {
       return 'Unknown date';
@@ -63,7 +84,12 @@ export default function DashboardPage({ auth, onLogout }) {
   const handleClearHistory = () => {
     localStorage.removeItem(HISTORY_KEY);
     setHistory([]);
-    setSelectedEntry(null);
+  };
+
+  const handleViewResult = (entry) => {
+    if (!entry.analysisResult) return;
+    window.sessionStorage.setItem('fake_job_last_analysis', JSON.stringify(entry.analysisResult));
+    navigate('/analyze', { state: { analysisResult: entry.analysisResult } });
   };
 
   return (
@@ -150,7 +176,8 @@ export default function DashboardPage({ auth, onLogout }) {
               <div className="dash-distribution">
                 <div className="dash-dist-bar-h">
                   <div className="dash-dist-bar-label">
-                    <span>Safe</span><span>{safePercent}%</span>
+                    <span>Safe</span>
+                    <span>{safePercent}%</span>
                   </div>
                   <div className="dash-dist-track">
                     <div className="dash-dist-fill safe" style={{ width: `${safePercent}%` }} />
@@ -158,23 +185,33 @@ export default function DashboardPage({ auth, onLogout }) {
                 </div>
                 <div className="dash-dist-bar-h">
                   <div className="dash-dist-bar-label">
-                    <span>Suspicious</span><span>{suspiciousPercent}%</span>
+                    <span>Suspicious</span>
+                    <span>{suspiciousPercent}%</span>
                   </div>
                   <div className="dash-dist-track">
-                    <div className="dash-dist-fill warn" style={{ width: `${suspiciousPercent}%` }} />
+                    <div
+                      className="dash-dist-fill warn"
+                      style={{ width: `${suspiciousPercent}%` }}
+                    />
                   </div>
                 </div>
                 <div className="dash-dist-bar-h">
                   <div className="dash-dist-bar-label">
-                    <span>Deceptive</span><span>{deceptivePercent}%</span>
+                    <span>Deceptive</span>
+                    <span>{deceptivePercent}%</span>
                   </div>
                   <div className="dash-dist-track">
-                    <div className="dash-dist-fill danger" style={{ width: `${deceptivePercent}%` }} />
+                    <div
+                      className="dash-dist-fill danger"
+                      style={{ width: `${deceptivePercent}%` }}
+                    />
                   </div>
                 </div>
                 <div className="dash-avg-line">
                   <Target size={14} />
-                  <span>Average Risk Score: <strong>{stats.avgScore}/100</strong></span>
+                  <span>
+                    Average Risk Score: <strong>{stats.avgScore}/100</strong>
+                  </span>
                 </div>
               </div>
             ) : (
@@ -197,31 +234,56 @@ export default function DashboardPage({ auth, onLogout }) {
                   <svg viewBox="0 0 100 100" className="dash-donut">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="#ece7e1" strokeWidth="12" />
                     <circle
-                      cx="50" cy="50" r="40" fill="none"
-                      stroke="var(--safe)" strokeWidth="12"
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="var(--safe)"
+                      strokeWidth="12"
                       strokeDasharray={`${(stats.low / stats.total) * 251.3} 251.3`}
                       strokeDashoffset="0"
-                      transform="rotate(-90 50 50)" />
+                      transform="rotate(-90 50 50)"
+                    />
                     <circle
-                      cx="50" cy="50" r="40" fill="none"
-                      stroke="var(--warn)" strokeWidth="12"
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="var(--warn)"
+                      strokeWidth="12"
                       strokeDasharray={`${(stats.medium / stats.total) * 251.3} 251.3`}
                       strokeDashoffset={`${-(stats.low / stats.total) * 251.3}`}
-                      transform="rotate(-90 50 50)" />
+                      transform="rotate(-90 50 50)"
+                    />
                     <circle
-                      cx="50" cy="50" r="40" fill="none"
-                      stroke="var(--danger)" strokeWidth="12"
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="var(--danger)"
+                      strokeWidth="12"
                       strokeDasharray={`${(stats.high / stats.total) * 251.3} 251.3`}
                       strokeDashoffset={`${-((stats.low + stats.medium) / stats.total) * 251.3}`}
-                      transform="rotate(-90 50 50)" />
-                    <text x="50" y="46" textAnchor="middle" className="dash-donut-num">{stats.total}</text>
-                    <text x="50" y="62" textAnchor="middle" className="dash-donut-label">scans</text>
+                      transform="rotate(-90 50 50)"
+                    />
+                    <text x="50" y="46" textAnchor="middle" className="dash-donut-num">
+                      {stats.total}
+                    </text>
+                    <text x="50" y="62" textAnchor="middle" className="dash-donut-label">
+                      scans
+                    </text>
                   </svg>
                 </div>
                 <div className="dash-donut-legend">
-                  <span><i className="dot safe" /> Legitimate <b>{stats.low}</b></span>
-                  <span><i className="dot warn" /> Suspicious <b>{stats.medium}</b></span>
-                  <span><i className="dot danger" /> Deceptive <b>{stats.high}</b></span>
+                  <span>
+                    <i className="dot safe" /> Legitimate <b>{stats.low}</b>
+                  </span>
+                  <span>
+                    <i className="dot warn" /> Suspicious <b>{stats.medium}</b>
+                  </span>
+                  <span>
+                    <i className="dot danger" /> Deceptive <b>{stats.high}</b>
+                  </span>
                 </div>
               </div>
             ) : (
@@ -257,7 +319,6 @@ export default function DashboardPage({ auth, onLogout }) {
                 </div>
                 <ArrowRight size={18} />
               </button>
-              
             </div>
           </div>
 
@@ -270,19 +331,32 @@ export default function DashboardPage({ auth, onLogout }) {
               <div className="dash-insight-body">
                 <div className="dash-insight-row">
                   <Clock size={16} />
-                  <span>Last scan: <strong>{formatDate(stats.lastScan)}</strong></span>
+                  <span>
+                    Last scan: <strong>{formatDate(stats.lastScan)}</strong>
+                  </span>
                 </div>
                 <div className="dash-insight-row">
                   <Activity size={16} />
-                  <span>Average risk score: <strong>{stats.avgScore}/100</strong></span>
+                  <span>
+                    Average risk score: <strong>{stats.avgScore}/100</strong>
+                  </span>
                 </div>
                 <div className="dash-insight-row">
                   {deceptivePercent > 40 ? (
-                    <><ShieldAlert size={16} color="var(--danger)" /><span className="text-danger">High scam detection rate — stay vigilant!</span></>
+                    <>
+                      <ShieldAlert size={16} color="var(--danger)" />
+                      <span className="text-danger">High scam detection rate — stay vigilant!</span>
+                    </>
                   ) : deceptivePercent > 15 ? (
-                    <><AlertTriangle size={16} color="var(--warn)" /><span className="text-warn">Moderate risk detected in your scans.</span></>
+                    <>
+                      <AlertTriangle size={16} color="var(--warn)" />
+                      <span className="text-warn">Moderate risk detected in your scans.</span>
+                    </>
                   ) : (
-                    <><CheckCircle2 size={16} color="var(--safe)" /><span className="text-safe">Most of your scans appear legitimate.</span></>
+                    <>
+                      <CheckCircle2 size={16} color="var(--safe)" />
+                      <span className="text-safe">Most of your scans appear legitimate.</span>
+                    </>
                   )}
                 </div>
               </div>
@@ -303,7 +377,11 @@ export default function DashboardPage({ auth, onLogout }) {
             <div className="dash-header-right">
               {history.length > 0 && <span className="dash-badge">{history.length} records</span>}
               {history.length > 0 && (
-                <button className="dash-clear-btn" onClick={handleClearHistory} title="Clear all history">
+                <button
+                  className="dash-clear-btn"
+                  onClick={handleClearHistory}
+                  title="Clear all history"
+                >
                   <Trash2 size={16} />
                   Clear
                 </button>
@@ -322,16 +400,12 @@ export default function DashboardPage({ auth, onLogout }) {
                       <th>Risk Level</th>
                       <th>Verdict</th>
                       <th>Models</th>
-                      <th></th>
+                      <th>Result</th>
                     </tr>
                   </thead>
                   <tbody>
                     {history.slice(0, 15).map((entry) => (
-                      <tr
-                        key={entry.id}
-                        className={`dash-history-row ${selectedEntry?.id === entry.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
-                      >
+                      <tr key={entry.id} className="dash-history-row">
                         <td className="dash-date">
                           <Calendar size={14} />
                           {formatDate(entry.date)}
@@ -352,49 +426,31 @@ export default function DashboardPage({ auth, onLogout }) {
                           {entry.modelCount || 8} models
                         </td>
                         <td>
-                          <Eye size={16} className="dash-view-icon" />
+                          <button
+                            type="button"
+                            className="dash-view-result"
+                            onClick={() => handleViewResult(entry)}
+                            disabled={!entry.analysisResult}
+                            title={
+                              entry.analysisResult
+                                ? 'Open full analysis result'
+                                : 'Full result was not saved for this older scan'
+                            }
+                            aria-label={
+                              entry.analysisResult
+                                ? 'Open full analysis result'
+                                : 'Full result unavailable for this older scan'
+                            }
+                          >
+                            <Eye size={16} />
+                            <span>{entry.analysisResult ? 'View' : 'Unavailable'}</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {/* Expanded detail panel */}
-              {selectedEntry && (
-                <div className="dash-detail-panel">
-                  <div className="dash-detail-header">
-                    <h3>Scan Detail</h3>
-                    <span className={`dash-level-badge ${riskLevelClass(selectedEntry.riskLevel)}`}>
-                      {riskLevelLabel(selectedEntry.riskLevel)} — {selectedEntry.riskScore}/100
-                    </span>
-                  </div>
-                  <div className="dash-detail-grid">
-                    <div className="dash-detail-item">
-                      <span>Verdict</span>
-                      <strong>{selectedEntry.prediction || 'N/A'}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Models Used</span>
-                      <strong>{selectedEntry.modelCount || 8}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Scan Date</span>
-                      <strong>{formatDate(selectedEntry.date)}</strong>
-                    </div>
-                    <div className="dash-detail-item">
-                      <span>Risk Level</span>
-                      <strong className={`text-${riskLevelClass(selectedEntry.riskLevel)}`}>
-                        {riskLevelLabel(selectedEntry.riskLevel)}
-                      </strong>
-                    </div>
-                  </div>
-                  <button className="btn-analyze" style={{ marginTop: '18px', minHeight: '46px', fontSize: '0.95rem', padding: '0 22px' }} onClick={() => navigate('/analyze')}>
-                    <Search size={18} />
-                    Run Another Scan
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <div className="dash-empty">
