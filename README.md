@@ -83,6 +83,27 @@ Husky and lint-staged automatically format and lint staged frontend files before
 each commit. GitHub Actions runs the backend tests, frontend linting, frontend
 tests, and a production build.
 
+## Full-stack Docker development
+
+Start PostgreSQL, run the database migrations, and launch the backend and
+frontend with one command:
+
+```bash
+docker compose up --build
+```
+
+The frontend is available at http://localhost:5190 and proxies `/api` requests
+to the backend container. Set `MODEL_SERVER_URL` before starting Compose when a
+standalone model inference service is required:
+
+```bash
+MODEL_SERVER_URL=https://model-api.example.com docker compose up --build
+```
+
+Do not expose an unauthenticated model server directly to the public internet.
+The Final Demo evidence and rehearsal checklist are maintained in
+[`docs/final-demo-readiness.md`](docs/final-demo-readiness.md).
+
 ## API endpoints
 
 | Method | Path | Description |
