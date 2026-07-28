@@ -23,7 +23,7 @@ and supported by automated or repeatable evidence.
 | INF-07 | An administrator can view research and service-health information.       | Non-admin users see the user dashboard; admins see health and model information.       | `/dashboard`        | Role-aware routing and Admin Dashboard              | `App.test.jsx`, admin API tests, Playwright   | Team  | Implemented |
 | INF-08 | The application handles service failure without crashing or losing input. | 401 logs out safely; 503/network failures show retryable messages; local history remains. | Analyse/Dashboard | API error mapping, loading/error UI, offline fallback | API, App, Dashboard and Playwright tests      | Team  | Implemented |
 | INF-09 | The system protects user data and privileged operations.                 | Passwords are hashed; JWT, ownership and admin checks are server-enforced.             | API boundary        | Auth dependencies, ownership filters, rate limits   | Backend auth/history/admin tests              | Team  | Implemented |
-| INF-10 | The application can be deployed reproducibly as coordinated services.    | Database, migration, backend and frontend start in dependency order with health checks. | Docker Compose      | `compose.yaml` and service Dockerfiles              | Deployment smoke test still required         | Team  | In progress |
+| INF-10 | The application can be deployed reproducibly as coordinated services.    | Database, migration, backend and frontend start in dependency order with health checks. | Docker Compose      | `compose.yaml` and service Dockerfiles              | Full local-to-remote-model smoke test passed | Team  | Implemented |
 | INF-11 | The UI remains usable on phone, tablet and desktop layouts.               | Core routes have responsive layouts, visible loading states and no blocking UI defects. | All primary routes  | Responsive CSS and explicit async states            | Playwright plus rehearsal screenshots needed | Team  | In progress |
 | INF-12 | Model evaluation avoids train/validation/test leakage.                    | Group-aware splits and provenance checks prevent row mismatch and test-set fitting.    | Offline pipeline    | Safe ensemble fitting and split validation          | Pipeline tests; fitted release evidence needed | Team | In progress |
 
@@ -41,7 +41,7 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 | Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; automated 503 path passes; rehearsal still required                                                     |
 | Live status        | Refresh service status and scan history without a full page reload    | Implemented on Admin Dashboard and user Dashboard; history falls back to browser-cached results when offline         |
 | Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening and [router risk tracking](security/react-router-risk-acceptance.md) remain |
-| Containers         | One-command frontend/backend/database startup                         | Compose configuration validates; runtime smoke test awaits an available Docker daemon                               |
+| Containers         | One-command frontend/backend/database startup                         | Full Compose and remote-model analysis smoke test passed                                                             |
 | Ensemble release   | Fitted config, provenance, held-out evaluation                        | Follow the [ensemble release checklist](ensemble-release-checklist.md)                                               |
 
 ## Architecture and design evidence
@@ -54,6 +54,24 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 - ADR 003: model warm-up strategy.
 - ADR 004: XAI method selection.
 - Data leakage prevention: deduplication and group-aware splitting.
+
+## Docker smoke-test evidence
+
+Tested locally on 2026-07-28 with Docker Engine 29.6.1:
+
+- `docker compose config --quiet` passed.
+- `docker compose up --build -d` built the frontend and remote-backend images.
+- PostgreSQL became healthy and both Alembic migrations exited successfully.
+- Backend `/api/live` returned HTTP 200 through ports 8000 and the frontend proxy.
+- Frontend port 5190 returned HTTP 200 and its container became healthy.
+- Registration, JWT issuance, and authenticated history retrieval succeeded through
+  the frontend proxy, proving the frontend/backend/database path.
+- After setting the local, Git-ignored `.env` `MODEL_SERVER_URL`, `/api/health`
+  returned HTTP 200 with 8/8 models available and the database connected.
+- An authenticated analysis request through port 5190 returned HTTP 200 with a
+  successful ensemble result, eight active models, and zero failed models.
+- The tested model endpoint uses plain HTTP. Production deployment still requires
+  HTTPS, service authentication, and restrictive firewall rules.
 
 ## Rehearsal checklist
 
