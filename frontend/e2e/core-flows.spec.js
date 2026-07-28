@@ -154,7 +154,7 @@ test('analyses a job advert and records it in the user dashboard', async ({ page
 
   await expect(page.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
   await expect(page.getByText('86', { exact: true })).toBeVisible();
-  await page.goto('/dashboard');
+  await page.getByRole('link', { name: 'Dashboard' }).click();
   await expect(
     page.getByText('Total Scans').locator('..').getByText('1', { exact: true }),
   ).toBeVisible();
@@ -192,13 +192,15 @@ test('routes an administrator to the research dashboard and reports service heal
     ...AUTH_RESPONSE,
     user: { ...AUTH_RESPONSE.user, username: 'admin-user', is_admin: true },
   };
-  await page.route('**/api/health', (route) =>
-    route.fulfill({
+  let healthRequests = 0;
+  await page.route('**/api/health', (route) => {
+    healthRequests += 1;
+    return route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ status: 'healthy' }),
-    }),
-  );
+    });
+  });
 
   await authenticate(page, '/analyze', adminAuth);
   await page.getByRole('link', { name: /Dashboard/ }).click();
@@ -207,4 +209,8 @@ test('routes an administrator to the research dashboard and reports service heal
   await expect(page.getByRole('heading', { name: 'Admin & Research Dashboard' })).toBeVisible();
   await expect(page.getByText('System Healthy')).toBeVisible();
   await expect(page.getByText('Models Deployed')).toBeVisible();
+  const requestsBeforeRefresh = healthRequests;
+  await page.getByRole('button', { name: 'Refresh system health' }).click();
+  await expect.poll(() => healthRequests).toBeGreaterThan(requestsBeforeRefresh);
+  await expect(page.getByText('System Healthy')).toBeVisible();
 });
