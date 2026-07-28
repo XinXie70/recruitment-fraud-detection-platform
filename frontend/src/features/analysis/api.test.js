@@ -19,8 +19,7 @@ test('returns a friendly message when the analysis service is unavailable', asyn
   await expect(
     analyzeJobText('A valid job advertisement for testing.', 'test-token'),
   ).rejects.toMatchObject({
-    message:
-      'The analysis service is temporarily unavailable. Please try again shortly.',
+    message: 'The analysis service is temporarily unavailable. Please try again shortly.',
     status: 503,
   });
 
@@ -36,16 +35,12 @@ test('returns a friendly message when the analysis service is unavailable', asyn
 });
 
 test('returns a friendly message when the network connection fails', async () => {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn().mockRejectedValue(new TypeError('Failed to fetch')),
-  );
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
 
   await expect(
     analyzeJobText('A valid job advertisement for testing.', 'test-token'),
   ).rejects.toMatchObject({
-    message:
-      'Unable to connect to the analysis service. Check your connection and try again.',
+    message: 'Unable to connect to the analysis service. Check your connection and try again.',
     code: 'NETWORK_ERROR',
   });
 });

@@ -1,0 +1,12 @@
+{
+  "version": "v1",
+  "ensemble_name": "ensemble_lr_bert_class_weighted",
+  "score_scale": "0_to_1",
+  "low_suspicious_threshold": 0.1567,
+  "suspicious_high_threshold": 0.62,
+  "selection_split": "validation",
+  "low_threshold_rule": "highest threshold with at least 90% non-low fraud recall",
+  "minimum_non_low_fraud_recall": 0.9,
+  "high_threshold_rule": "reuse frozen binary ensemble threshold",
+  "test_used_for_selection": false
+}

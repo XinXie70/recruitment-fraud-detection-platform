@@ -62,7 +62,12 @@ export default function MeteorBackground() {
 
       nebulae.forEach((nebula) => {
         const glow = ctx.createRadialGradient(
-          nebula.x, nebula.y, 0, nebula.x, nebula.y, nebula.radius,
+          nebula.x,
+          nebula.y,
+          0,
+          nebula.x,
+          nebula.y,
+          nebula.radius,
         );
         glow.addColorStop(0, `rgba(${nebula.color}, ${nebula.alpha})`);
         glow.addColorStop(0.42, `rgba(${nebula.color}, ${nebula.alpha * 0.35})`);

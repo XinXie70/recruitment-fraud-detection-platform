@@ -5,7 +5,6 @@ import { expect, test } from 'vitest';
 
 import ModelContributions from './ModelContributions';
 
-
 test('formats and labels model contribution values without hiding precision', () => {
   render(
     <ModelContributions

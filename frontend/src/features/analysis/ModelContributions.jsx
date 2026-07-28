@@ -1,7 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 
-
 function formatPercent(value) {
   if (value == null || !Number.isFinite(Number(value))) return 'N/A';
 
@@ -18,9 +17,7 @@ function percentWidth(value) {
 
 export default function ModelContributions({ members }) {
   const modelMembers = members || [];
-  const unavailableCount = modelMembers.filter(
-    (member) => member.status !== 'success',
-  ).length;
+  const unavailableCount = modelMembers.filter((member) => member.status !== 'success').length;
 
   return (
     <>
@@ -28,13 +25,10 @@ export default function ModelContributions({ members }) {
         <div className="partial-result-notice" role="status">
           <AlertTriangle size={20} />
           <div>
-            <strong>
-              Partial model result
-            </strong>
+            <strong>Partial model result</strong>
             <p>
-              {unavailableCount} of {modelMembers.length} models did not return
-              a usable score. The final result uses the models that completed
-              successfully.
+              {unavailableCount} of {modelMembers.length} models did not return a usable score. The
+              final result uses the models that completed successfully.
             </p>
           </div>
         </div>
@@ -42,10 +36,7 @@ export default function ModelContributions({ members }) {
 
       <div className="model-contribution-list">
         {modelMembers.map((member) => (
-          <article
-            className={`model-contribution ${member.status}`}
-            key={member.key}
-          >
+          <article className={`model-contribution ${member.status}`} key={member.key}>
             <div className="model-contribution-heading">
               <strong>{member.display_name}</strong>
               <span>
@@ -80,8 +71,8 @@ export default function ModelContributions({ members }) {
               </>
             ) : (
               <p>
-                This model was temporarily unavailable. The remaining successful
-                models were used for the final result.
+                This model was temporarily unavailable. The remaining successful models were used
+                for the final result.
               </p>
             )}
           </article>

@@ -1,0 +1,5 @@
+# Git LFS — large model artifacts (required for BERT weights)
+model_weights/bert/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+model_weights/dnn/**/*.keras filter=lfs diff=lfs merge=lfs -text
+model_weights/dnn/**/*.pkl filter=lfs diff=lfs merge=lfs -text
+model_weights/** filter=lfs diff=lfs merge=lfs -text

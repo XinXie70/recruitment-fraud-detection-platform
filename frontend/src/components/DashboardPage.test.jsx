@@ -1,12 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import {
-  MemoryRouter,
-  Route,
-  Routes,
-  useLocation,
-} from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, expect, test, vi } from 'vitest';
 
 import DashboardPage from './DashboardPage';
@@ -58,10 +53,7 @@ test('opens a saved dashboard analysis result from the View button', () => {
           path="*"
           element={
             <>
-              <DashboardPage
-                auth={{ user: { username: 'joy' } }}
-                onLogout={() => {}}
-              />
+              <DashboardPage auth={{ user: { username: 'joy' } }} onLogout={() => {}} />
               <LocationProbe />
             </>
           }
@@ -81,7 +73,7 @@ test('opens a saved dashboard analysis result from the View button', () => {
 
   expect(screen.getByTestId('current-location')).toHaveTextContent('/analyze');
 
-  expect(
-    JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis')),
-  ).toEqual(analysisResult);
+  expect(JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'))).toEqual(
+    analysisResult,
+  );
 });

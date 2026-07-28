@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BookOpen, ExternalLink, Loader2 } from 'lucide-react';
 import { fetchEducation } from '../analysis/api';
 
-
 const TOPICS = [
   ['all', 'All topics'],
   ['fake_jobs', 'Fake jobs'],
@@ -22,10 +21,18 @@ export default function EducationLibrary() {
     setLoading(true);
     setError('');
     fetchEducation(topic === 'all' ? null : topic)
-      .then((data) => { if (active) setItems(data); })
-      .catch((requestError) => { if (active) setError(requestError.message); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+      .then((data) => {
+        if (active) setItems(data);
+      })
+      .catch((requestError) => {
+        if (active) setError(requestError.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [topic]);
 
   return (
@@ -47,7 +54,11 @@ export default function EducationLibrary() {
           </button>
         ))}
       </div>
-      {loading && <p className="education-state"><Loader2 className="spin-icon" /> Loading resources...</p>}
+      {loading && (
+        <p className="education-state">
+          <Loader2 className="spin-icon" /> Loading resources...
+        </p>
+      )}
       {error && <p className="auth-error">{error}</p>}
       {!loading && !error && (
         <div className="education-grid">
@@ -57,11 +68,19 @@ export default function EducationLibrary() {
               <h2>{item.title}</h2>
               <p>{item.summary}</p>
               <h3>Warning signs</h3>
-              <ul>{item.warning_signs.map((sign) => <li key={sign}>{sign}</li>)}</ul>
+              <ul>
+                {item.warning_signs.map((sign) => (
+                  <li key={sign}>{sign}</li>
+                ))}
+              </ul>
               <h3>Example</h3>
               <p>{item.example}</p>
               <h3>Best practices</h3>
-              <ul>{item.best_practices.map((practice) => <li key={practice}>{practice}</li>)}</ul>
+              <ul>
+                {item.best_practices.map((practice) => (
+                  <li key={practice}>{practice}</li>
+                ))}
+              </ul>
               <a href={item.source_url} rel="noreferrer" target="_blank">
                 {item.source_name} <ExternalLink size={15} />
               </a>
