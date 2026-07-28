@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import time
 import uuid
 
 from fastapi import Request, Response
@@ -43,9 +44,24 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
             },
         )
 
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = request_id
-        return response
+        started_at = time.perf_counter()
+        status_code = 500
+        try:
+            response = await call_next(request)
+            status_code = response.status_code
+            response.headers["X-Request-ID"] = request_id
+            return response
+        finally:
+            logger.info(
+                "request.complete",
+                extra={
+                    "request_id": request_id,
+                    "method": request.method,
+                    "path": request.url.path,
+                    "status_code": status_code,
+                    "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
+                },
+            )
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
