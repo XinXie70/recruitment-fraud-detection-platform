@@ -5,6 +5,18 @@ export default defineConfig({
   plugins: [react()],
   test: {
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{js,jsx}'],
+      exclude: ['src/main.jsx'],
+      reporter: ['text', 'json-summary', 'html'],
+      thresholds: {
+        statements: 10,
+        branches: 10,
+        functions: 10,
+        lines: 10,
+      },
+    },
   },
   server: {
     port: 5190,

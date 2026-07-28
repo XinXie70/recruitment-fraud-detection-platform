@@ -71,7 +71,7 @@ const ANALYSIS_RESPONSE = {
   },
 };
 
-async function authenticate(page, expectedPath = '/analyze') {
+async function authenticate(page, expectedPath = '/analyze', authResponse = AUTH_RESPONSE) {
   await page.route('**/api/auth/login', async (route) => {
     const request = route.request();
     expect(request.method()).toBe('POST');
@@ -82,7 +82,7 @@ async function authenticate(page, expectedPath = '/analyze') {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify(AUTH_RESPONSE),
+      body: JSON.stringify(authResponse),
     });
   });
 
@@ -183,4 +183,28 @@ test('shows a recoverable message when the model service is unavailable', async 
     page.getByText('The analysis service is temporarily unavailable. Please try again shortly.'),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Analyze Text' })).toBeEnabled();
+});
+
+test('routes an administrator to the research dashboard and reports service health', async ({
+  page,
+}) => {
+  const adminAuth = {
+    ...AUTH_RESPONSE,
+    user: { ...AUTH_RESPONSE.user, username: 'admin-user', is_admin: true },
+  };
+  await page.route('**/api/health', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ status: 'healthy' }),
+    }),
+  );
+
+  await authenticate(page, '/analyze', adminAuth);
+  await page.getByRole('link', { name: /Dashboard/ }).click();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole('heading', { name: 'Admin & Research Dashboard' })).toBeVisible();
+  await expect(page.getByText('System Healthy')).toBeVisible();
+  await expect(page.getByText('Models Deployed')).toBeVisible();
 });

@@ -9,25 +9,25 @@ Copy every committed user story and non-functional requirement from the proposal
 into this table. A story is only complete when its acceptance criteria can be
 demonstrated and supported by automated or repeatable test evidence.
 
-| ID | User story / requirement | Acceptance criteria | Demo route | Implementation | Test evidence | Owner | Status |
-|---|---|---|---|---|---|---|---|
-| TBD | TBD | TBD | TBD | TBD | TBD | TBD | Not verified |
+| ID  | User story / requirement | Acceptance criteria | Demo route | Implementation | Test evidence | Owner | Status       |
+| --- | ------------------------ | ------------------- | ---------- | -------------- | ------------- | ----- | ------------ |
+| TBD | TBD                      | TBD                 | TBD        | TBD            | TBD           | TBD   | Not verified |
 
 Allowed status values: `Not started`, `In progress`, `Implemented`, and
 `Demo verified`.
 
 ## Quality evidence
 
-| Area | Evidence to prepare | Current status |
-|---|---|---|
-| Backend tests | Test count and coverage report | 74 tests passed; 90.54% measured locally |
-| Frontend tests | Unit/component coverage report | 5 tests pass; coverage report required |
-| End-to-end tests | Authentication, analyse, history, and failure paths | 4 Playwright tests pass; admin API flow remains |
-| Responsive UI | Phone, tablet, and desktop screenshots | Implemented; rehearsal verification required |
-| Loading and errors | Slow request, invalid input, and unavailable model service | Implemented; rehearsal verification required |
-| Security | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening required |
-| Containers | One-command frontend/backend/database startup | Implemented in `compose.yaml`; smoke test required |
-| Ensemble release | Fitted config, provenance, held-out evaluation | Follow the [ensemble release checklist](ensemble-release-checklist.md) |
+| Area               | Evidence to prepare                                                   | Current status                                                         |
+| ------------------ | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Backend tests      | Test count and coverage report                                        | 74 tests passed; 90.54% measured locally                               |
+| Frontend tests     | Unit/component coverage report                                        | 5 tests pass; whole-source baseline: 14.13% statements                 |
+| End-to-end tests   | Authentication, analyse, history, admin routing, and failure paths    | 5 Playwright tests pass                                                |
+| Responsive UI      | Phone, tablet, and desktop screenshots                                | Implemented; rehearsal verification required                           |
+| Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; rehearsal verification required                           |
+| Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening required                      |
+| Containers         | One-command frontend/backend/database startup                         | Implemented in `compose.yaml`; smoke test required                     |
+| Ensemble release   | Fitted config, provenance, held-out evaluation                        | Follow the [ensemble release checklist](ensemble-release-checklist.md) |
 
 ## Architecture and design evidence
 
@@ -54,10 +54,10 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 
 ## Suggested timing
 
-| Section | Time |
-|---|---:|
-| Problem, users, and architecture | 1 minute |
-| User stories and acceptance criteria | 7–8 minutes |
-| Algorithm, XAI, and leakage prevention | 2–3 minutes |
+| Section                                   |        Time |
+| ----------------------------------------- | ----------: |
+| Problem, users, and architecture          |    1 minute |
+| User stories and acceptance criteria      | 7–8 minutes |
+| Algorithm, XAI, and leakage prevention    | 2–3 minutes |
 | Testing, security, Docker, and deployment | 1–2 minutes |
-| Buffer | 1 minute |
+| Buffer                                    |    1 minute |
