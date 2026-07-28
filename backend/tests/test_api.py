@@ -32,18 +32,25 @@ class TestHealthEndpoints:
 
 class TestAuthEndpoints:
     def test_register_creates_user(self, client):
-        resp = client.post("/api/auth/register", json={
-            "email": "new@example.com",
-            "username": "newuser",
-            "password": "Securepass123",
-        })
+        resp = client.post(
+            "/api/auth/register",
+            json={
+                "email": "new@example.com",
+                "username": "newuser",
+                "password": "Securepass123",
+            },
+        )
         assert resp.status_code == 201
         data = resp.json()
         assert "access_token" in data
         assert data["user"]["email"] == "new@example.com"
 
     def test_register_duplicate_rejected(self, client):
-        payload = {"email": "dup@example.com", "username": "dupuser", "password": "Securepass123"}
+        payload = {
+            "email": "dup@example.com",
+            "username": "dupuser",
+            "password": "Securepass123",
+        }
         client.post("/api/auth/register", json=payload)
         resp = client.post("/api/auth/register", json=payload)
         assert resp.status_code == 409
@@ -100,9 +107,13 @@ class TestAuthEndpoints:
         assert resp.json()["username"] == "testuser"
 
     def test_invalid_login_rejected(self, client):
-        resp = client.post("/api/auth/login", json={
-            "identifier": "nobody", "password": "wrong",
-        })
+        resp = client.post(
+            "/api/auth/login",
+            json={
+                "identifier": "nobody",
+                "password": "wrong",
+            },
+        )
         assert resp.status_code == 401
 
     def test_non_numeric_token_subject_is_rejected(self, client):
@@ -165,6 +176,10 @@ class TestAnalysisEndpoints:
         assert resp.status_code == 422
         assert resp.json()["error"]["code"] == "REQUEST_VALIDATION_FAILED"
 
+    def test_score_phase_requires_auth(self, client):
+        resp = client.post("/api/v1/analyze/score", json={"text": "test"})
+        assert resp.status_code == 401
+
 
 class TestUserHistoryEndpoints:
     def test_user_can_list_and_delete_only_own_history(
@@ -206,9 +221,7 @@ class TestUserHistoryEndpoints:
         db_session.add_all([*own_items, other_item])
         db_session.commit()
 
-        listing = client.get(
-            "/api/v1/history?page=1&page_size=1", headers=auth_headers
-        )
+        listing = client.get("/api/v1/history?page=1&page_size=1", headers=auth_headers)
         assert listing.status_code == 200
         assert listing.json()["total"] == 2
         assert listing.json()["total_pages"] == 2

@@ -108,6 +108,49 @@ def _run_analysis(
         ) from exc
 
 
+def _run_score(
+    payload: AnalysisRequest,
+    service: AnalysisService,
+    request_id: str,
+) -> AnalysisResponse:
+    try:
+        return service.score(payload.text)
+    except InputRejectedError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "status": exc.status,
+                "message": exc.reason,
+                "job_relevance_score": exc.job_relevance_score,
+            },
+        ) from exc
+    except EnsembleUnavailableError as exc:
+        logger.error("No ensemble member available", extra={"request_id": request_id})
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Prediction service is temporarily unavailable.",
+        ) from exc
+    except Exception as exc:
+        logger.exception("Score phase failed", extra={"request_id": request_id})
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Analysis failed. Please try again later.",
+        ) from exc
+
+
+@router.post("/api/v1/analyze/score", response_model=AnalysisResponse)
+@limiter.limit(settings.rate_limit_analyze)
+def analyze_score_v1(
+    request: Request,
+    payload: AnalysisRequest,
+    current_user: User = Depends(get_current_user),
+    service: AnalysisService = Depends(get_analysis_service),
+    request_id: str = Depends(get_request_id),
+) -> AnalysisResponse:
+    """Return the validated ensemble score before detailed XAI is generated."""
+    return _run_score(payload, service, request_id)
+
+
 @router.post("/api/v1/analyze", response_model=AnalysisResponse)
 @limiter.limit(settings.rate_limit_analyze)
 def analyze_v1(
@@ -227,5 +270,7 @@ def get_education_item(
 ) -> EducationItem:
     item = service.gentle_ai.get_item(item_id)
     if item is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Education item not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Education item not found."
+        )
     return item

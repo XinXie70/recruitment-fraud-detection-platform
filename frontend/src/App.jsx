@@ -26,7 +26,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { SAMPLES } from './utils/analysisUtils';
-import { analyzeJobText } from './features/analysis/api';
+import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
 import ExplanationText from './features/analysis/ExplanationText';
 import GentleGuidance from './features/analysis/GentleGuidance';
 import ModelContributions from './features/analysis/ModelContributions';
@@ -107,7 +107,7 @@ function riskLabel(level) {
   return 'Low Risk';
 }
 
-function ReportPage({ result, onBack }) {
+function ReportPage({ result, onBack, explanationLoading = false, explanationError = '' }) {
   const riskLevel = result.ensemble.risk_level;
   const score = Math.round(result.ensemble.risk_score * 100);
   const verdict = result.ensemble.classification_label;
@@ -232,7 +232,15 @@ function ReportPage({ result, onBack }) {
               </div>
               <span>{result.xai.method.replaceAll('_', ' ')}</span>
             </div>
-            {result.xai.status === 'success' ? (
+            {explanationLoading ? (
+              <div className="partial-result-notice" role="status">
+                <Loader2 size={20} className="spin-icon" />
+                <div>
+                  <strong>Risk score ready</strong>
+                  <p>Preparing the detailed model-derived explanation…</p>
+                </div>
+              </div>
+            ) : result.xai.status === 'success' ? (
               <>
                 <div className="evidence-legend">
                   <span className="raises_risk">Raises risk</span>
@@ -257,8 +265,8 @@ function ReportPage({ result, onBack }) {
                 <div>
                   <strong>Explanation temporarily unavailable</strong>
                   <p>
-                    The ensemble risk result is still available, but the detailed explanation could
-                    not be generated. You can continue using the model scores above.
+                    {explanationError ||
+                      'The ensemble risk result is still available, but the detailed explanation could not be generated. You can continue using the model scores above.'}
                   </p>
                 </div>
               </div>
@@ -557,6 +565,9 @@ function AnalyzePage({ auth, onLogout }) {
   const [result, setResult] = useState(restoredResult);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [explanationError, setExplanationError] = useState('');
+  const requestSequence = useRef(0);
 
   const handleAnalyze = async () => {
     const payloadText = text.trim();
@@ -566,14 +577,36 @@ function AnalyzePage({ auth, onLogout }) {
     setLoading(true);
     setError(null);
     setResult(null);
+    setExplanationLoading(false);
+    setExplanationError('');
+    const sequence = requestSequence.current + 1;
+    requestSequence.current = sequence;
 
     try {
-      const data = await analyzeJobText(payloadText, auth.access_token);
-      const completedResult = { ...data, inputText: payloadText };
+      const scoreData = await analyzeJobScore(payloadText, auth.access_token);
+      if (requestSequence.current !== sequence) return;
+      const scoreResult = { ...scoreData, inputText: payloadText };
+      setResult(scoreResult);
+      setLoading(false);
+      setExplanationLoading(true);
 
-      setResult(completedResult);
-      window.sessionStorage.setItem(LAST_ANALYSIS_STORAGE_KEY, JSON.stringify(completedResult));
-      saveAnalysisHistory(completedResult);
+      try {
+        const data = await analyzeJobText(payloadText, auth.access_token);
+        if (requestSequence.current !== sequence) return;
+        const completedResult = { ...data, inputText: payloadText };
+        setResult(completedResult);
+        window.sessionStorage.setItem(LAST_ANALYSIS_STORAGE_KEY, JSON.stringify(completedResult));
+        saveAnalysisHistory(completedResult);
+      } catch (explanationFailure) {
+        if (requestSequence.current !== sequence) return;
+        console.error(explanationFailure);
+        if (explanationFailure.status === 401) onLogout();
+        setExplanationError(
+          'The detailed explanation could not be loaded. The risk score remains available.',
+        );
+      } finally {
+        if (requestSequence.current === sequence) setExplanationLoading(false);
+      }
     } catch (err) {
       console.error(err);
       if (err.status === 401) {
@@ -586,18 +619,21 @@ function AnalyzePage({ auth, onLogout }) {
   };
 
   const handleSample = (sampleText) => {
+    requestSequence.current += 1;
     setText(sampleText);
     setResult(null);
     setError(null);
   };
 
   const handleClear = () => {
+    requestSequence.current += 1;
     setText('');
     setResult(null);
     setError(null);
   };
 
   const handleNewScan = () => {
+    requestSequence.current += 1;
     window.sessionStorage.removeItem(LAST_ANALYSIS_STORAGE_KEY);
     setText('');
     setResult(null);
@@ -605,10 +641,17 @@ function AnalyzePage({ auth, onLogout }) {
   };
 
   const hasInput = Boolean(text.trim());
-  const loadingMessage = 'Running the backend ensemble and preparing an explanation...';
+  const loadingMessage = 'Running all eight models to calculate the risk score...';
 
   if (result && !loading) {
-    return <ReportPage result={result} onBack={handleNewScan} />;
+    return (
+      <ReportPage
+        result={result}
+        onBack={handleNewScan}
+        explanationLoading={explanationLoading}
+        explanationError={explanationError}
+      />
+    );
   }
 
   return (

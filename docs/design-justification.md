@@ -70,16 +70,21 @@ and the saved ensemble configuration.
 **Context.** Users need evidence for a risk result, but the ensemble contains
 models for which gradient-only methods do not work.
 
-**Decision.** Explain the aggregated scoring function using SHAP Partition,
-fall back to occlusion when necessary, then convert evidence into deterministic
-educational language. Ollama rewriting is optional.
+**Decision.** Return the validated eight-model risk score first, then request
+the complete explanation as a second UI phase. Explain the aggregated scoring
+function using SHAP Partition, fall back to occlusion when necessary, then
+convert evidence into deterministic educational language. Ollama rewriting is
+optional.
 
 **Why.** The approach works across heterogeneous models and separates factual
 attribution from presentation. A deterministic fallback prevents an external
 LLM outage or hallucination from blocking the core result.
 
 **Trade-offs.** Perturbation-based explanation adds inference calls and is an
-approximation of model behaviour rather than a causal explanation.
+approximation of model behaviour rather than a causal explanation. The
+two-stage API repeats the base ensemble request before XAI; this spends some
+additional backend work in exchange for showing the decision to the user much
+earlier and preserving it when explanation generation fails.
 
 **Evidence.** [ADR-004](adr/004-xai-method-selection.md) and
 `backend/xai_gentle/`.

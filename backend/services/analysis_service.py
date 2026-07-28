@@ -11,7 +11,7 @@ from services.cache import TTLCache
 from services.ensemble_predictor import EnsemblePredictor
 from services.model_adapter import ModelRegistry
 from url_analyzer import analyze_urls
-from xai_gentle import GentleAIService, RiskContext, XAIService
+from xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
 
@@ -95,7 +95,9 @@ class AnalysisService:
         if not validation.get("is_valid", False):
             raise InputRejectedError(
                 status=str(validation.get("status", "invalid_input")),
-                reason=str(validation.get("reason", "Input is not a valid job posting.")),
+                reason=str(
+                    validation.get("reason", "Input is not a valid job posting.")
+                ),
                 job_relevance_score=validation.get("job_relevance_score"),
             )
 
@@ -147,3 +149,62 @@ class AnalysisService:
                 logger.exception("Failed to persist analysis history")
 
         return result
+
+    def score(self, text: str) -> AnalysisResponse:
+        """Return the ensemble result without waiting for expensive XAI work."""
+        cache_key = TTLCache.text_key(text)
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            logger.info(
+                "Analysis cache hit during score phase",
+                extra={"cache_key": cache_key[:16]},
+            )
+            return cached
+
+        validation = self.validator(text)
+        if not validation.get("is_valid", False):
+            raise InputRejectedError(
+                status=str(validation.get("status", "invalid_input")),
+                reason=str(
+                    validation.get("reason", "Input is not a valid job posting.")
+                ),
+                job_relevance_score=validation.get("job_relevance_score"),
+            )
+
+        computation = self.ensemble.predict(text)
+        pending_xai = XAIResult(
+            status="unavailable",
+            method="unavailable",
+            output_value=computation.ensemble.risk_score,
+            message="Detailed model-derived explanation is being prepared.",
+        )
+        risk_context = RiskContext(
+            risk_score=computation.ensemble.risk_score,
+            risk_level=computation.ensemble.risk_level,
+            classification_label=computation.ensemble.classification_label,
+            recommended_action=computation.ensemble.recommended_action,
+        )
+        gentle_result = self.gentle_ai.generate(risk_context, pending_xai)
+
+        url_failed = False
+        try:
+            url_result = URLAnalysis.model_validate(self.url_analyzer(text))
+        except Exception:
+            logger.exception("URL analysis failed during score phase")
+            url_failed = True
+            url_result = empty_url_analysis("URL analysis is temporarily unavailable.")
+
+        return AnalysisResponse(
+            phase="score",
+            status=(
+                "degraded"
+                if computation.ensemble.status == "degraded" or url_failed
+                else "success"
+            ),
+            job_relevance_score=validation.get("job_relevance_score"),
+            ensemble=computation.ensemble,
+            member_outputs=computation.members,
+            xai=pending_xai,
+            gentle_ai=gentle_result,
+            url_analysis=url_result,
+        )

@@ -149,6 +149,23 @@ test('registers a new user and opens the analyser', async ({ page }) => {
 
 test('analyses a job advert and records it in the user dashboard', async ({ page }) => {
   await authenticate(page);
+  await page.route('**/api/v1/analyze/score', async (route) => {
+    expect(route.request().headers().authorization).toBe('Bearer e2e-token');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ...ANALYSIS_RESPONSE,
+        phase: 'score',
+        xai: {
+          status: 'unavailable',
+          method: 'unavailable',
+          items: [],
+          message: 'Detailed model-derived explanation is being prepared.',
+        },
+      }),
+    });
+  });
   await page.route('**/api/v1/analyze', async (route) => {
     expect(route.request().headers().authorization).toBe('Bearer e2e-token');
     expect(route.request().postDataJSON().text).toContain('bank details');
@@ -177,7 +194,7 @@ test('analyses a job advert and records it in the user dashboard', async ({ page
 
 test('shows a recoverable message when the model service is unavailable', async ({ page }) => {
   await authenticate(page);
-  await page.route('**/api/v1/analyze', (route) =>
+  await page.route('**/api/v1/analyze/score', (route) =>
     route.fulfill({
       status: 503,
       contentType: 'application/json',
