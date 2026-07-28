@@ -13,7 +13,6 @@ import {
   LogOut,
   Loader2,
   Search,
-  Share2,
   ShieldAlert,
   UserPlus,
   X,
@@ -135,9 +134,6 @@ function ReportPage({ result, onBack }) {
         <div className="report-case">
           <span>Case ID</span>
           <strong>{caseId}</strong>
-          <button type="button" className="report-share" aria-label="Share report">
-            <Share2 size={18} />
-          </button>
         </div>
       </header>
 

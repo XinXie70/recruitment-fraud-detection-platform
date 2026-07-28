@@ -1947,9 +1947,14 @@ button.nav-button {
   }
 
   .report-sidebar {
-    display: grid;
-    grid-template-columns: minmax(300px, 0.9fr) minmax(280px, 1fr);
+    display: block;
     overflow: visible;
+  }
+
+  .report-risk-panel {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
   }
 
   .report-main {
@@ -2086,7 +2091,27 @@ button.nav-button {
   .app-nav-inner {
     height: auto;
     min-height: 76px;
-    padding: 16px 20px;
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .nav-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .nav-link,
+  .nav-button {
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: 0.85rem;
+  }
+
+  .nav-user {
+    display: none;
   }
 
   .nav-badge {
