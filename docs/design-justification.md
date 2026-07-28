@@ -166,4 +166,6 @@ still be frozen and labelled with the evaluation version before the demo.
    firewall rules.
 3. Define history-data retention and deletion policy.
 4. Decide whether the production frontend uses a CDN/static host or Nginx.
-5. Add end-to-end browser tests and record frontend coverage evidence.
+5. Record frontend coverage evidence and extend the Playwright suite to the
+   admin API flow (the core authentication, analysis, history, and 503 paths
+   are automated).

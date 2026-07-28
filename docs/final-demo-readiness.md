@@ -21,8 +21,8 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 | Area | Evidence to prepare | Current status |
 |---|---|---|
 | Backend tests | Test count and coverage report | 74 tests passed; 90.54% measured locally |
-| Frontend tests | Unit/component coverage report | Coverage report required |
-| End-to-end tests | Login, analyse, history, admin, and failure paths | Required |
+| Frontend tests | Unit/component coverage report | 5 tests pass; coverage report required |
+| End-to-end tests | Authentication, analyse, history, and failure paths | 4 Playwright tests pass; admin API flow remains |
 | Responsive UI | Phone, tablet, and desktop screenshots | Implemented; rehearsal verification required |
 | Loading and errors | Slow request, invalid input, and unavailable model service | Implemented; rehearsal verification required |
 | Security | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening required |
@@ -47,7 +47,7 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 - [ ] Each feature is linked to a user story and acceptance criteria.
 - [ ] The model service is warmed up before the demo.
 - [ ] Demo accounts and deterministic sample inputs are ready.
-- [ ] Failure and edge-case behaviour has been rehearsed.
+- [ ] Failure and edge-case behaviour has been rehearsed (automated 503 path passes).
 - [ ] Backup screenshots or a short local recording are available.
 - [ ] The team can explain architecture choices, ensemble logic, security,
       testing, deployment, and data-leakage controls.

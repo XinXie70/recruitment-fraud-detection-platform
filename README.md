@@ -76,7 +76,16 @@ Before opening a pull request, run:
 ```bash
 npm run lint
 npm test
+npm run test:e2e
 npm run build
+```
+
+The Playwright suite covers authentication redirects, registration, successful
+analysis with history persistence, and recoverable model-service failure. On a
+new development machine, install its headless browser once with:
+
+```bash
+npx playwright install --only-shell chromium
 ```
 
 Husky and lint-staged automatically format and lint staged frontend files before
