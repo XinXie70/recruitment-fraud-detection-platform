@@ -3,14 +3,11 @@ import {
   Activity,
   AlertTriangle,
   ArrowLeft,
-  BookOpen,
-  Briefcase,
   CalendarClock,
   CheckCircle2,
   Gift,
   Info,
   LogIn,
-  LogOut,
   Loader2,
   Search,
   ShieldAlert,
@@ -32,10 +29,10 @@ import ExplanationText from './features/analysis/ExplanationText';
 import GentleGuidance from './features/analysis/GentleGuidance';
 import ModelContributions from './features/analysis/ModelContributions';
 import EducationLibrary from './features/education/EducationLibrary';
-import DashboardPage from './components/DashboardPage';
-import AdminDashboard from './components/AdminDashboard';
 import './App.css';
 import SharedNavigation from './components/Navigation';
+import AdminDashboard from './components/AdminDashboard';
+import DashboardPage from './components/DashboardPage';
 const AUTH_STORAGE_KEY = 'fake_job_auth';
 const HISTORY_STORAGE_KEY = 'fake_job_history';
 const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
@@ -58,10 +55,7 @@ function saveAnalysisHistory(result) {
 
     const updatedHistory = [entry, ...history].slice(0, 50);
 
-    window.localStorage.setItem(
-      HISTORY_STORAGE_KEY,
-      JSON.stringify(updatedHistory),
-    );
+    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory));
   } catch (error) {
     console.error('Failed to save analysis history:', error);
   }
@@ -165,11 +159,11 @@ function ReportPage({ result, onBack }) {
                 <div className={`report-score-fill ${riskLevel}`} style={{ width: `${score}%` }} />
               </div>
               <small>
-                {result.ensemble.active_model_count} active model(s), version {result.ensemble.version}
+                {result.ensemble.active_model_count} active model(s), version{' '}
+                {result.ensemble.version}
               </small>
             </div>
           </section>
-
         </aside>
 
         <section className="report-main">
@@ -188,9 +182,7 @@ function ReportPage({ result, onBack }) {
                 {riskLevel === 'low' ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
               </div>
               <div>
-                <h2>
-                  {result.ensemble.recommended_action}
-                </h2>
+                <h2>{result.ensemble.recommended_action}</h2>
                 <p>Guidance is based only on the ensemble result and structured XAI evidence.</p>
               </div>
             </div>
@@ -203,24 +195,20 @@ function ReportPage({ result, onBack }) {
                 <Activity size={22} />
                 <div>
                   <h2>Eight-Model Technical Details</h2>
-                  <span className="classification-note">
-                    Scores, weights and contributions
-                  </span>
+                  <span className="classification-note">Scores, weights and contributions</span>
                 </div>
               </div>
 
-    <span className="technical-details-action">
-      Expand details
-    </span>
-  </summary>
+              <span className="technical-details-action">Expand details</span>
+            </summary>
 
-  <div className="technical-details-content">
-    <p className="classification-note">
-      Calibrated score × effective weight = final contribution
-    </p>
-    <ModelContributions members={result.member_outputs} />
-  </div>
-</details>
+            <div className="technical-details-content">
+              <p className="classification-note">
+                Calibrated score × effective weight = final contribution
+              </p>
+              <ModelContributions members={result.member_outputs} />
+            </div>
+          </details>
 
           <section className="report-panel">
             <div className="report-panel-header">
@@ -240,7 +228,10 @@ function ReportPage({ result, onBack }) {
                 <ul className="report-signal-list">
                   {result.gentle_ai.evidence_explanations.map((item) => (
                     <li key={`${item.start}-${item.end}`} className={riskLevel}>
-                      <div><strong>{item.text}</strong><span>{item.explanation}</span></div>
+                      <div>
+                        <strong>{item.text}</strong>
+                        <span>{item.explanation}</span>
+                      </div>
                       <b>{item.direction === 'raises_risk' ? 'Raises' : 'Lowers'}</b>
                     </li>
                   ))}
@@ -252,14 +243,13 @@ function ReportPage({ result, onBack }) {
                 <div>
                   <strong>Explanation temporarily unavailable</strong>
                   <p>
-                    The ensemble risk result is still available, but the detailed explanation
-                    could not be generated. You can continue using the model scores above.
+                    The ensemble risk result is still available, but the detailed explanation could
+                    not be generated. You can continue using the model scores above.
                   </p>
                 </div>
               </div>
             )}
           </section>
-
         </section>
       </main>
     </div>
@@ -539,14 +529,16 @@ function LearnPage({ auth, onLogout }) {
 
 function AnalyzePage({ auth, onLogout }) {
   const location = useLocation();
-  const restoredResult = location.state?.analysisResult || (() => {
-    try {
-      const raw = window.sessionStorage.getItem(LAST_ANALYSIS_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  })();
+  const restoredResult =
+    location.state?.analysisResult ||
+    (() => {
+      try {
+        const raw = window.sessionStorage.getItem(LAST_ANALYSIS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })();
   const [text, setText] = useState(restoredResult?.inputText || '');
   const [result, setResult] = useState(restoredResult);
   const [loading, setLoading] = useState(false);
@@ -566,10 +558,7 @@ function AnalyzePage({ auth, onLogout }) {
       const completedResult = { ...data, inputText: payloadText };
 
       setResult(completedResult);
-      window.sessionStorage.setItem(
-        LAST_ANALYSIS_STORAGE_KEY,
-        JSON.stringify(completedResult),
-      );
+      window.sessionStorage.setItem(LAST_ANALYSIS_STORAGE_KEY, JSON.stringify(completedResult));
       saveAnalysisHistory(completedResult);
     } catch (err) {
       console.error(err);
@@ -617,8 +606,8 @@ function AnalyzePage({ auth, onLogout }) {
         <section className="hero">
           <AnimatedTitle text={HERO_TITLE} />
           <p>
-            Paste any job listing below. Our backend ensemble scores it and highlights
-            the model-derived risk signals.
+            Paste any job listing below. Our backend ensemble scores it and highlights the
+            model-derived risk signals.
           </p>
         </section>
 
@@ -724,7 +713,9 @@ function AppShell() {
       />
       <Route
         path="/register"
-        element={<AuthPage mode="register" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />}
+        element={
+          <AuthPage mode="register" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
+        }
       />
       <Route
         path="/analyze"
@@ -742,10 +733,7 @@ function AppShell() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/learn"
-        element={<Navigate to="/education" replace />}
-      />
+      <Route path="/learn" element={<Navigate to="/education" replace />} />
       <Route
         path="/dashboard"
         element={

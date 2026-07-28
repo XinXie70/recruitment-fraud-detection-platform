@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import math
-import os
+import logging
 import re
 from dataclasses import dataclass
 from typing import Callable, Sequence
 
+from config import settings
+
 from .contracts import EvidenceSpan, XAIResult
 
+logger = logging.getLogger("fake_job_detection_api.xai")
 
 BatchScorer = Callable[[Sequence[str]], list[float]]
 WORD_PATTERN = re.compile(r"\b[\w'-]+\b", re.UNICODE)
@@ -147,15 +150,10 @@ class XAIService:
         max_segments: int | None = None,
         max_evals: int | None = None,
     ):
-        configured_shap = os.getenv("XAI_USE_SHAP", "true").lower() in {
-            "1",
-            "true",
-            "yes",
-        }
-        self.prefer_shap = configured_shap if prefer_shap is None else prefer_shap
-        self.max_items = max_items or int(os.getenv("XAI_MAX_ITEMS", "10"))
-        self.max_segments = max_segments or int(os.getenv("XAI_MAX_SEGMENTS", "80"))
-        self.max_evals = max_evals or int(os.getenv("XAI_MAX_EVALS", "200"))
+        self.prefer_shap = prefer_shap if prefer_shap is not None else settings.xai_use_shap
+        self.max_items = max_items or settings.xai_max_items
+        self.max_segments = max_segments or settings.xai_max_segments
+        self.max_evals = max_evals or settings.xai_max_evals
 
     def explain(
         self,
@@ -167,21 +165,22 @@ class XAIService:
         if self.prefer_shap:
             try:
                 return self._explain_with_shap(text, score_batch, expected_output)
-            except Exception as exc:  # SHAP is optional at runtime
-                shap_error = f"{type(exc).__name__}: {exc}"
+            except Exception:  # SHAP is optional at runtime
+                logger.warning("SHAP explanation failed", exc_info=True)
+                shap_error = "SHAP was unavailable."
 
         try:
             result = self._explain_with_occlusion(text, score_batch, expected_output)
             if shap_error:
                 result.message = (
                     "SHAP was unavailable, so ensemble occlusion attribution was used. "
-                    f"Reason: {shap_error}"
                 )
             return result
-        except Exception as exc:
-            messages = [f"Occlusion explanation failed: {type(exc).__name__}: {exc}"]
+        except Exception:
+            logger.exception("Occlusion explanation failed")
+            messages = ["Occlusion explanation was unavailable."]
             if shap_error:
-                messages.insert(0, f"SHAP explanation failed: {shap_error}")
+                messages.insert(0, shap_error)
             return XAIResult(
                 status="unavailable",
                 method="unavailable",
@@ -215,7 +214,9 @@ class XAIService:
         baseline = float(baseline_and_masks[0])
 
         items: list[EvidenceSpan] = []
-        for segment, masked_score in zip(segments, baseline_and_masks[1:]):
+        for segment, masked_score in zip(
+            segments, baseline_and_masks[1:], strict=True
+        ):
             contribution = baseline - float(masked_score)
             if abs(contribution) < 1e-6:
                 continue
@@ -293,7 +294,9 @@ class XAIService:
             raise ValueError("SHAP token count does not match original text offsets")
 
         items: list[EvidenceSpan] = []
-        for segment, contribution_value in zip(original_segments, contributions):
+        for segment, contribution_value in zip(
+            original_segments, contributions, strict=True
+        ):
             contribution = float(contribution_value)
             if abs(contribution) < 1e-6:
                 continue

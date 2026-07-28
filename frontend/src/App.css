@@ -124,7 +124,12 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fcfcfb;
-  font: 0.96rem/1.85 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font:
+    0.96rem/1.85 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -280,7 +285,12 @@ body {
     repeating-linear-gradient(92deg, rgba(232, 168, 111, 0.055) 0 1px, transparent 1px 96px),
     var(--page);
   color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -594,7 +604,11 @@ button.nav-button {
   cursor: pointer;
   font-size: 1.18rem;
   font-weight: 900;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
 }
 
 .mode-switch button.active {
@@ -730,7 +744,11 @@ button.nav-button {
   cursor: pointer;
   font-size: 1.12rem;
   font-weight: 800;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.15s;
 }
 
 .btn-analyze {
@@ -1798,7 +1816,7 @@ button.nav-button {
 }
 
 .report-score-row em::before {
-  content: "·";
+  content: '·';
   margin-right: 12px;
   color: var(--muted);
 }
@@ -2027,7 +2045,6 @@ button.nav-button {
   .report-score-track {
     margin: 8px 0;
   }
-
 }
 
 @media (max-width: 760px) {
@@ -2985,7 +3002,6 @@ button.nav-button {
   margin-bottom: 18px;
   padding: 10px 14px;
 }
-
 .dash-date,
 .dash-model-count {
   white-space: nowrap;
@@ -3024,7 +3040,7 @@ button.nav-button {
 }
 
 .technical-details-summary::after {
-  content: "⌄";
+  content: '⌄';
   flex: 0 0 auto;
   font-size: 1.5rem;
   line-height: 1;
@@ -3068,7 +3084,7 @@ button.nav-button {
   font-size: 0;
 }
 .technical-details[open] .technical-details-action::after {
-  content: "Collapse details";
+  content: 'Collapse details';
   font-size: 0.85rem;
 }
 

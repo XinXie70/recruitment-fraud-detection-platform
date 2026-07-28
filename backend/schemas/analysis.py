@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import os
 from typing import Literal
 
+from config import settings
 from pydantic import BaseModel, Field, field_validator, model_validator
-from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
+from xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
 API_VERSION = "1.0"
-MAX_INPUT_CHARS = int(os.getenv("MAX_INPUT_CHARS", "50000"))
+MAX_INPUT_CHARS = settings.max_input_chars
 
 
 class AnalysisRequest(BaseModel):
@@ -95,28 +95,3 @@ class AnalysisResponse(BaseModel):
 class EducationListResponse(BaseModel):
     api_version: Literal["1.0"] = API_VERSION
     items: list[EducationItem]
-
-
-class AnalysisHistoryItem(BaseModel):
-    id: int
-    risk_score: float
-    risk_level: str
-    classification_label: str
-    input_text_snippet: str
-    created_at: str
-
-    class Config:
-        from_attributes = True
-
-
-class AnalysisHistoryListResponse(BaseModel):
-    total: int
-    items: list[AnalysisHistoryItem]
-
-
-class AdminStatsResponse(BaseModel):
-    total_users: int
-    total_analyses: int
-    analyses_today: int
-    risk_distribution: dict[str, int]
-    recent_analyses: list[AnalysisHistoryItem]

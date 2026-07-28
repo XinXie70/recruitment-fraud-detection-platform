@@ -1,19 +1,28 @@
+# Uncompressed datasets stay local. Compressed experiment inputs may be tracked.
+data/raw/*.csv
+data/processed/*.csv
+
+# Trained models and experiment outputs
+/models/
+artifacts/
+checkpoints/
+outputs/
+*.joblib
+*.pkl
+*.pt
+*.pth
+
+# Local environments and temporary files
 .venv/
+venv/
 __pycache__/
 *.py[cod]
-
-node_modules/
-dist/
-.vite/
-.pytest_cache/
-.coverage
-htmlcov/
-*.log
-*.db
-*.sqlite
-*.sqlite3
-
-.DS_Store
 .env
 .env.*
-work/
+!.env.example
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+.ipynb_checkpoints/
+.idea/
+.vscode/

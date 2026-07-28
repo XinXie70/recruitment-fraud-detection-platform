@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib
 import logging
 import math
-import os
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,6 +10,8 @@ from threading import Lock
 from typing import Callable, Protocol, Sequence
 
 import httpx
+
+from config import settings
 
 logger = logging.getLogger("fake_job_detection_api.models")
 
@@ -190,7 +191,7 @@ class HttpModelAdapter:
             self._client = httpx.Client(
                 timeout=httpx.Timeout(
                     connect=10.0,
-                    read=float(os.getenv("MODEL_SERVER_TIMEOUT", "120")),
+                    read=settings.model_server_timeout,
                     write=10.0,
                     pool=10.0,
                 )
@@ -234,7 +235,6 @@ class HttpModelAdapter:
                     )
 
                 scores.append(float(risk_score))
-
             return scores
         except httpx.HTTPError as exc:
             raise RuntimeError(
@@ -254,12 +254,11 @@ class ModelRegistry:
         max_workers: int | None = None,
     ):
         self.adapters = {adapter.key: adapter for adapter in adapters}
-        configured_workers = int(os.getenv("MODEL_MAX_WORKERS", "3"))
-        self.max_workers = max_workers or configured_workers
+        self.max_workers = max_workers or settings.model_max_workers
 
     @classmethod
     def default(cls) -> "ModelRegistry":
-        model_server_url = os.getenv("MODEL_SERVER_URL", "").strip()
+        model_server_url = settings.model_server_url.strip()
         if model_server_url:
             logger.info(
                 "Using remote model server at %s (MODEL_SERVER_URL is set)",
@@ -398,12 +397,3 @@ class ModelRegistry:
         finally:
             executor.shutdown(wait=False, cancel_futures=True)
         return outputs
-
-    def shutdown(self) -> None:
-        """Close any persistent resources (e.g. HTTP clients held by adapters)."""
-        for adapter in self.adapters.values():
-            if hasattr(adapter, "close"):
-                try:
-                    adapter.close()
-                except Exception:
-                    pass

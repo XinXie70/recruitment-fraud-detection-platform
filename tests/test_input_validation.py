@@ -1,10 +1,19 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from final_model_pipelines.validation_pipeline import validate_job_input
-from services.analysis_service import InputRejectedError
-from test_analysis_contract import build_service
+from services.analysis_service import AnalysisService, InputRejectedError
+
+
+def build_service() -> AnalysisService:
+    """Build the smallest service needed to test pre-inference validation."""
+    return AnalysisService(
+        ensemble=Mock(),
+        xai=Mock(),
+        gentle_ai=Mock(),
+        url_analyzer=Mock(),
+    )
 
 
 UNRELATED_TEXT = """

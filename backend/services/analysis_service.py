@@ -1,19 +1,24 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
 from final_model_pipelines.validation_pipeline import validate_job_input
 
 from schemas.analysis import AnalysisResponse, URLAnalysis
+from services.cache import TTLCache
 from services.ensemble_predictor import EnsemblePredictor
 from services.model_adapter import ModelRegistry
 from url_analyzer import analyze_urls
-from backend.xai_gentle import GentleAIService, RiskContext, XAIService
+from xai_gentle import GentleAIService, RiskContext, XAIService
+
+logger = logging.getLogger("fake_job_detection_api.analysis")
 
 
 Validator = Callable[[str], dict[str, Any]]
 URLAnalyzer = Callable[[str], dict[str, Any]]
+HistorySaver = Callable[[str, AnalysisResponse, int | None], None]
 
 
 @dataclass(frozen=True)
@@ -46,14 +51,17 @@ class AnalysisService:
         gentle_ai: GentleAIService,
         validator: Validator = validate_job_input,
         url_analyzer: URLAnalyzer = analyze_urls,
+        cache: TTLCache | None = None,
     ):
         self.ensemble = ensemble
         self.xai = xai
         self.gentle_ai = gentle_ai
         self.validator = validator
         self.url_analyzer = url_analyzer
+        self.cache = cache or TTLCache()
         self.ready = False
         self.warm_up_outcomes: dict[str, str | None] = {}
+        self.on_analysis_complete: HistorySaver | None = None
 
     @classmethod
     def from_environment(cls) -> "AnalysisService":
@@ -76,6 +84,13 @@ class AnalysisService:
         return dict(self.warm_up_outcomes)
 
     def analyze(self, text: str) -> AnalysisResponse:
+        # Check cache first — avoid re-running the full pipeline for duplicates.
+        cache_key = TTLCache.text_key(text)
+        cached = self.cache.get(cache_key)
+        if cached is not None:
+            logger.info("Analysis cache hit", extra={"cache_key": cache_key[:16]})
+            return cached
+
         validation = self.validator(text)
         if not validation.get("is_valid", False):
             raise InputRejectedError(
@@ -101,18 +116,17 @@ class AnalysisService:
         url_failed = False
         try:
             url_result = URLAnalysis.model_validate(self.url_analyzer(text))
-        except Exception as exc:
+        except Exception:
+            logger.exception("URL analysis failed")
             url_failed = True
-            url_result = empty_url_analysis(
-                f"URL analysis was unavailable: {type(exc).__name__}: {exc}"
-            )
+            url_result = empty_url_analysis("URL analysis is temporarily unavailable.")
 
         degraded = (
             computation.ensemble.status == "degraded"
             or xai_result.status == "unavailable"
             or url_failed
         )
-        return AnalysisResponse(
+        result = AnalysisResponse(
             status="degraded" if degraded else "success",
             job_relevance_score=validation.get("job_relevance_score"),
             ensemble=computation.ensemble,
@@ -122,9 +136,14 @@ class AnalysisService:
             url_analysis=url_result,
         )
 
-    def shutdown(self) -> None:
-        """Release resources held by the ensemble registry (e.g. HTTP clients)."""
-        try:
-            self.ensemble.shutdown()
-        except Exception:
-            pass
+        # Cache successful results for `analysis_cache_ttl_seconds`.
+        self.cache.set(cache_key, result)
+
+        # Persist to analysis history (fire-and-forget via callback).
+        if self.on_analysis_complete is not None:
+            try:
+                self.on_analysis_complete(text, result, None)
+            except Exception:
+                logger.exception("Failed to persist analysis history")
+
+        return result

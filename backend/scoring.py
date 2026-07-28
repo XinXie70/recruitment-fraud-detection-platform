@@ -1,6 +1,15 @@
 """
 Ensemble Scoring Module — combines predictions from 8 ML models into a unified risk score.
 
+.. attention::
+   This module is **NOT used by the FastAPI backend**. The API scoring path uses
+   ``services/ensemble_predictor.py`` + ``final_model_pipelines/risk_mapping.py``
+   instead. This file is kept as a reference / standalone utility for offline
+   model evaluation scripts in ``model/final_model_pipelines/``.
+
+   If you are adding new scoring logic, update ``ensemble_predictor.py``, not
+   this file.
+
 ================================================================================
 FORMULA & RATIONALE
 ================================================================================
@@ -103,7 +112,7 @@ consistent with the asymmetric cost of fraud detection.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Literal
 
 # ---------------------------------------------------------------------------

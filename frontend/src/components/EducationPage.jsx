@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AlertTriangle, ArrowLeft, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2,
-  DollarSign, FileText, Globe, HelpCircle, Lightbulb,
-  Lock, Mail, MessageCircle, RefreshCw, Search, Shield, ShieldAlert,
-  ThumbsUp, Zap,
+  AlertTriangle,
+  ArrowLeft,
+  BarChart3,
+  BookOpen,
+  Brain,
+  CheckCircle2,
+  DollarSign,
+  FileText,
+  Globe,
+  HelpCircle,
+  Lightbulb,
+  Lock,
+  Mail,
+  MessageCircle,
+  RefreshCw,
+  Search,
+  Shield,
+  ShieldAlert,
+  ThumbsUp,
+  Zap,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
@@ -111,23 +127,45 @@ const SAFETY_GUIDE = [
 // Simple quiz questions
 const QUIZ_QUESTIONS = [
   {
-    question: 'A job posting asks you to pay $200 for "training materials" before starting. Is this a red flag?',
-    options: ['Yes, legitimate employers never charge for training', 'No, this is normal practice', 'Only if the amount is high', 'Depends on the company size'],
+    question:
+      'A job posting asks you to pay $200 for "training materials" before starting. Is this a red flag?',
+    options: [
+      'Yes, legitimate employers never charge for training',
+      'No, this is normal practice',
+      'Only if the amount is high',
+      'Depends on the company size',
+    ],
     correct: 0,
   },
   {
     question: 'Which communication method is most suspicious in a job application?',
-    options: ['Company email (@company.com)', 'LinkedIn message', 'WhatsApp or Telegram', 'Phone call from HR'],
+    options: [
+      'Company email (@company.com)',
+      'LinkedIn message',
+      'WhatsApp or Telegram',
+      'Phone call from HR',
+    ],
     correct: 2,
   },
   {
-    question: 'A listing promises "$500/day, no experience needed, work from home." What should you do?',
-    options: ['Apply immediately', 'Share with friends', 'Be skeptical and research the company', 'Send your bank details to get paid'],
+    question:
+      'A listing promises "$500/day, no experience needed, work from home." What should you do?',
+    options: [
+      'Apply immediately',
+      'Share with friends',
+      'Be skeptical and research the company',
+      'Send your bank details to get paid',
+    ],
     correct: 2,
   },
   {
     question: 'What should you verify before accepting a job offer?',
-    options: ['Just the salary amount', 'Company registration, website, and reviews', 'Only the job title', 'Nothing — if it looks good, accept it'],
+    options: [
+      'Just the salary amount',
+      'Company registration, website, and reviews',
+      'Only the job title',
+      'Nothing — if it looks good, accept it',
+    ],
     correct: 1,
   },
 ];
@@ -171,11 +209,7 @@ export default function EducationPage({ auth, onLogout }) {
       <Navigation auth={auth} onLogout={onLogout} />
 
       <main className="app-main edu-main">
-        <button
-          type="button"
-          className="edu-back-result"
-          onClick={() => navigate('/analyze')}
-        >
+        <button type="button" className="edu-back-result" onClick={() => navigate('/analyze')}>
           <ArrowLeft size={19} />
           Back to analysis result
         </button>
@@ -187,15 +221,26 @@ export default function EducationPage({ auth, onLogout }) {
           </div>
           <h1>Learn to Spot Fake Job Postings</h1>
           <p>
-            Understanding the tactics used by scammers is your best defense.
-            Explore red flags, learn how our ML models work, and test your knowledge.
+            Understanding the tactics used by scammers is your best defense. Explore red flags,
+            learn how our ML models work, and test your knowledge.
           </p>
           <div className="edu-hero-actions">
-            <button className="btn-analyze" onClick={() => document.getElementById('edu-redflags').scrollIntoView({ behavior: 'smooth' })}>
+            <button
+              className="btn-analyze"
+              onClick={() =>
+                document.getElementById('edu-redflags').scrollIntoView({ behavior: 'smooth' })
+              }
+            >
               <ShieldAlert size={20} />
               View Red Flags
             </button>
-            <button className="btn-sample" onClick={() => { setQuizStarted(true); document.getElementById('edu-quiz').scrollIntoView({ behavior: 'smooth' }); }}>
+            <button
+              className="btn-sample"
+              onClick={() => {
+                setQuizStarted(true);
+                document.getElementById('edu-quiz').scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               <HelpCircle size={20} />
               Take the Quiz
             </button>
@@ -278,7 +323,9 @@ export default function EducationPage({ auth, onLogout }) {
                 <Zap size={32} />
               </div>
               <h3>Ready to test your scam-spotting skills?</h3>
-              <p>Take this quick 4-question quiz to see how well you can identify fake job postings.</p>
+              <p>
+                Take this quick 4-question quiz to see how well you can identify fake job postings.
+              </p>
               <button className="btn-analyze" onClick={() => setQuizStarted(true)}>
                 <HelpCircle size={20} />
                 Start Quiz
@@ -289,7 +336,9 @@ export default function EducationPage({ auth, onLogout }) {
           {quizStarted && !quizDone && (
             <div className="edu-quiz-card">
               <div className="edu-quiz-progress">
-                <span>Question {currentQ + 1} of {QUIZ_QUESTIONS.length}</span>
+                <span>
+                  Question {currentQ + 1} of {QUIZ_QUESTIONS.length}
+                </span>
                 <div className="edu-quiz-progress-track">
                   <div
                     className="edu-quiz-progress-fill"
@@ -315,7 +364,9 @@ export default function EducationPage({ auth, onLogout }) {
                     >
                       <span className="edu-quiz-opt-letter">{String.fromCharCode(65 + i)}</span>
                       {opt}
-                      {selectedAnswer !== null && isCorrect(i) && <CheckCircle2 size={18} className="edu-quiz-check" />}
+                      {selectedAnswer !== null && isCorrect(i) && (
+                        <CheckCircle2 size={18} className="edu-quiz-check" />
+                      )}
                     </button>
                   );
                 })}

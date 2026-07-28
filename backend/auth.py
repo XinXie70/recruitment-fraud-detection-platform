@@ -1,31 +1,38 @@
-import os
+import logging
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from config import settings
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
+from rate_limit import limiter
 
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-for-local-development")
+SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "120"))
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
+JWT_ISSUER = settings.jwt_issuer
+JWT_AUDIENCE = settings.jwt_audience
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+logger = logging.getLogger("fake_job_detection_api.auth")
 
 
 class RegisterRequest(BaseModel):
     email: str = Field(..., min_length=5, max_length=255)
     username: str = Field(..., min_length=3, max_length=80)
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=8, max_length=30)
 
     @field_validator("email")
     @classmethod
@@ -43,17 +50,31 @@ class RegisterRequest(BaseModel):
             raise ValueError("Username can only contain letters, numbers, hyphens, and underscores.")
         return cleaned
 
+    @field_validator("password")
+    @classmethod
+    def password_must_meet_policy(cls, value: str) -> str:
+        if not any("A" <= char <= "Z" for char in value):
+            raise ValueError("Password must contain an uppercase letter.")
+        if not any("a" <= char <= "z" for char in value):
+            raise ValueError("Password must contain a lowercase letter.")
+        if not any("0" <= char <= "9" for char in value):
+            raise ValueError("Password must contain a number.")
+        # bcrypt only processes 72 bytes. Checking encoded length prevents
+        # multi-byte passwords from reaching the hasher and raising a 500.
+        if len(value.encode("utf-8")) > 72:
+            raise ValueError("Password must not exceed 72 UTF-8 bytes.")
+        return value
+
 
 class LoginRequest(BaseModel):
     identifier: str = Field(..., min_length=3, max_length=255)
-    password: str = Field(..., min_length=1, max_length=128)
+    password: str = Field(..., min_length=1, max_length=30)
 
 
 class UserResponse(BaseModel):
     id: int
     email: str
     username: str
-    is_admin: bool
 
 
 class TokenResponse(BaseModel):
@@ -71,18 +92,21 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(user: User) -> str:
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": str(user.id), "exp": expires_at}
+    issued_at = datetime.now(timezone.utc)
+    expires_at = issued_at + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {
+        "sub": str(user.id),
+        "iat": issued_at,
+        "exp": expires_at,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "jti": str(uuid4()),
+    }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def to_user_response(user: User) -> UserResponse:
-    return UserResponse(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        is_admin=user.is_admin,
-    )
+    return UserResponse(id=user.id, email=user.email, username=user.username)
 
 
 def get_current_user(
@@ -95,21 +119,29 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
         user_id = payload.get("sub")
         if user_id is None:
             raise credentials_error
-    except JWTError as exc:
+        user_id = int(user_id)
+    except (JWTError, TypeError, ValueError) as exc:
         raise credentials_error from exc
 
-    user = db.get(User, int(user_id))
+    user = db.get(User, user_id)
     if user is None:
         raise credentials_error
     return user
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit(settings.rate_limit_auth_register)
+def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
     existing = (
         db.query(User)
         .filter(or_(User.email == payload.email, User.username == payload.username))
@@ -121,19 +153,34 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
             detail="Email or username is already registered.",
         )
 
-    user = User(
-        email=payload.email,
-        username=payload.username,
-        password_hash=hash_password(payload.password),
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
+    try:
+        user = User(
+            email=payload.email,
+            username=payload.username,
+            password_hash=hash_password(payload.password),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username is already registered.",
+        ) from exc
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Registration failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed. Please try again later.",
+        ) from exc
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit(settings.rate_limit_auth_login)
+def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     identifier = payload.identifier.strip()
     user = (
         db.query(User)
