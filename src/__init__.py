@@ -1,1 +1,1 @@
-"""src 包标记，便于 python -m 导入。"""
+"""Mark src as a package so modules can be imported with python -m."""

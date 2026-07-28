@@ -1,0 +1,152 @@
+# ============================================================
+# Google Cloud Build — Auto build & deploy frontend + backend to Cloud Run
+#
+# One-time setup:
+#   1. Create a free PostgreSQL database on Supabase (supabase.com)
+#   2. Create secrets in Secret Manager:
+#      - DATABASE_URL_PRODUCTION  (Supabase connection string)
+#      - SECRET_KEY_PRODUCTION
+#   3. Grant Cloud Build service account access to Secret Manager
+#
+# Trigger: push to main branch (auto), or manual trigger
+# ============================================================
+
+steps:
+  # ==================== Backend ====================
+
+  # --- 1. Build backend Docker image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-backend'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'
+      - '-f'
+      - 'backend/Dockerfile.cloudrun'
+      - '.'
+
+  # --- 2. Push backend image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-backend'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+
+  # --- 3. Deploy backend to Cloud Run ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-backend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy ${_BACKEND_SERVICE_NAME} \
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA} \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --cpu=${_CPU} \
+          --memory=${_MEMORY} \
+          --min-instances=${_MIN_INSTANCES} \
+          --max-instances=${_MAX_INSTANCES} \
+          --concurrency=${_CONCURRENCY} \
+          --timeout=${_REQUEST_TIMEOUT} \
+          --set-env-vars=ENVIRONMENT=production \
+          --set-env-vars=LOG_LEVEL=${_LOG_LEVEL} \
+          --set-env-vars=MODEL_SERVER_URL=${_MODEL_SERVER_URL} \
+          --set-env-vars=MODEL_SERVER_TIMEOUT=${_MODEL_SERVER_TIMEOUT} \
+          --set-env-vars=MAX_INPUT_CHARS=${_MAX_INPUT_CHARS} \
+          --set-env-vars=MODEL_TIMEOUT_SECONDS=${_MODEL_TIMEOUT_SECONDS} \
+          --set-env-vars=MODEL_MAX_WORKERS=${_MODEL_MAX_WORKERS} \
+          --set-env-vars=CORS_ORIGINS=${_CORS_ORIGINS} \
+          --set-secrets=DATABASE_URL=DATABASE_URL_PRODUCTION:latest \
+          --set-secrets=SECRET_KEY=SECRET_KEY_PRODUCTION:latest \
+          --set-secrets=ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES:latest
+
+  # --- 4. Get backend URL ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'get-backend-url'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BACKEND_URL=$(gcloud run services describe ${_BACKEND_SERVICE_NAME} \
+          --region=${_REGION} \
+          --platform=managed \
+          --format='value(status.url)')
+        echo "Backend URL: $BACKEND_URL"
+        echo "$BACKEND_URL" > /workspace/backend_url.txt
+
+  # ==================== Frontend ====================
+
+  # --- 5. Build frontend Docker image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:latest'
+      - '-f'
+      - 'frontend/Dockerfile.prod'
+      - '.'
+
+  # --- 6. Push frontend image ---
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+
+  # --- 7. Deploy frontend to Cloud Run ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-frontend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        gcloud run deploy ${_FRONTEND_SERVICE_NAME} \
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA} \
+          --region=${_REGION} \
+          --platform=managed \
+          --allow-unauthenticated \
+          --cpu=1 \
+          --memory=256Mi \
+          --min-instances=${_MIN_INSTANCES} \
+          --max-instances=${_MAX_INSTANCES} \
+          --concurrency=${_CONCURRENCY} \
+          --timeout=60s \
+          --set-env-vars=BACKEND_URL=$${BACKEND_URL}
+
+# --- Substitutions (override on manual trigger) ---
+substitutions:
+  _REGION: "asia-southeast1"
+  _BACKEND_SERVICE_NAME: "almond-backend"
+  _FRONTEND_SERVICE_NAME: "almond-frontend"
+  _REPOSITORY: "almond-repo"
+  _CPU: "1"
+  _MEMORY: "512Mi"
+  _MIN_INSTANCES: "0"
+  _MAX_INSTANCES: "5"
+  _CONCURRENCY: "80"
+  _REQUEST_TIMEOUT: "300s"
+  _LOG_LEVEL: "INFO"
+  _MODEL_SERVER_URL: ""
+  _MODEL_SERVER_TIMEOUT: "120"
+  _MAX_INPUT_CHARS: "50000"
+  _MODEL_TIMEOUT_SECONDS: "30"
+  _MODEL_MAX_WORKERS: "3"
+  _CORS_ORIGINS: "*"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+# Artifact Registry — store images
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/backend:latest'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/frontend:latest'

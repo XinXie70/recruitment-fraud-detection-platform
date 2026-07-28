@@ -1,6 +1,7 @@
 # model_results
 
-存放 BERT（class-weighted）的评估结果、预测与图表（不含大权重文件）。
+This directory contains class-weighted BERT evaluation results, predictions,
+and figures. Large model-weight files are not stored here.
 
 ```text
 model_results/

@@ -1,0 +1,9 @@
+{
+  "low_threshold": 0.19,
+  "high_threshold": 0.91,
+  "tuned_on": "validation",
+  "optimization_score": 0.8669,
+  "binary_f1_at_low_threshold": 0.5062,
+  "binary_recall_at_low_threshold": 0.9425,
+  "note": "Thresholds are for risk_mapping layer only. Binary classification metrics use LOW as fake/real decision boundary."
+}

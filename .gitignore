@@ -1,4 +1,4 @@
-# Large datasets are kept locally and rebuilt by the pipeline.
+# Uncompressed datasets stay local. Compressed experiment inputs may be tracked.
 data/raw/*.csv
 data/processed/*.csv
 
@@ -21,6 +21,11 @@ checkpoints/
 venv/
 __pycache__/
 *.py[cod]
+.env
+.env.*
+!.env.example
+frontend/node_modules/
+frontend/dist/
 .DS_Store
 .ipynb_checkpoints/
 .idea/

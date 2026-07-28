@@ -1,8 +1,9 @@
-# BERT 可运行代码包
+# Runnable BERT Package
 
-本目录与同级的 `model_weights/`、`model_results/`、以及 `data/splits/` 一起使用。
+Use this directory together with the repository-level `model_weights/`,
+`model_results/`, and `data/splits/` directories.
 
-## 依赖安装
+## Install dependencies
 
 ```powershell
 . E:\ml\activate.ps1
@@ -10,24 +11,25 @@ pip install -r model_code/requirements-bert.txt
 pip install -r requirements.txt
 ```
 
-## 运行 BERT（class-weighted）
+## Run class-weighted BERT
 
 ```powershell
 cd model_code/bert
 
-# 训练 class-weighted 模型，权重写入 ../../model_weights/bert/bert_class_weighted
+# Train the class-weighted model and write weights to ../../model_weights/bert/bert_class_weighted
 python train_bert.py
 
-# 用已保存权重在 test 上评估
+# Evaluate saved weights on the test split
 python evaluate_bert.py --checkpoint_dir ..\..\model_weights\bert\bert_class_weighted\best
 
-# 单条推理
+# Run inference on one record
 python predict_bert.py --text "Urgent work-from-home role. Send bank details."
 ```
 
-## Git LFS（权重文件）
+## Git LFS for model weights
 
-BERT `model.safetensors` 约 418MB，超过 GitHub 普通文件 100MB 限制，必须用 Git LFS：
+The BERT `model.safetensors` file is approximately 418 MB, which exceeds
+GitHub's 100 MB regular-file limit. Use Git LFS:
 
 ```powershell
 git lfs install

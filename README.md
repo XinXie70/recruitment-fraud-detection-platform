@@ -1,31 +1,31 @@
 # Fake Job Advertisement Detection — LR + BERT + Ensemble
 
-虚假招聘广告检测项目，保留三个生产模型：
+This fake job advertisement detection project retains three production models:
 
-| 模型 | 说明 |
+| Model | Description |
 |---|---|
 | **Logistic Regression** | TF-IDF + LR baseline |
-| **BERT (class-weighted)** | 带类别权重的 BERT 微调 |
-| **LR + BERT Ensemble** | 加权融合 + 风险分级 |
+| **BERT (class-weighted)** | BERT fine-tuned with class weights |
+| **LR + BERT Ensemble** | Weighted ensemble with risk bands |
 
-## 目录结构
+## Project structure
 
 ```text
-├── data/splits/              # 固定 train / validation / test（唯一训练数据组）
-├── model_code/bert/          # BERT 训练与推理代码
+├── data/splits/              # Fixed train / validation / test splits
+├── model_code/bert/          # BERT training and inference code
 ├── model_weights/            # LR joblib + BERT safetensors
-├── model_results/bert/       # BERT 评估结果
-├── reports/models/           # 三模型指标、预测、ensemble 与 risk band 配置
+├── model_results/bert/       # BERT evaluation results
+├── reports/models/           # Metrics, predictions, ensemble, and risk-band configs
 ├── src/
-│   ├── data_pipeline/        # 共享数据处理
-│   ├── models/               # LR 训练、ensemble、risk band 脚本
-│   └── api/                  # FastAPI 推理服务
-└── scripts/smoke_test_api.py # E 盘冒烟测试
+│   ├── data_pipeline/        # Shared data processing
+│   ├── models/               # LR training, ensemble, and risk-band scripts
+│   └── api/                  # FastAPI inference service
+└── scripts/smoke_test_api.py # Smoke test for the E: drive environment
 ```
 
-## 快速开始
+## Quick start
 
-### 1. 环境（E 盘 CUDA）
+### 1. Environment (E: drive with CUDA)
 
 ```powershell
 git lfs install
@@ -36,42 +36,65 @@ pip install -r requirements.txt
 pip install -r model_code/requirements-bert.txt
 ```
 
-### 2. 训练 LR（若权重不存在）
+### 2. Train LR (if weights are unavailable)
 
 ```powershell
 python src/models/logistic_regression/train_baseline.py
 ```
 
-权重输出：`model_weights/logistic_regression/logistic_regression_baseline.joblib`
+Weights are written to `model_weights/logistic_regression/logistic_regression_baseline.joblib`.
 
-### 3. 启动 FastAPI
+### 3. Start FastAPI
 
 ```powershell
 uvicorn src.api.main:app --host 0.0.0.0 --port 8000
 ```
 
-Swagger 文档：http://127.0.0.1:8000/docs
+Swagger documentation: http://127.0.0.1:8000/docs
 
-### 4. 冒烟测试（E 盘）
+### 4. Smoke test (E: drive)
 
 ```powershell
 python scripts/smoke_test_api.py
 ```
 
-结果写入 `E:\ml\smoke-test-results\fake-job-api-smoke.json`
+Results are written to `E:\ml\smoke-test-results\fake-job-api-smoke.json`.
 
-## API 端点
+## Frontend development
 
-| 方法 | 路径 | 说明 |
+The frontend requires Node.js 20.19 or a compatible newer release. With `nvm`:
+
+```bash
+nvm use
+cd frontend
+npm ci
+npm run dev
+```
+
+Before opening a pull request, run:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+Husky and lint-staged automatically format and lint staged frontend files before
+each commit. GitHub Actions runs the backend tests, frontend linting, frontend
+tests, and a production build.
+
+## API endpoints
+
+| Method | Path | Description |
 |---|---|---|
-| GET | `/health` | 健康检查 |
-| POST | `/predict/lr` | Logistic Regression 预测 |
-| POST | `/predict/bert` | BERT (class-weighted) 预测 |
-| POST | `/predict/ensemble` | LR+BERT 融合预测 |
-| POST | `/predict/ensemble/risk` | 融合预测 + 风险分级 (Low/Suspicious/High) |
-| POST | `/predict/lr/batch` | LR 批量预测（最多 100 条） |
+| GET | `/health` | Health check |
+| POST | `/predict/lr` | Logistic Regression prediction |
+| POST | `/predict/bert` | Class-weighted BERT prediction |
+| POST | `/predict/ensemble` | LR+BERT ensemble prediction |
+| POST | `/predict/ensemble/risk` | Ensemble prediction with Low/Suspicious/High risk band |
+| POST | `/predict/lr/batch` | Batch LR prediction (up to 100 records) |
 
-### 请求示例
+### Request example
 
 ```json
 POST /predict/ensemble/risk
@@ -80,7 +103,7 @@ POST /predict/ensemble/risk
 }
 ```
 
-### 响应示例
+### Response example
 
 ```json
 {
@@ -103,7 +126,7 @@ POST /predict/ensemble/risk
 }
 ```
 
-## 后端集成示例（Python）
+## Backend integration example (Python)
 
 ```python
 import httpx
@@ -118,37 +141,42 @@ risk_level = result["risk_level"]      # Low | Suspicious | High
 risk_score = result["risk_score"]      # 0–100
 ```
 
-## 数据集
+## Dataset
 
-固定划分位于 `data/splits/`（70% Train / 15% Validation / 15% Test，seed 42）。
+The fixed splits are stored in `data/splits/` (70% Train / 15% Validation / 15% Test, seed 42).
 
-原始数据需自行获取 EMSCAD 并重命名为 `data/raw/emscad_v1.csv`，详见 `DATA_CONTRACT_V1.md`。
+Obtain the raw EMSCAD dataset separately, rename it to `data/raw/emscad_v1.csv`,
+and see `DATA_CONTRACT_V1.md` for details.
 
-## 模型训练与评估流程
+Dataset source: Vidros et al. (2017), *Automatic Detection of Online Recruitment
+Frauds: Characteristics, Methods, and a Public Dataset*.
+https://doi.org/10.3390/fi9010006
+
+## Model training and evaluation workflow
 
 ```powershell
 # LR baseline
 python src/models/logistic_regression/train_baseline.py
 
-# BERT 评估（已有权重）
+# Evaluate BERT with existing weights
 cd model_code/bert
 python evaluate_bert.py --checkpoint_dir ..\..\model_weights\bert\bert_class_weighted\best
 
-# Ensemble（validation 搜权重，test 应用锁定配置）
+# Search ensemble weights on validation; apply the locked config to test
 cd ..\..
 python src/models/build_ensemble.py --mode validation
 python src/models/build_ensemble.py --mode test
 
-# 风险分级
+# Risk bands
 python src/models/build_risk_bands.py --mode validation
 python src/models/build_risk_bands.py --mode test
 ```
 
-## 风险分级配置
+## Risk-band configuration
 
-冻结配置：`reports/models/risk_band_v1_config.json`
+Frozen configuration: `reports/models/risk_band_v1_config.json`
 
-| 等级 | 规则 |
+| Level | Rule |
 |---|---|
 | **Low** | fraud_score < 0.1567 |
 | **Suspicious** | 0.1567 ≤ fraud_score < 0.62 |
@@ -156,11 +184,11 @@ python src/models/build_risk_bands.py --mode test
 
 `risk_score = fraud_score × 100`
 
-## 保留的结果文件
+## Retained result files
 
-- `reports/models/logistic_regression/` — LR 指标与预测
-- `reports/models/bert/` — BERT 指标与预测
-- `reports/models/ensemble_lr_bert/` — 融合配置与预测
-- `reports/models/risk_band_v1_*` — 风险分级配置与结果
+- `reports/models/logistic_regression/` — LR metrics and predictions
+- `reports/models/bert/` — BERT metrics and predictions
+- `reports/models/ensemble_lr_bert/` — Ensemble configuration and predictions
+- `reports/models/risk_band_v1_*` — Risk-band configuration and results
 
-更多实验约定见 `MODEL_EXPERIMENT_CONTRACT_V1.md`。
+See `MODEL_EXPERIMENT_CONTRACT_V1.md` for additional experiment conventions.
