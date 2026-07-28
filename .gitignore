@@ -30,3 +30,7 @@ frontend/dist/
 .ipynb_checkpoints/
 .idea/
 .vscode/
+
+# Training runtime output is local-only; retain placeholder directories.
+model_results/**/logs/*
+!model_results/**/logs/.gitkeep
