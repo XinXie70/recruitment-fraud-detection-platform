@@ -14,11 +14,13 @@ The system serves a single core domain — fake job detection — with these cha
 - Synchronous request-response flow: submit text → validate → ensemble inference → XAI → response
 - Small team (3–5 developers)
 - Deployed on Cloud Run / Render (serverless, auto-scaling)
-- 8 ML models loaded in-process for low-latency inference
+- 8 ML models accessed through a stable adapter interface; they can be loaded
+  in-process or hosted by a separate inference runtime
 
 ## Decision
 
-**Use a modular monolith**, not microservices.
+**Use a modular monolith for the business application**, while allowing the
+compute-heavy model runtime to be deployed separately.
 
 The backend is a single FastAPI application with clear internal boundaries:
 
@@ -28,22 +30,25 @@ The backend is a single FastAPI application with clear internal boundaries:
 - `xai_gentle/` — explainability + education subdomain
 - `config.py` — centralized configuration
 - `middleware.py` — cross-cutting concerns
+- `services/model_adapter.py` — local/remote inference boundary
 
 ## Alternatives Considered
 
 | Alternative | Why Rejected |
 |-------------|-------------|
-| Microservices (one per model) | Network overhead kills ensemble latency; 8 model servers is unmanageable for a small team |
+| Microservices (one per model) | Eight independently operated services would add excessive networking and deployment complexity |
 | Separate XAI service | XAI needs direct access to ensemble internals (SHAP values); separating would duplicate model loading |
 | Message queue for async analysis | No async use case; all requests need synchronous responses |
 
 ## Consequences
 
 **Positive:**
-- Zero inter-service network latency for ensemble inference
+- Simple in-process inference is available for environments with local artifacts
 - Single deployment unit → simpler CI/CD, monitoring, debugging
 - All design patterns (DI, caching, resilience) work in-process with no distributed coordination
+- The model runtime may use independent compute without changing route/service contracts
 
 **Negative:**
-- Cannot scale models independently (mitigated: Cloud Run scales the whole app horizontally)
+- Remote inference adds latency and another security boundary (mitigated with
+  timeouts, health reporting, HTTPS, authentication, and network restrictions)
 - Coupling at deploy time (mitigated: internal interfaces are clean — could extract a service later if needed)

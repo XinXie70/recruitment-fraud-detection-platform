@@ -3,12 +3,14 @@ import {
   Activity,
   AlertTriangle,
   ArrowLeft,
+  BookOpen,
   CalendarClock,
   CheckCircle2,
   Gift,
   Info,
   LogIn,
   Loader2,
+  LayoutDashboard,
   Search,
   ShieldAlert,
   UserPlus,
@@ -125,9 +127,21 @@ function ReportPage({ result, onBack }) {
           <ShieldAlert size={18} />
           <span>{riskLabel(riskLevel)}</span>
         </div>
-        <div className="report-case">
-          <span>Case ID</span>
-          <strong>{caseId}</strong>
+        <div className="report-topbar-end">
+          <nav className="report-nav" aria-label="Report navigation">
+            <Link to="/dashboard">
+              <LayoutDashboard size={17} />
+              Dashboard
+            </Link>
+            <Link to="/education">
+              <BookOpen size={17} />
+              Education
+            </Link>
+          </nav>
+          <div className="report-case">
+            <span>Case ID</span>
+            <strong>{caseId}</strong>
+          </div>
         </div>
       </header>
 

@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/requirements-remote.txt
 
@@ -59,7 +59,13 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm test
+        run: npm run test:coverage
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps --only-shell chromium
+
+      - name: End-to-end test
+        run: npm run test:e2e
 
       - name: Build
         run: npm run build

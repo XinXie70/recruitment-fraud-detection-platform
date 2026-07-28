@@ -1344,6 +1344,7 @@ button.nav-button {
 
 .report-status,
 .report-case,
+.report-topbar-end,
 .report-risk-kicker,
 .report-risk-pill {
   display: inline-flex;
@@ -1377,9 +1378,38 @@ button.nav-button {
 }
 
 .report-case {
-  justify-self: end;
   gap: 12px;
   color: var(--muted);
+}
+
+.report-topbar-end {
+  justify-self: end;
+  gap: 18px;
+}
+
+.report-nav {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.report-nav a {
+  min-height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--muted);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.report-nav a:hover,
+.report-nav a:focus-visible {
+  color: var(--text);
+  border-color: var(--blue);
 }
 
 .report-case span {
@@ -2057,9 +2087,14 @@ button.nav-button {
 
   .report-back,
   .report-status,
+  .report-topbar-end,
   .report-case {
     justify-self: stretch;
     justify-content: center;
+  }
+
+  .report-topbar-end {
+    flex-wrap: wrap;
   }
 
   .report-layout {
@@ -2454,6 +2489,10 @@ button.nav-button {
   color: var(--safe);
 }
 
+.admin-health-pill.warn {
+  color: var(--warn);
+}
+
 .admin-health-pill.danger {
   color: var(--danger);
 }
@@ -2464,6 +2503,11 @@ button.nav-button {
   width: 44px;
   height: 44px;
   cursor: pointer;
+}
+
+.admin-refresh-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .admin-kpi-row {

@@ -37,5 +37,6 @@ The app returns HTTP responses immediately (auth works). Analysis endpoints chec
 
 - Auth is available ~2 seconds after cold start
 - Analysis endpoints return 503 for ~30–60 seconds after cold start
-- Cloud Run health checks pass immediately (they hit `/api/health` which is always available)
+- Process liveness checks pass through `/api/live`; dependency readiness is
+  reported separately through `/api/ready` and the richer `/api/health`
 - Failed model members are tolerated — the ensemble degrades gracefully

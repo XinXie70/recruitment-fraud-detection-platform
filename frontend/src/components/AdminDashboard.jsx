@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import {
   Award,
   BarChart3,
@@ -158,12 +158,20 @@ export default function AdminDashboard({ auth, onLogout }) {
   const [activeMetric, setActiveMetric] = useState('f1');
   const [viewMode, setViewMode] = useState('ranking');
 
-  useEffect(() => {
-    fetch(apiUrl('/api/health'))
-      .then((r) => r.json())
-      .then((d) => setHealthStatus(d))
-      .catch(() => setHealthStatus({ status: 'unreachable' }));
+  const refreshHealth = useCallback(async () => {
+    setHealthStatus(null);
+    try {
+      const response = await fetch(apiUrl('/api/health'));
+      if (!response.ok) throw new Error(`Health request failed: ${response.status}`);
+      setHealthStatus(await response.json());
+    } catch {
+      setHealthStatus({ status: 'unreachable' });
+    }
   }, []);
+
+  useEffect(() => {
+    void refreshHealth();
+  }, [refreshHealth]);
 
   const formatPct = (v) => `${(v * 100).toFixed(1)}%`;
   const bestModel = useMemo(() => [...MODEL_METRICS].sort((a, b) => b.f1 - a.f1)[0], []);
@@ -179,6 +187,13 @@ export default function AdminDashboard({ auth, onLogout }) {
     () => Math.max(...MODEL_METRICS.map((m) => m[activeMetric])),
     [activeMetric],
   );
+  const healthPresentation = useMemo(() => {
+    if (healthStatus?.status === 'healthy') return { className: 'safe', label: 'System Healthy' };
+    if (healthStatus?.status === 'degraded') {
+      return { className: 'warn', label: 'System Degraded' };
+    }
+    return { className: 'danger', label: 'System Offline' };
+  }, [healthStatus]);
 
   const categories = useMemo(
     () => ({
@@ -221,14 +236,19 @@ export default function AdminDashboard({ auth, onLogout }) {
           </div>
           <div className="admin-header-actions">
             {healthStatus && (
-              <span
-                className={`admin-health-pill ${healthStatus.status === 'healthy' ? 'safe' : 'danger'}`}
-              >
+              <span className={`admin-health-pill ${healthPresentation.className}`}>
                 <span className="health-dot" />
-                {healthStatus.status === 'healthy' ? 'System Healthy' : 'Offline'}
+                {healthPresentation.label}
               </span>
             )}
-            <button className="admin-refresh-btn" onClick={() => window.location.reload()}>
+            <button
+              aria-label="Refresh system health"
+              className="admin-refresh-btn"
+              disabled={healthStatus === null}
+              onClick={refreshHealth}
+              title="Refresh system health"
+              type="button"
+            >
               <RefreshCw size={16} />
             </button>
           </div>

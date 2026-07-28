@@ -2,11 +2,11 @@
 
 This fake job advertisement detection project retains three production models:
 
-| Model | Description |
-|---|---|
-| **Logistic Regression** | TF-IDF + LR baseline |
+| Model                     | Description                        |
+| ------------------------- | ---------------------------------- |
+| **Logistic Regression**   | TF-IDF + LR baseline               |
 | **BERT (class-weighted)** | BERT fine-tuned with class weights |
-| **LR + BERT Ensemble** | Weighted ensemble with risk bands |
+| **LR + BERT Ensemble**    | Weighted ensemble with risk bands  |
 
 ## Project structure
 
@@ -76,23 +76,57 @@ Before opening a pull request, run:
 ```bash
 npm run lint
 npm test
+npm run test:coverage
+npm run test:e2e
 npm run build
+```
+
+The Playwright suite covers authentication redirects, registration, successful
+analysis with history persistence, and recoverable model-service failure. On a
+new development machine, install its headless browser once with:
+
+```bash
+npx playwright install --only-shell chromium
 ```
 
 Husky and lint-staged automatically format and lint staged frontend files before
 each commit. GitHub Actions runs the backend tests, frontend linting, frontend
 tests, and a production build.
 
+## Full-stack Docker development
+
+Start PostgreSQL, run the database migrations, and launch the backend and
+frontend with one command:
+
+```bash
+docker compose up --build
+```
+
+The frontend is available at http://localhost:5190 and proxies `/api` requests
+to the backend container. Set `MODEL_SERVER_URL` before starting Compose when a
+standalone model inference service is required:
+
+```bash
+MODEL_SERVER_URL=https://model-api.example.com docker compose up --build
+```
+
+Do not expose an unauthenticated model server directly to the public internet.
+The Final Demo evidence and rehearsal checklist are maintained in
+[`docs/final-demo-readiness.md`](docs/final-demo-readiness.md).
+Architecture diagrams and rationale are available in
+[`docs/architecture/`](docs/architecture/README.md) and
+[`docs/design-justification.md`](docs/design-justification.md).
+
 ## API endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| GET | `/health` | Health check |
-| POST | `/predict/lr` | Logistic Regression prediction |
-| POST | `/predict/bert` | Class-weighted BERT prediction |
-| POST | `/predict/ensemble` | LR+BERT ensemble prediction |
-| POST | `/predict/ensemble/risk` | Ensemble prediction with Low/Suspicious/High risk band |
-| POST | `/predict/lr/batch` | Batch LR prediction (up to 100 records) |
+| Method | Path                     | Description                                            |
+| ------ | ------------------------ | ------------------------------------------------------ |
+| GET    | `/health`                | Health check                                           |
+| POST   | `/predict/lr`            | Logistic Regression prediction                         |
+| POST   | `/predict/bert`          | Class-weighted BERT prediction                         |
+| POST   | `/predict/ensemble`      | LR+BERT ensemble prediction                            |
+| POST   | `/predict/ensemble/risk` | Ensemble prediction with Low/Suspicious/High risk band |
+| POST   | `/predict/lr/batch`      | Batch LR prediction (up to 100 records)                |
 
 ### Request example
 
@@ -148,8 +182,8 @@ The fixed splits are stored in `data/splits/` (70% Train / 15% Validation / 15% 
 Obtain the raw EMSCAD dataset separately, rename it to `data/raw/emscad_v1.csv`,
 and see `DATA_CONTRACT_V1.md` for details.
 
-Dataset source: Vidros et al. (2017), *Automatic Detection of Online Recruitment
-Frauds: Characteristics, Methods, and a Public Dataset*.
+Dataset source: Vidros et al. (2017), _Automatic Detection of Online Recruitment
+Frauds: Characteristics, Methods, and a Public Dataset_.
 https://doi.org/10.3390/fi9010006
 
 ## Model training and evaluation workflow
@@ -176,11 +210,11 @@ python src/models/build_risk_bands.py --mode test
 
 Frozen configuration: `reports/models/risk_band_v1_config.json`
 
-| Level | Rule |
-|---|---|
-| **Low** | fraud_score < 0.1567 |
+| Level          | Rule                        |
+| -------------- | --------------------------- |
+| **Low**        | fraud_score < 0.1567        |
 | **Suspicious** | 0.1567 ≤ fraud_score < 0.62 |
-| **High** | fraud_score ≥ 0.62 |
+| **High**       | fraud_score ≥ 0.62          |
 
 `risk_score = fraud_score × 100`
 
