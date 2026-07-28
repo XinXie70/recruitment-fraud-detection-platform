@@ -65,6 +65,16 @@ def test_history_failure_rolls_back_without_crashing() -> None:
     assert db.rolled_back is True
 
 
+def test_history_preview_redacts_contact_details() -> None:
+    text = "Contact recruiter@example.com or +61 412 345 678 for this role."
+    preview = analysis_router._redact_history_preview(text)
+
+    assert "recruiter@example.com" not in preview
+    assert "412 345 678" not in preview
+    assert "[REDACTED_EMAIL]" in preview
+    assert "[REDACTED_PHONE]" in preview
+
+
 def test_url_analysis_error_is_sanitized(monkeypatch) -> None:
     monkeypatch.setattr(
         analysis_router,
@@ -73,7 +83,8 @@ def test_url_analysis_error_is_sanitized(monkeypatch) -> None:
     )
     with pytest.raises(HTTPException) as raised:
         analysis_router.analyze_url_payload(
-            AnalysisRequest(text="https://example.com"),
+            request=SimpleNamespace(),
+            payload=AnalysisRequest(text="https://example.com"),
             current_user=SimpleNamespace(id=1),
         )
     assert raised.value.status_code == 500

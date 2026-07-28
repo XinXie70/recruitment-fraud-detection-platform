@@ -9,6 +9,11 @@ from config import settings
 
 
 class TestHealthEndpoints:
+    def test_live_does_not_depend_on_services(self, client):
+        resp = client.get("/api/live")
+        assert resp.status_code == 200
+        assert resp.json() == {"status": "alive"}
+
     def test_health_returns_ok(self, client):
         resp = client.get("/api/health")
         # 200 = healthy, 503 = degraded (models not fully loaded).
@@ -22,6 +27,7 @@ class TestHealthEndpoints:
         resp = client.get("/api/ready")
         # Models are not warmed up in test — expect 503
         assert resp.status_code == 503
+        assert resp.json()["detail"]["database_connected"] is True
 
 
 class TestAuthEndpoints:
@@ -52,6 +58,7 @@ class TestAuthEndpoints:
             },
         )
         assert resp.status_code == 422
+        assert "密" not in resp.text
 
     @pytest.mark.parametrize(
         "password",
@@ -156,6 +163,74 @@ class TestAnalysisEndpoints:
     def test_empty_text_rejected(self, client, auth_headers):
         resp = client.post("/api/v1/analyze", json={"text": ""}, headers=auth_headers)
         assert resp.status_code == 422
+        assert resp.json()["error"]["code"] == "REQUEST_VALIDATION_FAILED"
+
+
+class TestUserHistoryEndpoints:
+    def test_user_can_list_and_delete_only_own_history(
+        self, client, auth_headers, db_session
+    ):
+        from models import AnalysisHistory, User
+
+        owner = db_session.query(User).filter(User.username == "testuser").one()
+        other = User(
+            email="other@example.com",
+            username="other-user",
+            password_hash="not-used-in-this-test",
+        )
+        db_session.add(other)
+        db_session.flush()
+        own_items = [
+            AnalysisHistory(
+                user_id=owner.id,
+                input_preview=f"Own listing {index}",
+                input_hash=str(index) * 64,
+                risk_score=0.2,
+                risk_level="low",
+                status="success",
+                ensemble_available=8,
+                ensemble_total=8,
+            )
+            for index in (1, 2)
+        ]
+        other_item = AnalysisHistory(
+            user_id=other.id,
+            input_preview="Other user's listing",
+            input_hash="3" * 64,
+            risk_score=0.8,
+            risk_level="high",
+            status="success",
+            ensemble_available=8,
+            ensemble_total=8,
+        )
+        db_session.add_all([*own_items, other_item])
+        db_session.commit()
+
+        listing = client.get(
+            "/api/v1/history?page=1&page_size=1", headers=auth_headers
+        )
+        assert listing.status_code == 200
+        assert listing.json()["total"] == 2
+        assert listing.json()["total_pages"] == 2
+        assert len(listing.json()["items"]) == 1
+        assert "Other user's listing" not in listing.text
+
+        forbidden_delete = client.delete(
+            f"/api/v1/history/{other_item.id}", headers=auth_headers
+        )
+        assert forbidden_delete.status_code == 404
+
+        own_delete = client.delete(
+            f"/api/v1/history/{own_items[0].id}", headers=auth_headers
+        )
+        assert own_delete.status_code == 204
+
+        remaining = client.get("/api/v1/history", headers=auth_headers)
+        assert remaining.json()["total"] == 1
+
+    def test_history_requires_authentication(self, client):
+        assert client.get("/api/v1/history").status_code == 401
+        assert client.delete("/api/v1/history/1").status_code == 401
 
 
 class TestAdminEndpoints:

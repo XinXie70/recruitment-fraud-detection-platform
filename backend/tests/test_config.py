@@ -24,3 +24,13 @@ def test_production_accepts_long_random_secret() -> None:
         secret_key="a-secure-production-secret-with-more-than-32-bytes",
     )
     assert settings.app_env == "production"
+
+
+def test_production_rejects_wildcard_cors() -> None:
+    with pytest.raises(ValidationError, match="explicit trusted origins"):
+        Settings(
+            _env_file=None,
+            app_env="production",
+            secret_key="a-secure-production-secret-with-more-than-32-bytes",
+            cors_origins="*",
+        )

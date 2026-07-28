@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 
 from config import settings
@@ -90,6 +91,27 @@ class AnalysisResponse(BaseModel):
     xai: XAIResult
     gentle_ai: GentleAIResult
     url_analysis: URLAnalysis
+
+
+class UserAnalysisHistoryItem(BaseModel):
+    id: int
+    input_preview: str
+    risk_score: float = Field(..., ge=0, le=1)
+    risk_level: Literal["low", "medium", "high"]
+    status: Literal["success", "degraded"]
+    ensemble_available: int = Field(..., ge=0)
+    ensemble_total: int = Field(..., ge=0)
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class UserAnalysisHistoryPage(BaseModel):
+    items: list[UserAnalysisHistoryItem]
+    total: int = Field(..., ge=0)
+    page: int = Field(..., ge=1)
+    page_size: int = Field(..., ge=1, le=100)
+    total_pages: int = Field(..., ge=0)
 
 
 class EducationListResponse(BaseModel):

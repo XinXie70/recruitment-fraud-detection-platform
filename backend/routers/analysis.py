@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import re
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 
 from auth import get_current_user
 from config import settings
@@ -18,16 +19,29 @@ from schemas.analysis import (
     AnalysisResponse,
     EducationListResponse,
     URLAnalysis,
+    UserAnalysisHistoryItem,
+    UserAnalysisHistoryPage,
 )
 from services.analysis_service import AnalysisService, InputRejectedError
 from services.ensemble_predictor import EnsembleUnavailableError
 from url_analyzer import analyze_urls
+from utils import Pagination, paginate
 from xai_gentle import EducationItem
 from xai_gentle.contracts import EducationTopic
 
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
 router = APIRouter(tags=["analysis"])
+
+_EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
+_PHONE_PATTERN = re.compile(r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)")
+
+
+def _redact_history_preview(text: str) -> str:
+    """Remove common contact details before persisting a short input preview."""
+    preview = text[:500]
+    preview = _EMAIL_PATTERN.sub("[REDACTED_EMAIL]", preview)
+    return _PHONE_PATTERN.sub("[REDACTED_PHONE]", preview)
 
 
 def _save_history(
@@ -40,7 +54,7 @@ def _save_history(
     try:
         history = AnalysisHistory(
             user_id=user_id,
-            input_preview=text[:500],
+            input_preview=_redact_history_preview(text),
             input_hash=hashlib.sha256(text.encode()).hexdigest(),
             risk_score=result.ensemble.risk_score,
             risk_level=result.ensemble.risk_level,
@@ -126,7 +140,9 @@ def predict_compatibility(
 
 
 @router.post("/api/analyze-url", response_model=URLAnalysis)
+@limiter.limit(settings.rate_limit_analyze)
 def analyze_url_payload(
+    request: Request,
     payload: AnalysisRequest,
     current_user: User = Depends(get_current_user),
 ) -> URLAnalysis:
@@ -138,6 +154,62 @@ def analyze_url_payload(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="URL analysis failed. Please try again later.",
         ) from exc
+
+
+@router.get("/api/v1/history", response_model=UserAnalysisHistoryPage)
+def list_own_analysis_history(
+    page: Pagination = Depends(paginate),
+    current_user: User = Depends(get_current_user),
+    db=Depends(get_db),
+) -> UserAnalysisHistoryPage:
+    query = db.query(AnalysisHistory).filter(AnalysisHistory.user_id == current_user.id)
+    total = query.count()
+    rows = (
+        query.order_by(AnalysisHistory.created_at.desc())
+        .offset(page.offset)
+        .limit(page.limit)
+        .all()
+    )
+    return UserAnalysisHistoryPage(
+        items=[UserAnalysisHistoryItem.model_validate(row) for row in rows],
+        total=total,
+        page=page.page,
+        page_size=page.size,
+        total_pages=(total + page.size - 1) // page.size,
+    )
+
+
+@router.delete("/api/v1/history/{history_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_own_analysis_history(
+    history_id: int,
+    current_user: User = Depends(get_current_user),
+    db=Depends(get_db),
+) -> Response:
+    history = (
+        db.query(AnalysisHistory)
+        .filter(
+            AnalysisHistory.id == history_id,
+            AnalysisHistory.user_id == current_user.id,
+        )
+        .first()
+    )
+    if history is None:
+        # Do not reveal whether another user owns the requested record.
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analysis history item not found.",
+        )
+    try:
+        db.delete(history)
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception("Failed to delete analysis history")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Analysis history could not be deleted.",
+        ) from None
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/api/v1/education", response_model=EducationListResponse)

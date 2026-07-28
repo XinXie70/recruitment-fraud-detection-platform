@@ -112,6 +112,10 @@ class Settings(BaseSettings):
             or len(self.secret_key.encode("utf-8")) < 32
         ):
             raise ValueError("Production SECRET_KEY must contain at least 32 bytes.")
+        if "*" in self.cors_origin_list:
+            raise ValueError(
+                "Production CORS_ORIGINS must list explicit trusted origins; '*' is not allowed."
+            )
         return self
 
     @property

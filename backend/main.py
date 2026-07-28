@@ -16,6 +16,7 @@ for import_path in (BACKEND_DIR, PROJECT_ROOT, MODEL_DIR):
 from config import settings
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -49,7 +50,14 @@ class _JsonFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
         }
-        for attr in ("request_id", "path", "method", "body_len"):
+        for attr in (
+            "request_id",
+            "path",
+            "method",
+            "body_len",
+            "status_code",
+            "duration_ms",
+        ):
             if hasattr(record, attr):
                 payload[attr] = getattr(record, attr)
         if record.exc_info and record.exc_info[1]:
@@ -81,6 +89,9 @@ analysis_service = get_analysis_service()
 
 
 def _init_database() -> None:
+    if settings.app_env == "production":
+        # Production schema changes are applied by Alembic before the server starts.
+        return
     Base.metadata.create_all(bind=engine)
 
 
@@ -141,6 +152,56 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    request_id = getattr(request.state, "request_id", "unknown")
+    public_errors = [
+        {
+            "type": error.get("type", "validation_error"),
+            "loc": list(error.get("loc", ())),
+            "msg": error.get("msg", "Invalid value."),
+        }
+        for error in exc.errors()
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": public_errors,
+            "error": {
+                "code": "REQUEST_VALIDATION_FAILED",
+                "message": "The request payload is invalid.",
+                "request_id": request_id,
+            },
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    request_id = getattr(request.state, "request_id", "unknown")
+    logger.exception(
+        "Unhandled request failure",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+        },
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error.",
+            "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "The service could not complete the request.",
+                "request_id": request_id,
+            },
+        },
+    )
+
 # Middleware stack (order matters: outer → inner)
 app.add_middleware(RequestBodyGuardMiddleware)  # ASGI-level: body size + content-type
 app.add_middleware(
@@ -165,6 +226,13 @@ app.include_router(admin_router)
 class ReadyResponse(BaseModel):
     status: str
     model_ready: bool
+    database_connected: bool
+
+
+@app.get("/api/live", include_in_schema=False)
+def liveness_check() -> dict[str, str]:
+    """Process-level probe that does not depend on the database or model runtime."""
+    return {"status": "alive"}
 
 
 @app.get("/api/health")
@@ -196,9 +264,22 @@ def health_check(request: Request):
 
 @app.get("/api/ready", response_model=ReadyResponse)
 def readiness_check() -> ReadyResponse:
-    if not analysis_service.ready:
-        raise HTTPException(status_code=503, detail="Prediction models are not ready.")
-    return ReadyResponse(status="ready", model_ready=True)
+    model_ready = analysis_service.ready
+    database_connected = _check_database()
+    if not model_ready or not database_connected:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "Service dependencies are not ready.",
+                "model_ready": model_ready,
+                "database_connected": database_connected,
+            },
+        )
+    return ReadyResponse(
+        status="ready",
+        model_ready=True,
+        database_connected=True,
+    )
 
 
 if __name__ == "__main__":

@@ -94,9 +94,15 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
 ### Method 1: Cloud Build Auto Deploy (recommended)
 
 Push to `main` branch. `cloudbuild.yaml` will automatically:
-1. Build + deploy backend `almond-backend`
-2. Get the backend URL
-3. Build + deploy frontend `almond-frontend` (auto-injects `BACKEND_URL`)
+1. Build and push the versioned backend image
+2. Deploy and execute the one-off `almond-migrate` Cloud Run Job
+3. Deploy backend `almond-backend` only after migrations succeed
+4. Get the backend URL
+5. Build + deploy frontend `almond-frontend` (auto-injects `BACKEND_URL`)
+
+The API container runs with `RUN_DATABASE_MIGRATIONS=false`. This prevents
+multiple Cloud Run instances from racing to apply schema changes during rollout
+or autoscaling. A failed migration stops the build before the API deployment.
 
 ### Method 2: Manual Separate Deployment
 
