@@ -9,10 +9,7 @@ function errorMessage(data, fallback) {
 const ANALYSIS_TIMEOUT_MS = 135000;
 export async function analyzeJobText(text, accessToken) {
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(
-    () => controller.abort(),
-    ANALYSIS_TIMEOUT_MS,
-  );
+  const timeoutId = window.setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT_MS);
 
   try {
     const response = await fetch(apiUrl('/api/v1/analyze'), {
@@ -28,10 +25,7 @@ export async function analyzeJobText(text, accessToken) {
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      let message = errorMessage(
-        data,
-        'The analysis service could not complete this request.',
-      );
+      let message = errorMessage(data, 'The analysis service could not complete this request.');
 
       if (response.status === 503) {
         message = 'The analysis service is temporarily unavailable. Please try again shortly.';
@@ -49,9 +43,7 @@ export async function analyzeJobText(text, accessToken) {
     return data;
   } catch (error) {
     if (error.name === 'AbortError') {
-      const timeoutError = new Error(
-        'The analysis took longer than expected. Please try again.',
-      );
+      const timeoutError = new Error('The analysis took longer than expected. Please try again.');
       timeoutError.code = 'ANALYSIS_TIMEOUT';
       throw timeoutError;
     }

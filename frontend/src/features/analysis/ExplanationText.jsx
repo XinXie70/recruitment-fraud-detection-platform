@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default function ExplanationText({ text, items }) {
   const spans = [...(items || [])]
     .filter((item) => item.start >= 0 && item.end <= text.length && item.end > item.start)
@@ -11,7 +10,9 @@ export default function ExplanationText({ text, items }) {
   spans.forEach((item, index) => {
     if (item.start < cursor) return;
     if (item.start > cursor) {
-      parts.push(<React.Fragment key={`plain-${index}`}>{text.slice(cursor, item.start)}</React.Fragment>);
+      parts.push(
+        <React.Fragment key={`plain-${index}`}>{text.slice(cursor, item.start)}</React.Fragment>,
+      );
     }
     const directionLabel = item.direction === 'raises_risk' ? 'Raises risk' : 'Lowers risk';
     parts.push(

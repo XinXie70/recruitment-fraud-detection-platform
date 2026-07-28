@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
 export default function GentleGuidance({ guidance }) {
   if (!guidance) return null;
   return (
@@ -16,7 +15,9 @@ export default function GentleGuidance({ guidance }) {
         ))}
       </ol>
       <p className="analysis-disclaimer">{guidance.disclaimer}</p>
-      <Link className="education-link" to="/learn">Open educational resources</Link>
+      <Link className="education-link" to="/learn">
+        Open educational resources
+      </Link>
     </>
   );
 }

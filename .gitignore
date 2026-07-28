@@ -2,15 +2,19 @@
 data/raw/*.csv
 data/processed/*.csv
 
-# Trained models and experiment outputs
+# Legacy / local-only experiment trees (replaced by model_* layout)
 /models/
+/outputs/
 artifacts/
 checkpoints/
-outputs/
+
+# Generic binary dumps outside the deliverable weight pack
 *.joblib
-*.pkl
+!model_weights/**/*.joblib
 *.pt
 *.pth
+*.pkl
+!model_weights/**/*.pkl
 
 # Local environments and temporary files
 .venv/

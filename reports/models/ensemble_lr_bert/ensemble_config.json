@@ -1,0 +1,17 @@
+{
+  "method": "weighted_average",
+  "base_models": [
+    "logistic_regression_baseline",
+    "bert_class_weighted"
+  ],
+  "weights": {
+    "logistic_regression_baseline": 0.6000000000000001,
+    "bert_class_weighted": 0.3999999999999999
+  },
+  "threshold_selection": "max_fraud_f1_on_validation",
+  "selected_threshold": 0.62,
+  "validation_input_files": {
+    "logistic_regression_baseline": "F:\\final-version\\capstone-project-26t2-9900-h09c-almond\\reports\\models\\logistic_regression\\validation_predictions.csv",
+    "bert_class_weighted": "F:\\final-version\\capstone-project-26t2-9900-h09c-almond\\reports\\models\\bert\\validation_predictions.csv"
+  }
+}

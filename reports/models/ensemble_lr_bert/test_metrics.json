@@ -1,0 +1,24 @@
+{
+  "model_name": "ensemble_lr_bert_class_weighted",
+  "method": "weighted_average",
+  "weights": {
+    "logistic_regression_baseline": 0.6000000000000001,
+    "bert_class_weighted": 0.3999999999999999
+  },
+  "threshold": 0.62,
+  "test_metrics": {
+    "threshold": 0.62,
+    "pr_auc": 0.905817110133598,
+    "roc_auc": 0.9905304202512842,
+    "fraud_precision": 0.8817204301075269,
+    "fraud_recall": 0.7663551401869159,
+    "fraud_f1": 0.82,
+    "confusion_matrix": {
+      "tn": 2254,
+      "fp": 11,
+      "fn": 25,
+      "tp": 82
+    }
+  },
+  "num_rows": 2372
+}

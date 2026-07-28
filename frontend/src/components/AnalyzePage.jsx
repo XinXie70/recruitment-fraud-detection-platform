@@ -9,7 +9,16 @@ import { apiUrl } from '../utils/api';
 
 const HERO_TITLE = 'Detect Fake Job Advertisements';
 
-const MODEL_KEYS = ['logistic_regression', 'svm', 'xgboost', 'dnn', 'rnn', 'bilstm', 'bert', 'roberta'];
+const MODEL_KEYS = [
+  'logistic_regression',
+  'svm',
+  'xgboost',
+  'dnn',
+  'rnn',
+  'bilstm',
+  'bert',
+  'roberta',
+];
 
 export default function AnalyzePage({ auth, onLogout }) {
   const [text, setText] = useState('');
@@ -104,7 +113,8 @@ export default function AnalyzePage({ auth, onLogout }) {
   };
 
   const hasInput = Boolean(text.trim());
-  const loadingMessage = 'Running 8 ML models (LR, SVM, XGBoost, DNN, RNN, BiLSTM, BERT, RoBERTa)...';
+  const loadingMessage =
+    'Running 8 ML models (LR, SVM, XGBoost, DNN, RNN, BiLSTM, BERT, RoBERTa)...';
 
   if (result && !loading) {
     return <ReportPage result={result} onBack={handleNewScan} />;
@@ -119,8 +129,8 @@ export default function AnalyzePage({ auth, onLogout }) {
         <section className="hero">
           <AnimatedTitle text={HERO_TITLE} />
           <p>
-            Paste any job listing below. Our analyzer scores it with eight machine
-            learning models and highlights the risk signals.
+            Paste any job listing below. Our analyzer scores it with eight machine learning models
+            and highlights the risk signals.
           </p>
         </section>
 

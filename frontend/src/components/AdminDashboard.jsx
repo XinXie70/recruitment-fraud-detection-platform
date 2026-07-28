@@ -1,34 +1,142 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Award, BarChart3, Brain, Cpu, Database,
-  Layers, Server, Zap,
-  ChevronDown, ChevronUp, RefreshCw, Target, GitBranch,
-  Gauge, Crosshair, Percent,
+  Award,
+  BarChart3,
+  Brain,
+  Cpu,
+  Database,
+  Layers,
+  Server,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Target,
+  GitBranch,
+  Gauge,
+  Crosshair,
+  Percent,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
 import { apiUrl } from '../utils/api';
 
 const MODEL_METRICS = [
-  { model: 'Bi-LSTM', accuracy: 0.9857, precision: 0.8389, recall: 0.8728, f1: 0.8555, threshold: 0.67, category: 'dl' },
-  { model: 'SVM', accuracy: 0.9790, precision: 0.7816, recall: 0.7861, f1: 0.7839, threshold: 0.31, category: 'classic' },
-  { model: 'XGBoost', accuracy: 0.9746, precision: 0.6864, recall: 0.8728, f1: 0.7684, threshold: 0.17, category: 'classic' },
-  { model: 'DNN', accuracy: 0.9704, precision: 0.6450, recall: 0.8613, f1: 0.7376, threshold: 0.33, category: 'dl' },
-  { model: 'Logistic Reg.', accuracy: 0.9175, precision: 0.4626, recall: 0.8266, f1: 0.5934, threshold: 0.23, category: 'classic' },
-  { model: 'RNN', accuracy: 0.9763, precision: 0.7143, recall: 0.8324, f1: 0.7689, threshold: 0.24, category: 'dl' },
-  { model: 'BERT', accuracy: 0.9900, precision: 0.9200, recall: 0.8900, f1: 0.9050, threshold: 0.50, category: 'transformer' },
-  { model: 'RoBERTa', accuracy: 0.9880, precision: 0.9100, recall: 0.8800, f1: 0.8950, threshold: 0.50, category: 'transformer' },
+  {
+    model: 'Bi-LSTM',
+    accuracy: 0.9857,
+    precision: 0.8389,
+    recall: 0.8728,
+    f1: 0.8555,
+    threshold: 0.67,
+    category: 'dl',
+  },
+  {
+    model: 'SVM',
+    accuracy: 0.979,
+    precision: 0.7816,
+    recall: 0.7861,
+    f1: 0.7839,
+    threshold: 0.31,
+    category: 'classic',
+  },
+  {
+    model: 'XGBoost',
+    accuracy: 0.9746,
+    precision: 0.6864,
+    recall: 0.8728,
+    f1: 0.7684,
+    threshold: 0.17,
+    category: 'classic',
+  },
+  {
+    model: 'DNN',
+    accuracy: 0.9704,
+    precision: 0.645,
+    recall: 0.8613,
+    f1: 0.7376,
+    threshold: 0.33,
+    category: 'dl',
+  },
+  {
+    model: 'Logistic Reg.',
+    accuracy: 0.9175,
+    precision: 0.4626,
+    recall: 0.8266,
+    f1: 0.5934,
+    threshold: 0.23,
+    category: 'classic',
+  },
+  {
+    model: 'RNN',
+    accuracy: 0.9763,
+    precision: 0.7143,
+    recall: 0.8324,
+    f1: 0.7689,
+    threshold: 0.24,
+    category: 'dl',
+  },
+  {
+    model: 'BERT',
+    accuracy: 0.99,
+    precision: 0.92,
+    recall: 0.89,
+    f1: 0.905,
+    threshold: 0.5,
+    category: 'transformer',
+  },
+  {
+    model: 'RoBERTa',
+    accuracy: 0.988,
+    precision: 0.91,
+    recall: 0.88,
+    f1: 0.895,
+    threshold: 0.5,
+    category: 'transformer',
+  },
 ];
 
 const MODEL_ARCHITECTURES = {
-  'Logistic Reg.': { type: 'Linear Classifier', params: '~10K', desc: 'Simple linear classifier with TF-IDF features. Fast, interpretable baseline for binary classification.' },
-  'SVM': { type: 'Kernel SVM (RBF)', params: '~50K', desc: 'Support Vector Machine with RBF kernel on TF-IDF vectors. Excels on high-dimensional sparse text data.' },
-  'XGBoost': { type: 'Gradient Boosting', params: '~200 trees', desc: 'Tree-based ensemble with gradient boosting. Handles mixed feature types and provides feature importance.' },
-  'DNN': { type: 'Deep Neural Network', params: '~500K', desc: '3-layer fully connected network with ReLU + dropout. Learns complex non-linear patterns in job descriptions.' },
-  'RNN': { type: 'LSTM Network', params: '~300K', desc: 'Long Short-Term Memory network capturing sequential dependencies in text. Good at understanding word order.' },
-  'Bi-LSTM': { type: 'Bidirectional LSTM', params: '~600K', desc: 'Bidirectional LSTM with attention mechanism. Processes text both forward and backward for full context.' },
-  'BERT': { type: 'Transformer (Encoder)', params: '~110M', desc: 'Bidirectional Encoder from Transformers. Pre-trained on BooksCorpus + Wikipedia, fine-tuned for fake job detection.' },
-  'RoBERTa': { type: 'Transformer (Encoder)', params: '~125M', desc: 'Robustly Optimized BERT. Trained on more data with dynamic masking, better performance on nuanced classification.' },
+  'Logistic Reg.': {
+    type: 'Linear Classifier',
+    params: '~10K',
+    desc: 'Simple linear classifier with TF-IDF features. Fast, interpretable baseline for binary classification.',
+  },
+  SVM: {
+    type: 'Kernel SVM (RBF)',
+    params: '~50K',
+    desc: 'Support Vector Machine with RBF kernel on TF-IDF vectors. Excels on high-dimensional sparse text data.',
+  },
+  XGBoost: {
+    type: 'Gradient Boosting',
+    params: '~200 trees',
+    desc: 'Tree-based ensemble with gradient boosting. Handles mixed feature types and provides feature importance.',
+  },
+  DNN: {
+    type: 'Deep Neural Network',
+    params: '~500K',
+    desc: '3-layer fully connected network with ReLU + dropout. Learns complex non-linear patterns in job descriptions.',
+  },
+  RNN: {
+    type: 'LSTM Network',
+    params: '~300K',
+    desc: 'Long Short-Term Memory network capturing sequential dependencies in text. Good at understanding word order.',
+  },
+  'Bi-LSTM': {
+    type: 'Bidirectional LSTM',
+    params: '~600K',
+    desc: 'Bidirectional LSTM with attention mechanism. Processes text both forward and backward for full context.',
+  },
+  BERT: {
+    type: 'Transformer (Encoder)',
+    params: '~110M',
+    desc: 'Bidirectional Encoder from Transformers. Pre-trained on BooksCorpus + Wikipedia, fine-tuned for fake job detection.',
+  },
+  RoBERTa: {
+    type: 'Transformer (Encoder)',
+    params: '~125M',
+    desc: 'Robustly Optimized BERT. Trained on more data with dynamic masking, better performance on nuanced classification.',
+  },
 };
 
 const CATEGORY_COLORS = {
@@ -59,15 +167,27 @@ export default function AdminDashboard({ auth, onLogout }) {
 
   const formatPct = (v) => `${(v * 100).toFixed(1)}%`;
   const bestModel = useMemo(() => [...MODEL_METRICS].sort((a, b) => b.f1 - a.f1)[0], []);
-  const avgF1 = useMemo(() => MODEL_METRICS.reduce((s, m) => s + m.f1, 0) / MODEL_METRICS.length, []);
-  const sorted = useMemo(() => [...MODEL_METRICS].sort((a, b) => b[activeMetric] - a[activeMetric]), [activeMetric]);
-  const maxMetric = useMemo(() => Math.max(...MODEL_METRICS.map((m) => m[activeMetric])), [activeMetric]);
+  const avgF1 = useMemo(
+    () => MODEL_METRICS.reduce((s, m) => s + m.f1, 0) / MODEL_METRICS.length,
+    [],
+  );
+  const sorted = useMemo(
+    () => [...MODEL_METRICS].sort((a, b) => b[activeMetric] - a[activeMetric]),
+    [activeMetric],
+  );
+  const maxMetric = useMemo(
+    () => Math.max(...MODEL_METRICS.map((m) => m[activeMetric])),
+    [activeMetric],
+  );
 
-  const categories = useMemo(() => ({
-    classic: MODEL_METRICS.filter((m) => m.category === 'classic'),
-    dl: MODEL_METRICS.filter((m) => m.category === 'dl'),
-    transformer: MODEL_METRICS.filter((m) => m.category === 'transformer'),
-  }), []);
+  const categories = useMemo(
+    () => ({
+      classic: MODEL_METRICS.filter((m) => m.category === 'classic'),
+      dl: MODEL_METRICS.filter((m) => m.category === 'dl'),
+      transformer: MODEL_METRICS.filter((m) => m.category === 'transformer'),
+    }),
+    [],
+  );
 
   const categoryAverages = useMemo(() => {
     const avg = {};
@@ -101,7 +221,9 @@ export default function AdminDashboard({ auth, onLogout }) {
           </div>
           <div className="admin-header-actions">
             {healthStatus && (
-              <span className={`admin-health-pill ${healthStatus.status === 'healthy' ? 'safe' : 'danger'}`}>
+              <span
+                className={`admin-health-pill ${healthStatus.status === 'healthy' ? 'safe' : 'danger'}`}
+              >
                 <span className="health-dot" />
                 {healthStatus.status === 'healthy' ? 'System Healthy' : 'Offline'}
               </span>
@@ -115,7 +237,10 @@ export default function AdminDashboard({ auth, onLogout }) {
         {/* Top KPI Row */}
         <section className="admin-kpi-row">
           <div className="admin-kpi-card">
-            <div className="admin-kpi-icon" style={{ background: 'rgba(91,123,181,0.12)', color: '#5b7bb5' }}>
+            <div
+              className="admin-kpi-icon"
+              style={{ background: 'rgba(91,123,181,0.12)', color: '#5b7bb5' }}
+            >
               <Brain size={22} />
             </div>
             <div>
@@ -124,7 +249,10 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
           </div>
           <div className="admin-kpi-card">
-            <div className="admin-kpi-icon" style={{ background: 'rgba(111,128,103,0.12)', color: 'var(--safe)' }}>
+            <div
+              className="admin-kpi-icon"
+              style={{ background: 'rgba(111,128,103,0.12)', color: 'var(--safe)' }}
+            >
               <Award size={22} />
             </div>
             <div>
@@ -133,7 +261,10 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
           </div>
           <div className="admin-kpi-card">
-            <div className="admin-kpi-icon" style={{ background: 'rgba(232,168,111,0.12)', color: 'var(--blue-dark)' }}>
+            <div
+              className="admin-kpi-icon"
+              style={{ background: 'rgba(232,168,111,0.12)', color: 'var(--blue-dark)' }}
+            >
               <Target size={22} />
             </div>
             <div>
@@ -142,7 +273,10 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
           </div>
           <div className="admin-kpi-card">
-            <div className="admin-kpi-icon" style={{ background: 'rgba(184,95,76,0.10)', color: 'var(--danger)' }}>
+            <div
+              className="admin-kpi-icon"
+              style={{ background: 'rgba(184,95,76,0.10)', color: 'var(--danger)' }}
+            >
               <Zap size={22} />
             </div>
             <div>
@@ -151,7 +285,10 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
           </div>
           <div className="admin-kpi-card">
-            <div className="admin-kpi-icon" style={{ background: 'rgba(185,131,69,0.12)', color: 'var(--warn)' }}>
+            <div
+              className="admin-kpi-icon"
+              style={{ background: 'rgba(185,131,69,0.12)', color: 'var(--warn)' }}
+            >
               <GitBranch size={22} />
             </div>
             <div>
@@ -163,13 +300,22 @@ export default function AdminDashboard({ auth, onLogout }) {
 
         {/* View Toggle */}
         <section className="admin-view-toggle">
-          <button className={`admin-toggle-btn ${viewMode === 'ranking' ? 'active' : ''}`} onClick={() => setViewMode('ranking')}>
+          <button
+            className={`admin-toggle-btn ${viewMode === 'ranking' ? 'active' : ''}`}
+            onClick={() => setViewMode('ranking')}
+          >
             <BarChart3 size={18} /> Performance Ranking
           </button>
-          <button className={`admin-toggle-btn ${viewMode === 'radar' ? 'active' : ''}`} onClick={() => setViewMode('radar')}>
+          <button
+            className={`admin-toggle-btn ${viewMode === 'radar' ? 'active' : ''}`}
+            onClick={() => setViewMode('radar')}
+          >
             <Crosshair size={18} /> Category Comparison
           </button>
-          <button className={`admin-toggle-btn ${viewMode === 'detail' ? 'active' : ''}`} onClick={() => setViewMode('detail')}>
+          <button
+            className={`admin-toggle-btn ${viewMode === 'detail' ? 'active' : ''}`}
+            onClick={() => setViewMode('detail')}
+          >
             <Layers size={18} /> Architecture Details
           </button>
 
@@ -193,7 +339,9 @@ export default function AdminDashboard({ auth, onLogout }) {
             <div className="admin-card-header">
               <BarChart3 size={22} />
               <h2>{METRIC_LABELS[activeMetric]} Ranking</h2>
-              <span className="admin-badge">Sorted by {METRIC_LABELS[activeMetric].toLowerCase()}</span>
+              <span className="admin-badge">
+                Sorted by {METRIC_LABELS[activeMetric].toLowerCase()}
+              </span>
             </div>
             <div className="admin-perf-list">
               {sorted.map((m, i) => (
@@ -203,10 +351,26 @@ export default function AdminDashboard({ auth, onLogout }) {
                   onClick={() => setExpandedModel(expandedModel === m.model ? null : m.model)}
                 >
                   <div className="admin-perf-main">
-                    <span className="admin-rank" style={{ background: i === 0 ? 'var(--blue)' : i === 1 ? '#9e9e9e' : i === 2 ? '#c97f3d' : 'transparent', color: i < 3 ? '#fff' : 'var(--muted)' }}>
+                    <span
+                      className="admin-rank"
+                      style={{
+                        background:
+                          i === 0
+                            ? 'var(--blue)'
+                            : i === 1
+                              ? '#9e9e9e'
+                              : i === 2
+                                ? '#c97f3d'
+                                : 'transparent',
+                        color: i < 3 ? '#fff' : 'var(--muted)',
+                      }}
+                    >
                       #{i + 1}
                     </span>
-                    <span className="admin-cat-dot" style={{ background: CATEGORY_COLORS[m.category] }} />
+                    <span
+                      className="admin-cat-dot"
+                      style={{ background: CATEGORY_COLORS[m.category] }}
+                    />
                     <div className="admin-perf-bar-wrap">
                       <div className="admin-perf-label">
                         <strong>{m.model}</strong>
@@ -226,7 +390,11 @@ export default function AdminDashboard({ auth, onLogout }) {
                       <span className="admin-mini-metric">F1 {formatPct(m.f1)}</span>
                       <span className="admin-mini-metric">Acc {formatPct(m.accuracy)}</span>
                     </div>
-                    {expandedModel === m.model ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    {expandedModel === m.model ? (
+                      <ChevronUp size={18} />
+                    ) : (
+                      <ChevronDown size={18} />
+                    )}
                   </div>
                   {expandedModel === m.model && (
                     <div className="admin-perf-detail">
@@ -254,15 +422,23 @@ export default function AdminDashboard({ auth, onLogout }) {
                         <div className="admin-metric">
                           <span>Category</span>
                           <strong style={{ color: CATEGORY_COLORS[m.category] }}>
-                            {m.category === 'transformer' ? 'Transformer' : m.category === 'dl' ? 'Deep Learning' : 'Classic ML'}
+                            {m.category === 'transformer'
+                              ? 'Transformer'
+                              : m.category === 'dl'
+                                ? 'Deep Learning'
+                                : 'Classic ML'}
                           </strong>
                         </div>
                       </div>
                       {MODEL_ARCHITECTURES[m.model] && (
                         <div className="admin-arch-info">
                           <div className="admin-arch-header">
-                            <span className="admin-arch-type">{MODEL_ARCHITECTURES[m.model].type}</span>
-                            <span className="admin-arch-params">{MODEL_ARCHITECTURES[m.model].params} params</span>
+                            <span className="admin-arch-type">
+                              {MODEL_ARCHITECTURES[m.model].type}
+                            </span>
+                            <span className="admin-arch-params">
+                              {MODEL_ARCHITECTURES[m.model].params} params
+                            </span>
                           </div>
                           <p>{MODEL_ARCHITECTURES[m.model].desc}</p>
                         </div>
@@ -288,7 +464,11 @@ export default function AdminDashboard({ auth, onLogout }) {
               <div key={catKey} className="admin-category-section">
                 <div className="admin-category-header">
                   <span className="admin-cat-tag" style={{ background: CATEGORY_COLORS[catKey] }}>
-                    {catKey === 'transformer' ? 'Transformer Models' : catKey === 'dl' ? 'Deep Learning' : 'Classic ML'}
+                    {catKey === 'transformer'
+                      ? 'Transformer Models'
+                      : catKey === 'dl'
+                        ? 'Deep Learning'
+                        : 'Classic ML'}
                   </span>
                   <span className="admin-cat-avg">
                     Avg F1: <strong>{formatPct(categoryAverages[catKey].f1)}</strong>
@@ -309,7 +489,9 @@ export default function AdminDashboard({ auth, onLogout }) {
                             }}
                           />
                         </div>
-                        <span className="admin-cat-bar-val">{formatPct(categoryAverages[catKey][metric])}</span>
+                        <span className="admin-cat-bar-val">
+                          {formatPct(categoryAverages[catKey][metric])}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -340,7 +522,11 @@ export default function AdminDashboard({ auth, onLogout }) {
               <div key={catKey} className="admin-category-section">
                 <div className="admin-category-header">
                   <span className="admin-cat-tag" style={{ background: CATEGORY_COLORS[catKey] }}>
-                    {catKey === 'transformer' ? 'Transformer Models' : catKey === 'dl' ? 'Deep Learning' : 'Classic ML'}
+                    {catKey === 'transformer'
+                      ? 'Transformer Models'
+                      : catKey === 'dl'
+                        ? 'Deep Learning'
+                        : 'Classic ML'}
                   </span>
                 </div>
                 <div className="admin-arch-grid">
@@ -350,7 +536,14 @@ export default function AdminDashboard({ auth, onLogout }) {
                       <div key={m.model} className={`admin-arch-card ${catKey}`}>
                         <div className="admin-arch-card-header">
                           <strong>{m.model}</strong>
-                          <span className="admin-type-badge" style={{ background: CATEGORY_COLORS[catKey] + '22', color: CATEGORY_COLORS[catKey], borderColor: CATEGORY_COLORS[catKey] + '44' }}>
+                          <span
+                            className="admin-type-badge"
+                            style={{
+                              background: CATEGORY_COLORS[catKey] + '22',
+                              color: CATEGORY_COLORS[catKey],
+                              borderColor: CATEGORY_COLORS[catKey] + '44',
+                            }}
+                          >
                             {arch?.type || catKey}
                           </span>
                         </div>
@@ -371,14 +564,26 @@ export default function AdminDashboard({ auth, onLogout }) {
                             <strong>{formatPct(m.precision)}</strong>
                           </div>
                         </div>
-                        <p className="admin-arch-desc">{arch?.desc || 'No description available.'}</p>
+                        <p className="admin-arch-desc">
+                          {arch?.desc || 'No description available.'}
+                        </p>
                         <div className="admin-arch-meta">
-                          <span><Database size={14} /> {arch?.params || 'N/A'}</span>
-                          <span><Gauge size={14} /> threshold: {m.threshold.toFixed(2)}</span>
+                          <span>
+                            <Database size={14} /> {arch?.params || 'N/A'}
+                          </span>
+                          <span>
+                            <Gauge size={14} /> threshold: {m.threshold.toFixed(2)}
+                          </span>
                         </div>
                         <div className="admin-arch-f1-bar">
                           <div className="admin-arch-f1-track">
-                            <div className="admin-arch-f1-fill" style={{ width: `${m.f1 * 100}%`, background: CATEGORY_COLORS[catKey] }} />
+                            <div
+                              className="admin-arch-f1-fill"
+                              style={{
+                                width: `${m.f1 * 100}%`,
+                                background: CATEGORY_COLORS[catKey],
+                              }}
+                            />
                           </div>
                           <span>F1</span>
                         </div>
@@ -401,7 +606,10 @@ export default function AdminDashboard({ auth, onLogout }) {
             <div className="admin-system-item">
               <span>Backend Status</span>
               <strong className={healthStatus?.status === 'healthy' ? 'text-safe' : 'text-danger'}>
-                <span className="health-dot" style={{ display: 'inline-block', marginRight: '6px' }} />
+                <span
+                  className="health-dot"
+                  style={{ display: 'inline-block', marginRight: '6px' }}
+                />
                 {healthStatus?.status || 'Checking...'}
               </strong>
             </div>
@@ -431,7 +639,9 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>Best Model</span>
-              <strong>{bestModel.model} (F1: {formatPct(bestModel.f1)})</strong>
+              <strong>
+                {bestModel.model} (F1: {formatPct(bestModel.f1)})
+              </strong>
             </div>
           </div>
         </section>

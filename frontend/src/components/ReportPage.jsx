@@ -1,5 +1,15 @@
 import React from 'react';
-import { Activity, AlertTriangle, ArrowLeft, BookOpen, CalendarClock, CheckCircle2, Info, Share2, ShieldAlert } from 'lucide-react';
+import {
+  Activity,
+  AlertTriangle,
+  ArrowLeft,
+  BookOpen,
+  CalendarClock,
+  CheckCircle2,
+  Info,
+  Share2,
+  ShieldAlert,
+} from 'lucide-react';
 import MeteorBackground from './MeteorBackground';
 import ScoreBar from './ScoreBar';
 
@@ -14,7 +24,16 @@ const MODEL_LABELS = {
   roberta: 'RoBERTa',
 };
 
-const MODEL_KEYS = ['logistic_regression', 'svm', 'xgboost', 'dnn', 'rnn', 'bilstm', 'bert', 'roberta'];
+const MODEL_KEYS = [
+  'logistic_regression',
+  'svm',
+  'xgboost',
+  'dnn',
+  'rnn',
+  'bilstm',
+  'bert',
+  'roberta',
+];
 
 function levelFromClassification(label) {
   if (label === 'Likely Deceptive') return 'high';
@@ -35,16 +54,14 @@ function combinedClassification(level) {
 }
 
 function modelScoreBars(result) {
-  return MODEL_KEYS
-    .filter((key) => result.models[key])
-    .map((key) => ({
-      key,
-      title: MODEL_LABELS[key],
-      score: Math.round(result.models[key].risk_score * 100),
-      classification: result.models[key].classification_label,
-      action: result.models[key].recommended_action,
-      level: levelFromClassification(result.models[key].classification_label),
-    }));
+  return MODEL_KEYS.filter((key) => result.models[key]).map((key) => ({
+    key,
+    title: MODEL_LABELS[key],
+    score: Math.round(result.models[key].risk_score * 100),
+    classification: result.models[key].classification_label,
+    action: result.models[key].recommended_action,
+    level: levelFromClassification(result.models[key].classification_label),
+  }));
 }
 
 export default function ReportPage({ result, onBack }) {
@@ -110,9 +127,14 @@ export default function ReportPage({ result, onBack }) {
                 <strong>{confidence}%</strong>
               </div>
               <div className="report-score-track">
-                <div className={`report-score-fill ${riskLevel}`} style={{ width: `${confidence}%` }} />
+                <div
+                  className={`report-score-fill ${riskLevel}`}
+                  style={{ width: `${confidence}%` }}
+                />
               </div>
-              <small>Based on {scoreItems.length} detection layer(s) and {signalCount} signal(s).</small>
+              <small>
+                Based on {scoreItems.length} detection layer(s) and {signalCount} signal(s).
+              </small>
             </div>
           </section>
         </aside>
