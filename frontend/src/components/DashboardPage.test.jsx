@@ -1,8 +1,8 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { beforeEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import DashboardPage from './DashboardPage';
 
@@ -20,8 +20,13 @@ function LocationProbe() {
 }
 
 beforeEach(() => {
+  vi.restoreAllMocks();
   window.localStorage.clear();
   window.sessionStorage.clear();
+});
+
+afterEach(() => {
+  cleanup();
 });
 
 test('opens a saved dashboard analysis result from the View button', () => {
@@ -76,4 +81,77 @@ test('opens a saved dashboard analysis result from the View button', () => {
   expect(JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'))).toEqual(
     analysisResult,
   );
+});
+
+test('loads server history and refreshes it with the access token', async () => {
+  const fetchMock = vi
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        items: [
+          {
+            id: 42,
+            input_preview: 'Remote job advert',
+            risk_score: 0.82,
+            risk_level: 'high',
+            status: 'success',
+            ensemble_available: 7,
+            ensemble_total: 8,
+            created_at: '2026-07-28T02:00:00.000Z',
+          },
+        ],
+      }),
+    })
+    .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ items: [] }) });
+
+  render(
+    <MemoryRouter>
+      <DashboardPage
+        auth={{ access_token: 'dashboard-token', user: { username: 'joy' } }}
+        onLogout={() => {}}
+      />
+    </MemoryRouter>,
+  );
+
+  expect((await screen.findAllByText('82/100')).length).toBeGreaterThan(0);
+  expect(screen.getByText('Likely Deceptive')).toBeInTheDocument();
+  expect(screen.getByText('7 models')).toBeInTheDocument();
+  expect(fetchMock).toHaveBeenCalledWith('/api/v1/history?page=1&page_size=100', {
+    headers: { Authorization: 'Bearer dashboard-token' },
+  });
+
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh scan history' }));
+  await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+});
+
+test('keeps local history when server synchronization fails', async () => {
+  window.localStorage.setItem(
+    'fake_job_history',
+    JSON.stringify([
+      {
+        id: 7,
+        date: '2026-07-28T01:00:00.000Z',
+        riskLevel: 'medium',
+        riskScore: 55,
+        prediction: 'Suspicious',
+      },
+    ]),
+  );
+  vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('offline'));
+
+  render(
+    <MemoryRouter>
+      <DashboardPage
+        auth={{ access_token: 'dashboard-token', user: { username: 'joy' } }}
+        onLogout={() => {}}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(await screen.findByRole('status')).toHaveTextContent(
+    'Could not sync history. Showing results saved in this browser.',
+  );
+  expect(screen.getAllByText('55/100').length).toBeGreaterThan(0);
 });

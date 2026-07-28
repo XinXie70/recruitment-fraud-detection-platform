@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Activity,
@@ -18,9 +18,11 @@ import {
   PieChart,
   Target,
   Eye,
+  RefreshCw,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
+import { apiUrl } from '../utils/api';
 
 const HISTORY_KEY = 'fake_job_history';
 
@@ -33,9 +35,87 @@ function loadHistory() {
   }
 }
 
+function verdictForRisk(level) {
+  if (level === 'high') return 'Likely Deceptive';
+  if (level === 'medium') return 'Suspicious';
+  return 'Likely Legitimate';
+}
+
+function normalizeServerHistory(items) {
+  return items.map((entry) => ({
+    id: `server-${entry.id}`,
+    serverId: entry.id,
+    source: 'server',
+    date: entry.created_at,
+    inputText: entry.input_preview,
+    riskLevel: entry.risk_level,
+    riskScore: Math.round(Number(entry.risk_score || 0) * 100),
+    prediction: verdictForRisk(entry.risk_level),
+    modelCount: entry.ensemble_available,
+    modelTotal: entry.ensemble_total,
+    status: entry.status,
+  }));
+}
+
+function mergeHistory(serverEntries, localEntries) {
+  const unusedLocal = [...localEntries];
+  const mergedServer = serverEntries.map((serverEntry) => {
+    const serverTime = new Date(serverEntry.date).getTime();
+    const matchIndex = unusedLocal.findIndex((localEntry) => {
+      const localTime = new Date(localEntry.date).getTime();
+      return (
+        localEntry.riskLevel === serverEntry.riskLevel &&
+        Number(localEntry.riskScore) === serverEntry.riskScore &&
+        Number.isFinite(serverTime) &&
+        Number.isFinite(localTime) &&
+        Math.abs(serverTime - localTime) <= 120_000
+      );
+    });
+
+    if (matchIndex < 0) return serverEntry;
+    const [localMatch] = unusedLocal.splice(matchIndex, 1);
+    return { ...localMatch, ...serverEntry, analysisResult: localMatch.analysisResult };
+  });
+
+  return [...mergedServer, ...unusedLocal]
+    .map((entry) => ({ ...entry, source: entry.source || 'local' }))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export default function DashboardPage({ auth, onLogout }) {
   const navigate = useNavigate();
+  const accessToken = auth?.access_token;
   const [history, setHistory] = useState(loadHistory);
+  const [syncError, setSyncError] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const syncHistory = useCallback(async () => {
+    if (!accessToken) return;
+
+    setIsSyncing(true);
+    setSyncError('');
+    const localHistory = loadHistory();
+
+    try {
+      const response = await fetch(apiUrl('/api/v1/history?page=1&page_size=100'), {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (response.status === 401) {
+        onLogout?.();
+        return;
+      }
+      if (!response.ok) throw new Error(`History request failed (${response.status})`);
+
+      const payload = await response.json();
+      setHistory(mergeHistory(normalizeServerHistory(payload.items || []), localHistory));
+    } catch {
+      setHistory(localHistory);
+      setSyncError('Could not sync history. Showing results saved in this browser.');
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [accessToken, onLogout]);
 
   const stats = useMemo(() => {
     const h = history;
@@ -49,9 +129,8 @@ export default function DashboardPage({ auth, onLogout }) {
   }, [history]);
 
   useEffect(() => {
-    const h = loadHistory();
-    setHistory(h);
-  }, []);
+    syncHistory();
+  }, [syncHistory]);
   const riskLevelLabel = (level) => {
     if (level === 'high') return 'High Risk';
     if (level === 'medium') return 'Medium Risk';
@@ -83,7 +162,11 @@ export default function DashboardPage({ auth, onLogout }) {
 
   const handleClearHistory = () => {
     localStorage.removeItem(HISTORY_KEY);
-    setHistory([]);
+    setHistory((current) =>
+      current
+        .filter((entry) => entry.source === 'server')
+        .map(({ analysisResult: _analysisResult, ...entry }) => entry),
+    );
   };
 
   const handleViewResult = (entry) => {
@@ -375,19 +458,37 @@ export default function DashboardPage({ auth, onLogout }) {
             <Clock size={22} />
             <h2>Recent Scans</h2>
             <div className="dash-header-right">
+              <button
+                type="button"
+                className="dash-refresh-btn"
+                onClick={syncHistory}
+                disabled={isSyncing || !accessToken}
+                title="Refresh scan history"
+                aria-label="Refresh scan history"
+              >
+                <RefreshCw size={16} className={isSyncing ? 'spin' : ''} />
+                {isSyncing ? 'Syncing' : 'Refresh'}
+              </button>
               {history.length > 0 && <span className="dash-badge">{history.length} records</span>}
-              {history.length > 0 && (
+              {history.some((entry) => entry.source !== 'server' || entry.analysisResult) && (
                 <button
                   className="dash-clear-btn"
                   onClick={handleClearHistory}
-                  title="Clear all history"
+                  title="Clear full result details saved in this browser"
                 >
                   <Trash2 size={16} />
-                  Clear
+                  Clear local cache
                 </button>
               )}
             </div>
           </div>
+
+          {syncError && (
+            <div className="dash-sync-message" role="status">
+              <AlertTriangle size={16} />
+              {syncError}
+            </div>
+          )}
 
           {history.length > 0 ? (
             <>
@@ -423,7 +524,7 @@ export default function DashboardPage({ auth, onLogout }) {
                         <td className="dash-verdict">{entry.prediction || '—'}</td>
                         <td className="dash-model-count">
                           <TrendingUp size={14} />
-                          {entry.modelCount || 8} models
+                          {entry.modelCount ?? 8} models
                         </td>
                         <td>
                           <button

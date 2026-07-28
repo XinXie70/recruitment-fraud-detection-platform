@@ -94,6 +94,20 @@ async function authenticate(page, expectedPath = '/analyze', authResponse = AUTH
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.route('**/api/v1/history?*', async (route) => {
+    expect(route.request().headers().authorization).toBe('Bearer e2e-token');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [],
+        total: 0,
+        page: 1,
+        page_size: 100,
+        total_pages: 0,
+      }),
+    });
+  });
   await page.goto('/');
   await page.evaluate(() => {
     window.localStorage.clear();

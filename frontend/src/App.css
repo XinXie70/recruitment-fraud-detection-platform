@@ -2998,7 +2998,8 @@ button.nav-button {
   color: var(--danger);
 }
 
-.dash-clear-btn {
+.dash-clear-btn,
+.dash-refresh-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3008,6 +3009,39 @@ button.nav-button {
   background: #fff;
   color: var(--danger);
   cursor: pointer;
+}
+
+.dash-refresh-btn {
+  border-color: rgba(50, 92, 111, 0.2);
+  color: var(--primary);
+}
+
+.dash-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.dash-sync-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 18px 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(185, 131, 69, 0.12);
+  color: var(--warn);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.spin {
+  animation: dash-spin 0.8s linear infinite;
+}
+
+@keyframes dash-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .dash-view-result,
