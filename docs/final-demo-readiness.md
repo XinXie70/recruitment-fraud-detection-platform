@@ -27,6 +27,7 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 | Loading and errors | Slow request, invalid input, and unavailable model service | Implemented; rehearsal verification required |
 | Security | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening required |
 | Containers | One-command frontend/backend/database startup | Implemented in `compose.yaml`; smoke test required |
+| Ensemble release | Fitted config, provenance, held-out evaluation | Follow the [ensemble release checklist](ensemble-release-checklist.md) |
 
 ## Architecture and design evidence
 
