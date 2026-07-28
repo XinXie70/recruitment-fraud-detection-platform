@@ -21,7 +21,7 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 | Area               | Evidence to prepare                                                   | Current status                                                         |
 | ------------------ | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | Backend tests      | Test count and coverage report                                        | 74 tests passed; 90.54% measured locally                               |
-| Frontend tests     | Unit/component coverage report                                        | 5 tests pass; whole-source baseline: 14.13% statements                 |
+| Frontend tests     | Unit/component coverage report                                        | 11 tests pass; 41.81% statements / 42.97% lines                        |
 | End-to-end tests   | Authentication, analyse, history, admin routing, and failure paths    | 5 Playwright tests pass                                                |
 | Responsive UI      | Phone, tablet, and desktop screenshots                                | Implemented; rehearsal verification required                           |
 | Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; rehearsal verification required                           |

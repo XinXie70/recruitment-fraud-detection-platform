@@ -166,7 +166,7 @@ still be frozen and labelled with the evaluation version before the demo.
    firewall rules.
 3. Define history-data retention and deletion policy.
 4. Decide whether the production frontend uses a CDN/static host or Nginx.
-5. Raise whole-source frontend unit coverage from the current 14.13% statement
-   baseline. Playwright automates authentication, registration, analysis,
-   history, admin routing/health, and the 503 path, but its browser execution is
-   reported separately from Vitest's source coverage.
+5. Continue raising whole-source frontend unit coverage from the current 41.81%
+   statement / 42.97% line baseline. Playwright automates authentication,
+   registration, analysis, history, admin routing/health, and the 503 path, but
+   its browser execution is reported separately from Vitest's source coverage.
