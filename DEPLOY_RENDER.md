@@ -60,6 +60,11 @@ Make sure `frontend/Dockerfile.prod` and `frontend/docker-entrypoint.sh` are pus
 
 Nginx proxies `/api/*` to the backend internally. The browser only talks to the frontend domain — same origin, no CORS.
 
+The proxy resolves the backend's public hostname through Cloudflare and Google
+DNS, caches the result for five minutes, and reuses HTTP/1.1 connections. A DNS
+lookup that cannot complete within one second fails quickly instead of producing
+intermittent five-second 502 responses.
+
 ---
 
 ## 4. Verify
@@ -95,5 +100,4 @@ Open `https://almond-frontend.onrender.com` in browser and test.
 |----------------------|------------|
 | Render Web Service × 2 | Free tier |
 | **Total**            | **$0 🎉**  |
-
 
