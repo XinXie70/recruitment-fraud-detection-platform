@@ -24,7 +24,7 @@ import {
   Routes,
   useLocation,
   useNavigate,
-} from 'react-router-dom';
+} from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
 import ExplanationText from './features/analysis/ExplanationText';

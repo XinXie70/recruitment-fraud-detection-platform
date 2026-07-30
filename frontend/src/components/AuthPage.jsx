@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { LogIn, Loader2, UserPlus } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
