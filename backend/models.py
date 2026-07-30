@@ -18,7 +18,7 @@ from database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     username: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -31,7 +31,10 @@ class User(Base):
 
     # Relationships
     analyses: Mapped[list["AnalysisHistory"]] = relationship(
-        "AnalysisHistory", back_populates="user", lazy="selectin"
+        "AnalysisHistory",
+        back_populates="user",
+        lazy="selectin",
+        passive_deletes=True,
     )
 
 
@@ -58,14 +61,15 @@ class AnalysisHistory(Base):
             name="ck_analysis_history_ensemble_counts",
         ),
         Index("ix_analysis_history_user_created_at", "user_id", "created_at"),
+        Index("ix_analysis_history_created_at", "created_at"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     input_preview: Mapped[str] = mapped_column(String(500), nullable=False)
-    input_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    input_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     risk_score: Mapped[float] = mapped_column(Float, nullable=False)
     risk_level: Mapped[str] = mapped_column(String(10), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False)

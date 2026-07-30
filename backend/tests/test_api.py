@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from jose import jwt
+import jwt
 
 from config import settings
 
@@ -130,7 +130,7 @@ class TestAuthEndpoints:
 
     def test_token_for_wrong_audience_is_rejected(self, client, auth_headers):
         token = auth_headers["Authorization"].removeprefix("Bearer ")
-        claims = jwt.get_unverified_claims(token)
+        claims = jwt.decode(token, options={"verify_signature": False})
         claims["aud"] = "different-client"
         wrong_audience_token = jwt.encode(
             claims,

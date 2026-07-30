@@ -20,8 +20,10 @@ env:
   REGION: australia-southeast1
   REGISTRY: australia-southeast1-docker.pkg.dev
   REPOSITORY: almond-app
+  CLOUD_SQL_INSTANCE: algorithm-502800:australia-southeast1:almond-db
   WORKLOAD_IDENTITY_PROVIDER: projects/462086104697/locations/global/workloadIdentityPools/github-actions/providers/github
   DEPLOY_SERVICE_ACCOUNT: github-actions-deployer@algorithm-502800.iam.gserviceaccount.com
+  RUNTIME_SERVICE_ACCOUNT: 462086104697-compute@developer.gserviceaccount.com
 
 jobs:
   backend:
@@ -54,6 +56,29 @@ jobs:
             --tag "${IMAGE}:latest" \
             --push \
             .
+
+      - name: Apply database migrations
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-backend
+        run: |
+          gcloud run jobs deploy almond-db-migrate \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --image "${IMAGE}:${GITHUB_SHA}" \
+            --service-account "${RUNTIME_SERVICE_ACCOUNT}" \
+            --set-cloudsql-instances "${CLOUD_SQL_INSTANCE}" \
+            --set-env-vars "APP_ENV=production,RUN_DATABASE_MIGRATIONS=true" \
+            --set-secrets "DATABASE_URL=almond-database-url:latest,SECRET_KEY=almond-secret-key:latest" \
+            --command /app/backend/docker-entrypoint.sh \
+            --args true \
+            --max-retries 1 \
+            --task-timeout 5m \
+            --quiet
+          gcloud run jobs execute almond-db-migrate \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --wait \
+            --quiet
 
       - name: Deploy backend
         env:

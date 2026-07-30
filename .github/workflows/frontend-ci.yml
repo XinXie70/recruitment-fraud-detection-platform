@@ -10,6 +10,25 @@ permissions:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: fake_job_detection_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fake_job_detection_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/fake_job_detection_test
+      TEST_DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/fake_job_detection_test
+      MODEL_SERVER_URL: http://model-server.invalid
 
     steps:
       - name: Check out repository
@@ -25,14 +44,18 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r backend/requirements-remote.txt pytest pytest-cov ruff
 
+      - name: Apply database migrations
+        run: python -m alembic -c backend/alembic.ini upgrade head
+
+      - name: Check models and migrations are in sync
+        run: python -m alembic -c backend/alembic.ini check
+
       - name: Lint backend
         working-directory: backend
         run: ruff check . --select E9,F,B --ignore B008
 
       - name: Test backend with coverage
         working-directory: backend
-        env:
-          MODEL_SERVER_URL: http://model-server.invalid
         run: python -m pytest tests -q --cov=. --cov-config=.coveragerc
 
   frontend:

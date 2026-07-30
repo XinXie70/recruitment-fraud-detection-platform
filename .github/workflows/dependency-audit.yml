@@ -50,9 +50,4 @@ jobs:
         run: python -m pip install pip-audit
 
       - name: Audit Python dependencies
-        # ecdsa currently has no fixed release; remove this exception after
-        # replacing python-jose or when an upstream fix becomes available.
-        run: >-
-          pip-audit
-          --requirement backend/requirements-remote.txt
-          --ignore-vuln PYSEC-2026-1325
+        run: pip-audit --requirement backend/requirements-remote.txt

@@ -5,7 +5,8 @@ from uuid import uuid4
 from config import settings
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_
@@ -130,7 +131,7 @@ def get_current_user(
         if user_id is None:
             raise credentials_error
         user_id = int(user_id)
-    except (JWTError, TypeError, ValueError) as exc:
+    except (InvalidTokenError, TypeError, ValueError) as exc:
         raise credentials_error from exc
 
     user = db.get(User, user_id)

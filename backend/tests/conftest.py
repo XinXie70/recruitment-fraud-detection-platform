@@ -28,6 +28,7 @@ if not _test_db_url:
     test_db_path = Path(_temporary_db_dir.name) / "test.db"
     _test_db_url = f"sqlite:///{test_db_path}"
 os.environ["DATABASE_URL"] = _test_db_url
+os.environ["APP_ENV"] = "test"
 
 # Disable rate limiting during tests.
 os.environ["RATE_LIMIT_ENABLED"] = "false"

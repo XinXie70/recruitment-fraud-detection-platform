@@ -34,3 +34,17 @@ def test_production_rejects_wildcard_cors() -> None:
             secret_key="a-secure-production-secret-with-more-than-32-bytes",
             cors_origins="*",
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("db_pool_size", 0),
+        ("db_max_overflow", -1),
+        ("db_pool_timeout_seconds", 0),
+        ("db_pool_recycle_seconds", 30),
+    ],
+)
+def test_database_pool_settings_reject_unsafe_values(field: str, value: int) -> None:
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, **{field: value})

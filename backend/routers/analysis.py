@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import logging
 import re
 from datetime import datetime, timezone
@@ -35,13 +36,29 @@ router = APIRouter(tags=["analysis"])
 
 _EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 _PHONE_PATTERN = re.compile(r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)")
+_URL_PATTERN = re.compile(r"\b(?:https?://|www\.)\S+", re.IGNORECASE)
+_SECRET_PATTERN = re.compile(
+    r"\b(password|passwd|api[_-]?key|access[_-]?token|secret)\s*[:=]\s*\S+",
+    re.IGNORECASE,
+)
 
 
 def _redact_history_preview(text: str) -> str:
     """Remove common contact details before persisting a short input preview."""
     preview = text[:500]
     preview = _EMAIL_PATTERN.sub("[REDACTED_EMAIL]", preview)
-    return _PHONE_PATTERN.sub("[REDACTED_PHONE]", preview)
+    preview = _PHONE_PATTERN.sub("[REDACTED_PHONE]", preview)
+    preview = _URL_PATTERN.sub("[REDACTED_URL]", preview)
+    return _SECRET_PATTERN.sub(lambda match: f"{match.group(1)}=[REDACTED]", preview)
+
+
+def _hash_history_input(text: str) -> str:
+    """Create a keyed digest so stored hashes cannot be matched offline."""
+    return hmac.new(
+        settings.secret_key.encode("utf-8"),
+        text.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
 
 
 def _save_history(
@@ -55,7 +72,7 @@ def _save_history(
         history = AnalysisHistory(
             user_id=user_id,
             input_preview=_redact_history_preview(text),
-            input_hash=hashlib.sha256(text.encode()).hexdigest(),
+            input_hash=_hash_history_input(text),
             risk_score=result.ensemble.risk_score,
             risk_level=result.ensemble.risk_level,
             status=result.status,
