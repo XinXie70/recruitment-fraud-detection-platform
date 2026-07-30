@@ -1,4 +1,9 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { BarChart, PieChart } from 'echarts/charts';
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import {
   Award,
   BarChart3,
@@ -16,10 +21,14 @@ import {
   Gauge,
   Crosshair,
   Percent,
+  Users,
+  Activity,
 } from 'lucide-react';
 import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
 import { apiUrl } from '../utils/api';
+
+echarts.use([BarChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
 
 const MODEL_METRICS = [
   {
@@ -157,6 +166,8 @@ export default function AdminDashboard({ auth, onLogout }) {
   const [healthStatus, setHealthStatus] = useState(null);
   const [activeMetric, setActiveMetric] = useState('f1');
   const [viewMode, setViewMode] = useState('ranking');
+  const [adminStats, setAdminStats] = useState(null);
+  const [statsError, setStatsError] = useState('');
 
   const refreshHealth = useCallback(async () => {
     setHealthStatus(null);
@@ -169,9 +180,27 @@ export default function AdminDashboard({ auth, onLogout }) {
     }
   }, []);
 
+  const refreshStats = useCallback(async () => {
+    setStatsError('');
+    try {
+      const response = await fetch(apiUrl('/api/admin/stats'), {
+        headers: { Authorization: `Bearer ${auth.access_token}` },
+      });
+      if (response.status === 401) {
+        onLogout();
+        return;
+      }
+      if (!response.ok) throw new Error(`Stats request failed: ${response.status}`);
+      setAdminStats(await response.json());
+    } catch {
+      setStatsError('Live dashboard data is temporarily unavailable.');
+    }
+  }, [auth.access_token, onLogout]);
+
   useEffect(() => {
     void refreshHealth();
-  }, [refreshHealth]);
+    void refreshStats();
+  }, [refreshHealth, refreshStats]);
 
   const formatPct = (v) => `${(v * 100).toFixed(1)}%`;
   const bestModel = useMemo(() => [...MODEL_METRICS].sort((a, b) => b.f1 - a.f1)[0], []);
@@ -218,6 +247,62 @@ export default function AdminDashboard({ auth, onLogout }) {
   }, [categories]);
 
   const radarMax = 1.0;
+  const riskChartOption = useMemo(
+    () => ({
+      color: ['#b85f4c', '#b98345', '#6f8067'],
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend: {
+        bottom: 0,
+        textStyle: { color: '#67625d' },
+      },
+      series: [
+        {
+          name: 'Risk level',
+          type: 'pie',
+          radius: ['52%', '74%'],
+          center: ['50%', '44%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderColor: '#fff', borderWidth: 3, borderRadius: 6 },
+          label: { formatter: '{b}\n{c}', color: '#403c38', fontWeight: 600 },
+          data: [
+            { value: adminStats?.high_risk_count ?? 0, name: 'High' },
+            { value: adminStats?.medium_risk_count ?? 0, name: 'Medium' },
+            { value: adminStats?.low_risk_count ?? 0, name: 'Low' },
+          ],
+        },
+      ],
+    }),
+    [adminStats],
+  );
+  const modelChartOption = useMemo(
+    () => ({
+      color: ['#5b7bb5', '#6f8067', '#b98345', '#b85f4c'],
+      tooltip: { trigger: 'axis', valueFormatter: (value) => `${(value * 100).toFixed(1)}%` },
+      legend: { top: 0, textStyle: { color: '#67625d' } },
+      grid: { left: 48, right: 20, top: 48, bottom: 72 },
+      xAxis: {
+        type: 'category',
+        data: MODEL_METRICS.map((model) => model.model),
+        axisLabel: { color: '#67625d', rotate: 28 },
+        axisLine: { lineStyle: { color: '#d9d1c7' } },
+      },
+      yAxis: {
+        type: 'value',
+        min: 0.4,
+        max: 1,
+        axisLabel: { color: '#67625d', formatter: (value) => `${Math.round(value * 100)}%` },
+        splitLine: { lineStyle: { color: '#ece6de' } },
+      },
+      series: ['accuracy', 'precision', 'recall', 'f1'].map((metric) => ({
+        name: METRIC_LABELS[metric],
+        type: 'bar',
+        barMaxWidth: 18,
+        data: MODEL_METRICS.map((model) => model[metric]),
+        emphasis: { focus: 'series' },
+      })),
+    }),
+    [],
+  );
 
   return (
     <div className="app">
@@ -230,9 +315,9 @@ export default function AdminDashboard({ auth, onLogout }) {
           <div>
             <h1 className="admin-title">
               <Cpu size={28} />
-              Admin & Research Dashboard
+              Admin Analytics Dashboard
             </h1>
-            <p>Comprehensive evaluation metrics for all 8 deployed ML models.</p>
+            <p>Live platform activity, risk distribution, and deployed model performance.</p>
           </div>
           <div className="admin-header-actions">
             {healthStatus && (
@@ -245,13 +330,92 @@ export default function AdminDashboard({ auth, onLogout }) {
               aria-label="Refresh system health"
               className="admin-refresh-btn"
               disabled={healthStatus === null}
-              onClick={refreshHealth}
+              onClick={() => {
+                void refreshHealth();
+                void refreshStats();
+              }}
               title="Refresh system health"
               type="button"
             >
               <RefreshCw size={16} />
             </button>
           </div>
+        </section>
+
+        {statsError && (
+          <div className="admin-data-error" role="alert">
+            {statsError}
+          </div>
+        )}
+
+        <section className="admin-business-kpis" aria-label="Platform activity overview">
+          <div className="admin-kpi-card">
+            <div className="admin-kpi-icon" style={{ color: '#5b7bb5' }}>
+              <Users size={22} />
+            </div>
+            <div>
+              <strong>{adminStats?.total_users ?? '—'}</strong>
+              <span>Total Users</span>
+            </div>
+          </div>
+          <div className="admin-kpi-card">
+            <div className="admin-kpi-icon" style={{ color: '#6f8067' }}>
+              <Activity size={22} />
+            </div>
+            <div>
+              <strong>{adminStats?.total_analyses ?? '—'}</strong>
+              <span>Total Analyses</span>
+            </div>
+          </div>
+          <div className="admin-kpi-card">
+            <div className="admin-kpi-icon" style={{ color: '#b98345' }}>
+              <Zap size={22} />
+            </div>
+            <div>
+              <strong>{adminStats?.analyses_today ?? '—'}</strong>
+              <span>Analyses Today</span>
+            </div>
+          </div>
+          <div className="admin-kpi-card">
+            <div className="admin-kpi-icon" style={{ color: '#b85f4c' }}>
+              <Gauge size={22} />
+            </div>
+            <div>
+              <strong>{adminStats ? formatPct(adminStats.avg_risk_score) : '—'}</strong>
+              <span>Average Risk</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="admin-chart-grid">
+          <article className="admin-card admin-chart-card">
+            <div className="admin-card-header">
+              <Activity size={22} />
+              <h2>Live Risk Distribution</h2>
+              <span className="admin-badge">{adminStats?.total_analyses ?? 0} analyses</span>
+            </div>
+            <ReactEChartsCore
+              echarts={echarts}
+              option={riskChartOption}
+              style={{ height: 340 }}
+              notMerge
+              lazyUpdate
+            />
+          </article>
+          <article className="admin-card admin-chart-card admin-chart-card-wide">
+            <div className="admin-card-header">
+              <BarChart3 size={22} />
+              <h2>Model Performance</h2>
+              <span className="admin-badge">ECharts comparison</span>
+            </div>
+            <ReactEChartsCore
+              echarts={echarts}
+              option={modelChartOption}
+              style={{ height: 340 }}
+              notMerge
+              lazyUpdate
+            />
+          </article>
         </section>
 
         {/* Top KPI Row */}

@@ -2448,6 +2448,34 @@ button.nav-button {
   padding: 64px 0;
 }
 
+.admin-business-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-chart-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(520px, 1.7fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.admin-chart-card {
+  min-width: 0;
+  margin: 0;
+}
+
+.admin-data-error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid rgba(184, 95, 76, 0.35);
+  border-radius: 10px;
+  color: var(--danger);
+  background: rgba(184, 95, 76, 0.08);
+}
+
 .admin-header {
   display: flex;
   justify-content: space-between;
@@ -2751,6 +2779,14 @@ button.nav-button {
 }
 
 @media (max-width: 1000px) {
+  .admin-business-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-kpi-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2776,6 +2812,7 @@ button.nav-button {
     flex-direction: column;
   }
 
+  .admin-business-kpis,
   .admin-kpi-row,
   .admin-category-grid,
   .admin-arch-grid,
