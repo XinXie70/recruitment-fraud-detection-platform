@@ -232,13 +232,29 @@ test('routes an administrator to the research dashboard and reports service heal
       body: JSON.stringify({ status: 'healthy' }),
     });
   });
+  await page.route('**/api/admin/stats', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        total_users: 12,
+        total_analyses: 48,
+        analyses_today: 7,
+        avg_risk_score: 0.25,
+        high_risk_count: 8,
+        medium_risk_count: 10,
+        low_risk_count: 30,
+      }),
+    }),
+  );
 
   await authenticate(page, '/analyze', adminAuth);
   await page.getByRole('link', { name: /Dashboard/ }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole('heading', { name: 'Admin & Research Dashboard' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Admin Analytics Dashboard' })).toBeVisible();
   await expect(page.getByText('System Healthy')).toBeVisible();
+  await expect(page.getByText('Total Users').locator('..').getByText('12')).toBeVisible();
   await expect(page.getByText('Models Deployed')).toBeVisible();
   const requestsBeforeRefresh = healthRequests;
   await page.getByRole('button', { name: 'Refresh system health' }).click();

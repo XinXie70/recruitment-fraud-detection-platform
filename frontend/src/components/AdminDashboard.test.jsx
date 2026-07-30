@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AdminDashboard from './AdminDashboard';
 
-vi.mock('echarts-for-react/lib/core', () => ({
+vi.mock('echarts-for-react/esm/core.js', () => ({
   default: ({ option }) => <div data-testid="echart">{option.series[0].type}</div>,
 }));
 vi.mock('echarts/core', () => ({ use: vi.fn() }));
