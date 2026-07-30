@@ -1,0 +1,12 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=backend/Dockerfile.cloudrun
+      - --tag=australia-southeast1-docker.pkg.dev/$PROJECT_ID/almond-app/almond-backend:latest
+      - .
+images:
+  - australia-southeast1-docker.pkg.dev/$PROJECT_ID/almond-app/almond-backend:latest
+options:
+  logging: CLOUD_LOGGING_ONLY
+
