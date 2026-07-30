@@ -298,3 +298,24 @@ class TestAdminEndpoints:
         )
         assert analyses.status_code == 200
         assert analyses.json()["total"] == 2
+
+    def test_login_returns_admin_role(self, client, db_session):
+        from auth import hash_password
+        from models import User
+
+        admin = User(
+            email="admin@example.com",
+            username="dedicated-admin",
+            password_hash=hash_password("Adminpass123"),
+            is_admin=True,
+        )
+        db_session.add(admin)
+        db_session.commit()
+
+        response = client.post(
+            "/api/auth/login",
+            json={"identifier": "dedicated-admin", "password": "Adminpass123"},
+        )
+
+        assert response.status_code == 200
+        assert response.json()["user"]["is_admin"] is True

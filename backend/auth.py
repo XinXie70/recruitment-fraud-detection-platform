@@ -76,6 +76,7 @@ class UserResponse(BaseModel):
     id: int
     email: str
     username: str
+    is_admin: bool
 
 
 class TokenResponse(BaseModel):
@@ -107,7 +108,12 @@ def create_access_token(user: User) -> str:
 
 
 def to_user_response(user: User) -> UserResponse:
-    return UserResponse(id=user.id, email=user.email, username=user.username)
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        is_admin=user.is_admin,
+    )
 
 
 def get_current_user(
