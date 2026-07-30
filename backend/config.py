@@ -16,7 +16,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     async_database_url: str = (
         "postgresql+asyncpg://postgres:postgres@localhost:5432/fake_job_detection"
     )
+    db_pool_size: int = Field(default=5, ge=1, le=50)
+    db_max_overflow: int = Field(default=5, ge=0, le=50)
+    db_pool_timeout_seconds: int = Field(default=10, ge=1, le=120)
+    db_pool_recycle_seconds: int = Field(default=1800, ge=60, le=86400)
 
     # ------------------------------------------------------------------
     # Authentication

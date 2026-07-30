@@ -66,13 +66,31 @@ def test_history_failure_rolls_back_without_crashing() -> None:
 
 
 def test_history_preview_redacts_contact_details() -> None:
-    text = "Contact recruiter@example.com or +61 412 345 678 for this role."
+    text = (
+        "Contact recruiter@example.com or +61 412 345 678. "
+        "Apply at https://jobs.example.com/private?token=abc and api_key=secret-value."
+    )
     preview = analysis_router._redact_history_preview(text)
 
     assert "recruiter@example.com" not in preview
     assert "412 345 678" not in preview
+    assert "jobs.example.com" not in preview
+    assert "secret-value" not in preview
     assert "[REDACTED_EMAIL]" in preview
     assert "[REDACTED_PHONE]" in preview
+    assert "[REDACTED_URL]" in preview
+    assert "api_key=[REDACTED]" in preview
+
+
+def test_history_hash_is_keyed_and_deterministic(monkeypatch) -> None:
+    text = "A private job listing"
+    digest = analysis_router._hash_history_input(text)
+
+    assert digest == analysis_router._hash_history_input(text)
+    assert digest != __import__("hashlib").sha256(text.encode()).hexdigest()
+
+    monkeypatch.setattr(analysis_router.settings, "secret_key", "different-secret")
+    assert digest != analysis_router._hash_history_input(text)
 
 
 def test_url_analysis_error_is_sanitized(monkeypatch) -> None:

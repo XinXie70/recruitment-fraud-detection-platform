@@ -131,7 +131,8 @@ async def lifespan(app: FastAPI):
         logger.exception("Database initialisation failed.")
 
     # Start model warm-up in background — do NOT block app startup.
-    threading.Thread(target=_warm_up_models_background, daemon=True).start()
+    if settings.app_env != "test":
+        threading.Thread(target=_warm_up_models_background, daemon=True).start()
     yield
 
 
