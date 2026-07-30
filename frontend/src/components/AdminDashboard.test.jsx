@@ -30,6 +30,28 @@ describe('AdminDashboard', () => {
           json: () => Promise.resolve({ status: 'healthy' }),
         });
       }
+      if (url.endsWith('/api/admin/model-metrics')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              version: '2026.07',
+              dataset: 'EMS CAD held-out test set',
+              models: [
+                {
+                  model: 'BERT',
+                  accuracy: 0.99,
+                  precision: 0.92,
+                  recall: 0.89,
+                  f1: 0.905,
+                  threshold: 0.5,
+                  category: 'transformer',
+                },
+              ],
+            }),
+        });
+      }
       return Promise.resolve({
         ok: true,
         status: 200,
@@ -59,10 +81,14 @@ describe('AdminDashboard', () => {
     expect(screen.getByText('48')).toBeVisible();
     expect(screen.getByText('25.0%')).toBeVisible();
     expect(screen.getAllByTestId('echart')).toHaveLength(2);
+    expect(screen.getByText('EMS CAD held-out test set · v2026.07')).toBeVisible();
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('/api/admin/stats', {
         headers: { Authorization: 'Bearer admin-token' },
       }),
     );
+    expect(fetch).toHaveBeenCalledWith('/api/admin/model-metrics', {
+      headers: { Authorization: 'Bearer admin-token' },
+    });
   });
 });

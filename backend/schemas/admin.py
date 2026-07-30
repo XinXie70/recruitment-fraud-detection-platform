@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AnalysisHistoryItem(BaseModel):
@@ -45,3 +46,19 @@ class AdminUserItem(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ModelMetric(BaseModel):
+    model: str
+    accuracy: float = Field(ge=0, le=1)
+    precision: float = Field(ge=0, le=1)
+    recall: float = Field(ge=0, le=1)
+    f1: float = Field(ge=0, le=1)
+    threshold: float = Field(ge=0, le=1)
+    category: Literal["classic", "dl", "transformer"]
+
+
+class ModelMetricsResponse(BaseModel):
+    version: str
+    dataset: str
+    models: list[ModelMetric]

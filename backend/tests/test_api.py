@@ -250,6 +250,7 @@ class TestAdminEndpoints:
     def test_non_admin_rejected(self, client, auth_headers):
         resp = client.get("/api/admin/stats", headers=auth_headers)
         assert resp.status_code == 403
+        assert client.get("/api/admin/model-metrics", headers=auth_headers).status_code == 403
 
     def test_admin_dashboard_queries(self, client, auth_headers, db_session):
         from models import AnalysisHistory, User
@@ -298,6 +299,11 @@ class TestAdminEndpoints:
         )
         assert analyses.status_code == 200
         assert analyses.json()["total"] == 2
+
+        metrics = client.get("/api/admin/model-metrics", headers=auth_headers)
+        assert metrics.status_code == 200
+        assert metrics.json()["version"] == "2026.07"
+        assert len(metrics.json()["models"]) == 8
 
     def test_login_returns_admin_role(self, client, db_session):
         from auth import hash_password
