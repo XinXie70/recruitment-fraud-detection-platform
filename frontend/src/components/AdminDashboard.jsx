@@ -30,81 +30,6 @@ import { apiUrl } from '../utils/api';
 
 echarts.use([BarChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
 
-const MODEL_METRICS = [
-  {
-    model: 'Bi-LSTM',
-    accuracy: 0.9857,
-    precision: 0.8389,
-    recall: 0.8728,
-    f1: 0.8555,
-    threshold: 0.67,
-    category: 'dl',
-  },
-  {
-    model: 'SVM',
-    accuracy: 0.979,
-    precision: 0.7816,
-    recall: 0.7861,
-    f1: 0.7839,
-    threshold: 0.31,
-    category: 'classic',
-  },
-  {
-    model: 'XGBoost',
-    accuracy: 0.9746,
-    precision: 0.6864,
-    recall: 0.8728,
-    f1: 0.7684,
-    threshold: 0.17,
-    category: 'classic',
-  },
-  {
-    model: 'DNN',
-    accuracy: 0.9704,
-    precision: 0.645,
-    recall: 0.8613,
-    f1: 0.7376,
-    threshold: 0.33,
-    category: 'dl',
-  },
-  {
-    model: 'Logistic Reg.',
-    accuracy: 0.9175,
-    precision: 0.4626,
-    recall: 0.8266,
-    f1: 0.5934,
-    threshold: 0.23,
-    category: 'classic',
-  },
-  {
-    model: 'RNN',
-    accuracy: 0.9763,
-    precision: 0.7143,
-    recall: 0.8324,
-    f1: 0.7689,
-    threshold: 0.24,
-    category: 'dl',
-  },
-  {
-    model: 'BERT',
-    accuracy: 0.99,
-    precision: 0.92,
-    recall: 0.89,
-    f1: 0.905,
-    threshold: 0.5,
-    category: 'transformer',
-  },
-  {
-    model: 'RoBERTa',
-    accuracy: 0.988,
-    precision: 0.91,
-    recall: 0.88,
-    f1: 0.895,
-    threshold: 0.5,
-    category: 'transformer',
-  },
-];
-
 const MODEL_ARCHITECTURES = {
   'Logistic Reg.': {
     type: 'Linear Classifier',
@@ -167,6 +92,8 @@ export default function AdminDashboard({ auth, onLogout }) {
   const [activeMetric, setActiveMetric] = useState('f1');
   const [viewMode, setViewMode] = useState('ranking');
   const [adminStats, setAdminStats] = useState(null);
+  const [modelMetrics, setModelMetrics] = useState([]);
+  const [metricsMeta, setMetricsMeta] = useState(null);
   const [statsError, setStatsError] = useState('');
 
   const refreshHealth = useCallback(async () => {
@@ -197,24 +124,49 @@ export default function AdminDashboard({ auth, onLogout }) {
     }
   }, [auth.access_token, onLogout]);
 
+  const refreshModelMetrics = useCallback(async () => {
+    try {
+      const response = await fetch(apiUrl('/api/admin/model-metrics'), {
+        headers: { Authorization: `Bearer ${auth.access_token}` },
+      });
+      if (response.status === 401) {
+        onLogout();
+        return;
+      }
+      if (!response.ok) throw new Error(`Model metrics request failed: ${response.status}`);
+      const payload = await response.json();
+      setModelMetrics(payload.models);
+      setMetricsMeta({ version: payload.version, dataset: payload.dataset });
+    } catch {
+      setStatsError('Dashboard data is temporarily unavailable.');
+    }
+  }, [auth.access_token, onLogout]);
+
   useEffect(() => {
     void refreshHealth();
     void refreshStats();
-  }, [refreshHealth, refreshStats]);
+    void refreshModelMetrics();
+  }, [refreshHealth, refreshModelMetrics, refreshStats]);
 
   const formatPct = (v) => `${(v * 100).toFixed(1)}%`;
-  const bestModel = useMemo(() => [...MODEL_METRICS].sort((a, b) => b.f1 - a.f1)[0], []);
+  const bestModel = useMemo(
+    () => [...modelMetrics].sort((a, b) => b.f1 - a.f1)[0] ?? null,
+    [modelMetrics],
+  );
   const avgF1 = useMemo(
-    () => MODEL_METRICS.reduce((s, m) => s + m.f1, 0) / MODEL_METRICS.length,
-    [],
+    () =>
+      modelMetrics.length
+        ? modelMetrics.reduce((sum, model) => sum + model.f1, 0) / modelMetrics.length
+        : 0,
+    [modelMetrics],
   );
   const sorted = useMemo(
-    () => [...MODEL_METRICS].sort((a, b) => b[activeMetric] - a[activeMetric]),
-    [activeMetric],
+    () => [...modelMetrics].sort((a, b) => b[activeMetric] - a[activeMetric]),
+    [activeMetric, modelMetrics],
   );
   const maxMetric = useMemo(
-    () => Math.max(...MODEL_METRICS.map((m) => m[activeMetric])),
-    [activeMetric],
+    () => Math.max(...modelMetrics.map((model) => model[activeMetric]), 1),
+    [activeMetric, modelMetrics],
   );
   const healthPresentation = useMemo(() => {
     if (healthStatus?.status === 'healthy') return { className: 'safe', label: 'System Healthy' };
@@ -226,21 +178,21 @@ export default function AdminDashboard({ auth, onLogout }) {
 
   const categories = useMemo(
     () => ({
-      classic: MODEL_METRICS.filter((m) => m.category === 'classic'),
-      dl: MODEL_METRICS.filter((m) => m.category === 'dl'),
-      transformer: MODEL_METRICS.filter((m) => m.category === 'transformer'),
+      classic: modelMetrics.filter((model) => model.category === 'classic'),
+      dl: modelMetrics.filter((model) => model.category === 'dl'),
+      transformer: modelMetrics.filter((model) => model.category === 'transformer'),
     }),
-    [],
+    [modelMetrics],
   );
 
   const categoryAverages = useMemo(() => {
     const avg = {};
     Object.entries(categories).forEach(([key, models]) => {
       avg[key] = {
-        f1: models.reduce((s, m) => s + m.f1, 0) / models.length,
-        accuracy: models.reduce((s, m) => s + m.accuracy, 0) / models.length,
-        precision: models.reduce((s, m) => s + m.precision, 0) / models.length,
-        recall: models.reduce((s, m) => s + m.recall, 0) / models.length,
+        f1: models.length ? models.reduce((s, m) => s + m.f1, 0) / models.length : 0,
+        accuracy: models.length ? models.reduce((s, m) => s + m.accuracy, 0) / models.length : 0,
+        precision: models.length ? models.reduce((s, m) => s + m.precision, 0) / models.length : 0,
+        recall: models.length ? models.reduce((s, m) => s + m.recall, 0) / models.length : 0,
       };
     });
     return avg;
@@ -282,7 +234,7 @@ export default function AdminDashboard({ auth, onLogout }) {
       grid: { left: 48, right: 20, top: 48, bottom: 72 },
       xAxis: {
         type: 'category',
-        data: MODEL_METRICS.map((model) => model.model),
+        data: modelMetrics.map((model) => model.model),
         axisLabel: { color: '#67625d', rotate: 28 },
         axisLine: { lineStyle: { color: '#d9d1c7' } },
       },
@@ -297,11 +249,11 @@ export default function AdminDashboard({ auth, onLogout }) {
         name: METRIC_LABELS[metric],
         type: 'bar',
         barMaxWidth: 18,
-        data: MODEL_METRICS.map((model) => model[metric]),
+        data: modelMetrics.map((model) => model[metric]),
         emphasis: { focus: 'series' },
       })),
     }),
-    [],
+    [modelMetrics],
   );
 
   return (
@@ -333,6 +285,7 @@ export default function AdminDashboard({ auth, onLogout }) {
               onClick={() => {
                 void refreshHealth();
                 void refreshStats();
+                void refreshModelMetrics();
               }}
               title="Refresh system health"
               type="button"
@@ -406,7 +359,11 @@ export default function AdminDashboard({ auth, onLogout }) {
             <div className="admin-card-header">
               <BarChart3 size={22} />
               <h2>Model Performance</h2>
-              <span className="admin-badge">ECharts comparison</span>
+              <span className="admin-badge">
+                {metricsMeta
+                  ? `${metricsMeta.dataset} · v${metricsMeta.version}`
+                  : 'Loading metrics'}
+              </span>
             </div>
             <ReactEChartsCore
               echarts={echarts}
@@ -428,7 +385,7 @@ export default function AdminDashboard({ auth, onLogout }) {
               <Brain size={22} />
             </div>
             <div>
-              <strong>{MODEL_METRICS.length}</strong>
+              <strong>{modelMetrics.length || '—'}</strong>
               <span>Models Deployed</span>
             </div>
           </div>
@@ -440,8 +397,8 @@ export default function AdminDashboard({ auth, onLogout }) {
               <Award size={22} />
             </div>
             <div>
-              <strong>{bestModel.model}</strong>
-              <span>Best (F1: {formatPct(bestModel.f1)})</span>
+              <strong>{bestModel?.model ?? '—'}</strong>
+              <span>{bestModel ? `Best (F1: ${formatPct(bestModel.f1)})` : 'Loading metrics'}</span>
             </div>
           </div>
           <div className="admin-kpi-card">
@@ -464,7 +421,7 @@ export default function AdminDashboard({ auth, onLogout }) {
               <Zap size={22} />
             </div>
             <div>
-              <strong>{MODEL_METRICS.filter((m) => m.f1 >= 0.85).length}</strong>
+              <strong>{modelMetrics.filter((model) => model.f1 >= 0.85).length}</strong>
               <span>Models ≥ 85% F1</span>
             </div>
           </div>
@@ -824,7 +781,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             <div className="admin-system-item">
               <span>Best Model</span>
               <strong>
-                {bestModel.model} (F1: {formatPct(bestModel.f1)})
+                {bestModel ? `${bestModel.model} (F1: ${formatPct(bestModel.f1)})` : 'Loading...'}
               </strong>
             </div>
           </div>

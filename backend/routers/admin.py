@@ -6,8 +6,11 @@ All endpoints require ``is_admin=True`` on the authenticated user.
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import case, func
@@ -20,12 +23,14 @@ from schemas.admin import (
     AdminStats,
     AdminUserItem,
     AnalysisHistoryItem,
+    ModelMetricsResponse,
     PaginatedResponse,
 )
 from utils import Pagination, paginate
 
 logger = logging.getLogger("fake_job_detection_api.admin")
 router = APIRouter(prefix="/api/admin", tags=["admin"])
+MODEL_METRICS_PATH = Path(__file__).resolve().parents[1] / "data" / "model_metrics.json"
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
@@ -35,6 +40,18 @@ def require_admin(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin access required.",
         )
     return current_user
+
+
+@lru_cache(maxsize=1)
+def load_model_metrics() -> ModelMetricsResponse:
+    with MODEL_METRICS_PATH.open(encoding="utf-8") as metrics_file:
+        return ModelMetricsResponse.model_validate(json.load(metrics_file))
+
+
+@router.get("/model-metrics", response_model=ModelMetricsResponse)
+def admin_model_metrics(_admin: User = Depends(require_admin)) -> ModelMetricsResponse:
+    """Return the versioned offline evaluation metrics used by the dashboard."""
+    return load_model_metrics()
 
 
 # ---------------------------------------------------------------------------
