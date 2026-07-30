@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import pytest
+import httpx
 
-from services.model_adapter import ModelAdapter, ModelRegistry, ModelSpec
+from services.model_adapter import HttpModelAdapter, ModelAdapter, ModelRegistry, ModelSpec
 
 
 class FakeAdapter:
@@ -80,3 +81,27 @@ def test_model_adapter_checks_required_artifact(tmp_path) -> None:
     )
     with pytest.raises(Exception, match="weight is missing"):
         adapter.predict_raw("text")
+
+
+def test_http_model_adapter_uses_model_endpoint_and_fraud_score() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/predict/lr"
+        assert request.content == b'{"text":"listing"}'
+        return httpx.Response(200, json={"fraud_score": 0.73})
+
+    adapter = HttpModelAdapter("logistic_regression", "LR", "http://model")
+    adapter._client = httpx.Client(transport=httpx.MockTransport(handler))
+
+    assert adapter.predict_raw("listing") == 0.73
+
+
+def test_http_model_adapter_rejects_invalid_response() -> None:
+    adapter = HttpModelAdapter("bert", "BERT", "http://model")
+    adapter._client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, json={"prediction": 1})
+        )
+    )
+
+    with pytest.raises(RuntimeError, match="no fraud_score"):
+        adapter.predict_raw("listing")

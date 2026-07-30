@@ -157,8 +157,7 @@ class ModelAdapter:
         return self.predict_raw_batch([text])[0]
 
 
-#: Map from repository model keys to the deployed model server's keys.
-#: Only ``logistic_regression`` differs; the other seven are identical.
+#: Map from repository model keys to the deployed model server's endpoint keys.
 _REMOTE_MODEL_KEY_MAP: dict[str, str] = {
     "logistic_regression": "lr",
     "svm": "svm",
@@ -174,8 +173,10 @@ _REMOTE_MODEL_KEY_MAP: dict[str, str] = {
 class HttpModelAdapter:
     """Remote model adapter that calls the standalone Model Inference Server.
 
-    Activated when ``MODEL_SERVER_URL`` is set.  Each adapter sends requests to
-    ``POST /predict/batch`` with ``{"texts": [...], "model": "<key>"}``.
+    Activated when ``MODEL_SERVER_URL`` is set. Each adapter sends requests to
+    ``POST /predict/<key>`` with ``{"text": "..."}`` and reads the returned
+    ``fraud_score`` probability. The current production model API exposes LR
+    and BERT through this contract.
     """
 
     def __init__(self, key: str, display_name: str, base_url: str):
@@ -199,47 +200,25 @@ class HttpModelAdapter:
         return self._client
 
     def predict_raw(self, text: str) -> float:
-        return self.predict_raw_batch([text])[0]
-
-    def predict_raw_batch(self, texts: Sequence[str]) -> list[float]:
-        if not texts:
-            return []
         try:
             resp = self.client.post(
-                f"{self._base_url}/predict/batch",
-                json={"texts": list(texts), "model": self._remote_key},
+                f"{self._base_url}/predict/{self._remote_key}",
+                json={"text": text},
             )
             resp.raise_for_status()
             data = resp.json()
-            results = data.get("results")
-
-            if not isinstance(results, list) or len(results) != len(texts):
+            if "fraud_score" not in data:
                 raise RuntimeError(
-                    f"Model {self.key} returned an invalid batch response."
+                    f"Model {self.key} returned no fraud_score."
                 )
-
-            scores: list[float] = []
-
-            for result in results:
-                if result.get("status") != "success":
-                    status = result.get("status", "error")
-                    message = result.get("message", "No error message provided.")
-                    raise RuntimeError(
-                        f"Model {self.key} returned {status}: {message}"
-                    )
-
-                risk_score = result.get("risk_score")
-                if risk_score is None:
-                    raise RuntimeError(
-                        f"Model {self.key} returned no risk score."
-                    )
-
-                scores.append(float(risk_score))
-            return scores
+            return ModelAdapter._normalise_scores([data["fraud_score"]], 1)[0]
         except httpx.HTTPError as exc:
             raise RuntimeError(
                 f"HTTP error calling model server for {self.key}: {exc}"
             ) from exc
+
+    def predict_raw_batch(self, texts: Sequence[str]) -> list[float]:
+        return [self.predict_raw(text) for text in texts]
 
     def close(self) -> None:
         if self._client is not None:
