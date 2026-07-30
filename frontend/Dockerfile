@@ -2,10 +2,12 @@ FROM node:22.22-alpine
 
 WORKDIR /app
 
-COPY frontend/package*.json ./
+COPY --chown=node:node frontend/package*.json ./
 RUN npm ci
 
-COPY frontend ./
+COPY --chown=node:node frontend ./
+
+USER node
 
 EXPOSE 5190
 

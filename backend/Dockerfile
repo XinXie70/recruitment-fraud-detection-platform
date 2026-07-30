@@ -6,11 +6,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+RUN groupadd --system app && useradd --system --gid app --no-create-home app
+
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
-COPY backend /app/backend
-COPY model /app/model
+COPY --chown=app:app backend /app/backend
+COPY --chown=app:app model /app/model
+
+USER app
 
 EXPOSE 8000
 
