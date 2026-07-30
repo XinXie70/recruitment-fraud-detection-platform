@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     jwt_issuer: str = "fake-job-detection-api"
     jwt_audience: str = "fake-job-detection-client"
 
+    # Dedicated administrator account. When all three values are configured,
+    # startup creates the account (or synchronises an existing matching user).
+    admin_email: str = ""
+    admin_username: str = ""
+    admin_password: str = ""
+
     # ------------------------------------------------------------------
     # CORS
     # ------------------------------------------------------------------
