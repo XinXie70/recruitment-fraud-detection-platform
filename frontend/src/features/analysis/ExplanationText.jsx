@@ -14,12 +14,16 @@ export default function ExplanationText({ text, items }) {
         <React.Fragment key={`plain-${index}`}>{text.slice(cursor, item.start)}</React.Fragment>,
       );
     }
-    const directionLabel = item.direction === 'raises_risk' ? 'Raises risk' : 'Lowers risk';
+    const directionLabel =
+      item.direction === 'raises_risk'
+        ? 'Increases model risk score'
+        : 'Decreases model risk score';
+    const percentagePoints = Math.abs(item.contribution) * 100;
     parts.push(
       <mark
         className={`evidence-highlight ${item.direction}`}
         key={`evidence-${item.start}-${item.end}`}
-        title={`${directionLabel}: ${item.contribution.toFixed(4)}`}
+        title={`${directionLabel} by approximately ${percentagePoints.toFixed(1)} percentage points`}
       >
         {text.slice(item.start, item.end)}
         <span className="sr-only"> ({directionLabel})</span>

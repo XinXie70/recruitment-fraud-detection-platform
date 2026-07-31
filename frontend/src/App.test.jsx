@@ -202,7 +202,9 @@ test('renders a successful analysis report and stores it in history', async () =
 
   expect(await screen.findByText('Likely Deceptive')).toBeVisible();
   expect(screen.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
-  expect(screen.getByText('Pressure language can be a warning sign.')).toBeVisible();
+  expect(screen.getByText('Increases model risk score')).toBeVisible();
+  expect(screen.getByText('+20.0 pp')).toBeVisible();
+  expect(screen.getByText(/not independent evidence of deception/i)).toBeVisible();
   expect(fetchMock).toHaveBeenCalledWith(
     '/api/v1/analyze/score',
     expect.objectContaining({

@@ -27,6 +27,7 @@ import {
 } from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
+import AttributionTable from './features/analysis/AttributionTable';
 import ExplanationText from './features/analysis/ExplanationText';
 import GentleGuidance from './features/analysis/GentleGuidance';
 import ModelContributions from './features/analysis/ModelContributions';
@@ -242,22 +243,8 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               </div>
             ) : result.xai.status === 'success' ? (
               <>
-                <div className="evidence-legend">
-                  <span className="raises_risk">Raises risk</span>
-                  <span className="lowers_risk">Lowers risk</span>
-                </div>
                 <ExplanationText text={result.inputText} items={evidence} />
-                <ul className="report-signal-list">
-                  {result.gentle_ai.evidence_explanations.map((item) => (
-                    <li key={`${item.start}-${item.end}`} className={riskLevel}>
-                      <div>
-                        <strong>{item.text}</strong>
-                        <span>{item.explanation}</span>
-                      </div>
-                      <b>{item.direction === 'raises_risk' ? 'Raises' : 'Lowers'}</b>
-                    </li>
-                  ))}
-                </ul>
+                <AttributionTable items={evidence} />
               </>
             ) : (
               <div className="partial-result-notice" role="status">
