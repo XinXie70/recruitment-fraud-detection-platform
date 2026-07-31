@@ -32,12 +32,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Scan dependencies and infrastructure files
+      - name: Scan dependencies and repository secrets
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
-          scanners: vuln,misconfig,secret
+          # Hadolint is the Dockerfile configuration gate. Keep Trivy focused
+          # on dependency vulnerabilities and secret detection.
+          scanners: vuln,secret
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "1"
