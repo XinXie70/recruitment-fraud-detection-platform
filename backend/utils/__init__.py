@@ -1,15 +1,4 @@
-"""
-Reusable pagination dependency for FastAPI list endpoints.
 
-Usage::
-
-    @router.get("/items")
-    def list_items(page: Pagination = Depends(paginate)):
-        query = db.query(Model)
-        total = query.count()
-        items = query.offset(page.offset).limit(page.limit).all()
-        return {"items": items, "total": total, "page": page.page, "page_size": page.size}
-"""
 
 from __future__ import annotations
 

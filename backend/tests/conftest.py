@@ -1,15 +1,3 @@
-"""
-Shared test fixtures — FastAPI TestClient with an isolated test database.
-
-Tests never fall back to the application ``DATABASE_URL``. Set
-``TEST_DATABASE_URL`` to use a dedicated CI database; otherwise a temporary
-SQLite database is created for the test session.
-
-Usage::
-
-    pytest backend/tests/ -v
-    TEST_DATABASE_URL=postgresql://... pytest backend/tests/ -v
-"""
 
 from __future__ import annotations
 
@@ -19,8 +7,7 @@ from pathlib import Path
 
 import pytest
 
-# Select the test database before importing application configuration. Never
-# allow a test run to silently connect to the development or production DB.
+# Select the test database before importing application configuration.
 _temporary_db_dir: tempfile.TemporaryDirectory[str] | None = None
 _test_db_url = os.getenv("TEST_DATABASE_URL", "").strip()
 if not _test_db_url:
@@ -38,12 +25,12 @@ from fastapi.testclient import TestClient
 
 from database import Base, engine, get_db
 
-# Ensure all tables (including new models) exist on the test database.
+# Ensure all tables exist
 Base.metadata.create_all(bind=engine)
 
-# ---------------------------------------------------------------------------
-# Per-test DB session (transactional rollback)
-# ---------------------------------------------------------------------------
+
+# Per-test DB session
+
 @pytest.fixture(scope="function")
 def db_session():
     """Yields a fresh SQLAlchemy session; creates tables then rolls back."""
@@ -61,9 +48,8 @@ def db_session():
         connection.close()
 
 
-# ---------------------------------------------------------------------------
 # FastAPI TestClient with overridden DB dependency
-# ---------------------------------------------------------------------------
+
 @pytest.fixture(scope="function")
 def client(db_session):
     """FastAPI TestClient whose ``get_db`` dependency returns the test session."""
@@ -81,9 +67,9 @@ def client(db_session):
     app.dependency_overrides.clear()
 
 
-# ---------------------------------------------------------------------------
+
 # Auth helper — register + get token
-# ---------------------------------------------------------------------------
+
 @pytest.fixture(scope="function")
 def auth_headers(client):
     """Register a test user and return ``{"Authorization": "Bearer <token>"}``."""

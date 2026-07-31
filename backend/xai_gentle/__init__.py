@@ -1,4 +1,4 @@
-"""Public interface for the independently owned XAI and Gentle AI module."""
+
 
 from .contracts import (
     EducationItem,

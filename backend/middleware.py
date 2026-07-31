@@ -1,6 +1,4 @@
-"""
-Middleware — request-id tracing, body validation, and content-type enforcement.
-"""
+
 
 from __future__ import annotations
 
@@ -18,13 +16,12 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 logger = logging.getLogger("fake_job_detection_api")
 _SAFE_REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
-# ---------------------------------------------------------------------------
+
 # Request ID middleware
-# ---------------------------------------------------------------------------
+
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
-    """Attach a unique request-id to every response and log context."""
 
     async def dispatch(self, request: Request, call_next):
         supplied_request_id = request.headers.get("X-Request-ID", "")
@@ -83,24 +80,20 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 def get_request_id(request: Request) -> str:
-    """Dependency that returns the current request-id (or a fallback)."""
+
     return getattr(request.state, "request_id", "unknown")
 
 
-# ---------------------------------------------------------------------------
-# Request body validation middleware (ASGI-level, wraps receive)
-# ---------------------------------------------------------------------------
 
-_MAX_BODY_BYTES = 200 * 1024  # 200 KiB hard cap for any request
+# Request body validation middleware
+
+
+_MAX_BODY_BYTES = 200 * 1024  # 200 KiB hard cap
 _JSON_METHODS = {"POST", "PUT", "PATCH"}
 
 
 class RequestBodyGuardMiddleware:
-    """Enforce Content-Type and maximum body size at ASGI level.
 
-    Applied *before* Pydantic validation so malformed / oversized payloads are
-    rejected early with a clear error, without touching the route handlers.
-    """
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -116,7 +109,7 @@ class RequestBodyGuardMiddleware:
             await self.app(scope, receive, send)
             return
 
-        # Collect body (up to the cap) for validation.
+        # Collect body for validation.
         body_chunks: list[bytes] = []
         total = 0
         more_body = True
@@ -129,7 +122,7 @@ class RequestBodyGuardMiddleware:
             chunk = message.get("body", b"")
             total += len(chunk)
             if total > _MAX_BODY_BYTES:
-                await self._send_error(send, 413, "Request body too large (max 200 KiB)")
+                await self._send_error(send, 413, "Request body too large ")
                 # Drain remaining chunks
                 while more_body:
                     msg = await receive()
@@ -148,10 +141,7 @@ class RequestBodyGuardMiddleware:
                 )
                 return
 
-        # Never log request bodies: authentication payloads and analyzed job
-        # advertisements can contain passwords or other sensitive data.
 
-        # Reconstruct receive so downstream can read the body
         async def _wrapped_receive() -> Message:
             nonlocal body_chunks
             if body_chunks:

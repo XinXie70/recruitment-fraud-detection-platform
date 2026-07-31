@@ -44,7 +44,7 @@ _SECRET_PATTERN = re.compile(
 
 
 def _redact_history_preview(text: str) -> str:
-    """Remove common contact details before persisting a short input preview."""
+
     preview = text[:500]
     preview = _EMAIL_PATTERN.sub("[REDACTED_EMAIL]", preview)
     preview = _PHONE_PATTERN.sub("[REDACTED_PHONE]", preview)
@@ -53,7 +53,7 @@ def _redact_history_preview(text: str) -> str:
 
 
 def _hash_history_input(text: str) -> str:
-    """Create a keyed digest so stored hashes cannot be matched offline."""
+
     return hmac.new(
         settings.secret_key.encode("utf-8"),
         text.encode("utf-8"),
@@ -67,7 +67,8 @@ def _save_history(
     user_id: int,
     db,
 ) -> None:
-    """Persist analysis result to history table."""
+
+
     try:
         history = AnalysisHistory(
             user_id=user_id,
@@ -164,9 +165,8 @@ def analyze_score_v1(
     service: AnalysisService = Depends(get_analysis_service),
     request_id: str = Depends(get_request_id),
 ) -> AnalysisResponse:
-    """Return the validated ensemble score before detailed XAI is generated."""
-    return _run_score(payload, service, request_id)
 
+    return _run_score(payload, service, request_id)
 
 @router.post("/api/v1/analyze", response_model=AnalysisResponse)
 @limiter.limit(settings.rate_limit_analyze)
@@ -254,7 +254,8 @@ def delete_own_analysis_history(
         .first()
     )
     if history is None:
-        # Do not reveal whether another user owns the requested record.
+
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Analysis history item not found.",

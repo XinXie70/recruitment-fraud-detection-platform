@@ -1,6 +1,5 @@
 """
-Lightweight in-process TTL cache for analysis results.
-
+Lightweight  TTL cache for analysis results.
 Avoids recomputing the full ensemble + XAI + Gentle AI pipeline when the
 same job-ad text is submitted within the TTL window.
 """
@@ -17,7 +16,7 @@ from config import settings
 
 
 class TTLCache:
-    """Thread-safe, in-memory cache with per-entry TTL."""
+
 
     def __init__(
         self,
@@ -41,9 +40,9 @@ class TTLCache:
         self._store: OrderedDict[str, tuple[float, Any]] = OrderedDict()
         self._lock = threading.Lock()
 
-    # ------------------------------------------------------------------
+
     # Public API
-    # ------------------------------------------------------------------
+
     def get(self, key: str) -> Any | None:
         with self._lock:
             entry = self._store.get(key)
@@ -82,14 +81,14 @@ class TTLCache:
         for key in expired:
             del self._store[key]
 
-    # ------------------------------------------------------------------
+
     # Helpers
-    # ------------------------------------------------------------------
+
     @staticmethod
     def text_key(text: str) -> str:
         """Deterministic cache key for a job-ad text."""
         return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-# Module-level instance — one per process is sufficient.
+# Module-level instance
 analysis_cache = TTLCache()

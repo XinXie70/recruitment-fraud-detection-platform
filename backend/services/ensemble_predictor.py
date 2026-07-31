@@ -102,15 +102,11 @@ class EnsembleComputation:
 
 def default_config_path() -> Path:
     """Resolve the default ensemble config path.
-
-    Tries ``ENSEMBLE_CONFIG_PATH`` env var first, then walks up from this
-    file's directory to locate the project root (``.../capstone-project-*/``)
-    and appends the known relative path.
     """
     if env_path := settings.ensemble_config_path:
         return Path(env_path)
 
-    # Walk upward from this file until we find a directory containing both
+
     # a "backend/" and "model/" folder (the project root).
     candidate = Path(__file__).resolve().parent
     for _ in range(6):  # safety limit — should never need more than 3-4 levels
@@ -125,7 +121,7 @@ def default_config_path() -> Path:
             )
         candidate = candidate.parent
 
-    # Ultimate fallback — keep the original heuristic but log a warning
+    # Ultimate fallback
     import warnings
 
     fallback = Path(__file__).resolve().parents[2]

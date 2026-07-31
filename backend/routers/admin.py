@@ -1,7 +1,6 @@
 """
 Admin routes — analytics dashboard, user management, and audit log.
-
-All endpoints require ``is_admin=True`` on the authenticated user.
+All endpoints require  s_admin=True  on the authenticated user.
 """
 
 from __future__ import annotations
@@ -50,13 +49,13 @@ def load_model_metrics() -> ModelMetricsResponse:
 
 @router.get("/model-metrics", response_model=ModelMetricsResponse)
 def admin_model_metrics(_admin: User = Depends(require_admin)) -> ModelMetricsResponse:
-    """Return the versioned offline evaluation metrics used by the dashboard."""
+    """Return  offline evaluation metrics"""
     return load_model_metrics()
 
 
-# ---------------------------------------------------------------------------
+
 # Stats
-# ---------------------------------------------------------------------------
+
 @router.get("/stats", response_model=AdminStats)
 def admin_stats(
     db: Session = Depends(get_db),
@@ -99,9 +98,9 @@ def admin_stats(
     )
 
 
-# ---------------------------------------------------------------------------
+
 # Users
-# ---------------------------------------------------------------------------
+
 @router.get("/users", response_model=PaginatedResponse)
 def admin_users(
     page: Pagination = Depends(paginate),
@@ -141,9 +140,9 @@ def admin_users(
     )
 
 
-# ---------------------------------------------------------------------------
+
 # Analysis History
-# ---------------------------------------------------------------------------
+
 @router.get("/analyses", response_model=PaginatedResponse)
 def admin_analyses(
     page: Pagination = Depends(paginate),

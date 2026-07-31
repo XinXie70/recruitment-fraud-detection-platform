@@ -1,9 +1,5 @@
 """
-Resilience primitives — explicit service health / degradation tracking.
-
-The ensemble already tolerates individual model failures (see
-``EnsemblePredictor.warm_up``), but the degradation state was implicit.
-This module makes it visible to operators and the health endpoint.
+Resilience primitives
 """
 
 from __future__ import annotations

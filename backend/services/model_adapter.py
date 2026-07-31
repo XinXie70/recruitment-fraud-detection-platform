@@ -63,14 +63,7 @@ DEFAULT_MODEL_SPECS: tuple[ModelSpec, ...] = (
     ModelSpec("dnn", "Deep Neural Network", "final_model_pipelines.dnn_pipeline.predict"),
     ModelSpec("rnn", "RNN", "final_model_pipelines.rnn_pipeline.predict"),
     ModelSpec("bilstm", "Bi-LSTM", "final_model_pipelines.bilstm_pipeline.predict"),
-    ModelSpec(
-        "bert",
-        "BERT",
-        "final_model_pipelines.bert_pipeline.predict",
-        artifact_relative_path=(
-            "model/final_model_pipelines/bert_pipeline/saved_model/model.safetensors"
-        ),
-    ),
+    ModelSpec("bert","BERT", "final_model_pipelines.bert_pipeline.predict", artifact_relative_path= ( "model/final_model_pipelines/bert_pipeline/saved_model/model.safetensors"),),
     ModelSpec(
         "roberta",
         "RoBERTa",
@@ -83,12 +76,7 @@ DEFAULT_MODEL_SPECS: tuple[ModelSpec, ...] = (
 
 
 class ModelAdapter:
-    """Stable wrapper around one existing model pipeline.
 
-    Only this class knows the current pipelines expose a private
-    ``_predict_risk_score`` batch function. Other application layers depend on
-    ``predict_raw`` and ``predict_raw_batch`` instead.
-    """
 
     def __init__(self, spec: ModelSpec, project_root: Path | None = None):
         self.spec = spec
@@ -163,7 +151,7 @@ class ModelAdapter:
         return self.predict_raw_batch([text])[0]
 
 
-#: Map from repository model keys to the deployed model server's endpoint keys.
+# Map from repository model keys to the deployed model server's endpoint keys.
 _REMOTE_MODEL_KEY_MAP: dict[str, str] = {
     "logistic_regression": "lr",
     "svm": "svm",
@@ -177,13 +165,8 @@ _REMOTE_MODEL_KEY_MAP: dict[str, str] = {
 
 
 class HttpModelAdapter:
-    """Remote model adapter that calls the standalone Model Inference Server.
 
-    Activated when ``MODEL_SERVER_URL`` is set. Each adapter sends requests to
-    ``POST /predict/<key>`` with ``{"text": "..."}`` and reads the returned
-    ``fraud_score`` probability. The current production model API exposes LR
-    and BERT through this contract.
-    """
+
 
     def __init__(self, key: str, display_name: str, base_url: str):
         self.key = key
@@ -268,7 +251,7 @@ class ModelRegistry:
             try:
                 adapter.predict_raw(sample)
                 outcomes[key] = None
-            except Exception as exc:  # pragma: no cover - depends on model runtime
+            except Exception as exc:  # pragma: no cover
                 outcomes[key] = f"{type(exc).__name__}: {exc}"
         return outcomes
 
