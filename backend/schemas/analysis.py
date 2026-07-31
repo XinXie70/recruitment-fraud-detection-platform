@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Final, Literal
 
 from config import settings
 from pydantic import BaseModel, Field, field_validator, model_validator
 from xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
-API_VERSION = "1.0"
+API_VERSION: Final[Literal["1.0"]] = "1.0"
 MAX_INPUT_CHARS = settings.max_input_chars
 
 

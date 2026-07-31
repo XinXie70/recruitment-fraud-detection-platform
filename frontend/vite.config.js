@@ -11,10 +11,10 @@ export default defineConfig({
       exclude: ['src/main.jsx'],
       reporter: ['text', 'json-summary', 'html'],
       thresholds: {
-        statements: 40,
+        statements: 45,
         branches: 30,
         functions: 35,
-        lines: 40,
+        lines: 45,
       },
     },
   },

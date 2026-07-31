@@ -219,12 +219,12 @@ class EnsemblePredictor:
                     ModelMemberOutput(
                         key=raw.key,
                         display_name=raw.display_name,
-                        status=raw.status,  # type: ignore[arg-type]
+                        status=raw.status,
                         configured_weight=member_config.weight,
                         effective_weight=0,
                         weighted_contribution=0,
                         error=raw.error,
-                        error_code=raw.error_code,  # type: ignore[arg-type]
+                        error_code=raw.error_code,
                     )
                 )
                 continue

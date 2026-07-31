@@ -41,7 +41,7 @@ class FakeRegistry:
         return {key: [0.25 for _ in texts] for key in model_keys}
 
     def warm_up(self, sample, model_keys):
-        return {key: None for key in model_keys}
+        return dict.fromkeys(model_keys)
 
 
 def test_partial_failure_renormalizes_weights() -> None:

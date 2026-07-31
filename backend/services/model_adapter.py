@@ -3,11 +3,12 @@ from __future__ import annotations
 import importlib
 import logging
 import math
+from collections.abc import Iterable
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Callable, Protocol, Sequence
+from typing import Callable, Literal, Protocol, Sequence
 
 import httpx
 
@@ -29,10 +30,13 @@ class ModelSpec:
 class RawModelResult:
     key: str
     display_name: str
-    status: str
+    status: Literal["success", "error", "timeout"]
     score: float | None = None
     error: str | None = None
-    error_code: str | None = None
+    error_code: (
+        Literal["not_registered", "artifact_unavailable", "inference_failed", "timeout"]
+        | None
+    ) = None
 
 
 class ModelArtifactUnavailableError(RuntimeError):
@@ -134,7 +138,9 @@ class ModelAdapter:
     def _normalise_scores(raw_scores: object, expected: int) -> list[float]:
         if hasattr(raw_scores, "tolist"):
             raw_scores = raw_scores.tolist()
-        scores = list(raw_scores)  # type: ignore[arg-type]
+        if not isinstance(raw_scores, Iterable) or isinstance(raw_scores, (str, bytes)):
+            raise TypeError("Model scores must be an iterable of probabilities")
+        scores = list(raw_scores)
         if len(scores) != expected:
             raise ValueError(f"Expected {expected} scores but model returned {len(scores)}")
 
