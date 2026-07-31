@@ -2400,7 +2400,9 @@ button.nav-button {
 }
 
 .dash-history-table-wrap {
-  overflow-x: auto;
+  max-height: 480px;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .dash-history-table {
@@ -2413,6 +2415,14 @@ button.nav-button {
   padding: 14px;
   border-bottom: 1px solid rgba(80, 65, 50, 0.1);
   text-align: left;
+}
+
+.dash-history-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(80, 65, 50, 0.1);
 }
 
 @media (max-width: 900px) {
