@@ -756,7 +756,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>Models Ready</span>
-              <strong>{healthStatus?.model_ready ? '✓ All 8 models loaded' : 'Loading...'}</strong>
+              <strong>{healthStatus?.model_ready ? ' Models ready' : 'Loading...'}</strong>
             </div>
             <div className="admin-system-item">
               <span>Total Parameters</span>
@@ -776,7 +776,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>Inference Strategy</span>
-              <strong>Ensemble (8 models → weighted average)</strong>
+              <strong>Weighted model ensemble</strong>
             </div>
             <div className="admin-system-item">
               <span>Best Model</span>
