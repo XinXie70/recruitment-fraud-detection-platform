@@ -150,8 +150,9 @@ class AnalysisService:
 
         return result
 
+
     def score(self, text: str) -> AnalysisResponse:
-        """Return the ensemble result without waiting for expensive XAI work."""
+
         cache_key = TTLCache.text_key(text)
         cached = self.cache.get(cache_key)
         if cached is not None:
@@ -160,6 +161,7 @@ class AnalysisService:
                 extra={"cache_key": cache_key[:16]},
             )
             return cached
+
 
         validation = self.validator(text)
         if not validation.get("is_valid", False):

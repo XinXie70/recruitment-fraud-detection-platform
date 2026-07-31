@@ -4,7 +4,7 @@ import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-# ── sys.path setup must happen BEFORE any local imports ──────────────
+# sys.path setup must happen BEFORE any local imports
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 MODEL_DIR = PROJECT_ROOT / "model"
@@ -39,9 +39,9 @@ from routers.analysis import router as analysis_router
 from services.resilience import ServiceStatus, SystemHealth
 
 
-# ---------------------------------------------------------------------------
+
 # Structured logging
-# ---------------------------------------------------------------------------
+
 class _JsonFormatter(logging.Formatter):
     """Emit log records as JSON lines for Cloud Run / structured log ingestion."""
     def format(self, record: logging.LogRecord) -> str:
@@ -92,13 +92,13 @@ analysis_service = get_analysis_service()
 
 def _init_database() -> None:
     if settings.app_env == "production":
-        # Production schema changes are applied by Alembic before the server starts.
+
         return
     Base.metadata.create_all(bind=engine)
 
 
 def _provision_admin() -> None:
-    """Create or synchronise the single dedicated administrator account."""
+
     credentials = (
         settings.admin_email.strip().lower(),
         settings.admin_username.strip(),
@@ -156,7 +156,7 @@ def _provision_admin() -> None:
 
 
 def _check_database() -> bool:
-    """Ping the database to verify connectivity."""
+
     db = None
     try:
         db = SessionLocal()
@@ -171,7 +171,7 @@ def _check_database() -> bool:
 
 
 def _warm_up_models_background() -> None:
-    """Load ML models in a background thread so auth endpoints are available immediately."""
+
     try:
         outcomes = analysis_service.warm_up()
         failed = {key: error for key, error in outcomes.items() if error}
@@ -191,15 +191,15 @@ async def lifespan(app: FastAPI):
     except Exception:
         logger.exception("Database initialisation failed.")
 
-    # Start model warm-up in background — do NOT block app startup.
+    # Start model warm-up in background
     if settings.app_env != "test":
         threading.Thread(target=_warm_up_models_background, daemon=True).start()
     yield
 
 
-# ---------------------------------------------------------------------------
+
 # App factory
-# ---------------------------------------------------------------------------
+
 app = FastAPI(
     title="Fake Job Detection API",
     description=(
@@ -210,7 +210,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Rate limiter — attach state + exception handler
+# Rate limiter attach state + exception handler
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -264,7 +264,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         },
     )
 
-# Middleware stack (order matters: outer → inner)
+# Middleware stack
 app.add_middleware(RequestBodyGuardMiddleware)  # ASGI-level: body size + content-type
 app.add_middleware(
     CORSMiddleware,
@@ -282,9 +282,8 @@ app.include_router(analysis_router)
 app.include_router(admin_router)
 
 
-# ---------------------------------------------------------------------------
 # Endpoints
-# ---------------------------------------------------------------------------
+
 class ReadyResponse(BaseModel):
     status: str
     model_ready: bool

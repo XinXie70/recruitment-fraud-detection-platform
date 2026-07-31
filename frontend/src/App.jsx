@@ -3,7 +3,6 @@ import {
   Activity,
   AlertTriangle,
   ArrowLeft,
-  BookOpen,
   CalendarClock,
   CheckCircle2,
   Gift,
@@ -133,10 +132,6 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             <Link to="/dashboard">
               <LayoutDashboard size={17} />
               Dashboard
-            </Link>
-            <Link to="/education">
-              <BookOpen size={17} />
-              Education
             </Link>
           </nav>
           <div className="report-case">

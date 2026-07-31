@@ -1,8 +1,3 @@
-# Cloud Run Dockerfile — backend only (no ML deps, no frontend)
-# Assumes MODEL_SERVER_URL points to the standalone model inference server.
-#
-# Build:  docker build -f backend/Dockerfile.cloudrun -t backend .
-# Deploy: gcloud run deploy backend --image=... --add-cloudsql-instances=...
 
 FROM python:3.11-slim
 

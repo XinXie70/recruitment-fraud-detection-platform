@@ -1,14 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import {
-  Briefcase,
-  LayoutDashboard,
-  BookOpen,
-  LogIn,
-  LogOut,
-  ShieldAlert,
-  UserPlus,
-} from 'lucide-react';
+import { Briefcase, LayoutDashboard, LogIn, LogOut, ShieldAlert, UserPlus } from 'lucide-react';
 
 export default function Navigation({ auth, onLogout }) {
   return (
@@ -31,16 +23,8 @@ export default function Navigation({ auth, onLogout }) {
                 <LayoutDashboard size={18} />
                 <span>Dashboard</span>
               </Link>
-              <Link to="/education" className="nav-link">
-                <BookOpen size={18} />
-                <span>Education</span>
-              </Link>
             </>
           )}
-          <Link to="/education" className="nav-link">
-            <BookOpen size={18} />
-            <span>Learn</span>
-          </Link>
           {auth ? (
             <>
               <span className="nav-user">{auth.user.username}</span>

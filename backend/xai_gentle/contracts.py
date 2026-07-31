@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-# Reusable type alias — keep in sync with EducationItem.topic
+# Reusable type alias
 EducationTopic = Literal["fake_jobs", "misinformation", "phishing", "scam_patterns"]
 
 

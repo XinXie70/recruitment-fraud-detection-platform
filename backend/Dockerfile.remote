@@ -1,5 +1,4 @@
-# Slim backend image — no ML dependencies, delegates inference to a remote model server.
-# Set MODEL_SERVER_URL to the model server address.
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
