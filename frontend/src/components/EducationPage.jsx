@@ -77,7 +77,7 @@ const HOW_IT_WORKS = [
   {
     icon: <Brain size={24} />,
     title: 'Multi-Model Analysis',
-    desc: 'Eight ML models analyze the text simultaneously: Logistic Regression, SVM, XGBoost, DNN, RNN, Bi-LSTM, BERT, and RoBERTa.',
+    desc: 'Machine learning models analyze the text using weighted text patterns and contextual meaning.',
   },
   {
     icon: <BarChart3 size={24} />,

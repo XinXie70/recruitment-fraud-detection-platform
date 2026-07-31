@@ -27,6 +27,7 @@ import {
 } from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
+import AttributionTable from './features/analysis/AttributionTable';
 import ExplanationText from './features/analysis/ExplanationText';
 import GentleGuidance from './features/analysis/GentleGuidance';
 import ModelContributions from './features/analysis/ModelContributions';
@@ -162,8 +163,6 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               <span />
               {riskLabel(riskLevel)}
             </div>
-            <p>{result.gentle_ai.summary}</p>
-
             <div className="report-confidence">
               <div>
                 <span>Ensemble Risk Score</span>
@@ -172,10 +171,6 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               <div className="report-score-track">
                 <div className={`report-score-fill ${riskLevel}`} style={{ width: `${score}%` }} />
               </div>
-              <small>
-                {result.ensemble.active_model_count} active model(s), version{' '}
-                {result.ensemble.version}
-              </small>
             </div>
           </section>
         </aside>
@@ -208,7 +203,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               <div className="section-title compact">
                 <Activity size={22} />
                 <div>
-                  <h2>Eight-Model Technical Details</h2>
+                  <h2>Model Technical Details</h2>
                   <span className="classification-note">Scores, weights and contributions</span>
                 </div>
               </div>
@@ -242,22 +237,8 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               </div>
             ) : result.xai.status === 'success' ? (
               <>
-                <div className="evidence-legend">
-                  <span className="raises_risk">Raises risk</span>
-                  <span className="lowers_risk">Lowers risk</span>
-                </div>
                 <ExplanationText text={result.inputText} items={evidence} />
-                <ul className="report-signal-list">
-                  {result.gentle_ai.evidence_explanations.map((item) => (
-                    <li key={`${item.start}-${item.end}`} className={riskLevel}>
-                      <div>
-                        <strong>{item.text}</strong>
-                        <span>{item.explanation}</span>
-                      </div>
-                      <b>{item.direction === 'raises_risk' ? 'Raises' : 'Lowers'}</b>
-                    </li>
-                  ))}
-                </ul>
+                <AttributionTable items={evidence} />
               </>
             ) : (
               <div className="partial-result-notice" role="status">
@@ -641,7 +622,7 @@ function AnalyzePage({ auth, onLogout }) {
   };
 
   const hasInput = Boolean(text.trim());
-  const loadingMessage = 'Running all eight models to calculate the risk score...';
+  const loadingMessage = 'Running the models to calculate the risk score...';
 
   if (result && !loading) {
     return (

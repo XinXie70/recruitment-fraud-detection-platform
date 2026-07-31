@@ -113,8 +113,7 @@ export default function AnalyzePage({ auth, onLogout }) {
   };
 
   const hasInput = Boolean(text.trim());
-  const loadingMessage =
-    'Running 8 ML models (LR, SVM, XGBoost, DNN, RNN, BiLSTM, BERT, RoBERTa)...';
+  const loadingMessage = 'Running the models...';
 
   if (result && !loading) {
     return <ReportPage result={result} onBack={handleNewScan} />;
@@ -129,8 +128,8 @@ export default function AnalyzePage({ auth, onLogout }) {
         <section className="hero">
           <AnimatedTitle text={HERO_TITLE} />
           <p>
-            Paste any job listing below. Our analyzer scores it with eight machine learning models
-            and highlights the risk signals.
+            Paste any job listing below. Our analyzer scores it with machine learning models and
+            highlights the risk signals.
           </p>
         </section>
 
@@ -204,7 +203,7 @@ export default function AnalyzePage({ auth, onLogout }) {
         {!result && !loading && !error && (
           <section className="empty-state">
             <Gift size={30} />
-            <p>Paste a job advertisement and run all eight models to see separate risk scores.</p>
+            <p>Paste a job advertisement and run the models to see separate risk scores.</p>
           </section>
         )}
       </main>

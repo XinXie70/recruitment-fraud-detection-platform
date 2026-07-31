@@ -150,6 +150,76 @@
   box-shadow: inset 0 -2px 0 #56836a;
 }
 
+.attribution-table-wrapper {
+  margin-top: 18px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.attribution-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  background: #ffffff;
+  text-align: left;
+}
+
+.attribution-table th,
+.attribution-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.attribution-table thead th {
+  background: #fcfcfb;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.attribution-table tbody th {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.attribution-table tbody tr:last-child th,
+.attribution-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.attribution-impact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.attribution-impact.raises_risk,
+.attribution-value.raises_risk {
+  color: var(--danger);
+}
+
+.attribution-impact.lowers_risk,
+.attribution-value.lowers_risk {
+  color: var(--safe);
+}
+
+.attribution-value {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+
+.attribution-disclaimer {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
 .gentle-summary,
 .analysis-disclaimer {
   line-height: 1.65;
@@ -3141,7 +3211,7 @@ button.nav-button {
     width: 190px;
   }
 }
-/* Expandable eight-model technical details */
+/* Expandable model technical details */
 
 .technical-details {
   flex: 0 0 auto;

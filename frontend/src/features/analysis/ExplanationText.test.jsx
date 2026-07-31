@@ -26,5 +26,9 @@ test('renders exact backend offsets without changing the original text', () => {
   const highlight = container.querySelector('mark');
   expect(highlight).toHaveClass('raises_risk');
   expect(highlight.childNodes[0].textContent).toBe('registration fee');
-  expect(container.textContent.replace(' (Raises risk)', '')).toBe(text);
+  expect(container.textContent.replace(' (Increases model risk score)', '')).toBe(text);
+  expect(highlight).toHaveAttribute(
+    'title',
+    'Increases model risk score by approximately 20.0 percentage points',
+  );
 });
