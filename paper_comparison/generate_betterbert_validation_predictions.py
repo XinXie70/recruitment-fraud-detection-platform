@@ -75,7 +75,9 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(
-            handle, fieldnames=["record_id", "label", "fraud_score"]
+            handle,
+            fieldnames=["record_id", "label", "fraud_score"],
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(output_rows)
