@@ -1,0 +1,4 @@
+2026-07-31 15:18:29 | INFO | Wrote paper assignment: F:\final-version-1\capstone-project-26t2-9900-h09c-almond\experiments\bert_paper_vs_project\paper_protocol_emscad_seed42\paper_80_20_seed42_assignments.csv.gz
+2026-07-31 15:18:29 | INFO | Paper split train: n=12873 fraud=624
+2026-07-31 15:18:29 | INFO | Paper split validation: n=1431 fraud=69
+2026-07-31 15:18:29 | INFO | Paper split test: n=3576 fraud=173

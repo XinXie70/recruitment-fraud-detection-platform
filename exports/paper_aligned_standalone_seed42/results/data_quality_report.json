@@ -1,0 +1,182 @@
+{
+  "split_files": {
+    "train": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\train.csv",
+    "validation": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\validation.csv",
+    "test": "F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\data\\splits\\test.csv"
+  },
+  "per_split": {
+    "train": {
+      "n_samples": 12873,
+      "n_legitimate": 12249,
+      "n_fraudulent": 624,
+      "class_ratio_legitimate": 0.95152645071079,
+      "class_ratio_fraudulent": 0.04847354928920997,
+      "label_counts": {
+        "0": 12249,
+        "1": 624
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 1401,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2266.6855433853802,
+        "median": 2307.0,
+        "min": 45,
+        "max": 5042,
+        "p90": 3501.0,
+        "p95": 3750.0,
+        "p99": 4129.0
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 8252,
+      "company_unique": 1
+    },
+    "validation": {
+      "n_samples": 1431,
+      "n_legitimate": 1362,
+      "n_fraudulent": 69,
+      "class_ratio_legitimate": 0.9517819706498952,
+      "class_ratio_fraudulent": 0.04821802935010482,
+      "label_counts": {
+        "0": 1362,
+        "1": 69
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 62,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2209.277428371768,
+        "median": 2217.0,
+        "min": 59,
+        "max": 4452,
+        "p90": 3453.0,
+        "p95": 3745.0,
+        "p99": 4112.9000000000015
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 1175,
+      "company_unique": 1
+    },
+    "test": {
+      "n_samples": 3576,
+      "n_legitimate": 3403,
+      "n_fraudulent": 173,
+      "class_ratio_legitimate": 0.9516219239373602,
+      "class_ratio_fraudulent": 0.04837807606263982,
+      "label_counts": {
+        "0": 3403,
+        "1": 173
+      },
+      "missing_values": {
+        "record_id": 0,
+        "seed": 0,
+        "split": 0,
+        "combined_text": 0,
+        "label": 0,
+        "model_text": 0,
+        "title": 0,
+        "company": 0,
+        "row_index": 0
+      },
+      "empty_text_count": 0,
+      "exact_duplicate_text_count": 227,
+      "duplicate_id_count": 0,
+      "text_length": {
+        "mean": 2300.7860738255035,
+        "median": 2355.5,
+        "min": 102,
+        "max": 4861,
+        "p90": 3510.0,
+        "p95": 3735.5,
+        "p99": 4101.0
+      },
+      "columns": [
+        "record_id",
+        "seed",
+        "split",
+        "combined_text",
+        "label",
+        "model_text",
+        "title",
+        "company",
+        "row_index"
+      ],
+      "title_unique": 2724,
+      "company_unique": 1
+    }
+  },
+  "cross_split_checks": {
+    "identical_text_train_validation": 142,
+    "identical_text_train_test": 296,
+    "identical_text_validation_test": 68,
+    "identical_id_train_validation": 0,
+    "identical_id_train_test": 0,
+    "identical_id_validation_test": 0,
+    "note": "Cross-split overlaps are reported for awareness only. This module never reassigns rows across splits.",
+    "company_title_overlap_train_validation": 384,
+    "company_title_overlap_train_test": 819,
+    "company_title_overlap_validation_test": 252
+  },
+  "policy": {
+    "no_resplit": true,
+    "no_merge": true,
+    "no_cross_validation": true,
+    "oversample_train_only": true
+  },
+  "token_length_stats_train": {
+    "n_texts_measured": 3000,
+    "mean": 461.0036666666667,
+    "median": 448.0,
+    "p90": 692.0,
+    "p95": 752.0,
+    "p99": 1046.1399999999967,
+    "pct_over_128": 0.9713333333333334,
+    "pct_over_256": 0.8586666666666667,
+    "pct_over_384": 0.6263333333333333,
+    "pct_over_512": 0.371,
+    "recommended_max_length": 384,
+    "recommendation_reason": "Measured train token lengths: median≈448, 85.9% >256, 62.6% >384, 37.1% >512. Default max_length=384 is chosen for RTX 3060 with batch=4 / accum=4; try 512 only after an OOM check. Long ads may still be truncated."
+  }
+}

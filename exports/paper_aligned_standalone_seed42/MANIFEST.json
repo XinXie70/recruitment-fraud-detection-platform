@@ -1,0 +1,218 @@
+{
+  "bundle": "paper_aligned_standalone_seed42",
+  "seed": 42,
+  "n_files": 52,
+  "total_bytes": 542781208,
+  "includes_raw": true,
+  "includes_split_script": true,
+  "files": [
+    {
+      "path": "code/__init__.py",
+      "bytes": 195
+    },
+    {
+      "path": "code/config.py",
+      "bytes": 4906
+    },
+    {
+      "path": "code/dataset.py",
+      "bytes": 13350
+    },
+    {
+      "path": "code/evaluate_bert.py",
+      "bytes": 4634
+    },
+    {
+      "path": "code/metrics.py",
+      "bytes": 14584
+    },
+    {
+      "path": "code/model.py",
+      "bytes": 1838
+    },
+    {
+      "path": "code/predict_bert.py",
+      "bytes": 6077
+    },
+    {
+      "path": "code/preprocessing.py",
+      "bytes": 7275
+    },
+    {
+      "path": "code/run_bert_paper_vs_project.py",
+      "bytes": 17001
+    },
+    {
+      "path": "code/split_paper_aligned_data.py",
+      "bytes": 8383
+    },
+    {
+      "path": "code/train_bert.py",
+      "bytes": 27779
+    },
+    {
+      "path": "code/utils.py",
+      "bytes": 7178
+    },
+    {
+      "path": "data/processed/emscad_condition_a_no_dedup_input_v1.csv.gz",
+      "bytes": 16151681
+    },
+    {
+      "path": "data/raw/emscad_v1.csv",
+      "bytes": 50043721
+    },
+    {
+      "path": "data/source/emscad_condition_a_no_dedup_input_v1.csv.gz",
+      "bytes": 16151681
+    },
+    {
+      "path": "data/splits/assignments.csv.gz",
+      "bytes": 49374
+    },
+    {
+      "path": "data/splits/test.csv.gz",
+      "bytes": 3936084
+    },
+    {
+      "path": "data/splits/train.csv.gz",
+      "bytes": 13723530
+    },
+    {
+      "path": "data/splits/validation.csv.gz",
+      "bytes": 1522466
+    },
+    {
+      "path": "MANIFEST.json",
+      "bytes": 8439
+    },
+    {
+      "path": "PROTOCOL.json",
+      "bytes": 939
+    },
+    {
+      "path": "README.md",
+      "bytes": 2562
+    },
+    {
+      "path": "results/bert-paper-protocol_test_metrics_bert_paper_protocol.json",
+      "bytes": 9079
+    },
+    {
+      "path": "results/data_quality_report.json",
+      "bytes": 5043
+    },
+    {
+      "path": "results/error_analysis_bert_paper_protocol.csv",
+      "bytes": 1415481
+    },
+    {
+      "path": "results/experiment_meta.json",
+      "bytes": 971
+    },
+    {
+      "path": "results/figures/class_distribution.png",
+      "bytes": 23183
+    },
+    {
+      "path": "results/figures/confusion_matrix_bert_paper_protocol.png",
+      "bytes": 26908
+    },
+    {
+      "path": "results/figures/model_comparison.png",
+      "bytes": 31952
+    },
+    {
+      "path": "results/figures/precision_recall_curve_bert_paper_protocol.png",
+      "bytes": 26272
+    },
+    {
+      "path": "results/figures/roc_curve_bert_paper_protocol.png",
+      "bytes": 30955
+    },
+    {
+      "path": "results/figures/training_loss_bert_paper_protocol.png",
+      "bytes": 50653
+    },
+    {
+      "path": "results/model_comparison.csv",
+      "bytes": 362
+    },
+    {
+      "path": "results/paper_protocol.log",
+      "bytes": 415
+    },
+    {
+      "path": "results/parent_comparison_summary.csv",
+      "bytes": 1170
+    },
+    {
+      "path": "results/parent_comparison_summary.md",
+      "bytes": 1769
+    },
+    {
+      "path": "results/parent_README.md",
+      "bytes": 433
+    },
+    {
+      "path": "results/predictions_bert_paper_protocol.csv",
+      "bytes": 603138
+    },
+    {
+      "path": "results/run_config_bert_paper_protocol.json",
+      "bytes": 5044
+    },
+    {
+      "path": "results/threshold_sweep_bert_paper_protocol.csv",
+      "bytes": 11267
+    },
+    {
+      "path": "results/train.pid",
+      "bytes": 6
+    },
+    {
+      "path": "results/train.started.txt",
+      "bytes": 55
+    },
+    {
+      "path": "results/train_stderr.log",
+      "bytes": 155419
+    },
+    {
+      "path": "results/train_stdout.log",
+      "bytes": 4024
+    },
+    {
+      "path": "results/training_history_bert_paper_protocol.csv",
+      "bytes": 1183
+    },
+    {
+      "path": "SEED.txt",
+      "bytes": 4
+    },
+    {
+      "path": "weights/best/config.json",
+      "bytes": 796
+    },
+    {
+      "path": "weights/best/model.safetensors",
+      "bytes": 437958624
+    },
+    {
+      "path": "weights/best/threshold.json",
+      "bytes": 176
+    },
+    {
+      "path": "weights/best/tokenizer.json",
+      "bytes": 711494
+    },
+    {
+      "path": "weights/best/tokenizer_config.json",
+      "bytes": 366
+    },
+    {
+      "path": "weights/best/train_meta.json",
+      "bytes": 1289
+    }
+  ]
+}
