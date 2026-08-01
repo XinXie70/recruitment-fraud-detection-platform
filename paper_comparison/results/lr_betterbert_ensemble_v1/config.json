@@ -1,0 +1,18 @@
+{
+  "lr_weight": 0.25,
+  "bert_weight": 0.75,
+  "threshold": 0.87,
+  "candidate_lr_weights": [
+    0.25,
+    0.4,
+    0.5,
+    0.6,
+    0.75
+  ],
+  "candidate_thresholds": "0.01 to 0.99 in steps of 0.01",
+  "selection_set": "validation",
+  "selection_metric": "fraud_f1",
+  "test_used_for_selection": false,
+  "validation_rows": 1431,
+  "test_rows": 3576
+}

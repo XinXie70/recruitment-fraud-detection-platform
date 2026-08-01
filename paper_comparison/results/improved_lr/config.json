@@ -1,0 +1,53 @@
+{
+  "experiment": "paper_aligned_improved_lr",
+  "paper": "Taneja et al. (2025), Fraud-BERT",
+  "dataset_rows": 17880,
+  "text_fields": [
+    "title",
+    "location",
+    "department",
+    "company_profile",
+    "description",
+    "requirements",
+    "benefits",
+    "employment_type",
+    "required_experience",
+    "required_education",
+    "industry",
+    "function"
+  ],
+  "outer_split": {
+    "train_ratio": 0.8,
+    "test_ratio": 0.2,
+    "random_seed": 12342,
+    "stratified": true
+  },
+  "development_split": {
+    "inner_train_ratio_of_full_data": 0.64,
+    "validation_ratio_of_full_data": 0.16,
+    "random_seed": 42,
+    "stratified": true
+  },
+  "selection_metric": "mean 3-fold internal-train CV PR-AUC",
+  "threshold_rule": "maximum fraud F1 on internal validation",
+  "best_cv_pr_auc": 0.8867476850954407,
+  "best_parameters": {
+    "model__C": 1.0,
+    "model__class_weight": "balanced",
+    "tfidf__ngram_range": [
+      1,
+      2
+    ]
+  },
+  "counts": {
+    "inner_train_rows": 11443,
+    "inner_train_fraud": 554,
+    "validation_rows": 2861,
+    "validation_fraud": 139,
+    "outer_train_rows": 14304,
+    "outer_train_fraud": 693,
+    "test_rows": 3576,
+    "test_fraud": 173
+  },
+  "test_used_for_selection": false
+}
