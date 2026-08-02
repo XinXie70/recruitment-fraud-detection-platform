@@ -25,7 +25,7 @@ model_results/
 model_weights/
 notebooks/
 reports/
-src/
+/src/
 tests/
 backend/tests/
 model/final_model_pipelines/**/artifacts/
@@ -35,4 +35,3 @@ model/final_model_pipelines/**/*.pt
 model/final_model_pipelines/**/*.pth
 model/final_model_pipelines/**/*.h5
 model/final_model_pipelines/**/*.keras
-
