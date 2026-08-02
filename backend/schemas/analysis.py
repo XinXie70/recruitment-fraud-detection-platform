@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Final, Literal
+from typing import Any, Final, Literal
 
 from config import settings
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -101,6 +101,7 @@ class UserAnalysisHistoryItem(BaseModel):
     status: Literal["success", "degraded"]
     ensemble_available: int = Field(..., ge=0)
     ensemble_total: int = Field(..., ge=0)
+    has_result: bool = False
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -112,6 +113,11 @@ class UserAnalysisHistoryPage(BaseModel):
     page: int = Field(..., ge=1)
     page_size: int = Field(..., ge=1, le=100)
     total_pages: int = Field(..., ge=0)
+
+
+class UserAnalysisHistoryDetail(BaseModel):
+    id: int
+    analysis_result: dict[str, Any]
 
 
 class EducationListResponse(BaseModel):

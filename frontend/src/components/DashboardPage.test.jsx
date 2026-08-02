@@ -126,6 +126,65 @@ test('loads server history and refreshes it with the access token', async () => 
   await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
 });
 
+test('opens a complete server history result that is not cached on this device', async () => {
+  const serverResult = {
+    status: 'success',
+    inputText: 'Result restored from the server',
+  };
+  vi.spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        items: [
+          {
+            id: 42,
+            input_preview: 'Remote job advert',
+            risk_score: 0.82,
+            risk_level: 'high',
+            status: 'success',
+            ensemble_available: 7,
+            ensemble_total: 8,
+            has_result: true,
+            created_at: '2026-07-28T02:00:00.000Z',
+          },
+        ],
+      }),
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: 42, analysis_result: serverResult }),
+    });
+
+  render(
+    <MemoryRouter initialEntries={['/dashboard']}>
+      <Routes>
+        <Route
+          path="*"
+          element={
+            <>
+              <DashboardPage
+                auth={{ access_token: 'dashboard-token', user: { username: 'joy' } }}
+                onLogout={() => {}}
+              />
+              <LocationProbe />
+            </>
+          }
+        />
+      </Routes>
+    </MemoryRouter>,
+  );
+
+  fireEvent.click(await screen.findByRole('button', { name: 'Open full analysis result' }));
+
+  await waitFor(() => expect(screen.getByTestId('current-location')).toHaveTextContent('/analyze'));
+  expect(globalThis.fetch).toHaveBeenLastCalledWith('/api/v1/history/42', {
+    headers: { Authorization: 'Bearer dashboard-token' },
+  });
+  expect(JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'))).toEqual(serverResult);
+});
+
 test('keeps local history when server synchronization fails', async () => {
   window.localStorage.setItem(
     'fake_job_history',

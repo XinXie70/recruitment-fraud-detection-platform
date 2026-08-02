@@ -101,6 +101,25 @@ class TestAuthEndpoints:
         assert claims["iat"] < claims["exp"]
         assert claims["jti"]
 
+    def test_oauth2_token_endpoint_accepts_form_login(self, client):
+        client.post(
+            "/api/auth/register",
+            json={
+                "email": "swagger@example.com",
+                "username": "swagger-user",
+                "password": "Securepass123",
+            },
+        )
+
+        resp = client.post(
+            "/api/auth/token",
+            data={"username": "swagger-user", "password": "Securepass123"},
+        )
+
+        assert resp.status_code == 200
+        assert resp.json()["token_type"] == "bearer"
+        assert resp.json()["user"]["username"] == "swagger-user"
+
     def test_me_returns_user(self, client, auth_headers):
         resp = client.get("/api/auth/me", headers=auth_headers)
         assert resp.status_code == 200
@@ -205,6 +224,9 @@ class TestUserHistoryEndpoints:
                 status="success",
                 ensemble_available=8,
                 ensemble_total=8,
+                analysis_result={"inputText": f"Own listing {index}", "status": "success"}
+                if index == 1
+                else None,
             )
             for index in (1, 2)
         ]
@@ -228,6 +250,25 @@ class TestUserHistoryEndpoints:
         assert len(listing.json()["items"]) == 1
         assert "Other user's listing" not in listing.text
 
+        available_item = next(item for item in own_items if item.analysis_result)
+        detail = client.get(
+            f"/api/v1/history/{available_item.id}", headers=auth_headers
+        )
+        assert detail.status_code == 200
+        assert detail.json()["analysis_result"]["inputText"] == "Own listing 1"
+
+        unavailable_item = next(item for item in own_items if not item.analysis_result)
+        assert (
+            client.get(
+                f"/api/v1/history/{unavailable_item.id}", headers=auth_headers
+            ).status_code
+            == 404
+        )
+        assert (
+            client.get(f"/api/v1/history/{other_item.id}", headers=auth_headers).status_code
+            == 404
+        )
+
         forbidden_delete = client.delete(
             f"/api/v1/history/{other_item.id}", headers=auth_headers
         )
@@ -243,6 +284,7 @@ class TestUserHistoryEndpoints:
 
     def test_history_requires_authentication(self, client):
         assert client.get("/api/v1/history").status_code == 401
+        assert client.get("/api/v1/history/1").status_code == 401
         assert client.delete("/api/v1/history/1").status_code == 401
 
 
