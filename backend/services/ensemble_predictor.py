@@ -279,7 +279,10 @@ class EnsemblePredictor:
             model_batches = self.registry.predict_raw_batches(
                 texts,
                 active_keys,
-                timeout_seconds=self.timeout_seconds,
+                # Explanation batches can be substantially slower than the initial
+                # single-text prediction. Do not degrade XAI merely because it takes
+                # longer than the prediction timeout.
+                timeout_seconds=None,
             )
             outputs = [0.0] * len(texts)
             for key in active_keys:

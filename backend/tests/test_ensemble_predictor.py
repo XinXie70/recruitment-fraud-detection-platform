@@ -33,11 +33,13 @@ def _config() -> EnsembleConfig:
 class FakeRegistry:
     def __init__(self, results):
         self.results = results
+        self.batch_timeout_seconds = "not-called"
 
     def predict_all(self, text, model_keys, timeout_seconds):
         return self.results
 
     def predict_raw_batches(self, texts, model_keys, timeout_seconds):
+        self.batch_timeout_seconds = timeout_seconds
         return {key: [0.25 for _ in texts] for key in model_keys}
 
     def warm_up(self, sample, model_keys):
@@ -58,6 +60,7 @@ def test_partial_failure_renormalizes_weights() -> None:
     assert computation.ensemble.risk_score == pytest.approx(0.8)
     assert computation.members[0].effective_weight == 1
     assert computation.score_batch(["one", "two"]) == [0.25, 0.25]
+    assert registry.batch_timeout_seconds is None
 
 
 def test_all_model_failures_raise_unavailable() -> None:
