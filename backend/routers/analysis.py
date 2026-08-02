@@ -20,6 +20,7 @@ from schemas.analysis import (
     AnalysisResponse,
     EducationListResponse,
     URLAnalysis,
+    UserAnalysisHistoryDetail,
     UserAnalysisHistoryItem,
     UserAnalysisHistoryPage,
 )
@@ -81,6 +82,10 @@ def _save_history(
                 1 for m in result.member_outputs if m.status == "success"
             ),
             ensemble_total=len(result.member_outputs),
+            analysis_result={
+                **result.model_dump(mode="json"),
+                "inputText": text,
+            },
             created_at=datetime.now(timezone.utc),
         )
         db.add(history)
@@ -231,11 +236,47 @@ def list_own_analysis_history(
         .all()
     )
     return UserAnalysisHistoryPage(
-        items=[UserAnalysisHistoryItem.model_validate(row) for row in rows],
+        items=[
+            UserAnalysisHistoryItem(
+                **UserAnalysisHistoryItem.model_validate(row).model_dump(
+                    exclude={"has_result"}
+                ),
+                has_result=row.analysis_result is not None,
+            )
+            for row in rows
+        ],
         total=total,
         page=page.page,
         page_size=page.size,
         total_pages=(total + page.size - 1) // page.size,
+    )
+
+
+@router.get(
+    "/api/v1/history/{history_id}",
+    response_model=UserAnalysisHistoryDetail,
+)
+def get_own_analysis_history(
+    history_id: int,
+    current_user: User = Depends(get_current_user),
+    db=Depends(get_db),
+) -> UserAnalysisHistoryDetail:
+    history = (
+        db.query(AnalysisHistory)
+        .filter(
+            AnalysisHistory.id == history_id,
+            AnalysisHistory.user_id == current_user.id,
+        )
+        .first()
+    )
+    if history is None or history.analysis_result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Full analysis result is not available for this history item.",
+        )
+    return UserAnalysisHistoryDetail(
+        id=history.id,
+        analysis_result=history.analysis_result,
     )
 
 

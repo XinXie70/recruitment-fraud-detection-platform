@@ -54,6 +54,7 @@ function normalizeServerHistory(items) {
     modelCount: entry.ensemble_available,
     modelTotal: entry.ensemble_total,
     status: entry.status,
+    hasResult: entry.has_result,
   }));
 }
 
@@ -88,6 +89,7 @@ export default function DashboardPage({ auth, onLogout }) {
   const [history, setHistory] = useState(loadHistory);
   const [syncError, setSyncError] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [loadingResultId, setLoadingResultId] = useState(null);
 
   const syncHistory = useCallback(async () => {
     if (!accessToken) return;
@@ -169,10 +171,38 @@ export default function DashboardPage({ auth, onLogout }) {
     );
   };
 
-  const handleViewResult = (entry) => {
-    if (!entry.analysisResult) return;
-    window.sessionStorage.setItem('fake_job_last_analysis', JSON.stringify(entry.analysisResult));
-    navigate('/analyze', { state: { analysisResult: entry.analysisResult } });
+  const openAnalysisResult = (analysisResult) => {
+    window.sessionStorage.setItem('fake_job_last_analysis', JSON.stringify(analysisResult));
+    navigate('/analyze', { state: { analysisResult } });
+  };
+
+  const handleViewResult = async (entry) => {
+    if (entry.analysisResult) {
+      openAnalysisResult(entry.analysisResult);
+      return;
+    }
+    if (!entry.serverId || !entry.hasResult || !accessToken) return;
+
+    setLoadingResultId(entry.id);
+    try {
+      const response = await fetch(apiUrl(`/api/v1/history/${entry.serverId}`), {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (response.status === 401) {
+        onLogout?.();
+        return;
+      }
+      if (!response.ok) throw new Error(`History detail request failed (${response.status})`);
+      const payload = await response.json();
+      openAnalysisResult(payload.analysis_result);
+    } catch {
+      setHistory((current) =>
+        current.map((item) => (item.id === entry.id ? { ...item, hasResult: false } : item)),
+      );
+      setSyncError('This full analysis result is no longer available.');
+    } finally {
+      setLoadingResultId(null);
+    }
   };
 
   return (
@@ -531,20 +561,29 @@ export default function DashboardPage({ auth, onLogout }) {
                             type="button"
                             className="dash-view-result"
                             onClick={() => handleViewResult(entry)}
-                            disabled={!entry.analysisResult}
+                            disabled={
+                              loadingResultId === entry.id ||
+                              (!entry.analysisResult && !entry.hasResult)
+                            }
                             title={
-                              entry.analysisResult
+                              entry.analysisResult || entry.hasResult
                                 ? 'Open full analysis result'
                                 : 'Full result was not saved for this older scan'
                             }
                             aria-label={
-                              entry.analysisResult
+                              entry.analysisResult || entry.hasResult
                                 ? 'Open full analysis result'
                                 : 'Full result unavailable for this older scan'
                             }
                           >
                             <Eye size={16} />
-                            <span>{entry.analysisResult ? 'View' : 'Unavailable'}</span>
+                            <span>
+                              {loadingResultId === entry.id
+                                ? 'Loading'
+                                : entry.analysisResult || entry.hasResult
+                                  ? 'View'
+                                  : 'Unavailable'}
+                            </span>
                           </button>
                         </td>
                       </tr>

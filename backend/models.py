@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    JSON,
     String,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -75,6 +76,7 @@ class AnalysisHistory(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     ensemble_available: Mapped[int] = mapped_column(Integer, default=0)
     ensemble_total: Mapped[int] = mapped_column(Integer, default=8)
+    analysis_result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

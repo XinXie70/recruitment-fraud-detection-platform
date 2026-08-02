@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from config import settings
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 from jwt import InvalidTokenError
 from passlib.context import CryptContext
@@ -26,7 +26,7 @@ JWT_AUDIENCE = settings.jwt_audience
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 logger = logging.getLogger("fake_job_detection_api.auth")
 
 
@@ -91,6 +91,26 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str) -> bool:
     return password_context.verify(password, password_hash)
+
+
+def authenticate_user(identifier: str, password: str, db: Session) -> User:
+    cleaned_identifier = identifier.strip()
+    user = (
+        db.query(User)
+        .filter(
+            or_(
+                User.email == cleaned_identifier.lower(),
+                User.username == cleaned_identifier,
+            )
+        )
+        .first()
+    )
+    if not user or not verify_password(password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username/email or password.",
+        )
+    return user
 
 
 def create_access_token(user: User) -> str:
@@ -188,17 +208,18 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit(settings.rate_limit_auth_login)
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
-    identifier = payload.identifier.strip()
-    user = (
-        db.query(User)
-        .filter(or_(User.email == identifier.lower(), User.username == identifier))
-        .first()
-    )
-    if not user or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username/email or password.",
-        )
+    user = authenticate_user(payload.identifier, payload.password, db)
+    return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
+
+
+@router.post("/token", response_model=TokenResponse)
+@limiter.limit(settings.rate_limit_auth_login)
+def token(
+    request: Request,
+    form: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+    user = authenticate_user(form.username, form.password, db)
     return TokenResponse(access_token=create_access_token(user), user=to_user_response(user))
 
 

@@ -90,6 +90,7 @@ def get_request_id(request: Request) -> str:
 
 _MAX_BODY_BYTES = 200 * 1024  # 200 KiB hard cap
 _JSON_METHODS = {"POST", "PUT", "PATCH"}
+_FORM_ENDPOINTS = {"/api/auth/token"}
 
 
 class RequestBodyGuardMiddleware:
@@ -135,9 +136,14 @@ class RequestBodyGuardMiddleware:
         # Validate Content-Type for non-empty bodies
         if body:
             content_type = self._get_header(scope, "content-type")
-            if not content_type or "application/json" not in content_type:
+            path = scope.get("path", "")
+            accepts_form = (
+                path in _FORM_ENDPOINTS
+                and "application/x-www-form-urlencoded" in content_type
+            )
+            if "application/json" not in content_type and not accepts_form:
                 await self._send_error(
-                    send, 415, "Content-Type must be application/json"
+                    send, 415, "Unsupported Content-Type"
                 )
                 return
 
