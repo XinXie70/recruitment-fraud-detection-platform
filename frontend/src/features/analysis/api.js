@@ -6,11 +6,7 @@ function errorMessage(data, fallback) {
   return fallback;
 }
 
-const ANALYSIS_TIMEOUT_MS = 135000;
 async function requestAnalysis(path, text, accessToken) {
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT_MS);
-
   try {
     const response = await fetch(apiUrl(path), {
       method: 'POST',
@@ -19,7 +15,6 @@ async function requestAnalysis(path, text, accessToken) {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ text }),
-      signal: controller.signal,
     });
 
     const data = await response.json().catch(() => ({}));
@@ -42,12 +37,6 @@ async function requestAnalysis(path, text, accessToken) {
 
     return data;
   } catch (error) {
-    if (error.name === 'AbortError') {
-      const timeoutError = new Error('The analysis took longer than expected. Please try again.');
-      timeoutError.code = 'ANALYSIS_TIMEOUT';
-      throw timeoutError;
-    }
-
     if (error instanceof TypeError) {
       const networkError = new Error(
         'Unable to connect to the analysis service. Check your connection and try again.',
@@ -55,10 +44,7 @@ async function requestAnalysis(path, text, accessToken) {
       networkError.code = 'NETWORK_ERROR';
       throw networkError;
     }
-
     throw error;
-  } finally {
-    window.clearTimeout(timeoutId);
   }
 }
 
