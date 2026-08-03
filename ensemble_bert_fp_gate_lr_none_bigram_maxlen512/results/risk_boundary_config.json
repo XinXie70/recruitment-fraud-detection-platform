@@ -1,0 +1,36 @@
+{
+  "selection_set": "validation",
+  "test_used_for_selection": false,
+  "minimum_non_low_fraud_recall": 0.9,
+  "risk_score": "bert_score",
+  "ensemble_roles": {
+    "bert": "primary risk-scoring model",
+    "lr": "false-positive gate for BERT High candidates only"
+  },
+  "high_rule": {
+    "bert_threshold": 0.3,
+    "lr_gate": 0.06,
+    "selection_metric": "maximum validation fraud_f1"
+  },
+  "low_rule": {
+    "method": "BERT primary risk score only",
+    "bert_threshold": 0.0024,
+    "selection_rule": "highest BERT threshold with minimum non-low fraud recall"
+  },
+  "validation_summary": {
+    "rows": 1431,
+    "fraudulent": 69,
+    "legitimate": 1362,
+    "low_total": 1331,
+    "low_fraud": 6,
+    "low_legitimate": 1325,
+    "suspicious_total": 39,
+    "suspicious_fraud": 5,
+    "suspicious_legitimate": 34,
+    "high_total": 61,
+    "high_fraud": 58,
+    "high_legitimate": 3,
+    "non_low_fraud": 63,
+    "non_low_fraud_recall": 0.9130434782608695
+  }
+}

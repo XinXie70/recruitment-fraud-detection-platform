@@ -32,3 +32,37 @@ python run_fp_gate_ensemble.py
 - `../retrain_paper_aligned_seed42_maxlen512/results/predictions_bert_paper_protocol_maxlen512.csv`
 
 对外风险输出口径见：[RISK_SCORE_AND_LEVEL.md](./RISK_SCORE_AND_LEVEL.md)
+
+## 三档风险边界
+
+High 参数由原有 FP-gate Validation 搜索确定。Low 参数通过 Validation
+trade-off 搜索确定，Test 不参与选参。
+
+```powershell
+cd ensemble_bert_fp_gate_lr_none_bigram_maxlen512
+
+# 只使用 Validation 选择并冻结边界
+python code/select_risk_boundaries.py --mode select
+
+# 冻结后才可将配置应用到 Test；此模式不会重新搜索阈值
+python code/select_risk_boundaries.py --mode apply-test
+```
+
+当前冻结规则：
+
+```text
+High: BERT score >= 0.30 and LR score >= 0.06
+Low:  BERT score < 0.0024
+Otherwise: Suspicious
+```
+
+BERT 是主风险评分模型。LR 只作为 High 候选的 false-positive gate，
+不参与 Low boundary。
+
+主要输出：
+
+- `results/risk_boundary_config.json`
+- `results/RISK_BOUNDARY_REPORT.md`
+- `results/low_boundary_tradeoff.csv`
+- `results/low_boundary_target_comparison.csv`
+- `results/validation_risk_levels.csv`
