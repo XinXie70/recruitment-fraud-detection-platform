@@ -1,0 +1,18 @@
+{
+  "experiment": "ensemble_bert_fp_gate_lr_none_bigram_maxlen512",
+  "method": "BERT decision + flip to legit when LR_score < lr_gate",
+  "lr_source": "lr_none_bigram_no_cv_paper_aligned_seed42",
+  "bert_source": "retrain_paper_aligned_seed42_maxlen512",
+  "bert_threshold": 0.3,
+  "lr_gate": 0.06,
+  "selection_set": "validation",
+  "selection_metric": "fraud_f1",
+  "test_used_for_selection": false,
+  "validation_rows": 1431,
+  "test_rows": 3576,
+  "validation_gate_flips": 1,
+  "test_gate_flips": 3,
+  "validation_bert_only_best_fraud_f1": 0.8854961832061069,
+  "validation_bert_only_best_threshold": 0.3,
+  "validation_selected_fraud_f1": 0.8923076923076924
+}
