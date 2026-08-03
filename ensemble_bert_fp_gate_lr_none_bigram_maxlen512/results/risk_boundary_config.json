@@ -2,7 +2,14 @@
   "selection_set": "validation",
   "test_used_for_selection": false,
   "minimum_non_low_fraud_recall": 0.9,
-  "risk_score": "bert_score",
+  "risk_score": {
+    "method": "BERT score unless the LR gate triggers",
+    "default_source": "bert_score",
+    "gated_source": "max(lr_score, low_boundary)",
+    "low_boundary_floor": 0.0024,
+    "scale": "0 to 1 internally; multiply by 100 for display",
+    "calibrated_probability": false
+  },
   "ensemble_roles": {
     "bert": "primary risk-scoring model",
     "lr": "false-positive gate for BERT High candidates only"
@@ -13,7 +20,7 @@
     "selection_metric": "maximum validation fraud_f1"
   },
   "low_rule": {
-    "method": "BERT primary risk score only",
+    "method": "BERT primary score only",
     "bert_threshold": 0.0024,
     "selection_rule": "highest BERT threshold with minimum non-low fraud recall"
   },
@@ -32,5 +39,14 @@
     "high_legitimate": 3,
     "non_low_fraud": 63,
     "non_low_fraud_recall": 0.9130434782608695
+  },
+  "validation_score_summary": {
+    "bert_pr_auc": 0.8560772660930918,
+    "bert_roc_auc": 0.9754623422503138,
+    "ensemble_risk_score_pr_auc": 0.859648011772272,
+    "ensemble_risk_score_roc_auc": 0.9756113132860882,
+    "gate_triggered": 1,
+    "risk_score_from_bert": 1430,
+    "risk_score_from_lr_gate": 1
   }
 }

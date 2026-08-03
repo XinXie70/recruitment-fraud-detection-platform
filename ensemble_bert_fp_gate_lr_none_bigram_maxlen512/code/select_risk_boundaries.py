@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import average_precision_score, roc_auc_score
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,20 +95,79 @@ def assign_levels(
         raise ValueError("Expected 0 < Low threshold < High threshold < 1")
 
     output = data.copy()
-    high = (output["bert_score"] >= bert_high_threshold) & (
-        output["lr_score"] >= lr_gate
-    )
+    high_candidate = output["bert_score"] >= bert_high_threshold
+    gate_triggered = high_candidate & (output["lr_score"] < lr_gate)
+    high = high_candidate & ~gate_triggered
     low = output["bert_score"] < bert_low_threshold
     if (high & low).any():
         raise ValueError("Low and High rules overlap")
 
+    # Official ensemble risk score:
+    # - normally use the BERT primary score;
+    # - when the LR false-positive gate triggers, use the LR score;
+    # - apply the frozen Low boundary as a floor so a gated High candidate is
+    #   kept in Suspicious rather than being moved all the way to Low.
+    output["bert_evidence_score"] = output["bert_score"]
     output["risk_score"] = output["bert_score"]
+    output.loc[gate_triggered, "risk_score"] = np.maximum(
+        output.loc[gate_triggered, "lr_score"], bert_low_threshold
+    )
+    output["risk_score_100"] = output["risk_score"] * 100.0
+    output["risk_score_source"] = "bert"
+    output.loc[gate_triggered, "risk_score_source"] = "lr_gate"
     output["risk_level"] = "Suspicious"
     output.loc[low, "risk_level"] = "Low"
     output.loc[high, "risk_level"] = "High"
     output["high_rule_met"] = high.astype(int)
     output["low_rule_met"] = low.astype(int)
+    output["gate_triggered"] = gate_triggered.astype(int)
+    output["decision_reason"] = "BERT score is between the Low and High boundaries"
+    output.loc[low, "decision_reason"] = "BERT score is below the Low boundary"
+    output.loc[high, "decision_reason"] = "BERT High rule passed the LR gate"
+    output.loc[gate_triggered, "decision_reason"] = (
+        "BERT High candidate was demoted by the LR gate"
+    )
+
+    if not (
+        output.loc[output["risk_level"] == "Low", "risk_score"]
+        < bert_low_threshold
+    ).all():
+        raise ValueError("A Low row has a risk score outside the Low band")
+    suspicious_scores = output.loc[
+        output["risk_level"] == "Suspicious", "risk_score"
+    ]
+    if not (
+        (suspicious_scores >= bert_low_threshold)
+        & (suspicious_scores < bert_high_threshold)
+    ).all():
+        raise ValueError("A Suspicious row has a risk score outside its band")
+    if not (
+        output.loc[output["risk_level"] == "High", "risk_score"]
+        >= bert_high_threshold
+    ).all():
+        raise ValueError("A High row has a risk score outside the High band")
     return output
+
+
+def summarise_scores(output: pd.DataFrame) -> dict:
+    labels = output["label"].to_numpy(dtype=int)
+    bert_scores = output["bert_evidence_score"].to_numpy(dtype=float)
+    ensemble_scores = output["risk_score"].to_numpy(dtype=float)
+    return {
+        "bert_pr_auc": float(average_precision_score(labels, bert_scores)),
+        "bert_roc_auc": float(roc_auc_score(labels, bert_scores)),
+        "ensemble_risk_score_pr_auc": float(
+            average_precision_score(labels, ensemble_scores)
+        ),
+        "ensemble_risk_score_roc_auc": float(
+            roc_auc_score(labels, ensemble_scores)
+        ),
+        "gate_triggered": int(output["gate_triggered"].sum()),
+        "risk_score_from_bert": int((output["risk_score_source"] == "bert").sum()),
+        "risk_score_from_lr_gate": int(
+            (output["risk_score_source"] == "lr_gate").sum()
+        ),
+    }
 
 
 def summarise_levels(output: pd.DataFrame) -> dict:
@@ -184,7 +244,12 @@ def target_comparison(tradeoff: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def write_report(high: dict, selected_low: dict, comparison: pd.DataFrame) -> None:
+def write_report(
+    high: dict,
+    selected_low: dict,
+    comparison: pd.DataFrame,
+    score_summary: dict,
+) -> None:
     comparison_rows = []
     for _, row in comparison.iterrows():
         comparison_rows.append(
@@ -224,7 +289,7 @@ Validation Fraud F1: {high['validation_fraud_f1']:.4f}
 
 ## Low boundary
 
-The Low boundary uses only the official BERT risk score. This preserves the
+The Low boundary uses only the primary BERT score. This preserves the
 frozen ensemble design: LR is not introduced as a second Low-risk decision
 mechanism.
 
@@ -243,6 +308,27 @@ Selected Validation result:
 - Suspicious advertisements: {int(selected_low['suspicious_total'])}
 - Legitimate advertisements in Suspicious: {int(selected_low['suspicious_legitimate'])}
 
+## Ensemble risk score
+
+The continuous score follows the frozen FP-gate decision:
+
+```text
+Normally:       risk_score = BERT score
+If gate fires:  risk_score = max(LR score, {selected_low['bert_low_threshold']:.4f})
+```
+
+The Low boundary is used as a safety floor so a gated High candidate remains
+Suspicious rather than falling into Low. The output also preserves the raw
+BERT evidence score and records the score source.
+
+Validation score diagnostics:
+
+- BERT PR-AUC: {score_summary['bert_pr_auc']:.4f}
+- Ensemble risk-score PR-AUC: {score_summary['ensemble_risk_score_pr_auc']:.4f}
+- BERT ROC-AUC: {score_summary['bert_roc_auc']:.4f}
+- Ensemble risk-score ROC-AUC: {score_summary['ensemble_risk_score_roc_auc']:.4f}
+- Gate-triggered scores using LR: {score_summary['risk_score_from_lr_gate']}
+
 ## Validation trade-off
 
 | Minimum target | BERT Low boundary | Fraud kept out of Low | Fraud in Low | Suspicious | Legitimate in Suspicious |
@@ -260,8 +346,9 @@ else:
     Suspicious
 ```
 
-The thresholds must be frozen before Test evaluation. The model scores are
-operational scores and should not be interpreted as calibrated probabilities.
+The thresholds must be frozen before Test evaluation. The ensemble risk score
+is an operational decision score and must not be interpreted as a calibrated
+probability.
 """
     (RESULTS / "RISK_BOUNDARY_REPORT.md").write_text(report, encoding="utf-8")
 
@@ -283,12 +370,20 @@ def select_on_validation() -> None:
         float(selected["bert_low_threshold"]),
     )
     selected_summary = summarise_levels(selected_output)
+    score_summary = summarise_scores(selected_output)
 
     config = {
         "selection_set": "validation",
         "test_used_for_selection": False,
         "minimum_non_low_fraud_recall": MINIMUM_NON_LOW_FRAUD_RECALL,
-        "risk_score": "bert_score",
+        "risk_score": {
+            "method": "BERT score unless the LR gate triggers",
+            "default_source": "bert_score",
+            "gated_source": "max(lr_score, low_boundary)",
+            "low_boundary_floor": float(selected["bert_low_threshold"]),
+            "scale": "0 to 1 internally; multiply by 100 for display",
+            "calibrated_probability": False,
+        },
         "ensemble_roles": {
             "bert": "primary risk-scoring model",
             "lr": "false-positive gate for BERT High candidates only",
@@ -299,13 +394,14 @@ def select_on_validation() -> None:
             "selection_metric": "maximum validation fraud_f1",
         },
         "low_rule": {
-            "method": "BERT primary risk score only",
+            "method": "BERT primary score only",
             "bert_threshold": float(selected["bert_low_threshold"]),
             "selection_rule": (
                 "highest BERT threshold with minimum non-low fraud recall"
             ),
         },
         "validation_summary": selected_summary,
+        "validation_score_summary": score_summary,
     }
 
     tradeoff.to_csv(RESULTS / "low_boundary_tradeoff.csv", index=False)
@@ -314,7 +410,7 @@ def select_on_validation() -> None:
     BOUNDARY_CONFIG.write_text(
         json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-    write_report(high, selected_low, comparison)
+    write_report(high, selected_low, comparison, score_summary)
 
     print("Boundary selection completed using Validation only.")
     print(
@@ -331,18 +427,58 @@ def apply_to_test() -> None:
     if not BOUNDARY_CONFIG.exists():
         raise FileNotFoundError("Run --mode select before applying to Test")
     config = json.loads(BOUNDARY_CONFIG.read_text(encoding="utf-8"))
+    low_threshold = float(config["low_rule"]["bert_threshold"])
     test = load_predictions(TEST_PREDICTIONS)
     output = assign_levels(
         test,
         float(config["high_rule"]["bert_threshold"]),
         float(config["high_rule"]["lr_gate"]),
-        float(config["low_rule"]["bert_threshold"]),
+        low_threshold,
     )
     output.to_csv(RESULTS / "test_risk_levels.csv", index=False)
     summary = summarise_levels(output)
+    score_summary = summarise_scores(output)
+    summary["score_summary"] = score_summary
     (RESULTS / "test_risk_level_summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
+    validation_output = pd.read_csv(RESULTS / "validation_risk_levels.csv")
+    validation_score_summary = summarise_scores(validation_output)
+    metrics = pd.DataFrame(
+        [
+            {"split": "validation", **validation_score_summary},
+            {"split": "test", **score_summary},
+        ]
+    )
+    metrics.to_csv(RESULTS / "risk_score_metrics.csv", index=False)
+
+    report = f"""# Ensemble Risk Score Report
+
+## Definition
+
+```text
+Normally:       risk_score = BERT score
+If gate fires:  risk_score = max(LR score, {low_threshold:.4f})
+Display score:  risk_score_100 = 100 * risk_score
+```
+
+The Low-boundary floor keeps every gated High candidate in Suspicious. Raw
+`bert_evidence_score`, `lr_score`, `risk_score_source`, and `gate_triggered`
+are retained for explanation.
+
+This is an operational ensemble decision score, not a calibrated probability.
+
+## Metrics
+
+| Split | BERT PR-AUC | Ensemble score PR-AUC | BERT ROC-AUC | Ensemble score ROC-AUC | Gate scores from LR |
+|---|---:|---:|---:|---:|---:|
+| Validation | {validation_score_summary['bert_pr_auc']:.4f} | {validation_score_summary['ensemble_risk_score_pr_auc']:.4f} | {validation_score_summary['bert_roc_auc']:.4f} | {validation_score_summary['ensemble_risk_score_roc_auc']:.4f} | {validation_score_summary['risk_score_from_lr_gate']} |
+| Test | {score_summary['bert_pr_auc']:.4f} | {score_summary['ensemble_risk_score_pr_auc']:.4f} | {score_summary['bert_roc_auc']:.4f} | {score_summary['ensemble_risk_score_roc_auc']:.4f} | {score_summary['risk_score_from_lr_gate']} |
+
+No risk-score parameter or threshold was selected on Test. Test only applies
+the frozen High rule, Low boundary, and score formula.
+"""
+    (RESULTS / "RISK_SCORE_REPORT.md").write_text(report, encoding="utf-8")
     print("Frozen boundaries applied to Test. No threshold search was run.")
 
 

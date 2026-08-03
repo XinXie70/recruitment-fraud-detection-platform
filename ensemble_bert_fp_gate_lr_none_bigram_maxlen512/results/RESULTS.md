@@ -31,6 +31,10 @@ BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
 
 ## Test comparison (Macro metrics)
 
+The ensemble PR-AUC and ROC-AUC use the formal operational risk score: BERT
+score normally, and the LR score with the Low-boundary floor when the FP-gate
+triggers. The score is not a calibrated probability.
+
 | Model | Macro P | Macro R | Macro F1 | PR-AUC | ROC-AUC |
 |---|---:|---:|---:|---:|---:|
 | LR (`None`, bigram, no CV) | 0.9622 | 0.9060 | 0.9321 | 0.9318 | 0.9900 |

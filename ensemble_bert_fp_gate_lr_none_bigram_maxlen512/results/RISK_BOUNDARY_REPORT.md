@@ -24,7 +24,7 @@ Validation Fraud F1: 0.8923
 
 ## Low boundary
 
-The Low boundary uses only the official BERT risk score. This preserves the
+The Low boundary uses only the primary BERT score. This preserves the
 frozen ensemble design: LR is not introduced as a second Low-risk decision
 mechanism.
 
@@ -42,6 +42,27 @@ Selected Validation result:
 - Fraud left in Low: 6
 - Suspicious advertisements: 39
 - Legitimate advertisements in Suspicious: 34
+
+## Ensemble risk score
+
+The continuous score follows the frozen FP-gate decision:
+
+```text
+Normally:       risk_score = BERT score
+If gate fires:  risk_score = max(LR score, 0.0024)
+```
+
+The Low boundary is used as a safety floor so a gated High candidate remains
+Suspicious rather than falling into Low. The output also preserves the raw
+BERT evidence score and records the score source.
+
+Validation score diagnostics:
+
+- BERT PR-AUC: 0.8561
+- Ensemble risk-score PR-AUC: 0.8596
+- BERT ROC-AUC: 0.9755
+- Ensemble risk-score ROC-AUC: 0.9756
+- Gate-triggered scores using LR: 1
 
 ## Validation trade-off
 
@@ -63,5 +84,6 @@ else:
     Suspicious
 ```
 
-The thresholds must be frozen before Test evaluation. The model scores are
-operational scores and should not be interpreted as calibrated probabilities.
+The thresholds must be frozen before Test evaluation. The ensemble risk score
+is an operational decision score and must not be interpreted as a calibrated
+probability.

@@ -59,6 +59,24 @@ Otherwise: Suspicious
 BERT 是主风险评分模型。LR 只作为 High 候选的 false-positive gate，
 不参与 Low boundary。
 
+正式 risk score：
+
+```text
+Normally:       risk_score = BERT score
+If gate fires:  risk_score = max(LR score, 0.0024)
+Display:        risk_score_100 = risk_score * 100
+```
+
+`0.0024`作为安全下限，保证gate样本仍进入Suspicious，不会降到Low。
+这是操作决策分数，不是经过校准的欺诈概率。原始BERT和LR分数会同时保留。
+
+Risk score输出：
+
+- `results/RISK_SCORE_REPORT.md`
+- `results/risk_score_metrics.csv`
+- `results/test_risk_levels.csv`
+- `results/test_risk_level_summary.json`
+
 主要输出：
 
 - `results/risk_boundary_config.json`
