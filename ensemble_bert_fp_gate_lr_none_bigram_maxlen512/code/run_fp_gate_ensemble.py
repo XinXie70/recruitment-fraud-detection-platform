@@ -1,7 +1,6 @@
 """BERT primary + LR FP gate (no class_weight, bigram LR, no CV).
 
-Same FP-gate protocol as ensemble_bert_fp_gate_lr_none_maxlen512, but LR
-scores come from lr_none_bigram_no_cv_paper_aligned_seed42:
+LR scores come from lr_none_bigram_no_cv_paper_aligned_seed42:
   - class_weight=None
   - unigram + bigram ngram_range=(1, 2)
   - no Train-internal CV
@@ -42,7 +41,10 @@ BERT_ROOT = CAPSTONE / "retrain_paper_aligned_seed42_maxlen512"
 
 LR_VAL = LR_ROOT / "results" / "validation_predictions.csv"
 LR_TEST = LR_ROOT / "results" / "test_predictions.csv"
-BERT_VAL = ROOT / "results" / "bert_validation_predictions.csv"
+# Prefer the BERT-side export; fall back to a local frozen copy.
+BERT_VAL_CANONICAL = BERT_ROOT / "results" / "bert_validation_predictions.csv"
+BERT_VAL_LOCAL = ROOT / "results" / "bert_validation_predictions.csv"
+BERT_VAL = BERT_VAL_CANONICAL if BERT_VAL_CANONICAL.exists() else BERT_VAL_LOCAL
 BERT_TEST = (
     BERT_ROOT / "results" / "predictions_bert_paper_protocol_maxlen512.csv"
 )
@@ -148,9 +150,12 @@ def main() -> None:
 
     if not BERT_VAL.exists():
         raise FileNotFoundError(
-            f"Missing BERT validation predictions: {BERT_VAL}\n"
-            "Copy from ensemble_bert_fp_gate_lr_none_maxlen512/results/ "
-            "or regenerate from the maxlen512 checkpoint."
+            f"Missing BERT validation predictions.\n"
+            f"Expected: {BERT_VAL_CANONICAL}\n"
+            f"Or local: {BERT_VAL_LOCAL}\n"
+            "Regenerate with:\n"
+            "  cd ../retrain_paper_aligned_seed42_maxlen512/code\n"
+            "  python export_validation_predictions.py"
         )
     if not LR_TEST_METRICS.exists():
         raise FileNotFoundError(
@@ -356,21 +361,31 @@ Test 结果只报告上述三支：LR / BERT / Ensemble。
 ```powershell
 . E:\\ml\\activate.ps1
 
+# 0) BERT：训练/评测后导出 Validation 分数（若已有冻结文件可跳过）
+cd ..\\retrain_paper_aligned_seed42_maxlen512\\code
+python export_validation_predictions.py
+
 # 1) 复现 LR（写 predictions + metrics）
-cd F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\lr_none_bigram_no_cv_paper_aligned_seed42\\code
+cd ..\\..\\lr_none_bigram_no_cv_paper_aligned_seed42\\code
 python train_lr_none_bigram_no_cv.py
 
-# 2) 复现 FP-gate（依赖冻结的 BERT 预测与上一步 LR 预测）
-cd F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\code
+# 2) 复现 FP-gate（依赖 BERT / LR 预测）
+cd ..\\..\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\code
 python run_fp_gate_ensemble.py
+
+# 3) Risk score / risk level（Validation 选参，再应用到 Test）
+cd ..\\risk_level
+python select_risk_boundaries.py --mode select
+python select_risk_boundaries.py --mode apply-test
 ```
 
 需要已存在：
 
-- `results/bert_validation_predictions.csv`（本目录）
+- `../retrain_paper_aligned_seed42_maxlen512/results/bert_validation_predictions.csv`
+  （或本目录 `results/bert_validation_predictions.csv`）
 - `../retrain_paper_aligned_seed42_maxlen512/results/predictions_bert_paper_protocol_maxlen512.csv`
 
-对外风险输出口径见：[RISK_SCORE_AND_LEVEL.md](./RISK_SCORE_AND_LEVEL.md)
+对外风险输出口径见：[risk_score/RISK_SCORE_AND_LEVEL.md](./risk_score/RISK_SCORE_AND_LEVEL.md)
 """,
         encoding="utf-8",
     )

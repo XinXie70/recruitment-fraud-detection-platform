@@ -1,0 +1,45 @@
+# Build context = capstone project root
+#   docker build -f docker/Dockerfile .
+
+.git
+**/__pycache__
+**/*.pyc
+**/.venv
+**/venv
+**/*.log
+
+# Unused trees
+data/
+exports/
+model_code/
+model_results/
+paper_comparison/
+reports/
+src/
+
+# Large split dumps
+**/*.csv.gz
+**/data/splits/
+
+# Extra LR bits
+lr_none_bigram_no_cv_paper_aligned_seed42/code/
+lr_none_bigram_no_cv_paper_aligned_seed42/results/**
+!lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json
+
+# Extra BERT bits
+retrain_paper_aligned_seed42_maxlen512/results/
+retrain_paper_aligned_seed42_maxlen512/data/
+retrain_paper_aligned_seed42_maxlen512/comparison_summary.csv
+retrain_paper_aligned_seed42_maxlen512/comparison_summary.md
+
+# Extra ensemble bits
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_score/
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/code/
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/**
+!ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/**
+!ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
+
+# Local API runtime noise
+api_flask/server.*.log
+api_flask/*.log

@@ -33,7 +33,7 @@
 
 ```powershell
 . E:\ml\activate.ps1
-cd F:\better-BERT\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\code
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\code
 python train_lr_none_bigram_no_cv.py
 ```
 

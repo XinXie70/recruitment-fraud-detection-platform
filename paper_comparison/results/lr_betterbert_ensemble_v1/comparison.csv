@@ -1,4 +1,0 @@
-model,split,fraud_precision,fraud_recall,fraud_f1,macro_f1,pr_auc,roc_auc,tn,fp,fn,tp
-Improved LR,Test,0.9610,0.8555,0.9052,0.9503,0.9454,0.9922,3397,6,25,148
-BetterBERT,Test,0.9430,0.8613,0.9003,0.9477,0.9341,0.9921,3394,9,24,149
-LR 25% + BetterBERT 75%,Test,0.9610,0.8555,0.9052,0.9503,0.9563,0.9937,3397,6,25,148

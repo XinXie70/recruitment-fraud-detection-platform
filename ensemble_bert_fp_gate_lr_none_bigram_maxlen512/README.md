@@ -17,21 +17,32 @@ Test 结果只报告上述三支：LR / BERT / Ensemble。
 ```powershell
 . E:\ml\activate.ps1
 
+# 0) BERT Validation 分数（若已有冻结文件可跳过）
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\code
+python export_validation_predictions.py
+
 # 1) 复现 LR（写 predictions + metrics）
-cd F:\better-BERT\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\code
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\code
 python train_lr_none_bigram_no_cv.py
 
-# 2) 复现 FP-gate（依赖冻结的 BERT 预测与上一步 LR 预测）
-cd F:\better-BERT\capstone-project-26t2-9900-h09c-almond\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\code
+# 2) 复现 FP-gate（依赖 BERT / LR 预测）
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\code
 python run_fp_gate_ensemble.py
+
+# 3) Risk score / risk level
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\risk_level
+python select_risk_boundaries.py --mode select
+python select_risk_boundaries.py --mode apply-test
 ```
 
 需要已存在：
 
-- `results/bert_validation_predictions.csv`（本目录）
+- `../retrain_paper_aligned_seed42_maxlen512/results/bert_validation_predictions.csv`
+  （脚本会同步刷新本目录 `results/bert_validation_predictions.csv`）
 - `../retrain_paper_aligned_seed42_maxlen512/results/predictions_bert_paper_protocol_maxlen512.csv`
+- BERT 权重：`../retrain_paper_aligned_seed42_maxlen512/weights/bert_paper_protocol_maxlen512/best/`
 
-对外风险输出口径见：[RISK_SCORE_AND_LEVEL.md](./RISK_SCORE_AND_LEVEL.md)
+对外风险输出口径见：[risk_score/RISK_SCORE_AND_LEVEL.md](./risk_score/RISK_SCORE_AND_LEVEL.md)
 
 ## 三档风险边界
 
@@ -42,10 +53,10 @@ trade-off 搜索确定，Test 不参与选参。
 cd ensemble_bert_fp_gate_lr_none_bigram_maxlen512
 
 # 只使用 Validation 选择并冻结边界
-python code/select_risk_boundaries.py --mode select
+python risk_level/select_risk_boundaries.py --mode select
 
 # 冻结后才可将配置应用到 Test；此模式不会重新搜索阈值
-python code/select_risk_boundaries.py --mode apply-test
+python risk_level/select_risk_boundaries.py --mode apply-test
 ```
 
 当前冻结规则：
@@ -71,17 +82,19 @@ Risk level仍由原始BERT-LR gate规则决定，不能只根据这个混合来�
 risk score反推。这是操作分数，不是经过校准的欺诈概率。原始BERT和LR
 分数会同时保留。
 
-Risk score输出：
+Risk score 输出（`risk_score/`）：
 
-- `results/RISK_SCORE_REPORT.md`
-- `results/risk_score_metrics.csv`
-- `results/test_risk_levels.csv`
-- `results/test_risk_level_summary.json`
+- `risk_score/RISK_SCORE_AND_LEVEL.md`
+- `risk_score/RISK_SCORE_REPORT.md`
+- `risk_score/risk_score_metrics.csv`
 
-主要输出：
+Risk level 输出（`risk_level/`）：
 
-- `results/risk_boundary_config.json`
-- `results/RISK_BOUNDARY_REPORT.md`
-- `results/low_boundary_tradeoff.csv`
-- `results/low_boundary_target_comparison.csv`
-- `results/validation_risk_levels.csv`
+- `risk_level/select_risk_boundaries.py`
+- `risk_level/risk_boundary_config.json`
+- `risk_level/RISK_BOUNDARY_REPORT.md`
+- `risk_level/low_boundary_tradeoff.csv`
+- `risk_level/low_boundary_target_comparison.csv`
+- `risk_level/validation_risk_levels.csv`
+- `risk_level/test_risk_levels.csv`
+- `risk_level/test_risk_level_summary.json`

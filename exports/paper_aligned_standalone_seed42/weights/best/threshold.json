@@ -1,7 +1,0 @@
-{
-  "threshold": 0.99,
-  "default_threshold": 0.5,
-  "model_name": "bert-base-uncased",
-  "run_name": "bert_paper_protocol",
-  "imbalance_method": "Class weight (none)"
-}

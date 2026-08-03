@@ -1,0 +1,30 @@
+services:
+  fraud-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: fraud-detection-api:latest
+    container_name: fraud-detection-api
+    ports:
+      - "${PORT:-5000}:5000"
+    environment:
+      PORT: "5000"
+      HOST: "0.0.0.0"
+      ALLOW_CPU: "${ALLOW_CPU:-1}"
+      GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
+      GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
+      GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-180}"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    # Cloud tip: give the container enough RAM for BERT on CPU (recommend >= 4GB).
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 4G

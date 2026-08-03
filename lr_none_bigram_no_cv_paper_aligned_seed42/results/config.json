@@ -1,7 +1,7 @@
 {
   "experiment": "lr_none_bigram_no_cv_paper_aligned_seed42",
   "class_weight": null,
-  "data_source": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\data\\splits",
+  "data_source": "F:\\FinalEsemble\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\data\\splits",
   "input": "combined_text from paper-aligned seed42 splits",
   "reproducibility": {
     "pythonhashseed": "42",

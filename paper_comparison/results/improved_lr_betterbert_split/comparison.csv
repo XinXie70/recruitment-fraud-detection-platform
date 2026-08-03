@@ -1,4 +1,0 @@
-model,split_seed,macro_precision,macro_recall,macro_f1,fraud_precision,fraud_recall,fraud_f1,accuracy,roc_auc,pr_auc,tn,fp,fn,tp
-Paper LR,12342,0.98,0.70,0.78,0.9857,0.3988,0.5679,0.9706,0.9815,,3402,1,104,69
-Improved LR on betterBERT split,42,0.9769,0.9269,0.9503,0.9610,0.8555,0.9052,0.9913,0.9922,0.9454,3397,6,25,148
-Improved BERT on betterBERT split,42,0.9680,0.9293,0.9477,0.9430,0.8613,0.9003,0.9908,0.9921,0.9341,3394,9,24,149

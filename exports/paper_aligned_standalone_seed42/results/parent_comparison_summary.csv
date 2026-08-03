@@ -1,6 +1,0 @@
-protocol,data,split,seed,max_length,lr,epochs,imbalance,eval_split,threshold,fraud_precision,fraud_recall,fraud_f1,pr_auc,roc_auc,accuracy
-Paper-aligned,EMSCAD full (Cond A input),80/20 + 10%val-of-train,42,256,5e-05,3,class_weight(raw),validation,0.99,0.9473684210526315,0.782608695652174,0.8571428571428571,0.9150625428087968,0.9878216178254485,0.9874213836477987
-Paper-aligned,EMSCAD full (Cond A input),80/20 + 10%val-of-train,42,256,5e-05,3,class_weight(raw),test,0.99,0.9430379746835443,0.861271676300578,0.9003021148036254,0.9341163936035921,0.9920947005277561,0.9907718120805369
-Paper reported (reference),EMSCAD (paper),80/20 stratified,42,256,5e-05,3,class_weight,test,,0.913,0.8497,0.8802,,0.9909,0.9888
-Project improved CW,Condition B exact-dedup,70/15/15,42,384,2e-05,5,oversample×3 + sqrt_clip,validation,0.02,0.9381443298969072,0.8504672897196262,0.8921568627450981,0.9004157111126767,0.975465225719098,0.9907212146773512
-Project improved CW,Condition B exact-dedup,70/15/15,42,384,2e-05,5,oversample×3 + sqrt_clip,holdout/test,0.02,0.8958333333333334,0.8037383177570093,0.8472906403940886,0.8700397813583991,0.9635472756906192,0.9869308600337268

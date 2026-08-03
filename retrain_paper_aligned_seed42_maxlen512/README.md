@@ -13,8 +13,23 @@
 
 ```powershell
 . E:\ml\activate.ps1
-cd F:\better-BERT\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\code
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\code
 python run_bert_paper_vs_project.py
 ```
 
 权重 → `weights/`；结果 → `results/`
+
+## Ensemble 所需 Validation 分数
+
+FP-gate ensemble（`../ensemble_bert_fp_gate_lr_none_bigram_maxlen512`）需要
+Validation 上的 BERT 分数文件。用已训练好的 checkpoint 导出：
+
+```powershell
+cd F:\FinalEsemble\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\code
+python export_validation_predictions.py
+```
+
+输出：
+
+- `results/bert_validation_predictions.csv`（规范路径）
+- 同步刷新 ensemble 目录下同名文件（若该目录存在）
