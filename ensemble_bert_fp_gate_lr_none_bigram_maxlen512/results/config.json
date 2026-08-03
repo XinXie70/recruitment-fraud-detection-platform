@@ -8,6 +8,24 @@
   "selection_set": "validation",
   "selection_metric": "fraud_f1",
   "test_used_for_selection": false,
+  "reported_test_models": [
+    "LR (class_weight=None, bigram, no CV)",
+    "BERT max_length=512",
+    "BERT + LR(None/bigram) FP-gate"
+  ],
+  "reproducibility": {
+    "pythonhashseed": "42",
+    "random_seed": 42,
+    "frozen_lr_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\lr_none_bigram_no_cv_paper_aligned_seed42\\results\\test_predictions.csv",
+    "frozen_bert_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\results\\predictions_bert_paper_protocol_maxlen512.csv",
+    "frozen_bert_validation_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\results\\bert_validation_predictions.csv",
+    "package_versions": {
+      "python": "3.13.7",
+      "numpy": "2.4.4",
+      "pandas": "3.0.3",
+      "scikit_learn": "1.9.0"
+    }
+  },
   "validation_rows": 1431,
   "test_rows": 3576,
   "validation_gate_flips": 1,

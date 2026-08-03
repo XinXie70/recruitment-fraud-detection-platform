@@ -10,6 +10,14 @@ Fixed-protocol LR on paper-aligned seed42 splits:
 
 Same Train/Validation/Test splits as `retrain_paper_aligned_seed42_maxlen512`.
 
+## Reproducibility
+
+- Split seed: `42`
+- Model `random_state`: `42`
+- `PYTHONHASHSEED`: `42`
+- Packages: `{'python': '3.13.7', 'numpy': '2.4.4', 'pandas': '3.0.3', 'scikit_learn': '1.9.0', 'joblib': '1.5.3'}`
+- Threshold selected on Validation only; Test evaluated once
+
 ## Fixed configuration
 
 - ngram_range: `(1, 2)`

@@ -16,6 +16,19 @@
 - 规模：Train 12,873 / Validation 1,431 / Test 3,576
 - 文本字段：`combined_text`
 
+## 复现
+
+固定项：
+
+- 划分与输入文本文件
+- `random_state=42`、`PYTHONHASHSEED=42`
+- 超参：`ngram_range=(1,2)`、`C=1.0`、`class_weight=None`
+- Validation 选阈值，Test 只评一次
+
+包版本写入 `results/config.json` 的 `reproducibility.package_versions`。
+
+对应 ensemble：`../ensemble_bert_fp_gate_lr_none_bigram_maxlen512`
+
 ## 运行
 
 ```powershell

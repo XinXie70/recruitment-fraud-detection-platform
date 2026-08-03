@@ -10,6 +10,16 @@
 LR branch: `lr_none_bigram_no_cv_paper_aligned_seed42`
 (`class_weight=None`, unigram+bigram, no Train CV).
 
+BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
+
+## Reproducibility
+
+- Selection seed / hash seed: `42` / `42`
+- Frozen LR predictions: `F:\better-BERT\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\results\test_predictions.csv`
+- Frozen BERT predictions: `F:\better-BERT\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\results\predictions_bert_paper_protocol_maxlen512.csv`
+- Packages: `{'python': '3.13.7', 'numpy': '2.4.4', 'pandas': '3.0.3', 'scikit_learn': '1.9.0'}`
+- Test report keeps only: LR / BERT / this ensemble
+
 ## Selected configuration
 
 - BERT threshold: `0.30`
@@ -24,11 +34,7 @@ LR branch: `lr_none_bigram_no_cv_paper_aligned_seed42`
 | Model | Macro P | Macro R | Macro F1 | PR-AUC | ROC-AUC |
 |---|---:|---:|---:|---:|---:|
 | LR (`None`, bigram, no CV) | 0.9622 | 0.9060 | 0.9321 | 0.9318 | 0.9900 |
-| BERT max_length=512 (paper thr) | 0.9607 | 0.9404 | 0.9503 | 0.9405 | 0.9931 |
-| BERT at selected thr `0.30` (no gate) | 0.9579 | 0.9403 | 0.9489 | 0.9405 | 0.9931 |
-| BERT + LR(`None`/CV) FP-gate (thr=0.30, gate=0.06) | 0.9664 | 0.9407 | 0.9532 | 0.9478 | 0.9933 |
-| BERT + LR(cw/unigram) FP-gate (thr=0.30, gate=0.29) | 0.9635 | 0.9406 | 0.9517 | 0.9408 | 0.9931 |
-| BERT + LR(cw/bigram) FP-gate (thr=0.29, gate=0.33) | 0.9693 | 0.9409 | 0.9546 | 0.9476 | 0.9933 |
+| BERT max_length=512 | 0.9607 | 0.9404 | 0.9503 | 0.9405 | 0.9931 |
 | **BERT + LR(None/bigram) FP-gate** | 0.9664 | 0.9407 | 0.9532 | 0.9478 | 0.9933 |
 
 ## Test comparison (Fraud metrics)
@@ -36,7 +42,7 @@ LR branch: `lr_none_bigram_no_cv_paper_aligned_seed42`
 | Model | Fraud P | Fraud R | Fraud F1 |
 |---|---:|---:|---:|
 | LR (`None`, bigram, no CV) | 0.9338 | 0.8150 | 0.8704 |
-| BERT max_length=512 (paper thr) | 0.9273 | 0.8844 | 0.9053 |
+| BERT max_length=512 | 0.9273 | 0.8844 | 0.9053 |
 | **BERT + LR(None/bigram) FP-gate** | 0.9387 | 0.8844 | 0.9107 |
 
 Macro F1 vs BERT-512 alone: higher (0.9503 → 0.9532).
