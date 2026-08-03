@@ -5,10 +5,10 @@
   "risk_score": {
     "method": "BERT score unless the LR gate triggers",
     "default_source": "bert_score",
-    "gated_source": "max(lr_score, low_boundary)",
-    "low_boundary_floor": 0.0024,
+    "gated_source": "lr_score",
     "scale": "0 to 1 internally; multiply by 100 for display",
-    "calibrated_probability": false
+    "calibrated_probability": false,
+    "level_rule": "risk level uses the original BERT-LR gate rule, not the mixed-source score alone"
   },
   "ensemble_roles": {
     "bert": "primary risk-scoring model",

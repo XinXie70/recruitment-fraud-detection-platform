@@ -49,12 +49,12 @@ The continuous score follows the frozen FP-gate decision:
 
 ```text
 Normally:       risk_score = BERT score
-If gate fires:  risk_score = max(LR score, 0.0024)
+If gate fires:  risk_score = LR score
 ```
 
-The Low boundary is used as a safety floor so a gated High candidate remains
-Suspicious rather than falling into Low. The output also preserves the raw
-BERT evidence score and records the score source.
+Risk level remains controlled by the original BERT-LR gate rule and is not
+reconstructed from this mixed-source score alone. The output also preserves
+the raw BERT evidence score and records the score source.
 
 Validation score diagnostics:
 

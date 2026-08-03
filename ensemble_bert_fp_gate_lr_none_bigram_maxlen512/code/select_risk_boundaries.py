@@ -104,14 +104,14 @@ def assign_levels(
 
     # Official ensemble risk score:
     # - normally use the BERT primary score;
-    # - when the LR false-positive gate triggers, use the LR score;
-    # - apply the frozen Low boundary as a floor so a gated High candidate is
-    #   kept in Suspicious rather than being moved all the way to Low.
+    # - when the LR false-positive gate triggers, use the LR score directly.
+    # Risk level is still determined by the original two-model gate rule; it is
+    # not reconstructed by thresholding this mixed-source score alone.
     output["bert_evidence_score"] = output["bert_score"]
     output["risk_score"] = output["bert_score"]
-    output.loc[gate_triggered, "risk_score"] = np.maximum(
-        output.loc[gate_triggered, "lr_score"], bert_low_threshold
-    )
+    output.loc[gate_triggered, "risk_score"] = output.loc[
+        gate_triggered, "lr_score"
+    ]
     output["risk_score_100"] = output["risk_score"] * 100.0
     output["risk_score_source"] = "bert"
     output.loc[gate_triggered, "risk_score_source"] = "lr_gate"
@@ -133,14 +133,6 @@ def assign_levels(
         < bert_low_threshold
     ).all():
         raise ValueError("A Low row has a risk score outside the Low band")
-    suspicious_scores = output.loc[
-        output["risk_level"] == "Suspicious", "risk_score"
-    ]
-    if not (
-        (suspicious_scores >= bert_low_threshold)
-        & (suspicious_scores < bert_high_threshold)
-    ).all():
-        raise ValueError("A Suspicious row has a risk score outside its band")
     if not (
         output.loc[output["risk_level"] == "High", "risk_score"]
         >= bert_high_threshold
@@ -314,12 +306,12 @@ The continuous score follows the frozen FP-gate decision:
 
 ```text
 Normally:       risk_score = BERT score
-If gate fires:  risk_score = max(LR score, {selected_low['bert_low_threshold']:.4f})
+If gate fires:  risk_score = LR score
 ```
 
-The Low boundary is used as a safety floor so a gated High candidate remains
-Suspicious rather than falling into Low. The output also preserves the raw
-BERT evidence score and records the score source.
+Risk level remains controlled by the original BERT-LR gate rule and is not
+reconstructed from this mixed-source score alone. The output also preserves
+the raw BERT evidence score and records the score source.
 
 Validation score diagnostics:
 
@@ -379,10 +371,13 @@ def select_on_validation() -> None:
         "risk_score": {
             "method": "BERT score unless the LR gate triggers",
             "default_source": "bert_score",
-            "gated_source": "max(lr_score, low_boundary)",
-            "low_boundary_floor": float(selected["bert_low_threshold"]),
+            "gated_source": "lr_score",
             "scale": "0 to 1 internally; multiply by 100 for display",
             "calibrated_probability": False,
+            "level_rule": (
+                "risk level uses the original BERT-LR gate rule, not the "
+                "mixed-source score alone"
+            ),
         },
         "ensemble_roles": {
             "bert": "primary risk-scoring model",
@@ -458,13 +453,14 @@ def apply_to_test() -> None:
 
 ```text
 Normally:       risk_score = BERT score
-If gate fires:  risk_score = max(LR score, {low_threshold:.4f})
+If gate fires:  risk_score = LR score
 Display score:  risk_score_100 = 100 * risk_score
 ```
 
-The Low-boundary floor keeps every gated High candidate in Suspicious. Raw
-`bert_evidence_score`, `lr_score`, `risk_score_source`, and `gate_triggered`
-are retained for explanation.
+Risk level is determined by the original two-model gate rule, not by applying
+the BERT boundaries to this mixed-source score alone. Raw `bert_evidence_score`,
+`lr_score`, `risk_score_source`, and `gate_triggered` are retained for
+explanation.
 
 This is an operational ensemble decision score, not a calibrated probability.
 

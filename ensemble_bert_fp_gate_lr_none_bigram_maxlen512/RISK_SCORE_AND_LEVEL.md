@@ -17,14 +17,14 @@ Both raw model scores are retained for explanation.
 gate_triggered = BERT score >= 0.30 and LR score < 0.06
 
 if gate_triggered:
-    risk_score = max(LR score, 0.0024)
+    risk_score = LR score
 else:
     risk_score = BERT score
 ```
 
-The `0.0024` floor is the frozen Low boundary. It prevents a gated BERT High
-candidate from being moved all the way into Low. A gated case therefore
-remains Suspicious.
+Risk level is determined separately by the original BERT-LR gate rule. It is
+not reconstructed by applying the BERT boundaries to this mixed-source score
+alone.
 
 For display:
 
@@ -32,8 +32,10 @@ For display:
 risk_score_100 = 100 * risk_score
 ```
 
-This is an operational ensemble decision score, not a calibrated probability
-of fraud.
+This is an operational mixed-source ensemble score, not a calibrated
+probability of fraud. A gated sample may have a score below the BERT Low
+boundary while remaining Suspicious because the level uses the two-model gate
+rule rather than the final score alone.
 
 ## 3. High rule
 
@@ -45,7 +47,7 @@ High if BERT score >= 0.30 and LR score >= 0.06
 ```
 
 When BERT reaches `0.30` but LR is below `0.06`, the advertisement is sent to
-Suspicious and its risk score is supplied by LR using the Low-boundary floor.
+Suspicious and its risk score is supplied directly by LR.
 
 ## 4. Low boundary
 
@@ -76,7 +78,7 @@ the High false-positive gate.
 gate_triggered = BERT score >= 0.30 and LR score < 0.06
 
 if gate_triggered:
-    risk_score = max(LR score, 0.0024)
+    risk_score = LR score
 else:
     risk_score = BERT score
 
