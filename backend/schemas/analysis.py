@@ -55,7 +55,7 @@ class EnsembleResult(BaseModel):
     fitted: bool
     weight_source: str
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def risk_score_100(self) -> float:
         """Percentage-scale risk score for API consumers and UI display."""

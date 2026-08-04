@@ -33,7 +33,7 @@ class RemoteFinalEnsemblePredictor:
         return data
 
     @staticmethod
-    def _probability(value: object, field: str) -> float:
+    def _probability(value: str | int | float, field: str) -> float:
         try:
             score = float(value)
         except (TypeError, ValueError) as exc:
