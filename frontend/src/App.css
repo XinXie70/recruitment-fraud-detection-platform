@@ -1385,6 +1385,36 @@ button.nav-button {
   animation-duration: 1.15s;
 }
 
+.xai-progress {
+  position: relative;
+  width: min(420px, 100%);
+  height: 6px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(201, 127, 61, 0.16);
+}
+
+.xai-progress-indicator {
+  position: absolute;
+  inset-block: 0;
+  left: -38%;
+  width: 38%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--accent), #f2bd83);
+  animation: xai-progress-loop 1.8s ease-in-out infinite;
+}
+
+@keyframes xai-progress-loop {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(365%);
+  }
+}
+
 @keyframes report-module-enter {
   from {
     opacity: 0;
@@ -1404,6 +1434,13 @@ button.nav-button {
     opacity: 1;
     transform: none;
     filter: none;
+    animation: none;
+  }
+
+  .xai-progress-indicator {
+    left: 0;
+    width: 100%;
+    opacity: 0.65;
     animation: none;
   }
 }

@@ -237,6 +237,13 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
                 <div>
                   <strong>Risk score ready</strong>
                   <p>Preparing the detailed model-derived explanation…</p>
+                  <div
+                    className="xai-progress"
+                    role="progressbar"
+                    aria-label="Preparing XAI explanation"
+                  >
+                    <span className="xai-progress-indicator" />
+                  </div>
                 </div>
               </div>
             ) : result.xai.status === 'success' ? (
