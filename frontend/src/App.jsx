@@ -118,7 +118,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
   return (
     <div className={`report-page ${riskLevel}`}>
       <MeteorBackground />
-      <header className="report-topbar">
+      <header className="report-topbar report-module-enter" style={{ '--module-order': 0 }}>
         <button type="button" className="report-back" onClick={onBack}>
           <ArrowLeft size={22} />
           <span>New Scan</span>
@@ -142,7 +142,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
       </header>
 
       <main className="report-layout">
-        <aside className="report-sidebar">
+        <aside className="report-sidebar report-module-enter" style={{ '--module-order': 1 }}>
           <section className={`report-risk-panel ${riskLevel}`}>
             <div className="report-risk-kicker">
               <ShieldAlert size={18} />
@@ -171,7 +171,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
         </aside>
 
         <section className="report-main">
-          <div className="report-meta">
+          <div className="report-meta report-module-enter" style={{ '--module-order': 2 }}>
             <span>
               <CalendarClock size={18} />
               {new Date().toLocaleString()}
@@ -180,7 +180,10 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             <span>{caseId}</span>
           </div>
 
-          <section className={`report-action-panel ${riskLevel}`}>
+          <section
+            className={`report-action-panel report-module-enter ${riskLevel}`}
+            style={{ '--module-order': 3 }}
+          >
             <div className="report-action-heading">
               <div className="report-action-icon">
                 {riskLevel === 'low' ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
@@ -193,7 +196,10 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             <GentleGuidance guidance={result.gentle_ai} />
           </section>
 
-          <details className="report-panel technical-details">
+          <details
+            className="report-panel technical-details report-module-enter"
+            style={{ '--module-order': 4 }}
+          >
             <summary className="technical-details-summary">
               <div className="section-title compact">
                 <Activity size={22} />
@@ -214,7 +220,10 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             </div>
           </details>
 
-          <section className="report-panel">
+          <section
+            className="report-panel report-module-enter xai-result-module"
+            style={{ '--module-order': 5 }}
+          >
             <div className="report-panel-header">
               <div className="section-title compact">
                 <Info size={22} />

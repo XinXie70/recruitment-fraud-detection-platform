@@ -1373,6 +1373,41 @@ button.nav-button {
   color: var(--text);
 }
 
+/* Reveal the report one module at a time after the single Analyze click. */
+.report-module-enter {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  animation: report-module-enter 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(0.22s + (var(--module-order, 0) * 0.42s));
+}
+
+.xai-result-module {
+  animation-duration: 1.15s;
+}
+
+@keyframes report-module-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: blur(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-module-enter {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+}
+
 .report-topbar {
   position: sticky;
   top: 0;
