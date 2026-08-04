@@ -1,0 +1,72 @@
+2026-08-04 08:43:13 | INFO | ======== Environment ========
+2026-08-04 08:43:13 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 08:43:13 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 08:43:13 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 08:43:13 | INFO | Transformers version   : 5.13.1
+2026-08-04 08:43:13 | INFO | CUDA available         : True
+2026-08-04 08:43:13 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 08:43:13 | INFO | cuDNN version          : 91900
+2026-08-04 08:43:13 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 08:43:13 | INFO | GPU count              : 1
+2026-08-04 08:43:13 | INFO | Current training device: cuda
+2026-08-04 08:43:13 | INFO | =============================
+2026-08-04 08:44:07 | INFO | ======== Environment ========
+2026-08-04 08:44:07 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 08:44:07 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 08:44:07 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 08:44:07 | INFO | Transformers version   : 5.13.1
+2026-08-04 08:44:07 | INFO | CUDA available         : True
+2026-08-04 08:44:07 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 08:44:07 | INFO | cuDNN version          : 91900
+2026-08-04 08:44:07 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 08:44:07 | INFO | GPU count              : 1
+2026-08-04 08:44:07 | INFO | Current training device: cuda
+2026-08-04 08:44:07 | INFO | =============================
+2026-08-04 08:44:51 | INFO | ======== Environment ========
+2026-08-04 08:44:51 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 08:44:51 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 08:44:51 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 08:44:51 | INFO | Transformers version   : 5.13.1
+2026-08-04 08:44:51 | INFO | CUDA available         : True
+2026-08-04 08:44:51 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 08:44:51 | INFO | cuDNN version          : 91900
+2026-08-04 08:44:51 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 08:44:51 | INFO | GPU count              : 1
+2026-08-04 08:44:51 | INFO | Current training device: cuda
+2026-08-04 08:44:51 | INFO | =============================
+2026-08-04 08:46:03 | INFO | ======== Environment ========
+2026-08-04 08:46:03 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 08:46:03 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 08:46:03 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 08:46:03 | INFO | Transformers version   : 5.13.1
+2026-08-04 08:46:03 | INFO | CUDA available         : True
+2026-08-04 08:46:03 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 08:46:03 | INFO | cuDNN version          : 91900
+2026-08-04 08:46:03 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 08:46:03 | INFO | GPU count              : 1
+2026-08-04 08:46:03 | INFO | Current training device: cuda
+2026-08-04 08:46:03 | INFO | =============================
+2026-08-04 08:58:32 | INFO | ======== Environment ========
+2026-08-04 08:58:32 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 08:58:32 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 08:58:32 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 08:58:32 | INFO | Transformers version   : 5.13.1
+2026-08-04 08:58:32 | INFO | CUDA available         : True
+2026-08-04 08:58:32 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 08:58:32 | INFO | cuDNN version          : 91900
+2026-08-04 08:58:32 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 08:58:32 | INFO | GPU count              : 1
+2026-08-04 08:58:32 | INFO | Current training device: cuda
+2026-08-04 08:58:32 | INFO | =============================
+2026-08-04 09:04:00 | INFO | ======== Environment ========
+2026-08-04 09:04:00 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 09:04:00 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 09:04:00 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 09:04:00 | INFO | Transformers version   : 5.13.1
+2026-08-04 09:04:00 | INFO | CUDA available         : True
+2026-08-04 09:04:00 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 09:04:00 | INFO | cuDNN version          : 91900
+2026-08-04 09:04:00 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 09:04:00 | INFO | GPU count              : 1
+2026-08-04 09:04:00 | INFO | Current training device: cuda
+2026-08-04 09:04:00 | INFO | =============================

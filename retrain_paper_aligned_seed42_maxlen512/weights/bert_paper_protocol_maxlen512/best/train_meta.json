@@ -1,0 +1,43 @@
+{
+  "config": {
+    "pretrained_model_name": "bert-base-uncased",
+    "learning_rate": 5e-05,
+    "weight_decay": 0.01,
+    "num_train_epochs": 3,
+    "train_batch_size": 8,
+    "eval_batch_size": 16,
+    "gradient_accumulation_steps": 2,
+    "max_length": 512,
+    "warmup_ratio": 0.1,
+    "early_stopping_patience": 2,
+    "dropout": 0.1,
+    "random_seed": 42,
+    "fp16": true,
+    "max_grad_norm": 1.0,
+    "use_class_weights": true,
+    "class_weight_transform": "none",
+    "class_weight_max": 100.0,
+    "fraud_oversample_factor": 1.0,
+    "gradient_checkpointing": false,
+    "selection_metric": "fraud_f1",
+    "default_threshold": 0.5,
+    "optimize_threshold": true,
+    "threshold_selection_mode": "max_fbeta",
+    "threshold_f_beta": 0.5,
+    "threshold_f1_tolerance": 0.01,
+    "min_fraud_recall_for_threshold": null,
+    "threshold_step": 0.01,
+    "output_dir": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\weights",
+    "run_name": "bert_paper_protocol_maxlen512",
+    "model_label": "BERT-paper-protocol",
+    "write_canonical_aliases": false
+  },
+  "best_epoch": 3,
+  "best_validation_metric": 0.8769230769230769,
+  "selection_metric": "fraud_f1",
+  "imbalance_method": "Class weight (none)",
+  "class_weights": [
+    0.5254714670585354,
+    10.314903846153847
+  ]
+}

@@ -1,13 +1,15 @@
+# Build context = capstone project root
 .git
 .gitattributes
 .venv
-__pycache__
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
 *.py[cod]
 .DS_Store
 .env
 .env.*
-*.md
-LICENSE
 *.log
 *.egg-info
 dist
@@ -31,9 +33,45 @@ frontend/.vite
 backend/__pycache__
 backend/**/__pycache__
 
-# Model - exclude duplicates and dev artifacts
+# Trees not needed by the standalone final-ensemble image
+data/
+exports/
+model_code/
+model_results/
+paper_comparison/
+reports/
+src/
+
+# Large split dumps
+**/*.csv.gz
+**/data/splits/
+
+# Extra LR experiment artifacts
+lr_none_bigram_no_cv_paper_aligned_seed42/code/
+lr_none_bigram_no_cv_paper_aligned_seed42/results/**
+!lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json
+
+# Extra BERT experiment artifacts
+retrain_paper_aligned_seed42_maxlen512/results/
+retrain_paper_aligned_seed42_maxlen512/data/
+retrain_paper_aligned_seed42_maxlen512/comparison_summary.csv
+retrain_paper_aligned_seed42_maxlen512/comparison_summary.md
+
+# Extra ensemble experiment artifacts
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_score/
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/code/
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/**
+!ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json
+ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/**
+!ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
+
+# Local API runtime noise
+api_flask/server.*.log
+api_flask/*.log
+
+# Other model development artifacts
 model/modelversion/
-model/**/__pycache__
+model/**/__pycache__/
 model/**/outputs/
 model/**/comparison_outputs/
 model/**/*.md

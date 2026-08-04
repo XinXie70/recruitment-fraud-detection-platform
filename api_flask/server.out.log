@@ -1,0 +1,19 @@
+Loading runtime config...
+{'lr': {'artifact': 'F:\\FinalEsemble\\capstone-project-26t2-9900-h09c-almond\\lr_none_bigram_no_cv_paper_aligned_seed42\\artifacts\\lr_none_bigram_no_cv_paper_aligned_seed42.joblib', 'decision_threshold': 0.15182349109365842, 'experiment': 'lr_none_bigram_no_cv_paper_aligned_seed42'}, 'bert': {'checkpoint': 'F:\\FinalEsemble\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\weights\\bert_paper_protocol_maxlen512\\best', 'max_length': 512, 'model_threshold': 0.32, 'experiment': 'retrain_paper_aligned_seed42_maxlen512'}, 'ensemble': {'bert_threshold': 0.3, 'lr_gate': 0.06, 'experiment': 'ensemble_bert_fp_gate_lr_none_bigram_maxlen512'}, 'risk': {'bert_high_threshold': 0.3, 'lr_gate': 0.06, 'bert_low_threshold': 0.0024, 'config_path': 'F:\\FinalEsemble\\capstone-project-26t2-9900-h09c-almond\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\risk_level\\risk_boundary_config.json'}}
+Loading LR...
+Loading BERT (first request may still warm CUDA kernels)...
+2026-08-04 09:04:00 | INFO | ======== Environment ========
+2026-08-04 09:04:00 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-04 09:04:00 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-04 09:04:00 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-04 09:04:00 | INFO | Transformers version   : 5.13.1
+2026-08-04 09:04:00 | INFO | CUDA available         : True
+2026-08-04 09:04:00 | INFO | PyTorch CUDA version   : 12.8
+2026-08-04 09:04:00 | INFO | cuDNN version          : 91900
+2026-08-04 09:04:00 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-04 09:04:00 | INFO | GPU count              : 1
+2026-08-04 09:04:00 | INFO | Current training device: cuda
+2026-08-04 09:04:00 | INFO | =============================
+Swagger UI: http://127.0.0.1:5000/apidocs/
+ * Serving Flask app 'app'
+ * Debug mode: off

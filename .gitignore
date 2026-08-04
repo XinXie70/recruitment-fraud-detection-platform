@@ -2,7 +2,7 @@
 data/raw/*.csv
 data/processed/*.csv
 
-# Legacy / local-only experiment trees (replaced by model_* layout)
+# Legacy / local-only experiment trees
 /models/
 /outputs/
 artifacts/

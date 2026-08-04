@@ -1,0 +1,67 @@
+# Optional GPU image (requires NVIDIA Container Toolkit on the host).
+# Build from capstone root:
+#   docker build -f docker/Dockerfile.gpu -t fraud-detection-api:gpu .
+
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PORT=5000 \
+    HOST=0.0.0.0 \
+    ALLOW_CPU=0 \
+    GUNICORN_WORKERS=1 \
+    GUNICORN_THREADS=4 \
+    GUNICORN_TIMEOUT=180 \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3.11 \
+        python3.11-venv \
+        python3-pip \
+        curl \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python \
+    && groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY docker/requirements-docker.txt /tmp/requirements-docker.txt
+RUN python -m pip install --upgrade pip \
+    && pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cu121 \
+    && pip install -r /tmp/requirements-docker.txt \
+    && rm /tmp/requirements-docker.txt
+
+COPY api_flask/ /app/api_flask/
+COPY docker/entrypoint.sh /app/api_flask/entrypoint.sh
+
+COPY lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/ \
+    /app/lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/
+COPY lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json \
+    /app/lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json
+COPY retrain_paper_aligned_seed42_maxlen512/weights/bert_paper_protocol_maxlen512/best/ \
+    /app/retrain_paper_aligned_seed42_maxlen512/weights/bert_paper_protocol_maxlen512/best/
+COPY retrain_paper_aligned_seed42_maxlen512/code/ \
+    /app/retrain_paper_aligned_seed42_maxlen512/code/
+COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json \
+    /app/ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json
+COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json \
+    /app/ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
+
+WORKDIR /app/api_flask
+RUN sed -i 's/\r$//' entrypoint.sh \
+    && chmod +x entrypoint.sh \
+    && mkdir -p /app/retrain_paper_aligned_seed42_maxlen512/results/logs \
+    && chown -R app:app /app
+
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT}/health" || exit 1
+
+USER app
+
+ENTRYPOINT ["./entrypoint.sh"]

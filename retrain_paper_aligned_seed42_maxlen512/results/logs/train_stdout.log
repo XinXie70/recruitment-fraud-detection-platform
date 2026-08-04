@@ -1,0 +1,33 @@
+2026-08-02 12:07:54 | WARNING | Project B/seed42 metrics not found; comparison will be paper-only
+2026-08-02 12:07:57 | INFO | Paper split train: n=12873 fraud=624
+2026-08-02 12:07:57 | INFO | Paper split validation: n=1431 fraud=69
+2026-08-02 12:07:57 | INFO | Paper split test: n=3576 fraud=173
+2026-08-02 12:07:57 | INFO | ======== Environment ========
+2026-08-02 12:07:57 | INFO | Python executable      : E:\ml\venv\Scripts\python.exe
+2026-08-02 12:07:57 | INFO | Python version         : 3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]
+2026-08-02 12:07:57 | INFO | PyTorch version        : 2.11.0+cu128
+2026-08-02 12:07:57 | INFO | Transformers version   : 5.13.1
+2026-08-02 12:07:57 | INFO | CUDA available         : True
+2026-08-02 12:07:57 | INFO | PyTorch CUDA version   : 12.8
+2026-08-02 12:07:57 | INFO | cuDNN version          : 91900
+2026-08-02 12:07:57 | INFO | GPU name               : NVIDIA GeForce RTX 3060 Laptop GPU
+2026-08-02 12:07:57 | INFO | GPU count              : 1
+2026-08-02 12:07:57 | INFO | Current training device: cuda
+2026-08-02 12:07:57 | INFO | =============================
+2026-08-02 12:07:57 | INFO | Using caller-provided splits: train=12873 validation=1431 test=3576
+2026-08-02 12:08:02 | INFO | Token length stats (train sample): {'n_texts_measured': 3000, 'mean': 461.0036666666667, 'median': 448.0, 'p90': 692.0, 'p95': 752.0, 'p99': 1046.1399999999967, 'pct_over_128': 0.9713333333333334, 'pct_over_256': 0.8586666666666667, 'pct_over_384': 0.6263333333333333, 'pct_over_512': 0.371, 'recommended_max_length': 384, 'recommendation_reason': 'Measured train token lengths: median¡Ö448, 85.9% >256, 62.6% >384, 37.1% >512. Default max_length=384 is chosen for RTX 3060 with batch=4 / accum=4; try 512 only after an OOM check. Long ads may still be truncated.'}
+2026-08-02 12:08:02 | INFO | Saved data_quality_report.json
+2026-08-02 12:08:02 | INFO | Train-only fraud oversample: factor=1.00  rows 12873¡ú12873  fraud 624¡ú624
+2026-08-02 12:08:02 | INFO | Train-only class weights (transform=none, max=100.0): [0.5254714670585354, 10.314903846153847]
+2026-08-02 12:08:03 | INFO | Start fine-tuning: model=bert-base-uncased use_class_weights=True max_length=512 batch=8 accum=2
+2026-08-02 12:15:04 | INFO | Epoch 1 | train_loss=0.4863 val_loss=0.3224 fraud_f1=0.7500 fraud_recall=0.6087 pr_auc=0.8978
+2026-08-02 12:15:24 | INFO | New best checkpoint saved at epoch 1 (fraud_f1=0.7500)
+2026-08-02 12:22:28 | INFO | Epoch 2 | train_loss=0.2235 val_loss=0.2385 fraud_f1=0.8264 fraud_recall=0.7246 pr_auc=0.8847
+2026-08-02 12:22:48 | INFO | New best checkpoint saved at epoch 2 (fraud_f1=0.8264)
+2026-08-02 12:29:47 | INFO | Epoch 3 | train_loss=0.0870 val_loss=0.2370 fraud_f1=0.8769 fraud_recall=0.8261 pr_auc=0.8895
+2026-08-02 12:30:07 | INFO | New best checkpoint saved at epoch 3 (fraud_f1=0.8769)
+2026-08-02 12:30:07 | INFO | Loading best checkpoint from F:\better-BERT\retrain_paper_aligned_seed42_maxlen512\weights\bert_paper_protocol_maxlen512\best
+2026-08-02 12:30:22 | INFO | Validation threshold selected on validation only: 0.3200 (fraud_f1=0.8855 precision=0.9355 recall=0.8406 mode=max_fbeta f_beta=0.5 min_recall=None step=0.01)
+2026-08-02 12:30:57 | INFO | Test fraud_f1=0.9053 fraud_recall=0.8844 pr_auc=0.9405
+2026-08-02 12:30:57 | INFO | Done. Artifacts under F:\better-BERT\retrain_paper_aligned_seed42_maxlen512\weights\bert_paper_protocol_maxlen512 and F:\better-BERT\retrain_paper_aligned_seed42_maxlen512\results
+2026-08-02 12:30:57 | INFO | Paper protocol done. Test fraud_f1=0.9053 pr_auc=0.9405 | comparison=F:\better-BERT\retrain_paper_aligned_seed42_maxlen512\comparison_summary.csv
