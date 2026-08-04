@@ -1,14 +1,39 @@
 # Build context = capstone project root
-#   docker build -f docker/Dockerfile .
-
 .git
-**/__pycache__
-**/*.pyc
+.gitattributes
+.venv
 **/.venv
 **/venv
-**/*.log
+**/__pycache__
+**/*.pyc
+*.py[cod]
+.DS_Store
+.env
+.env.*
+*.log
+*.egg-info
+dist
+build
 
-# Unused trees
+# Dev tooling
+.vscode
+*.code-workspace
+tests/
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Frontend
+frontend/node_modules
+node_modules
+frontend/dist
+frontend/.vite
+
+# Backend
+backend/__pycache__
+backend/**/__pycache__
+
+# Trees not needed by the standalone final-ensemble image
 data/
 exports/
 model_code/
@@ -21,18 +46,18 @@ src/
 **/*.csv.gz
 **/data/splits/
 
-# Extra LR bits
+# Extra LR experiment artifacts
 lr_none_bigram_no_cv_paper_aligned_seed42/code/
 lr_none_bigram_no_cv_paper_aligned_seed42/results/**
 !lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json
 
-# Extra BERT bits
+# Extra BERT experiment artifacts
 retrain_paper_aligned_seed42_maxlen512/results/
 retrain_paper_aligned_seed42_maxlen512/data/
 retrain_paper_aligned_seed42_maxlen512/comparison_summary.csv
 retrain_paper_aligned_seed42_maxlen512/comparison_summary.md
 
-# Extra ensemble bits
+# Extra ensemble experiment artifacts
 ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_score/
 ensemble_bert_fp_gate_lr_none_bigram_maxlen512/code/
 ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/**
@@ -43,3 +68,13 @@ ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/**
 # Local API runtime noise
 api_flask/server.*.log
 api_flask/*.log
+
+# Other model development artifacts
+model/modelversion/
+model/**/__pycache__/
+model/**/outputs/
+model/**/comparison_outputs/
+model/**/*.md
+model/**/*.png
+model/**/*.csv
+model/**/requirements.txt

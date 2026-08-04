@@ -1,0 +1,132 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cloud-run-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: algorithm-502800
+  PROJECT_NUMBER: "462086104697"
+  REGION: australia-southeast1
+  REGISTRY: australia-southeast1-docker.pkg.dev
+  REPOSITORY: almond-app
+  CLOUD_SQL_INSTANCE: algorithm-502800:australia-southeast1:almond-db
+  WORKLOAD_IDENTITY_PROVIDER: projects/462086104697/locations/global/workloadIdentityPools/github-actions/providers/github
+  DEPLOY_SERVICE_ACCOUNT: github-actions-deployer@algorithm-502800.iam.gserviceaccount.com
+  RUNTIME_SERVICE_ACCOUNT: 462086104697-compute@developer.gserviceaccount.com
+
+jobs:
+  backend:
+    name: Build and deploy backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Authenticate Docker
+        run: gcloud auth configure-docker "${REGISTRY}" --quiet
+
+      - name: Build and push backend image
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-backend
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --file backend/Dockerfile.cloudrun \
+            --tag "${IMAGE}:${GITHUB_SHA}" \
+            --tag "${IMAGE}:latest" \
+            --push \
+            .
+
+      - name: Apply database migrations
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-backend
+        run: |
+          gcloud run jobs deploy almond-db-migrate \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --image "${IMAGE}:${GITHUB_SHA}" \
+            --service-account "${RUNTIME_SERVICE_ACCOUNT}" \
+            --set-cloudsql-instances "${CLOUD_SQL_INSTANCE}" \
+            --set-env-vars "APP_ENV=production,RUN_DATABASE_MIGRATIONS=true" \
+            --set-secrets "DATABASE_URL=almond-database-url:latest,SECRET_KEY=almond-secret-key:latest" \
+            --command /app/backend/docker-entrypoint.sh \
+            --args true \
+            --max-retries 1 \
+            --task-timeout 5m \
+            --quiet
+          gcloud run jobs execute almond-db-migrate \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --wait \
+            --quiet
+
+      - name: Deploy backend
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-backend
+        run: |
+          gcloud run services update almond-backend \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --image "${IMAGE}:${GITHUB_SHA}" \
+            --quiet
+
+  frontend:
+    name: Build and deploy frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Authenticate Docker
+        run: gcloud auth configure-docker "${REGISTRY}" --quiet
+
+      - name: Build and push frontend image
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-frontend
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --file frontend/Dockerfile.prod \
+            --tag "${IMAGE}:${GITHUB_SHA}" \
+            --tag "${IMAGE}:latest" \
+            --push \
+            .
+
+      - name: Deploy frontend
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/almond-frontend
+        run: |
+          gcloud run services update almond-frontend \
+            --project "${PROJECT_ID}" \
+            --region "${REGION}" \
+            --image "${IMAGE}:${GITHUB_SHA}" \
+            --quiet

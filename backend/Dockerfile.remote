@@ -1,0 +1,28 @@
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+RUN groupadd --system app && useradd --system --gid app --no-create-home app
+
+# Install only lightweight backend dependencies (no TensorFlow / PyTorch / transformers)
+COPY backend/requirements-remote.txt /app/backend/requirements-remote.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements-remote.txt
+
+# Copy backend source and model utility code (risk_mapping, validation_pipeline, etc.)
+# Model weights are NOT copied — inference is delegated to the remote model server.
+COPY --chown=app:app backend /app/backend
+COPY --chown=app:app model/final_model_pipelines /app/model/final_model_pipelines
+RUN chmod +x /app/backend/docker-entrypoint.sh
+
+USER app
+
+EXPOSE 8000
+
+# Render provides $PORT env var; fall back to 8000 for local dev
+ENTRYPOINT ["/app/backend/docker-entrypoint.sh"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

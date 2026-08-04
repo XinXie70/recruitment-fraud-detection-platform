@@ -1,0 +1,88 @@
+name: almond
+
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fake_job_detection
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fake_job_detection"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    image: almond-backend:local
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.remote
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@database:5432/fake_job_detection
+      ASYNC_DATABASE_URL: postgresql+asyncpg://postgres:postgres@database:5432/fake_job_detection
+      SECRET_KEY: local-compose-secret-change-before-production
+      CORS_ORIGINS: http://localhost:5190,http://127.0.0.1:5190
+      MODEL_SERVER_URL: ${MODEL_SERVER_URL:-}
+      RUN_DATABASE_MIGRATIONS: "false"
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/live', timeout=2)"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    image: almond-frontend:local
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      VITE_API_PROXY_TARGET: http://backend:8000
+    ports:
+      - "5190:5190"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5190').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  migrate:
+    image: almond-backend:local
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@database:5432/fake_job_detection
+      SECRET_KEY: local-compose-secret-change-before-production
+      CORS_ORIGINS: http://localhost:5190,http://127.0.0.1:5190
+      RUN_DATABASE_MIGRATIONS: "true"
+    command: ["true"]
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  postgres_data:

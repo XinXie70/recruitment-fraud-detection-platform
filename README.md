@@ -1,197 +1,228 @@
-# Fake Job Advertisement Detection — Independent ML Workflow
+# Fake Job Advertisement Detection — LR + BERT + Ensemble
 
-This is a Master of IT project for detecting fraudulent English job
-advertisements.
+This fake job advertisement detection project retains three production models:
 
-The final system will combine models developed by two team members. My planned
-models are:
+| Model                     | Description                        |
+| ------------------------- | ---------------------------------- |
+| **Logistic Regression**   | TF-IDF + LR baseline               |
+| **BERT (class-weighted)** | BERT fine-tuned with class weights |
+| **LR + BERT Ensemble**    | Weighted ensemble with risk bands  |
 
-- Logistic Regression
-- Linear SVM
-- DistilRoBERTa
+## Project structure
 
-At the current stage, no models are trained. The goal is to prepare one shared
-data pipeline so that all models use the same data and evaluation rules.
+```text
+├── data/splits/              # Fixed train / validation / test splits
+├── model_code/bert/          # BERT training and inference code
+├── model_weights/            # LR joblib + BERT safetensors
+├── model_results/bert/       # BERT evaluation results
+├── reports/models/           # Metrics, predictions, ensemble, and risk-band configs
+├── src/
+│   ├── data_pipeline/        # Shared data processing
+│   ├── models/               # LR training, ensemble, and risk-band scripts
+│   └── api/                  # FastAPI inference service
+└── scripts/smoke_test_api.py # Smoke test for the E: drive environment
+```
+
+## Quick start
+
+### 1. Environment (E: drive with CUDA)
+
+```powershell
+git lfs install
+git lfs pull
+. E:\ml\activate.ps1
+cd f:\final-version2\capstone-project-26t2-9900-h09c-almond
+pip install -r requirements.txt
+pip install -r model_code/requirements-bert.txt
+```
+
+### 2. Train LR (if weights are unavailable)
+
+```powershell
+python src/models/logistic_regression/train_baseline.py
+```
+
+Weights are written to `model_weights/logistic_regression/logistic_regression_baseline.joblib`.
+
+### 3. Start FastAPI
+
+```powershell
+uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+```
+
+Swagger documentation: http://127.0.0.1:8000/docs
+
+### 4. Smoke test (E: drive)
+
+```powershell
+python scripts/smoke_test_api.py
+```
+
+Results are written to `E:\ml\smoke-test-results\fake-job-api-smoke.json`.
+
+## Frontend development
+
+The frontend requires Node.js 20.19 or a compatible newer release. With `nvm`:
+
+```bash
+nvm use
+cd frontend
+npm ci
+npm run dev
+```
+
+Before opening a pull request, run:
+
+```bash
+npm run lint
+npm test
+npm run test:coverage
+npm run test:e2e
+npm run build
+```
+
+The Playwright suite covers authentication redirects, registration, successful
+analysis with history persistence, and recoverable model-service failure. On a
+new development machine, install its headless browser once with:
+
+```bash
+npx playwright install --only-shell chromium
+```
+
+Husky and lint-staged automatically format and lint staged frontend files before
+each commit. GitHub Actions runs the backend tests, frontend linting, frontend
+tests, and a production build.
+
+## Full-stack Docker development
+
+Start PostgreSQL, run the database migrations, and launch the backend and
+frontend with one command:
+
+```bash
+docker compose up --build
+```
+
+The frontend is available at http://localhost:5190 and proxies `/api` requests
+to the backend container. Set `MODEL_SERVER_URL` before starting Compose when a
+standalone model inference service is required:
+
+```bash
+MODEL_SERVER_URL=https://model-api.example.com docker compose up --build
+```
+
+Do not expose an unauthenticated model server directly to the public internet.
+The Final Demo evidence and rehearsal checklist are maintained in
+[`docs/final-demo-readiness.md`](docs/final-demo-readiness.md).
+Architecture diagrams and rationale are available in
+[`docs/architecture/`](docs/architecture/README.md) and
+[`docs/design-justification.md`](docs/design-justification.md).
+
+## API endpoints
+
+| Method | Path                     | Description                                            |
+| ------ | ------------------------ | ------------------------------------------------------ |
+| GET    | `/health`                | Health check                                           |
+| POST   | `/predict/lr`            | Logistic Regression prediction                         |
+| POST   | `/predict/bert`          | Class-weighted BERT prediction                         |
+| POST   | `/predict/ensemble`      | LR+BERT ensemble prediction                            |
+| POST   | `/predict/ensemble/risk` | Ensemble prediction with Low/Suspicious/High risk band |
+| POST   | `/predict/lr/batch`      | Batch LR prediction (up to 100 records)                |
+
+### Request example
+
+```json
+POST /predict/ensemble/risk
+{
+  "text": "Urgent work-from-home job. Send bank details to apply."
+}
+```
+
+### Response example
+
+```json
+{
+  "model": "ensemble_lr_bert_class_weighted",
+  "fraud_score": 0.82,
+  "threshold": 0.62,
+  "prediction": 1,
+  "predicted_label": "Fraudulent",
+  "weights": {
+    "logistic_regression_baseline": 0.6,
+    "bert_class_weighted": 0.4
+  },
+  "lr_fraud_score": 0.75,
+  "bert_fraud_score": 0.91,
+  "risk_score": 82.0,
+  "risk_level": "High",
+  "binary_threshold": 0.62,
+  "low_suspicious_threshold": 0.1567,
+  "suspicious_high_threshold": 0.62
+}
+```
+
+## Backend integration example (Python)
+
+```python
+import httpx
+
+resp = httpx.post(
+    "http://127.0.0.1:8000/predict/ensemble/risk",
+    json={"text": job_ad_text},
+    timeout=30.0,
+)
+result = resp.json()
+risk_level = result["risk_level"]      # Low | Suspicious | High
+risk_score = result["risk_score"]      # 0–100
+```
 
 ## Dataset
 
-The main dataset is EMSCAD:
+The fixed splits are stored in `data/splits/` (70% Train / 15% Validation / 15% Test, seed 42).
 
-```text
-data/raw/emscad_v1.csv
-```
+Obtain the raw EMSCAD dataset separately, rename it to `data/raw/emscad_v1.csv`,
+and see `DATA_CONTRACT_V1.md` for details.
 
-It contains 17,880 job advertisements:
-
-- 17,014 legitimate advertisements
-- 866 fraudulent advertisements
-
-The source file uses `f` and `t` for the label. The pipeline converts them to:
-
-- `0` = legitimate
-- `1` = fraudulent
-
-The file SHA-256 is:
-
-```text
-25e52f6d34939510f3f2ca5afc55ccfe7259ccc01283319bd484c466ea88baaf
-```
-
-The dataset CSV is not stored in GitHub because of its size. Each team member
-must obtain the same file, rename it to `emscad_v1.csv`, place it in `data/raw/`,
-and confirm that its SHA-256 matches the value above.
-
-Dataset background: Vidros et al. (2017), *Automatic Detection of Online
-Recruitment Frauds: Characteristics, Methods, and a Public Dataset*.
+Dataset source: Vidros et al. (2017), _Automatic Detection of Online Recruitment
+Frauds: Characteristics, Methods, and a Public Dataset_.
 https://doi.org/10.3390/fi9010006
 
-## Shared rules
+## Model training and evaluation workflow
 
-- Use the same basic text cleaning for every model.
-- Use the same train, validation, and test sets for all models.
-- Duplicate and near-duplicate advertisements must stay in the same split.
-- Fit TF-IDF, vocabulary, scalers, and other learned preprocessing on train only.
-- Choose the final threshold using validation only; never use test for tuning.
-- Do not use test or external data for tuning.
+```powershell
+# LR baseline
+python src/models/logistic_regression/train_baseline.py
 
-More details are in `DATA_CONTRACT_V1.md`.
+# Evaluate BERT with existing weights
+cd model_code/bert
+python evaluate_bert.py --checkpoint_dir ..\..\model_weights\bert\bert_class_weighted\best
 
-## Raw data audit
+# Search ensemble weights on validation; apply the locked config to test
+cd ..\..
+python src/models/build_ensemble.py --mode validation
+python src/models/build_ensemble.py --mode test
 
-Run:
-
-```bash
-python3 src/data_pipeline/audit_raw.py
+# Risk bands
+python src/models/build_risk_bands.py --mode validation
+python src/models/build_risk_bands.py --mode test
 ```
 
-The script only reads the raw CSV and saves a simple report to:
+## Risk-band configuration
 
-```text
-data/diagnostics/raw_audit_v1.md
-```
+Frozen configuration: `reports/models/risk_band_v1_config.json`
 
-## Prepare the shared model dataset
+| Level          | Rule                        |
+| -------------- | --------------------------- |
+| **Low**        | fraud_score < 0.1567        |
+| **Suspicious** | 0.1567 ≤ fraud_score < 0.62 |
+| **High**       | fraud_score ≥ 0.62          |
 
-Run:
+`risk_score = fraud_score × 100`
 
-```bash
-python3 src/data_pipeline/prepare_data.py
-```
+## Retained result files
 
-This cleans and combines the five agreed text fields, converts the label to
-`0/1`, and creates a stable ID for each advertisement. The result is:
+- `reports/models/logistic_regression/` — LR metrics and predictions
+- `reports/models/bert/` — BERT metrics and predictions
+- `reports/models/ensemble_lr_bert/` — Ensemble configuration and predictions
+- `reports/models/risk_band_v1_*` — Risk-band configuration and results
 
-```text
-data/processed/emscad_processed_v1.csv
-```
-
-The processed file contains three columns: `record_id`, `combined_text`, and
-`label`.
-
-## Group duplicate advertisements
-
-Run:
-
-```bash
-python3 src/data_pipeline/group_duplicates.py
-```
-
-This keeps the first copy of each exact duplicate, retains different
-near-duplicate texts, and gives near duplicates the same `group_id`. It creates:
-
-```text
-data/processed/emscad_grouped_v1.csv
-data/diagnostics/duplicate_report_v1.md
-```
-
-The groups will be used in the next stage so that similar advertisements cannot
-appear in different data splits.
-
-## Compare split ratios
-
-Before creating the final splits, run:
-
-```bash
-python3 src/data_pipeline/analyse_split_options.py
-```
-
-This compares several group-aware split ratios using sample counts, class balance,
-and sensitivity across random seeds. It does not train models or create the final
-split files. The result is saved to:
-
-```text
-reports/split_feasibility_v1.md
-```
-
-The selected ratio is **70% Train / 15% Validation / 15% Test**, using seed 42.
-
-## Create the fixed splits
-
-Run:
-
-```bash
-python3 src/data_pipeline/create_splits.py
-```
-
-This creates the three shared files in `data/splits/`. Every model must use
-these same files. The integrity check is saved to:
-
-```text
-data/diagnostics/split_report_v1.md
-```
-
-The fixed `train.csv`, `validation.csv`, and `test.csv` files are stored in
-GitHub so team members can use the same data directly. The additional file
-`data/splits/split_assignments_v1.csv` records the agreed assignment of every
-`record_id` and makes the split reproducible.
-
-Expected SHA-256 values for the raw, processed, and split files are recorded in
-`data/checksums_v1.txt` for team verification.
-
-## Files stored in GitHub
-
-GitHub contains the pipeline code, documentation, reports, the fixed split
-assignment file, and the three final split CSV files. Raw data, intermediate
-processed data, trained model files, and local Python environments are excluded
-by `.gitignore`.
-
-To rebuild the shared data after placing `emscad_v1.csv` in `data/raw/`, run:
-
-```bash
-python3 src/data_pipeline/audit_raw.py
-python3 src/data_pipeline/prepare_data.py
-python3 src/data_pipeline/group_duplicates.py
-python3 src/data_pipeline/create_splits.py
-```
-
-## Logistic Regression baseline
-
-Create the local environment and install the project dependencies:
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-Train the baseline:
-
-```bash
-.venv/bin/python src/models/logistic_regression/train_baseline.py
-```
-
-The baseline uses group-aware cross-validation inside Train and selects its
-threshold on Validation. It does not read Test. Results are saved under
-`reports/models/logistic_regression/`.
-
-## Linear SVM baseline
-
-Train the baseline:
-
-```bash
-.venv/bin/python src/models/linear_svm/train_baseline.py
-```
-
-The SVM uses the same group-aware Train cross-validation and Validation
-threshold rule as Logistic Regression. Its decision scores are converted to
-0–1 fraud scores using group-aware sigmoid calibration fitted on Train only.
-Results are saved under `reports/models/linear_svm/`.
+See `MODEL_EXPERIMENT_CONTRACT_V1.md` for additional experiment conventions.

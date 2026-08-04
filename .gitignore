@@ -2,23 +2,41 @@
 data/raw/*.csv
 data/processed/*.csv
 
-# Trained models and experiment outputs
+# Legacy / local-only experiment trees
 /models/
+/outputs/
 artifacts/
 checkpoints/
-outputs/
+
+# Generic binary dumps outside the deliverable weight pack
 *.joblib
-*.pkl
+!model_weights/**/*.joblib
 *.pt
 *.pth
+*.pkl
+!model_weights/**/*.pkl
 
 # Local environments and temporary files
 .venv/
 venv/
 __pycache__/
 *.py[cod]
+.coverage
+.coverage.*
+htmlcov/
+.env
+.env.*
+!.env.example
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
 .DS_Store
 .ipynb_checkpoints/
 .idea/
 .vscode/
-model_weights/
+
+# Training runtime output is local-only; retain placeholder directories.
+model_results/**/logs/*
+!model_results/**/logs/.gitkeep

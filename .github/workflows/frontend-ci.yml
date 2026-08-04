@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: fake_job_detection_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fake_job_detection_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/fake_job_detection_test
+      TEST_DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/fake_job_detection_test
+      MODEL_SERVER_URL: http://model-server.invalid
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-remote.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r backend/requirements-remote.txt pytest pytest-cov ruff mypy
+
+      - name: Apply database migrations
+        run: python -m alembic -c backend/alembic.ini upgrade head
+
+      - name: Check models and migrations are in sync
+        run: python -m alembic -c backend/alembic.ini check
+
+      - name: Lint backend
+        run: ruff check backend
+
+      - name: Type-check backend core
+        run: mypy backend/services backend/routers backend/schemas backend/config.py backend/dependencies.py
+
+      - name: Test backend with coverage
+        working-directory: backend
+        run: python -m pytest tests -q --cov=. --cov-config=.coveragerc
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Test
+        run: npm run test:coverage
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps --only-shell chromium
+
+      - name: End-to-end test
+        run: npm run test:e2e
+
+      - name: Build
+        run: npm run build

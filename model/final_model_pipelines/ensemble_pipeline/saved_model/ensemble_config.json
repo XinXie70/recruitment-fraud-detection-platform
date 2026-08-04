@@ -1,0 +1,17 @@
+{
+  "version": "ensemble-v3-lr-bert-production",
+  "fitted": true,
+  "weight_source": "production_model_api",
+  "low_threshold": 0.1567,
+  "high_threshold": 0.62,
+  "models": {
+    "logistic_regression": {
+      "weight": 0.6,
+      "calibration": {"type": "identity"}
+    },
+    "bert": {
+      "weight": 0.4,
+      "calibration": {"type": "identity"}
+    }
+  }
+}
