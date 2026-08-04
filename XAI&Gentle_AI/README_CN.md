@@ -1,9 +1,10 @@
-# XAI 与 Gentle AI 代码交付包
+# XAI and Gentle AI Submission Package
 
-本目录只包含 XAI、Gentle AI、对应前端展示组件及测试，不包含模型权重、
-数据库、虚拟环境、`node_modules` 或其他组员负责的完整前后端代码。
+This directory contains the XAI and Gentle AI modules, their frontend display
+components, and related tests. It does not include model weights, databases,
+virtual environments, `node_modules`, or unrelated frontend and backend code.
 
-## 目录
+## Directory Structure
 
 ```text
 backend/
@@ -32,15 +33,18 @@ frontend/src/features/
     ModelContributions.test.jsx
 ```
 
-## 后端功能
+## Backend Features
 
-- `xai_service.py`：使用 SHAP Partition 解释正式 ensemble 风险评分；长文本使用分层 SHAP。
-- `contracts.py`：定义 XAI 和 Gentle AI 的稳定输入输出结构。
-- `gentle_ai_service.py`：根据 ensemble 风险和结构化 XAI 证据生成安全说明，可选调用本地 Ollama。
-- `gentle_fallback.py`：Ollama 不可用时返回确定性的模板内容。
-- `knowledge/education_en.json`：本地教育知识库。
+- `xai_service.py` uses SHAP Partition to explain the production ensemble risk
+  score. It uses hierarchical SHAP for long text.
+- `contracts.py` defines stable input and output structures for XAI and Gentle AI.
+- `gentle_ai_service.py` generates safety guidance from the ensemble risk and
+  structured XAI evidence. It can optionally use a local Ollama model.
+- `gentle_fallback.py` returns deterministic template content when Ollama is
+  unavailable.
+- `knowledge/education_en.json` stores the local educational knowledge base.
 
-后端通过以下公共接口接入：
+The backend modules expose the following public interface:
 
 ```python
 from xai_gentle import GentleAIService, RiskContext, XAIService
@@ -49,27 +53,32 @@ xai_result = XAIService().explain(text, score_batch, risk_score)
 gentle_result = GentleAIService().generate(risk_context, xai_result)
 ```
 
-正式项目仍需要在 `backend/services/analysis_service.py` 中提供：
+The production project must provide the following values through
+`backend/services/analysis_service.py`:
 
-- 原始招聘文本 `text`；
-- 正式 ensemble 的批量评分函数 `score_batch`；
-- 正式 ensemble 最终风险分数 `risk_score`。
+- The original job advertisement text, `text`.
+- The production ensemble batch-scoring function, `score_batch`.
+- The final production ensemble risk score, `risk_score`.
 
-后端依赖必须包含：
+The backend dependencies must include:
 
 ```text
 shap>=0.46.0,<1.0.0
 ```
 
-## 前端功能
+## Frontend Features
 
-- `ExplanationText.jsx`：根据后端 `start/end` 在原文中高亮证据。
-- `AttributionTable.jsx`：显示短语、风险方向和 SHAP 贡献值。
-- `ModelContributions.jsx`：显示 BERT 主模型和 LR false-positive gate 的决策角色。
-- `GentleGuidance.jsx`：显示 Gentle AI 摘要、安全建议和免责声明。
-- `attributionFormatting.js`：格式化 SHAP 百分点。
+- `ExplanationText.jsx` uses the backend `start` and `end` offsets to highlight
+  evidence in the original text.
+- `AttributionTable.jsx` displays phrases, risk direction, and SHAP contribution
+  values.
+- `ModelContributions.jsx` displays the decision roles of the primary BERT model
+  and the LR false-positive gate.
+- `GentleGuidance.jsx` displays the Gentle AI summary, safety guidance, and
+  disclaimer.
+- `attributionFormatting.js` formats SHAP contributions as percentage points.
 
-正式项目的 `frontend/src/App.jsx` 需要导入这些组件：
+The production `frontend/src/App.jsx` must import these components:
 
 ```javascript
 import AttributionTable from './features/xai_gentle/AttributionTable';
@@ -78,21 +87,17 @@ import GentleGuidance from './features/xai_gentle/GentleGuidance';
 import ModelContributions from './features/xai_gentle/ModelContributions';
 ```
 
-## 测试
+## Testing
 
-后端：
+Backend tests:
 
 ```bash
 python -m pytest -q backend/tests/test_xai_service.py backend/tests/test_gentle_ai.py
 ```
 
-前端测试需要放回完整项目后，在 `frontend` 目录执行：
+After placing the frontend files in the complete project, run the frontend tests
+from the `frontend` directory:
 
 ```bash
 pnpm test
 ```
-
-## 注意
-
-该压缩包是模块交付包，不是可以单独启动的网站。团队应把目录按原路径合并进完整项目，
-并保留最新 ensemble 的 `score_batch` 接口。XAI 不直接导入或修改 BERT、LR 或其他模型内部代码。
