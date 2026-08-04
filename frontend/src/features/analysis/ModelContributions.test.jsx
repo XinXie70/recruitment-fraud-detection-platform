@@ -43,8 +43,6 @@ test('formats and labels model contribution values without hiding precision', ()
   expect(screen.getByText('Calibrated fake-risk score <0.1%')).toBeInTheDocument();
   expect(screen.getByText('Calibrated fake-risk score N/A')).toBeInTheDocument();
   expect(screen.getByText('Calibrated fake-risk score 0.0%')).toBeInTheDocument();
-  expect(screen.getAllByText('Raw fake-risk score')).toHaveLength(3);
-  expect(screen.getAllByText('Effective ensemble weight')).toHaveLength(3);
+  expect(screen.getAllByText('Raw score')).toHaveLength(3);
   expect(screen.getAllByText('Contribution to final score')).toHaveLength(3);
-  expect(screen.getAllByText('12.5%')).toHaveLength(3);
 });

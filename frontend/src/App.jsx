@@ -205,7 +205,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
                 <Activity size={22} />
                 <div>
                   <h2>Model Technical Details</h2>
-                  <span className="classification-note">Scores, weights and contributions</span>
+                  <span className="classification-note">Scores and contributions</span>
                 </div>
               </div>
 
@@ -213,9 +213,6 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             </summary>
 
             <div className="technical-details-content">
-              <p className="classification-note">
-                Calibrated score × effective weight = final contribution
-              </p>
               <ModelContributions members={result.member_outputs} />
             </div>
           </details>
