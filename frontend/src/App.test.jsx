@@ -270,6 +270,51 @@ test('keeps the risk score visible when detailed explanation loading fails', asy
   expect(window.localStorage.getItem('fake_job_history')).toBeNull();
 });
 
+test('shows an indeterminate progress bar while the XAI explanation is loading', async () => {
+  window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
+  window.history.pushState({}, '', '/analyze');
+  const scoreResponse = {
+    ...ANALYSIS_RESPONSE,
+    phase: 'score',
+    xai: { status: 'unavailable', method: 'unavailable', items: [] },
+  };
+  let resolveExplanation;
+  const explanationResponse = new Promise((resolve) => {
+    resolveExplanation = resolve;
+  });
+  vi.stubGlobal(
+    'fetch',
+    vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue(scoreResponse),
+      })
+      .mockReturnValueOnce(explanationResponse),
+  );
+
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Load fake sample' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
+
+  expect(
+    await screen.findByRole('progressbar', { name: 'Preparing XAI explanation' }),
+  ).toBeVisible();
+  expect(screen.getByText('Preparing the detailed model-derived explanation…')).toBeVisible();
+
+  resolveExplanation({
+    ok: true,
+    status: 200,
+    json: vi.fn().mockResolvedValue(ANALYSIS_RESPONSE),
+  });
+  await waitFor(() =>
+    expect(
+      screen.queryByRole('progressbar', { name: 'Preparing XAI explanation' }),
+    ).not.toBeInTheDocument(),
+  );
+});
+
 test('logs out when the analysis API rejects an expired token', async () => {
   window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
   window.history.pushState({}, '', '/analyze');
