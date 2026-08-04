@@ -1,0 +1,122 @@
+[
+  {
+    "id": "fake-job-general-checks",
+    "topic": "fake_jobs",
+    "title": "Check a job offer before acting",
+    "summary": "Pause and independently verify the employer, recruiter, role, and contact details before sharing information or money.",
+    "warning_signs": [
+      "An unexpected recruiter contacts you through an encrypted messaging app.",
+      "The role promises high income for little effort or has almost no hiring process.",
+      "You are asked for money, cryptocurrency, bank access, or identity documents early in the process."
+    ],
+    "example": "A person receives an unexpected work-from-home offer, is moved to a messaging app, and is asked to pay before earnings can be released.",
+    "best_practices": [
+      "Find the employer's official website independently and contact it using details you find yourself.",
+      "Do not pay money or send banking, cryptocurrency, or identity details to an unverified recruiter.",
+      "Take time to check the offer with someone you trust."
+    ],
+    "indicator_terms": ["work from home", "no experience", "high income", "easy work", "immediate start", "urgent hiring"],
+    "source_name": "Scamwatch - Jobs and employment scams",
+    "source_url": "https://www.scamwatch.gov.au/types-of-scams/jobs-and-employment-scams"
+  },
+  {
+    "id": "fake-job-upfront-payment",
+    "topic": "fake_jobs",
+    "title": "Do not pay to start a job",
+    "summary": "Up-front recruitment, training, equipment, task, or account top-up payments are important job-scam warning signs.",
+    "warning_signs": [
+      "A fee is required before work or training begins.",
+      "You must top up an account or cryptocurrency wallet to unlock tasks or earnings.",
+      "The recruiter promises the payment will be reimbursed later."
+    ],
+    "example": "A supposed supervisor asks a candidate to pay for a training kit and promises reimbursement in the first pay cheque.",
+    "best_practices": [
+      "Do not send an up-front payment to obtain work or release earnings.",
+      "Contact your bank quickly if you have already transferred money.",
+      "Report the account and offer to the platform and Scamwatch."
+    ],
+    "indicator_terms": ["fee", "payment", "pay", "training kit", "top up", "cryptocurrency", "bitcoin", "usdt"],
+    "source_name": "Scamwatch - Jobs and employment scams",
+    "source_url": "https://www.scamwatch.gov.au/types-of-scams/jobs-and-employment-scams"
+  },
+  {
+    "id": "fake-job-contact-and-identity",
+    "topic": "fake_jobs",
+    "title": "Verify recruiters and protect identity details",
+    "summary": "Unexpected contact, messaging-only interviews, and early requests for sensitive identity information deserve independent checking.",
+    "warning_signs": [
+      "The recruiter insists on WhatsApp, Telegram, Signal, or personal email only.",
+      "There is no formal interview or discussion of qualifications and references.",
+      "Passport, driver licence, banking, or other identity details are requested before verification."
+    ],
+    "example": "A recruiter uses the name of a real company but communicates only through a personal account and requests passport and bank details.",
+    "best_practices": [
+      "Contact the company using an independently sourced official phone number or website.",
+      "Do not rely on links or contact details supplied in the message.",
+      "Limit personal details in a resume until the recruiter is verified."
+    ],
+    "indicator_terms": ["whatsapp", "telegram", "signal", "gmail", "yahoo", "passport", "bank details", "no interview"],
+    "source_name": "Scamwatch - Jobs and employment scams",
+    "source_url": "https://www.scamwatch.gov.au/types-of-scams/jobs-and-employment-scams"
+  },
+  {
+    "id": "misinformation-source-checking",
+    "topic": "misinformation",
+    "title": "Check information before trusting or sharing it",
+    "summary": "Question the source, evidence, context, headline, and motive, then compare the claim with trustworthy independent sources.",
+    "warning_signs": [
+      "The headline does not match the content or uses strong emotion without evidence.",
+      "The author, date, original context, or supporting sources are missing.",
+      "The content presents a one-sided claim as settled fact."
+    ],
+    "example": "An old image is reposted with a new caption that claims it shows a current event in a different place.",
+    "best_practices": [
+      "Check the original source, author, publication date, and full context.",
+      "Compare the claim with multiple trustworthy sources before sharing.",
+      "Use reverse image search or a recognised fact-checking service where appropriate."
+    ],
+    "indicator_terms": [],
+    "source_name": "eSafety Commissioner - Fake news and misinformation",
+    "source_url": "https://www.esafety.gov.au/key-topics/fake-news-and-misinformation"
+  },
+  {
+    "id": "phishing-safe-response",
+    "topic": "phishing",
+    "title": "Respond safely to suspicious messages",
+    "summary": "Phishing messages imitate trusted people or organisations to obtain information, money, credentials, or device access.",
+    "warning_signs": [
+      "A message pressures you to click, open an attachment, scan a code, or act urgently.",
+      "The sender requests passwords, verification codes, banking details, or personal information.",
+      "The displayed sender or link looks familiar but is not the official address."
+    ],
+    "example": "A message that appears to come from a bank links to a copied login page and asks for account credentials.",
+    "best_practices": [
+      "Do not use links or contact details in the suspicious message.",
+      "Open the official app or type the official address yourself to verify the request.",
+      "Report the message and secure affected accounts quickly if information was shared."
+    ],
+    "indicator_terms": ["click", "link", "password", "verification code", "banking details", "attachment"],
+    "source_name": "Australian Cyber Security Centre - Phishing",
+    "source_url": "https://www.cyber.gov.au/threats/types-threats/phishing"
+  },
+  {
+    "id": "scam-patterns-stop-check-protect",
+    "topic": "scam_patterns",
+    "title": "Recognise common pressure and impersonation patterns",
+    "summary": "Scams often combine authority, urgency, emotion, scarcity, or an unusually attractive offer to reduce the time you spend checking.",
+    "warning_signs": [
+      "The sender claims authority and demands immediate action.",
+      "The offer seems unusually rewarding, scarce, or too good to be true.",
+      "You are discouraged from checking with another person or official source."
+    ],
+    "example": "A caller impersonates a trusted organisation, creates urgency, and directs payment through an unusual method.",
+    "best_practices": [
+      "Stop and give yourself time before sending money or information.",
+      "Check the request through an official channel you find independently.",
+      "Protect accounts and report the incident promptly if something went wrong."
+    ],
+    "indicator_terms": ["urgent", "immediately", "act now", "limited time", "guaranteed", "financial freedom"],
+    "source_name": "Australian Cyber Security Centre - Recognise and report scams",
+    "source_url": "https://www.cyber.gov.au/learn-basics/explore-basics/recognise-and-report-scams"
+  }
+]
