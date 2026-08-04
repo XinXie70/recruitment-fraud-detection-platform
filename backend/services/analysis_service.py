@@ -6,10 +6,12 @@ from typing import Any, Callable
 
 from final_model_pipelines.validation_pipeline import validate_job_input
 
+from config import settings
 from schemas.analysis import AnalysisResponse, URLAnalysis
 from services.cache import TTLCache
 from services.ensemble_predictor import EnsemblePredictor
 from services.model_adapter import ModelRegistry
+from services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
 from url_analyzer import analyze_urls
 from xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
 
@@ -46,7 +48,7 @@ def empty_url_analysis(reason: str) -> URLAnalysis:
 class AnalysisService:
     def __init__(
         self,
-        ensemble: EnsemblePredictor,
+        ensemble: EnsemblePredictor | RemoteFinalEnsemblePredictor,
         xai: XAIService,
         gentle_ai: GentleAIService,
         validator: Validator = validate_job_input,
@@ -65,9 +67,16 @@ class AnalysisService:
 
     @classmethod
     def from_environment(cls) -> "AnalysisService":
-        registry = ModelRegistry.default()
+        if settings.model_server_url.strip():
+            ensemble = RemoteFinalEnsemblePredictor(
+                settings.model_server_url,
+                timeout_seconds=settings.model_server_timeout,
+            )
+        else:
+            registry = ModelRegistry.default()
+            ensemble = EnsemblePredictor.from_environment(registry)
         return cls(
-            ensemble=EnsemblePredictor.from_environment(registry),
+            ensemble=ensemble,
             xai=XAIService(),
             gentle_ai=GentleAIService(),
         )
