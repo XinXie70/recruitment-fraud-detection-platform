@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, Final, Literal
 
 from config import settings
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 from xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
@@ -54,6 +54,12 @@ class EnsembleResult(BaseModel):
     version: str
     fitted: bool
     weight_source: str
+
+    @computed_field
+    @property
+    def risk_score_100(self) -> float:
+        """Percentage-scale risk score for API consumers and UI display."""
+        return round(self.risk_score * 100, 2)
 
     @model_validator(mode="after")
     def thresholds_are_ordered(self) -> "EnsembleResult":

@@ -58,6 +58,7 @@ def test_partial_failure_renormalizes_weights() -> None:
 
     assert computation.ensemble.status == "degraded"
     assert computation.ensemble.risk_score == pytest.approx(0.8)
+    assert computation.ensemble.risk_score_100 == pytest.approx(80.0)
     assert computation.members[0].effective_weight == 1
     assert computation.score_batch(["one", "two"]) == [0.25, 0.25]
     assert registry.batch_timeout_seconds is None

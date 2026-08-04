@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from config import settings
 from services.analysis_service import AnalysisService
 from services.cache import TTLCache
 from services.ensemble_predictor import EnsemblePredictor
 from services.model_adapter import ModelRegistry
+from services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
 from xai_gentle import GentleAIService, XAIService
 
 
@@ -18,8 +20,12 @@ def get_model_registry() -> ModelRegistry:
 
 
 @lru_cache()
-def get_ensemble_predictor() -> EnsemblePredictor:
-
+def get_ensemble_predictor() -> EnsemblePredictor | RemoteFinalEnsemblePredictor:
+    if settings.model_server_url.strip():
+        return RemoteFinalEnsemblePredictor(
+            settings.model_server_url,
+            timeout_seconds=settings.model_server_timeout,
+        )
     return EnsemblePredictor.from_environment(get_model_registry())
 
 
