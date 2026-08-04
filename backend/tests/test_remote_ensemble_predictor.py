@@ -75,3 +75,72 @@ def test_remote_predictor_rejects_contract_mismatch() -> None:
 
     with pytest.raises(EnsembleUnavailableError, match="API contract"):
         predictor.predict("job listing")
+
+
+@pytest.mark.parametrize(
+    ("response", "message"),
+    [
+        (httpx.Response(503), "request failed"),
+        (httpx.Response(200, json={"ok": False}), "returned an error"),
+        (httpx.Response(200, json=["unexpected"]), "returned an error"),
+    ],
+)
+def test_remote_predictor_rejects_request_failures(
+    response: httpx.Response, message: str
+) -> None:
+    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor.client = httpx.Client(
+        transport=httpx.MockTransport(lambda request: response)
+    )
+
+    with pytest.raises(EnsembleUnavailableError, match=message):
+        predictor.predict("job listing")
+
+
+@pytest.mark.parametrize("value", ["not-a-number", -0.1, 1.1])
+def test_remote_predictor_rejects_invalid_probabilities(value: object) -> None:
+    payload = _all_response()
+    payload["risk"]["risk_score"] = value
+    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor.client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, json=payload)
+        )
+    )
+
+    with pytest.raises(EnsembleUnavailableError, match="invalid risk_score"):
+        predictor.predict("job listing")
+
+
+def test_remote_predictor_warm_up_reports_success_and_failure() -> None:
+    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor.client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, json=_all_response())
+        )
+    )
+    assert predictor.warm_up("job listing") == {"final_ensemble": None}
+
+    predictor.client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(503)
+        )
+    )
+    outcome = predictor.warm_up("job listing")
+    assert outcome["final_ensemble"] == "Remote final ensemble request failed."
+
+
+def test_remote_predictor_rejects_batch_contract_mismatch() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/predict/all":
+            return httpx.Response(200, json=_all_response())
+        return httpx.Response(200, json={"ok": True, "results": []})
+
+    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor.client = httpx.Client(transport=httpx.MockTransport(handler))
+    computation = predictor.predict("job listing")
+
+    with pytest.raises(EnsembleUnavailableError, match="batch response"):
+        computation.score_batch(["one"])
+
+    predictor.close()
