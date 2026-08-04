@@ -23,6 +23,8 @@ WORKDIR /app
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
+    && groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app \
     && rm -rf /var/lib/apt/lists/*
 
 # CPU PyTorch first (cloud-friendly; no NVIDIA runtime required), then API deps.
@@ -56,11 +58,14 @@ WORKDIR /app/api_flask
 
 RUN sed -i 's/\r$//' entrypoint.sh \
     && chmod +x entrypoint.sh \
-    && mkdir -p /app/retrain_paper_aligned_seed42_maxlen512/results/logs
+    && mkdir -p /app/retrain_paper_aligned_seed42_maxlen512/results/logs \
+    && chown -R app:app /app
 
 EXPOSE 5000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD curl -fsS "http://127.0.0.1:${PORT}/health" || exit 1
+
+USER app
 
 ENTRYPOINT ["./entrypoint.sh"]
