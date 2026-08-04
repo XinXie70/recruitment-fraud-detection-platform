@@ -56,12 +56,8 @@ export default function ModelContributions({ members }) {
                 </div>
                 <dl className="model-contribution-values">
                   <div>
-                    <dt>Raw fake-risk score</dt>
+                    <dt>Raw score</dt>
                     <dd>{formatPercent(member.raw_score)}</dd>
-                  </div>
-                  <div>
-                    <dt>Effective ensemble weight</dt>
-                    <dd>{formatPercent(member.effective_weight)}</dd>
                   </div>
                   <div>
                     <dt>Contribution to final score</dt>
