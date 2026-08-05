@@ -71,6 +71,18 @@ const ANALYSIS_RESPONSE = {
   },
 };
 
+async function expectResponsiveViewport(page) {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    )
+    .toBeLessThanOrEqual(0);
+
+  await expect(page.locator('nav.app-nav')).toBeVisible();
+}
+
 async function authenticate(page, expectedPath = '/analyze', authResponse = AUTH_RESPONSE) {
   await page.route('**/api/auth/login', async (route) => {
     const request = route.request();
@@ -121,6 +133,7 @@ test('redirects a signed-out user to login and returns to the requested page', a
   await authenticate(page, '/dashboard');
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole('heading', { name: /Welcome back, demo-user/ })).toBeVisible();
+  await expectResponsiveViewport(page);
 });
 
 test('registers a new user and opens the analyser', async ({ page }) => {
@@ -144,7 +157,8 @@ test('registers a new user and opens the analyser', async ({ page }) => {
   await page.getByRole('button', { name: 'Register' }).click();
 
   await expect(page).toHaveURL(/\/analyze$/);
-  await expect(page.getByText('demo-user', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Detect Fake Job Advertisements' })).toBeVisible();
+  await expectResponsiveViewport(page);
 });
 
 test('analyses a job advert and records it in the user dashboard', async ({ page }) => {
@@ -190,6 +204,7 @@ test('analyses a job advert and records it in the user dashboard', async ({ page
     page.getByText('Total Scans').locator('..').getByText('1', { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Likely Deceptive' })).toBeVisible();
+  await expectResponsiveViewport(page);
 });
 
 test('shows a recoverable message when the model service is unavailable', async ({ page }) => {
@@ -214,6 +229,7 @@ test('shows a recoverable message when the model service is unavailable', async 
     page.getByText('The analysis service is temporarily unavailable. Please try again shortly.'),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Analyze Text' })).toBeEnabled();
+  await expectResponsiveViewport(page);
 });
 
 test('routes an administrator to the research dashboard and reports service health', async ({
@@ -281,4 +297,5 @@ test('routes an administrator to the research dashboard and reports service heal
   await page.getByRole('button', { name: 'Refresh system health' }).click();
   await expect.poll(() => healthRequests).toBeGreaterThan(requestsBeforeRefresh);
   await expect(page.getByText('System Healthy')).toBeVisible();
+  await expectResponsiveViewport(page);
 });
