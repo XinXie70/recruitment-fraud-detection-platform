@@ -41,8 +41,8 @@ const ANALYSIS_RESPONSE = {
   ],
   xai: {
     status: 'success',
-    method: 'occlusion_fallback',
-    target: 'ensemble_fake_probability',
+    method: 'shap_partition',
+    target: 'ensemble_risk_score',
     version: 'xai-e2e',
     base_value: 0.2,
     output_value: 0.86,

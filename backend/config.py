@@ -61,10 +61,12 @@ class Settings(BaseSettings):
 
     # XAI
 
-    xai_use_shap: bool = True
-    xai_max_items: int = 10
-    xai_max_segments: int = 80
-    xai_max_evals: int = 200
+    xai_max_items: int = Field(default=10, ge=1, le=50)
+    xai_max_evals: int = Field(default=200, ge=8)
+    xai_hierarchical_min_words: int = Field(default=250, ge=1)
+    xai_hierarchical_top_segments: int = Field(default=2, ge=1)
+    xai_hierarchical_segment_words: int = Field(default=35, ge=1)
+    xai_hierarchical_max_evals: int = Field(default=160, ge=8)
 
 
     # Ollama

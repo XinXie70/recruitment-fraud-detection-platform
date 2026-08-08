@@ -34,6 +34,29 @@ candidate will receive a competitive salary and benefits, complete formal
 interviews, and work full time from our Sydney office.
 """
 
+MOBILE_PATROL_JOB_TEXT = """
+The Company
+Southern Cross Protection is a national security company servicing clients
+throughout Australia.
+
+The Role
+We have a permanent Night Mobile Patrol position available in Regency Park.
+This role provides reliable alarm response and thorough client site checks.
+
+The Tasks
+Respond to alarm activations, conduct lockups and perimeter checks, and prepare
+accurate and timely incident reports.
+
+Benefits of the role
+Use a modern patrol vehicle, join our reward and recognition program, and have
+one weekend off per fortnight.
+
+The Successful Candidate
+The successful candidate has a Security Providers Licence, a full Drivers
+Licence, unrestricted Australian working rights, and can work 12-hour shifts.
+Apply for a career with Southern Cross Protection.
+"""
+
 
 def test_unrelated_text_is_rejected_before_model_prediction():
     service = build_service()
@@ -50,6 +73,14 @@ def test_unrelated_text_is_rejected_before_model_prediction():
 
 def test_valid_job_advertisement_still_passes_validation():
     result = validate_job_input(VALID_JOB_TEXT)
+
+    assert result["is_valid"] is True
+    assert result["status"] in {"valid", "success_with_warning"}
+    assert result["job_relevance_score"] >= 0.4
+
+
+def test_job_ad_with_reward_and_incident_reports_is_not_rejected():
+    result = validate_job_input(MOBILE_PATROL_JOB_TEXT)
 
     assert result["is_valid"] is True
     assert result["status"] in {"valid", "success_with_warning"}

@@ -12,7 +12,15 @@ from backend.xai_gentle import GentleAIService, RiskContext, XAIService
 
 - `contracts.py`: Stable input/output contracts including `RiskContext`, `XAIResult`,
   and `GentleAIResult`.
-- `xai_service.py`: Explains the formal ensemble scorer, generating SHAP or occlusion evidence.
+- `xai_service.py`: Explains the formal ensemble risk scorer with SHAP Partition.
+  Long advertisements use sentence-aware phrase spans of at most eight words across
+  the complete input. This avoids a second masking pass that can collapse useful
+  evidence to zero when the formal risk probability is saturated. Displayed
+  evidence combines isolated high-impact fragments with nearby context and removes
+  standalone numeric, generic, calendar, and relatively insignificant noise without
+  changing model scores. Long-text analysis never substitutes a full sentence when
+  no reliable phrase-level attribution survives filtering; it returns an empty
+  evidence list with an explicit message instead.
 - `gentle_ai_service.py`: Reads structured evidence, optionally calls local Ollama for rewriting.
 - `gentle_fallback.py`: Deterministic templates used when Ollama is unavailable.
 - `knowledge/education_en.json`: Local education knowledge base.
@@ -26,7 +34,12 @@ XAIService.explain(text, score_batch, expected_output) -> XAIResult
 ```
 
 It does not import any concrete model or EnsemblePredictor — it only calls the
-`score_batch` provided by the backend.
+`score_batch` provided by the backend. With the final BERT + LR FP-gate model,
+this scorer is backed by the remote `/predict/batch` endpoint and returns the
+same formal `risk_score` used by the application.
+
+SHAP is the only attribution method. If it cannot run, XAI returns a structured
+`unavailable` result; it does not substitute keyword rules or occlusion scores.
 
 Gentle AI public API:
 
@@ -41,5 +54,5 @@ The only backend integration point is `backend/services/analysis_service.py`.
 Independent test command:
 
 ```bash
-python -m pytest -q tests/xai_gentle
+python -m pytest -q backend/tests/test_xai_service.py backend/tests/test_gentle_ai.py
 ```

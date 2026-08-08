@@ -118,8 +118,10 @@ class GentleAIService:
                     "model": self.ollama_model,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
+                    "think": False,
+                    "keep_alive": "10m",
                     "format": OllamaRewrite.model_json_schema(),
-                    "options": {"temperature": 0},
+                    "options": {"temperature": 0, "num_predict": 512},
                 },
             )
             response.raise_for_status()

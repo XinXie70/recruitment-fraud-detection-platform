@@ -26,10 +26,10 @@ import {
 } from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
-import AttributionTable from './features/analysis/AttributionTable';
-import ExplanationText from './features/analysis/ExplanationText';
-import GentleGuidance from './features/analysis/GentleGuidance';
-import ModelContributions from './features/analysis/ModelContributions';
+import AttributionTable from './features/xai_gentle/AttributionTable';
+import ExplanationText from './features/xai_gentle/ExplanationText';
+import GentleGuidance from './features/xai_gentle/GentleGuidance';
+import ModelContributions from './features/xai_gentle/ModelContributions';
 import EducationLibrary from './features/education/EducationLibrary';
 import './App.css';
 import SharedNavigation from './components/Navigation';
@@ -74,6 +74,29 @@ function loadStoredAuth() {
   }
 }
 
+function formatApiError(detail, fallback = 'Authentication failed.') {
+  if (typeof detail === 'string' && detail.trim()) {
+    return detail;
+  }
+
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((item) => (typeof item?.msg === 'string' ? item.msg : null))
+      .filter(Boolean)
+      .map((message) => message.replace(/^Value error,\s*/i, ''));
+
+    if (messages.length > 0) {
+      return messages.join(' ');
+    }
+  }
+
+  if (detail && typeof detail === 'object' && typeof detail.message === 'string') {
+    return detail.message;
+  }
+
+  return fallback;
+}
+
 function AnimatedTitle({ text }) {
   let letterIndex = 0;
 
@@ -114,6 +137,9 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
   const scanType = 'Text / Email Scan';
   const caseId = `TXT-${String(score).padStart(3, '0')}`;
   const evidence = result.xai?.items || [];
+  const usesFpGate =
+    result.ensemble.method === 'bert_lr_fp_gate' ||
+    result.ensemble.weight_source === 'remote_fp_gate';
 
   return (
     <div className={`report-page ${riskLevel}`}>
@@ -204,8 +230,10 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               <div className="section-title compact">
                 <Activity size={22} />
                 <div>
-                  <h2>Model Technical Details</h2>
-                  <span className="classification-note">Scores and contributions</span>
+                  <h2>{usesFpGate ? 'LR + BERT Technical Details' : 'Model Technical Details'}</h2>
+                  <span className="classification-note">
+                    {usesFpGate ? 'Scores and decision roles' : 'Scores and contributions'}
+                  </span>
                 </div>
               </div>
 
@@ -213,7 +241,7 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
             </summary>
 
             <div className="technical-details-content">
-              <ModelContributions members={result.member_outputs} />
+              <ModelContributions members={result.member_outputs} ensemble={result.ensemble} />
             </div>
           </details>
 
@@ -245,8 +273,15 @@ function ReportPage({ result, onBack, explanationLoading = false, explanationErr
               </div>
             ) : result.xai.status === 'success' ? (
               <>
+                <div className="evidence-legend" aria-label="XAI highlight legend">
+                  <span className="raises_risk">Raises risk</span>
+                  <span className="lowers_risk">Lowers risk</span>
+                </div>
                 <ExplanationText text={result.inputText} items={evidence} />
-                <AttributionTable items={evidence} />
+                <AttributionTable
+                  items={evidence}
+                  explanations={result.gentle_ai?.evidence_explanations || []}
+                />
               </>
             ) : (
               <div className="partial-result-notice" role="status">
@@ -429,7 +464,7 @@ function AuthPage({ mode, onAuth, auth, onLogout }) {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.detail || 'Authentication failed.');
+        throw new Error(formatApiError(data.detail));
       }
       onAuth(data);
       navigate(destination, { replace: true });

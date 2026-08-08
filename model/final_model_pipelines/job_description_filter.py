@@ -115,6 +115,8 @@ _STRUCTURE_FIELD_KW: tuple[str, ...] = (
     "benefits",
     "qualifications",
     "duties",
+    "tasks",
+    "successful candidate",
 )
 
 _JOB_TITLE_WORDS: tuple[str, ...] = (
@@ -175,13 +177,14 @@ _JOB_PHRASE_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
         r"\bposition summary\b",
         r"\bwhat you(?:'ll| will) do\b",
         r"\bwho you are\b",
+        r"\bthe successful candidate\b",
     )
 )
 
 _NEGATIVE_TOPIC_KW: tuple[str, ...] = (
     "news",
     "article",
-    "report",
+    "news report",
     "government",
     "election",
     "war",
@@ -276,7 +279,11 @@ def _count_job_phrases(text: str) -> int:
 
 def _count_negative_topics(text: str) -> int:
     lowered = text.lower()
-    return sum(1 for topic in _NEGATIVE_TOPIC_KW if topic in lowered)
+    return sum(
+        1
+        for topic in _NEGATIVE_TOPIC_KW
+        if re.search(rf"\b{re.escape(topic)}\b", lowered)
+    )
 
 
 def compute_keyword_score(text: str) -> float:

@@ -21,6 +21,8 @@ def _all_response() -> dict:
             "risk_score_100": 88.0,
             "risk_level": "High",
             "risk_score_source": "bert",
+            "gate_triggered": False,
+            "decision_reason": "BERT High rule passed the LR gate",
             "thresholds": {
                 "bert_low_threshold": 0.15,
                 "bert_high_threshold": 0.32,
@@ -57,7 +59,14 @@ def test_remote_predictor_maps_final_ensemble_contract() -> None:
     assert computation.ensemble.prediction == "fake"
     assert computation.ensemble.active_model_count == 2
     assert [member.key for member in computation.members] == ["lr", "bert"]
-    assert computation.members[1].effective_weight == 1
+    assert computation.members[0].role == "false_positive_gate"
+    assert computation.members[1].role == "primary_score"
+    assert computation.members[1].decision_active is True
+    assert computation.members[1].effective_weight is None
+    assert computation.ensemble.method == "bert_lr_fp_gate"
+    assert computation.ensemble.risk_score_source == "bert"
+    assert computation.ensemble.gate_triggered is False
+    assert computation.ensemble.lr_gate_threshold == pytest.approx(0.2)
     assert computation.score_batch(["one", "two"]) == [0.2, 0.7]
     assert [request.url.path for request in requests] == [
         "/predict/all",
