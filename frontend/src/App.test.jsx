@@ -42,7 +42,7 @@ const ANALYSIS_RESPONSE = {
   ],
   xai: {
     status: 'success',
-    method: 'occlusion_fallback',
+    method: 'shap_partition',
     items: [
       {
         start: 0,
@@ -201,9 +201,13 @@ test('renders a successful analysis report and stores it in history', async () =
   fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
 
   expect(await screen.findByText('Likely Deceptive')).toBeVisible();
+  expect(screen.getByLabelText('XAI highlight legend')).toHaveTextContent(
+    'Raises riskLowers risk',
+  );
   expect(screen.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
-  expect(screen.getByText('Increases model risk score')).toBeVisible();
-  expect(screen.getByText('+20.0 pp')).toBeVisible();
+  expect(screen.getAllByText('Higher-risk signal').length).toBeGreaterThan(0);
+  expect(screen.getByText('Pressure language can be a warning sign.')).toBeVisible();
+  expect(screen.queryByRole('columnheader', { name: 'Contribution' })).not.toBeInTheDocument();
   expect(screen.getByText(/not independent evidence of deception/i)).toBeVisible();
   expect(fetchMock).toHaveBeenCalledWith(
     '/api/v1/analyze/score',
@@ -318,4 +322,33 @@ test('registers a user with the expected payload', async () => {
       password: 'Secure123',
     }),
   });
+});
+
+test('shows FastAPI registration validation errors as readable text', async () => {
+  window.history.pushState({}, '', '/register');
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: false,
+      status: 422,
+      json: vi.fn().mockResolvedValue({
+        detail: [
+          {
+            type: 'value_error',
+            loc: ['body', 'password'],
+            msg: 'Value error, Password must contain an uppercase letter.',
+          },
+        ],
+      }),
+    }),
+  );
+
+  render(<App />);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'user@example.com' } });
+  fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'unit-user' } });
+  fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password1' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Register' }));
+
+  expect(await screen.findByText('Password must contain an uppercase letter.')).toBeVisible();
+  expect(screen.queryByText('[object Object]')).not.toBeInTheDocument();
 });

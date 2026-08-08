@@ -30,9 +30,11 @@ class ModelMemberOutput(BaseModel):
     status: Literal["success", "error", "timeout"]
     raw_score: float | None = Field(None, ge=0, le=1)
     calibrated_score: float | None = Field(None, ge=0, le=1)
-    configured_weight: float = Field(..., ge=0, le=1)
-    effective_weight: float = Field(..., ge=0, le=1)
-    weighted_contribution: float = Field(..., ge=0, le=1)
+    configured_weight: float | None = Field(None, ge=0, le=1)
+    effective_weight: float | None = Field(None, ge=0, le=1)
+    weighted_contribution: float | None = Field(None, ge=0, le=1)
+    role: Literal["weighted_member", "primary_score", "false_positive_gate"] | None = None
+    decision_active: bool | None = None
     error: str | None = None
     error_code: (
         Literal["not_registered", "artifact_unavailable", "inference_failed", "timeout"]
@@ -54,6 +56,13 @@ class EnsembleResult(BaseModel):
     version: str
     fitted: bool
     weight_source: str
+    method: Literal["calibrated_weighted", "bert_lr_fp_gate"] = "calibrated_weighted"
+    risk_score_source: Literal["bert", "lr_gate"] | None = None
+    gate_triggered: bool | None = None
+    decision_reason: str | None = None
+    bert_low_threshold: float | None = Field(None, ge=0, le=1)
+    bert_high_threshold: float | None = Field(None, ge=0, le=1)
+    lr_gate_threshold: float | None = Field(None, ge=0, le=1)
 
     @computed_field  # type: ignore[prop-decorator]
     @property

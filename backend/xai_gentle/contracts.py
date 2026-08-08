@@ -39,9 +39,9 @@ class EvidenceSpan(BaseModel):
 
 class XAIResult(BaseModel):
     status: Literal["success", "unavailable"]
-    method: Literal["shap_partition", "occlusion_fallback", "unavailable"]
-    target: Literal["ensemble_fake_probability"] = "ensemble_fake_probability"
-    version: str = "xai-v1"
+    method: Literal["shap_partition", "unavailable"]
+    target: Literal["ensemble_risk_score"] = "ensemble_risk_score"
+    version: str = "xai-v2"
     base_value: float | None = None
     output_value: float | None = Field(None, ge=0, le=1)
     items: list[EvidenceSpan] = Field(default_factory=list)

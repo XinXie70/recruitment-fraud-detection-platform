@@ -13,7 +13,7 @@ from services.ensemble_predictor import (
     EnsemblePredictor,
 )
 from services.model_adapter import RawModelResult
-from xai_gentle import GentleAIService, XAIService
+from xai_gentle import GentleAIService, XAIResult
 
 
 class CountingRegistry:
@@ -33,6 +33,16 @@ class CountingRegistry:
         return {"model": None}
 
 
+class StaticXAIService:
+    def explain(self, text, score_batch, expected_output):
+        return XAIResult(
+            status="success",
+            method="shap_partition",
+            output_value=expected_output,
+            items=[],
+        )
+
+
 def _service(*, validator=None, url_analyzer=None):
     registry = CountingRegistry()
     config = EnsembleConfig(
@@ -45,7 +55,7 @@ def _service(*, validator=None, url_analyzer=None):
     )
     service = AnalysisService(
         ensemble=EnsemblePredictor(registry, config),
-        xai=XAIService(prefer_shap=False),
+        xai=StaticXAIService(),
         gentle_ai=GentleAIService(ollama_enabled=False),
         validator=validator
         or (lambda text: {"is_valid": True, "job_relevance_score": 0.9}),

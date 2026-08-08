@@ -70,7 +70,16 @@ class RemoteFinalEnsemblePredictor:
             high_threshold = self._probability(
                 thresholds["bert_high_threshold"], "bert_high_threshold"
             )
+            lr_gate_threshold = self._probability(
+                thresholds["lr_gate"], "lr_gate"
+            )
             source = str(risk["risk_score_source"])
+            if source not in {"bert", "lr_gate"}:
+                raise TypeError
+            gate_triggered = risk["gate_triggered"]
+            if not isinstance(gate_triggered, bool):
+                raise TypeError
+            decision_reason = str(risk["decision_reason"])
         except (KeyError, TypeError) as exc:
             raise EnsembleUnavailableError(
                 "Remote final ensemble response does not match its API contract."
@@ -83,6 +92,10 @@ class RemoteFinalEnsemblePredictor:
         }
         classification, prediction, action = labels[risk_level]
         scores = {"lr": lr_score, "bert": bert_score}
+        roles = {
+            "lr": "false_positive_gate",
+            "bert": "primary_score",
+        }
         members = [
             ModelMemberOutput(
                 key=key,
@@ -90,9 +103,8 @@ class RemoteFinalEnsemblePredictor:
                 status="success",
                 raw_score=score,
                 calibrated_score=score,
-                configured_weight=1.0 if source.startswith(key) else 0.0,
-                effective_weight=1.0 if source.startswith(key) else 0.0,
-                weighted_contribution=risk_score if source.startswith(key) else 0.0,
+                role=roles[key],
+                decision_active=source.startswith(key),
             )
             for key, score in scores.items()
         ]
@@ -110,6 +122,13 @@ class RemoteFinalEnsemblePredictor:
             version="remote-lr-bert-fp-gate-v1",
             fitted=True,
             weight_source="remote_fp_gate",
+            method="bert_lr_fp_gate",
+            risk_score_source=source,
+            gate_triggered=gate_triggered,
+            decision_reason=decision_reason,
+            bert_low_threshold=low_threshold,
+            bert_high_threshold=high_threshold,
+            lr_gate_threshold=lr_gate_threshold,
         )
 
         def score_batch(texts: Sequence[str]) -> list[float]:
