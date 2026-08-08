@@ -10,8 +10,7 @@ function explanationFor(item, explanations) {
   if (exactMatch?.explanation) return exactMatch.explanation;
 
   const textMatch = (explanations || []).find(
-    (explanation) =>
-      explanation.text === item.text && explanation.direction === item.direction,
+    (explanation) => explanation.text === item.text && explanation.direction === item.direction,
   );
   if (textMatch?.explanation) return textMatch.explanation;
 
@@ -44,9 +43,7 @@ export default function AttributionTable({ items, explanations = [] }) {
             )}
             {sortedItems.map((item) => {
               const raisesRisk = item.direction === 'raises_risk';
-              const impactLabel = raisesRisk
-                ? 'Higher-risk signal'
-                : 'Lower-risk signal';
+              const impactLabel = raisesRisk ? 'Higher-risk signal' : 'Lower-risk signal';
 
               return (
                 <tr key={`${item.start}-${item.end}-${item.direction}`}>

@@ -201,9 +201,7 @@ test('renders a successful analysis report and stores it in history', async () =
   fireEvent.click(screen.getByRole('button', { name: 'Analyze Text' }));
 
   expect(await screen.findByText('Likely Deceptive')).toBeVisible();
-  expect(screen.getByLabelText('XAI highlight legend')).toHaveTextContent(
-    'Raises riskLowers risk',
-  );
+  expect(screen.getByLabelText('XAI highlight legend')).toHaveTextContent('Raises riskLowers risk');
   expect(screen.getByRole('heading', { name: 'High Risk Warning' })).toBeVisible();
   expect(screen.getAllByText('Higher-risk signal').length).toBeGreaterThan(0);
   expect(screen.getByText('Pressure language can be a warning sign.')).toBeVisible();

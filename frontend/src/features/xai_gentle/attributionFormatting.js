@@ -44,10 +44,7 @@ export function prepareEvidenceForRisk(
   const primaryItems = fallbackUsed
     ? [...validItems].sort(byContributionMagnitude).slice(0, supportingLimit)
     : supportingItems;
-  const maximumContrastingItems = Math.min(
-    contrastingLimit,
-    Math.max(0, primaryItems.length - 1),
-  );
+  const maximumContrastingItems = Math.min(contrastingLimit, Math.max(0, primaryItems.length - 1));
   const contrastingItems = fallbackUsed
     ? []
     : validItems

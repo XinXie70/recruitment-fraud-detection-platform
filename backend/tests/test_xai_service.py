@@ -10,7 +10,6 @@ from xai_gentle import EvidenceSpan, XAIService
 from xai_gentle.xai_service import (
     WORD_PATTERN,
     PartitionAttribution,
-    TextSegment,
     _build_coarse_segments,
     _build_phrase_segments,
     _top_evidence,
