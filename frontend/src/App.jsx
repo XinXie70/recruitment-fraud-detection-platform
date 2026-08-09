@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import React, { lazy, useEffect, useRef, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -15,15 +15,7 @@ import {
   UserPlus,
   X,
 } from 'lucide-react';
-import {
-  BrowserRouter,
-  Link,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router';
+import { BrowserRouter, Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
 import {
@@ -38,6 +30,7 @@ import GentleGuidance from './features/xai_gentle/GentleGuidance';
 import ModelContributions from './features/xai_gentle/ModelContributions';
 import './App.css';
 import SharedNavigation from './components/Navigation';
+import AppRouter from './app/AppRouter';
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const DashboardPage = lazy(() => import('./components/DashboardPage'));
@@ -734,60 +727,17 @@ function AppShell() {
   };
 
   return (
-    <Suspense
-      fallback={
-        <main className="loading-state" role="status">
-          <Loader2 size={34} className="spin-icon" />
-          <p>Loading page…</p>
-        </main>
-      }
-    >
-      <Routes>
-        <Route path="/" element={<Navigate to={auth ? '/analyze' : '/login'} replace />} />
-        <Route
-          path="/login"
-          element={
-            <AuthPage mode="login" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <AuthPage mode="register" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
-          }
-        />
-        <Route
-          path="/analyze"
-          element={
-            <ProtectedRoute auth={auth}>
-              <AnalyzePage auth={auth} onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/education"
-          element={
-            <ProtectedRoute auth={auth}>
-              <LearnPage auth={auth} onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/learn" element={<Navigate to="/education" replace />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute auth={auth}>
-              {auth?.user?.is_admin ? (
-                <AdminDashboard auth={auth} onLogout={handleLogout} />
-              ) : (
-                <DashboardPage auth={auth} onLogout={handleLogout} />
-              )}
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+    <AppRouter
+      auth={auth}
+      onAuth={handleAuth}
+      onLogout={handleLogout}
+      AuthPage={AuthPage}
+      AnalyzePage={AnalyzePage}
+      LearnPage={LearnPage}
+      ProtectedRoute={ProtectedRoute}
+      AdminDashboard={AdminDashboard}
+      DashboardPage={DashboardPage}
+    />
   );
 }
 
