@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 from ipaddress import ip_address
-from typing import Any
+from typing import Any, Literal, TypedDict
 from urllib.parse import urlparse
 
 import tldextract
@@ -70,6 +70,15 @@ class UrlFlag:
     weight: float
 
 
+class URLResultData(TypedDict):
+    url: str
+    domain: str
+    risk_score: float
+    risk_level: Literal["low", "medium", "high"]
+    flags: list[str]
+    flag_codes: list[str]
+
+
 def _normalize_candidate(candidate: str) -> str:
     cleaned = candidate.strip().strip(TRAILING_PUNCTUATION)
     if not re.match(r"^https?://", cleaned, re.IGNORECASE):
@@ -87,7 +96,7 @@ def _registered_domain(hostname: str) -> str:
     return normalized
 
 
-def _risk_level(score: float) -> str:
+def _risk_level(score: float) -> Literal["low", "medium", "high"]:
     if score >= 0.6:
         return "high"
     if score >= 0.3:
@@ -155,8 +164,8 @@ def _flag_url(url: str) -> tuple[str, list[UrlFlag]]:
 
 
 def analyze_urls(text: str) -> dict[str, Any]:
-    urls = []
-    reasons = []
+    urls: list[URLResultData] = []
+    reasons: list[str] = []
 
     for normalized_url in _unique_urls(text):
         domain, flags = _flag_url(normalized_url)

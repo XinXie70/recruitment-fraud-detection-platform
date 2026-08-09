@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import torch
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, DataCollatorWithPadding
 

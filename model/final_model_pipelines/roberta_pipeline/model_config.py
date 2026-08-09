@@ -3,17 +3,17 @@
 from pathlib import Path
 
 from final_model_pipelines.shared_config import (
-    CLEANED_DATA_PATH,
-    DATA_DIR,
-    LABEL_COL,
-    POSITIVE_LABEL,
-    RANDOM_STATE,
-    SPLIT_DIR,
-    TEST_SIZE,
-    TEXT_COL,
-    TEXT_FIELDS,
-    VAL_SIZE,
-    resolve_raw_data_path,
+    CLEANED_DATA_PATH as CLEANED_DATA_PATH,
+    DATA_DIR as DATA_DIR,
+    LABEL_COL as LABEL_COL,
+    POSITIVE_LABEL as POSITIVE_LABEL,
+    RANDOM_STATE as RANDOM_STATE,
+    SPLIT_DIR as SPLIT_DIR,
+    TEST_SIZE as TEST_SIZE,
+    TEXT_COL as TEXT_COL,
+    TEXT_FIELDS as TEXT_FIELDS,
+    VAL_SIZE as VAL_SIZE,
+    resolve_raw_data_path as resolve_raw_data_path,
 )
 
 PIPELINE_DIR = Path(__file__).resolve().parent
@@ -23,7 +23,7 @@ OUTPUT_DIR = PIPELINE_DIR / "outputs"
 MODEL_DISPLAY_NAME = "RoBERTa"
 FEATURE_METHOD = "RoBERTa BPE Embeddings"
 IMBALANCE_METHOD = "Class Weighting"
-CLASS_WEIGHT = {0: 1, 1: 6}
+CLASS_WEIGHT = {0: 1.0, 1: 6.0}
 
 PRETRAINED_MODEL_NAME = "roberta-base"
 MAX_LEN = 256

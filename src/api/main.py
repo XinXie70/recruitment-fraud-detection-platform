@@ -102,6 +102,8 @@ def predict_lr_batch(body: BatchPredictRequest) -> BatchPredictResponse:
                     predicted_label=result["predicted_label"],
                 )
             )
+        if service._lr_threshold is None:
+            raise RuntimeError("LR threshold was not loaded")
         return BatchPredictResponse(
             model="logistic_regression_baseline",
             threshold=service._lr_threshold,

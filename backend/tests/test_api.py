@@ -289,6 +289,43 @@ class TestUserHistoryEndpoints:
 
 
 class TestAdminEndpoints:
+    def test_admin_provisioning_does_not_reset_existing_password(
+        self, db_session, monkeypatch
+    ):
+        import main
+        from auth import hash_password, verify_password
+        from models import User
+
+        admin = User(
+            email="admin@example.com",
+            username="dedicated-admin",
+            password_hash=hash_password("Existingpass123"),
+            is_admin=False,
+        )
+        db_session.add(admin)
+        db_session.commit()
+
+        monkeypatch.setattr(main.settings, "app_env", "development")
+        monkeypatch.setattr(main.settings, "admin_email", "admin@example.com")
+        monkeypatch.setattr(main.settings, "admin_username", "dedicated-admin")
+        monkeypatch.setattr(main.settings, "admin_password", "Configuredpass456")
+
+        class ProvisioningSession:
+            def __getattr__(self, name):
+                return getattr(db_session, name)
+
+            def close(self):
+                pass
+
+        monkeypatch.setattr(main, "SessionLocal", ProvisioningSession)
+
+        main._provision_admin()
+
+        db_session.refresh(admin)
+        assert admin.is_admin is True
+        assert verify_password("Existingpass123", admin.password_hash)
+        assert not verify_password("Configuredpass456", admin.password_hash)
+
     def test_non_admin_rejected(self, client, auth_headers):
         resp = client.get("/api/admin/stats", headers=auth_headers)
         assert resp.status_code == 403

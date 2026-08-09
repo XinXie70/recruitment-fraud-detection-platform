@@ -24,7 +24,6 @@ services:
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@database:5432/fake_job_detection
-      ASYNC_DATABASE_URL: postgresql+asyncpg://postgres:postgres@database:5432/fake_job_detection
       SECRET_KEY: local-compose-secret-change-before-production
       CORS_ORIGINS: http://localhost:5190,http://127.0.0.1:5190
       MODEL_SERVER_URL: ${MODEL_SERVER_URL:-}

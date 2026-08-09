@@ -7,11 +7,10 @@ Never re-splits or merges them.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
-import torch
 from torch.utils.data import Dataset
 
 from config import (
@@ -19,7 +18,6 @@ from config import (
     ID_COLUMN,
     LABEL_COLUMN,
     TEST_CSV,
-    TEXT_COLUMN,
     TRAIN_CSV,
     VALIDATION_CSV,
 )

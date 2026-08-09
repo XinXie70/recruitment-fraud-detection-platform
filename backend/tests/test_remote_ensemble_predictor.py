@@ -74,6 +74,31 @@ def test_remote_predictor_maps_final_ensemble_contract() -> None:
     ]
 
 
+def test_remote_predictor_prefers_new_model_api_endpoints() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.path == "/predict/post_predict_lr":
+            return httpx.Response(200, json={"fraud_score": 0.72})
+        if request.url.path == "/predict/post_predict_bert":
+            return httpx.Response(200, json={"fraud_score": 0.88})
+        return httpx.Response(200, json={"ok": True})
+
+    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor.client = httpx.Client(transport=httpx.MockTransport(handler))
+
+    computation = predictor.predict("job listing")
+
+    assert computation.ensemble.risk_score == pytest.approx(0.88)
+    assert computation.ensemble.risk_level == "high"
+    assert computation.ensemble.method == "bert_lr_fp_gate"
+    assert [request.url.path for request in requests] == [
+        "/predict/post_predict_lr",
+        "/predict/post_predict_bert",
+    ]
+
+
 def test_remote_predictor_rejects_contract_mismatch() -> None:
     predictor = RemoteFinalEnsemblePredictor("http://model")
     predictor.client = httpx.Client(

@@ -32,6 +32,8 @@ frontend/dist/
 frontend/coverage/
 frontend/playwright-report/
 frontend/test-results/
+api_flask/server.*.log
+backend/test.db
 .DS_Store
 .ipynb_checkpoints/
 .idea/

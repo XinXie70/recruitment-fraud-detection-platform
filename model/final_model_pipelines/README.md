@@ -75,15 +75,17 @@ from final_model_pipelines.predict_all import predict_with_all_models
 ### Option B: Run directly from repository root without installing
 
 ```bash
-cd datapreprocessing
-python final_model_pipelines/predict_all.py
+python model/final_model_pipelines/predict_all.py
 ```
 
 All scripts add the repository root to `sys.path` internally. **You must run from the root directory**, or set:
 
 ```bash
-set PYTHONPATH=C:\path\to\datapreprocessing    # Windows
-export PYTHONPATH=/path/to/datapreprocessing   # Linux / macOS
+# Windows PowerShell, from the repository root
+$env:PYTHONPATH = (Get-Location).Path
+
+# Linux / macOS, from the repository root
+export PYTHONPATH="$(pwd)"
 ```
 
 ### Dependencies
@@ -91,7 +93,7 @@ export PYTHONPATH=/path/to/datapreprocessing   # Linux / macOS
 Install the aggregate pipeline requirements:
 
 ```bash
-pip install -r final_model_pipelines/requirements.txt
+pip install -r model/final_model_pipelines/requirements.txt
 ```
 
 For a lighter deployment, install only the selected model's requirements, for example `lr_pipeline/requirements.txt` or `svm_pipeline/requirements.txt`.

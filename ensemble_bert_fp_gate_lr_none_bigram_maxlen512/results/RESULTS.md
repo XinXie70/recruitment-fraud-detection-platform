@@ -15,8 +15,8 @@ BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
 ## Reproducibility
 
 - Selection seed / hash seed: `42` / `42`
-- Frozen LR predictions: `F:\better-BERT\capstone-project-26t2-9900-h09c-almond\lr_none_bigram_no_cv_paper_aligned_seed42\results\test_predictions.csv`
-- Frozen BERT predictions: `F:\better-BERT\capstone-project-26t2-9900-h09c-almond\retrain_paper_aligned_seed42_maxlen512\results\predictions_bert_paper_protocol_maxlen512.csv`
+- Frozen LR predictions: `lr_none_bigram_no_cv_paper_aligned_seed42/results/test_predictions.csv`
+- Frozen BERT predictions: `retrain_paper_aligned_seed42_maxlen512/results/predictions_bert_paper_protocol_maxlen512.csv`
 - Packages: `{'python': '3.13.7', 'numpy': '2.4.4', 'pandas': '3.0.3', 'scikit_learn': '1.9.0'}`
 - Test report keeps only: LR / BERT / this ensemble
 

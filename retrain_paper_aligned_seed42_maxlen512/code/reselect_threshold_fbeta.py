@@ -6,7 +6,6 @@ Does not retrain. Uses the existing retrain checkpoint.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader

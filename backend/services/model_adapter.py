@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import logging
 import math
 from collections.abc import Iterable
@@ -192,7 +193,8 @@ class HttpModelAdapter:
         try:
             resp = self.client.post(
                 f"{self._base_url}/predict/{self._remote_key}",
-                json={"text": text},
+                content=json.dumps({"text": text}, separators=(",", ":")),
+                headers={"content-type": "application/json"},
             )
             resp.raise_for_status()
             data = resp.json()

@@ -14,7 +14,6 @@ import shutil
 from pathlib import Path
 
 import pandas as pd
-import torch
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, DataCollatorWithPadding
 
