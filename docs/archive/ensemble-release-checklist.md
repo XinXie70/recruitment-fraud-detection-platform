@@ -1,4 +1,4 @@
-# Ensemble release checklist
+# Ensemble release checklist (Archived)
 
 The checked-in ensemble configuration is currently an explicitly unfitted
 development fallback. Do not present its equal weights as validation-optimised.

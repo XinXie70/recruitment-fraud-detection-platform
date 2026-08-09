@@ -2,7 +2,6 @@
 source = .
 omit =
     tests/*
-    scoring.py
 
 [report]
 show_missing = true

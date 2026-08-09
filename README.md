@@ -174,7 +174,7 @@ MODEL_SERVER_URL=https://model-api.example.com docker compose up --build
 
 Do not expose an unauthenticated model server directly to the public internet.
 The Final Demo evidence and rehearsal checklist are maintained in
-[`docs/final-demo-readiness.md`](docs/final-demo-readiness.md).
+[`docs/archive/final-demo-readiness.md`](docs/archive/final-demo-readiness.md).
 Architecture diagrams and rationale are available in
 [`docs/architecture/`](docs/architecture/README.md) and
 [`docs/design-justification.md`](docs/design-justification.md).

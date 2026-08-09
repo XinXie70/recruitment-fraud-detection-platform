@@ -27,7 +27,7 @@ The following checks were run from `frontend/` on 2026-08-09:
 - `npm audit --omit=dev` reported zero production vulnerabilities.
 
 Functional lint, test, end-to-end, and build evidence is maintained in the
-[Final Demo readiness checklist](../final-demo-readiness.md), rather than copied
+[archived Final Demo readiness checklist](../archive/final-demo-readiness.md), rather than copied
 into this security record where counts can become stale.
 
 ## Required controls

@@ -1,4 +1,4 @@
-# Final Demo readiness checklist
+# Final Demo readiness checklist (Archived)
 
 Use this document as the single source of truth for the Final Demo and keep the
 evidence links current.
@@ -40,15 +40,15 @@ Allowed status values: `Not started`, `In progress`, `Implemented`, and
 | Responsive UI      | Phone, tablet, and desktop screenshots                                | Implemented; rehearsal verification required                                                                         |
 | Loading and errors | Slow request, invalid input, and unavailable model service            | Implemented; automated 503 path passes; rehearsal still required                                                     |
 | Live status        | Refresh service status and scan history without a full page reload    | Implemented on Admin Dashboard and user Dashboard; history falls back to browser-cached results when offline         |
-| Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening and [router risk tracking](security/react-router-risk-acceptance.md) remain |
+| Security           | Password hashing, JWT validation, rate limits, CORS, model API access | Backend implemented; model API hardening and [router risk tracking](../security/react-router-risk-acceptance.md) remain |
 | Containers         | One-command frontend/backend/database startup                         | Full Compose and remote-model analysis smoke test passed                                                             |
 | Ensemble release   | Fitted config, provenance, held-out evaluation                        | Follow the [ensemble release checklist](ensemble-release-checklist.md)                                               |
 
 ## Architecture and design evidence
 
-- [System context and container/deployment diagrams](architecture/README.md).
-- [Prediction-request sequence diagram](architecture/prediction-sequence.md).
-- [Consolidated Design Justification](design-justification.md).
+- [System context and container/deployment diagrams](../architecture/README.md).
+- [Prediction-request sequence diagram](../architecture/prediction-sequence.md).
+- [Consolidated Design Justification](../design-justification.md).
 - ADR 001: modular monolith instead of microservices.
 - ADR 002: ensemble scoring formula.
 - ADR 003: model warm-up strategy.
