@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -30,11 +30,13 @@ import AttributionTable from './features/xai_gentle/AttributionTable';
 import ExplanationText from './features/xai_gentle/ExplanationText';
 import GentleGuidance from './features/xai_gentle/GentleGuidance';
 import ModelContributions from './features/xai_gentle/ModelContributions';
-import EducationLibrary from './features/education/EducationLibrary';
 import './App.css';
 import SharedNavigation from './components/Navigation';
-import AdminDashboard from './components/AdminDashboard';
-import DashboardPage from './components/DashboardPage';
+
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const DashboardPage = lazy(() => import('./components/DashboardPage'));
+const EducationLibrary = lazy(() => import('./features/education/EducationLibrary'));
+
 const AUTH_STORAGE_KEY = 'fake_job_auth';
 const HISTORY_STORAGE_KEY = 'fake_job_history';
 const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
@@ -786,49 +788,60 @@ function AppShell() {
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to={auth ? '/analyze' : '/login'} replace />} />
-      <Route
-        path="/login"
-        element={<AuthPage mode="login" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />}
-      />
-      <Route
-        path="/register"
-        element={
-          <AuthPage mode="register" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
-        }
-      />
-      <Route
-        path="/analyze"
-        element={
-          <ProtectedRoute auth={auth}>
-            <AnalyzePage auth={auth} onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/education"
-        element={
-          <ProtectedRoute auth={auth}>
-            <LearnPage auth={auth} onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/learn" element={<Navigate to="/education" replace />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute auth={auth}>
-            {auth?.user?.is_admin ? (
-              <AdminDashboard auth={auth} onLogout={handleLogout} />
-            ) : (
-              <DashboardPage auth={auth} onLogout={handleLogout} />
-            )}
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <Suspense
+      fallback={
+        <main className="loading-state" role="status">
+          <Loader2 size={34} className="spin-icon" />
+          <p>Loading page…</p>
+        </main>
+      }
+    >
+      <Routes>
+        <Route path="/" element={<Navigate to={auth ? '/analyze' : '/login'} replace />} />
+        <Route
+          path="/login"
+          element={
+            <AuthPage mode="login" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthPage mode="register" auth={auth} onAuth={handleAuth} onLogout={handleLogout} />
+          }
+        />
+        <Route
+          path="/analyze"
+          element={
+            <ProtectedRoute auth={auth}>
+              <AnalyzePage auth={auth} onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/education"
+          element={
+            <ProtectedRoute auth={auth}>
+              <LearnPage auth={auth} onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/learn" element={<Navigate to="/education" replace />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute auth={auth}>
+              {auth?.user?.is_admin ? (
+                <AdminDashboard auth={auth} onLogout={handleLogout} />
+              ) : (
+                <DashboardPage auth={auth} onLogout={handleLogout} />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 
