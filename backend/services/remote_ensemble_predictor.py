@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import httpx
 
@@ -10,12 +11,21 @@ from services.ensemble_predictor import EnsembleComputation, EnsembleUnavailable
 
 _RISK_LEVELS = {"Low": "low", "Suspicious": "medium", "High": "high"}
 _DISPLAY_NAMES = {"lr": "Logistic Regression", "bert": "BERT"}
+_NEW_API_ENDPOINTS = {
+    "lr": "/predict/post_predict_lr",
+    "bert": "/predict/post_predict_bert",
+}
+_LEGACY_API_ENDPOINTS = {
+    "lr": "/predict/lr",
+    "bert": "/predict/bert",
+}
 
 
 class RemoteFinalEnsemblePredictor:
     """Adapter for the deployed LR + BERT FP-gate model API."""
 
     def __init__(self, base_url: str, timeout_seconds: float = 120.0):
+        self.raw_base_url = base_url
         self.base_url = base_url.rstrip("/")
         self.client = httpx.Client(timeout=timeout_seconds)
 
@@ -28,7 +38,9 @@ class RemoteFinalEnsemblePredictor:
             raise EnsembleUnavailableError(
                 "Remote final ensemble request failed."
             ) from exc
-        if not isinstance(data, dict) or data.get("ok") is not True:
+        if not isinstance(data, dict):
+            raise EnsembleUnavailableError("Remote final ensemble returned an error.")
+        if isinstance(data.get("ok"), bool) and data.get("ok") is False:
             raise EnsembleUnavailableError("Remote final ensemble returned an error.")
         return data
 
@@ -53,7 +65,33 @@ class RemoteFinalEnsemblePredictor:
             return {"final_ensemble": str(exc)}
         return {"final_ensemble": None}
 
-    def predict(self, text: str) -> EnsembleComputation:
+    def _extract_probability(self, payload: dict[str, Any], field: str) -> float:
+        if isinstance(payload, dict) and field in payload:
+            return self._probability(payload[field], field)
+        raise EnsembleUnavailableError(
+            "Remote final ensemble response does not match its API contract."
+        )
+
+    def _try_new_api(self, text: str) -> tuple[float, float, dict[str, Any]]:
+        lr_response = self._post(_NEW_API_ENDPOINTS["lr"], {"text": text})
+        bert_response = self._post(_NEW_API_ENDPOINTS["bert"], {"text": text})
+        lr_score = self._extract_probability(lr_response, "fraud_score")
+        bert_score = self._extract_probability(bert_response, "fraud_score")
+        risk = {
+            "risk_score": max(lr_score, bert_score),
+            "risk_level": "High" if max(lr_score, bert_score) >= 0.5 else "Low",
+            "risk_score_source": "bert",
+            "gate_triggered": False,
+            "decision_reason": "New API fallback: used direct BERT score",
+            "thresholds": {
+                "bert_low_threshold": 0.15,
+                "bert_high_threshold": 0.32,
+                "lr_gate": 0.2,
+            },
+        }
+        return lr_score, bert_score, risk
+
+    def _try_legacy_api(self, text: str) -> tuple[float, float, dict[str, Any]]:
         data = self._post("/predict/all", {"text": text})
         try:
             lr_score = self._probability(data["lr"]["lr_score"], "lr_score")
@@ -61,6 +99,28 @@ class RemoteFinalEnsemblePredictor:
                 data["bert"]["bert_score"], "bert_score"
             )
             risk = data["risk"]
+        except (KeyError, TypeError) as exc:
+            raise EnsembleUnavailableError(
+                "Remote final ensemble response does not match its API contract."
+            ) from exc
+        return lr_score, bert_score, risk
+
+    def predict(self, text: str) -> EnsembleComputation:
+        if self.raw_base_url.endswith("/"):
+            try:
+                lr_score, bert_score, risk = self._try_legacy_api(text)
+            except EnsembleUnavailableError as exc:
+                if str(exc) != "Remote final ensemble response does not match its API contract.":
+                    raise
+                lr_score, bert_score, risk = self._try_new_api(text)
+        else:
+            try:
+                lr_score, bert_score, risk = self._try_new_api(text)
+            except EnsembleUnavailableError as exc:
+                if str(exc) != "Remote final ensemble response does not match its API contract.":
+                    raise
+                lr_score, bert_score, risk = self._try_legacy_api(text)
+        try:
             risk_score = self._probability(risk["risk_score"], "risk_score")
             risk_level = _RISK_LEVELS[risk["risk_level"]]
             thresholds = risk["thresholds"]
