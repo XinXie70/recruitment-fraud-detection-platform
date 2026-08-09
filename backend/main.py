@@ -16,13 +16,18 @@ if str(MODEL_DIR) not in sys.path:
 
 from backend.config import settings
 from backend.core.logging import configure_logging
+from backend.core.lifecycle import (
+    check_database,
+    initialise_database,
+    provision_admin,
+    warm_up_models,
+)
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy.exc import IntegrityError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -53,107 +58,28 @@ analysis_service = get_analysis_service()
 
 
 def _init_database() -> None:
-    if settings.app_env in {"test", "production"}:
-        return
-
-    # Development must follow the same versioned schema path as production.
-    # create_all() does not stamp alembic_version and breaks later upgrades.
-    from alembic import command
-    from alembic.config import Config
-
-    command.upgrade(Config(str(BACKEND_DIR / "alembic.ini")), "head")
+    initialise_database(settings.app_env, BACKEND_DIR / "alembic.ini")
 
 
 def _provision_admin() -> None:
-
-    if settings.app_env == "test":
-        logger.info("Skipping administrator provisioning in test environment.")
-        return
-
-    credentials = (
-        settings.admin_email.strip().lower(),
-        settings.admin_username.strip(),
-        settings.admin_password,
+    provision_admin(
+        app_env=settings.app_env,
+        email=settings.admin_email,
+        username=settings.admin_username,
+        password=settings.admin_password,
+        session_factory=SessionLocal,
+        user_model=User,
+        hash_password=hash_password,
+        logger=logger,
     )
-    if not any(credentials):
-        logger.info("Dedicated administrator provisioning is not configured.")
-        return
-    if not all(credentials):
-        raise RuntimeError(
-            "ADMIN_EMAIL, ADMIN_USERNAME and ADMIN_PASSWORD must all be configured."
-        )
-
-    email, username, password = credentials
-    password_is_valid = (
-        len(password) >= 8
-        and len(password.encode("utf-8")) <= 72
-        and any(char.isupper() for char in password)
-        and any(char.islower() for char in password)
-        and any(char.isdigit() for char in password)
-    )
-    if not password_is_valid:
-        raise RuntimeError(
-            "ADMIN_PASSWORD must be 8-72 bytes and contain uppercase, lowercase and digits."
-        )
-
-    db = SessionLocal()
-    try:
-        by_email = db.query(User).filter(User.email == email).one_or_none()
-        by_username = db.query(User).filter(User.username == username).one_or_none()
-        if by_email and by_username and by_email.id != by_username.id:
-            raise RuntimeError("Administrator email and username belong to different users.")
-
-        admin = by_email or by_username
-        if admin is None:
-            admin = User(
-                email=email,
-                username=username,
-                password_hash=hash_password(password),
-                is_admin=True,
-            )
-            db.add(admin)
-        else:
-            admin.email = email
-            admin.username = username
-            admin.is_admin = True
-        db.commit()
-        logger.info("Dedicated administrator account is ready: %s", username)
-    except IntegrityError:
-        db.rollback()
-        logger.warning("Dedicated administrator provisioning hit a race; continuing.")
-    except Exception:
-        db.rollback()
-        raise
-    finally:
-        db.close()
 
 
 def _check_database() -> bool:
-
-    db = None
-    try:
-        db = SessionLocal()
-        from sqlalchemy import text
-        db.execute(text("SELECT 1"))
-        return True
-    except Exception:
-        return False
-    finally:
-        if db is not None:
-            db.close()
+    return check_database(SessionLocal)
 
 
 def _warm_up_models_background() -> None:
-
-    try:
-        outcomes = analysis_service.warm_up()
-        failed = {key: error for key, error in outcomes.items() if error}
-        if analysis_service.ready:
-            logger.info("Ensemble runtime is ready. Failed members: %s", failed or "none")
-        else:
-            logger.error("No ensemble model could be loaded: %s", failed)
-    except Exception:
-        logger.exception("Background model warm-up failed.")
+    warm_up_models(analysis_service, logger)
 
 
 @asynccontextmanager
