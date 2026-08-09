@@ -15,6 +15,7 @@ if str(MODEL_DIR) not in sys.path:
     sys.path.insert(0, str(MODEL_DIR))
 
 from backend.config import settings
+from backend.core.logging import configure_logging
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -42,48 +43,7 @@ from backend.services.resilience import ServiceStatus, SystemHealth
 
 
 
-# Structured logging
-
-class _JsonFormatter(logging.Formatter):
-    """Emit log records as JSON lines for Cloud Run / structured log ingestion."""
-    def format(self, record: logging.LogRecord) -> str:
-        import json
-        payload = {
-            "timestamp": self.formatTime(record),
-            "level": record.levelname,
-            "logger": record.name,
-            "message": record.getMessage(),
-        }
-        for attr in (
-            "request_id",
-            "path",
-            "method",
-            "body_len",
-            "status_code",
-            "duration_ms",
-        ):
-            if hasattr(record, attr):
-                payload[attr] = getattr(record, attr)
-        if record.exc_info and record.exc_info[1]:
-            payload["exception"] = self.formatException(record.exc_info)
-        return json.dumps(payload, default=str)
-
-
-def _setup_logging() -> None:
-    root = logging.getLogger()
-    root.setLevel(settings.log_level)
-    handler = logging.StreamHandler(sys.stdout)
-    if settings.log_format == "json":
-        handler.setFormatter(_JsonFormatter())
-    else:
-        handler.setFormatter(logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        ))
-    root.handlers.clear()
-    root.addHandler(handler)
-
-
-_setup_logging()
+configure_logging()
 logger = logging.getLogger("fake_job_detection_api")
 
 CORS_ORIGINS = settings.cors_origin_list
