@@ -23,7 +23,7 @@ os.environ["RATE_LIMIT_ENABLED"] = "false"
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
-from database import Base, engine, get_db
+from backend.database import Base, engine, get_db
 
 # Ensure all tables exist
 Base.metadata.create_all(bind=engine)
@@ -53,7 +53,7 @@ def db_session():
 @pytest.fixture(scope="function")
 def client(db_session):
     """FastAPI TestClient whose ``get_db`` dependency returns the test session."""
-    from main import app
+    from backend.main import app
 
     def _override_get_db():
         try:

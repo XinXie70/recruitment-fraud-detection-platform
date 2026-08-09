@@ -6,8 +6,8 @@ import math
 
 import pytest
 
-from xai_gentle import EvidenceSpan, XAIService
-from xai_gentle.xai_service import (
+from backend.xai_gentle import EvidenceSpan, XAIService
+from backend.xai_gentle.xai_service import (
     WORD_PATTERN,
     PartitionAttribution,
     _build_coarse_segments,

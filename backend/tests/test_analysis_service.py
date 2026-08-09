@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import pytest
 
-from services.analysis_service import AnalysisService, InputRejectedError
-from services.cache import TTLCache
-from services.ensemble_predictor import (
+from backend.services.analysis_service import AnalysisService, InputRejectedError
+from backend.services.cache import TTLCache
+from backend.services.ensemble_predictor import (
     CalibrationConfig,
     EnsembleConfig,
     EnsembleMemberConfig,
     EnsemblePredictor,
 )
-from services.model_adapter import RawModelResult
-from xai_gentle import GentleAIService, XAIResult
+from backend.services.model_adapter import RawModelResult
+from backend.xai_gentle import GentleAIService, XAIResult
 
 
 class CountingRegistry:

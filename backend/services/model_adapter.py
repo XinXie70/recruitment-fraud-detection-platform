@@ -13,7 +13,7 @@ from typing import Callable, Literal, Protocol, Sequence
 
 import httpx
 
-from config import settings
+from backend.config import settings
 
 logger = logging.getLogger("fake_job_detection_api.models")
 

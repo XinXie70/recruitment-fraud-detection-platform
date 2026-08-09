@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from config import Settings
+from backend.config import Settings
 
 
 def test_production_rejects_default_secret() -> None:

@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
-from config import settings
+from backend.config import settings
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
@@ -13,9 +13,9 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from database import get_db
-from models import User
-from rate_limit import limiter
+from backend.database import get_db
+from backend.models import User
+from backend.rate_limit import limiter
 
 
 SECRET_KEY = settings.secret_key

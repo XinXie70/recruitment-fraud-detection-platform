@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from url_analyzer import analyze_urls
+from backend.url_analyzer import analyze_urls
 
 
 def test_public_suffix_domain_is_resolved_correctly() -> None:

@@ -15,17 +15,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
-from auth import get_current_user
-from database import get_db
-from models import AnalysisHistory, User
-from schemas.admin import (
+from backend.auth import get_current_user
+from backend.database import get_db
+from backend.models import AnalysisHistory, User
+from backend.schemas.admin import (
     AdminStats,
     AdminUserItem,
     AnalysisHistoryItem,
     ModelMetricsResponse,
     PaginatedResponse,
 )
-from utils import Pagination, paginate
+from backend.utils import Pagination, paginate
 
 logger = logging.getLogger("fake_job_detection_api.admin")
 router = APIRouter(prefix="/api/admin", tags=["admin"])

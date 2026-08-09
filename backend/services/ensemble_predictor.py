@@ -6,12 +6,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Sequence
 
-from config import settings
+from backend.config import settings
 
 from final_model_pipelines.risk_mapping import apply_risk_mapping
 
-from schemas.analysis import EnsembleResult, ModelMemberOutput
-from services.model_adapter import ModelRegistry, RawModelResult
+from backend.schemas.analysis import EnsembleResult, ModelMemberOutput
+from backend.services.model_adapter import ModelRegistry, RawModelResult
 
 
 class EnsembleConfigurationError(ValueError):

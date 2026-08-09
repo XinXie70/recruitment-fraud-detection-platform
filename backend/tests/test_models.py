@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from models import AnalysisHistory, User
+from backend.models import AnalysisHistory, User
 
 
 def test_analysis_history_rejects_invalid_risk_score(db_session) -> None:

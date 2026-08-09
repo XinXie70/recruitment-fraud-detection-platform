@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from services import cache as cache_module
-from services.cache import TTLCache
+from backend.services import cache as cache_module
+from backend.services.cache import TTLCache
 
 
 def test_cache_evicts_least_recently_used_entry() -> None:

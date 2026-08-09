@@ -3,8 +3,8 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from services.ensemble_predictor import EnsembleUnavailableError
-from services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.services.ensemble_predictor import EnsembleUnavailableError
+from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
 
 
 def _all_response() -> dict:

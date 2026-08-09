@@ -3,9 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Final, Literal
 
-from config import settings
+from backend.config import settings
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
-from xai_gentle import EducationItem, GentleAIResult, XAIResult
+from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
 
 
 API_VERSION: Final[Literal["1.0"]] = "1.0"

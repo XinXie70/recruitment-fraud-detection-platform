@@ -6,14 +6,14 @@ from typing import Any, Callable
 
 from final_model_pipelines.validation_pipeline import validate_job_input
 
-from config import settings
-from schemas.analysis import AnalysisResponse, URLAnalysis
-from services.cache import TTLCache
-from services.ensemble_predictor import EnsemblePredictor
-from services.model_adapter import ModelRegistry
-from services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
-from url_analyzer import analyze_urls
-from xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
+from backend.config import settings
+from backend.schemas.analysis import AnalysisResponse, URLAnalysis
+from backend.services.cache import TTLCache
+from backend.services.ensemble_predictor import EnsemblePredictor
+from backend.services.model_adapter import ModelRegistry
+from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.url_analyzer import analyze_urls
+from backend.xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
 

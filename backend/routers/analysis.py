@@ -8,14 +8,14 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 
-from auth import get_current_user
-from config import settings
-from database import get_db
-from dependencies import get_analysis_service
-from middleware import get_request_id
-from models import AnalysisHistory, User
-from rate_limit import limiter
-from schemas.analysis import (
+from backend.auth import get_current_user
+from backend.config import settings
+from backend.database import get_db
+from backend.dependencies import get_analysis_service
+from backend.middleware import get_request_id
+from backend.models import AnalysisHistory, User
+from backend.rate_limit import limiter
+from backend.schemas.analysis import (
     AnalysisRequest,
     AnalysisResponse,
     EducationListResponse,
@@ -24,12 +24,12 @@ from schemas.analysis import (
     UserAnalysisHistoryItem,
     UserAnalysisHistoryPage,
 )
-from services.analysis_service import AnalysisService, InputRejectedError
-from services.ensemble_predictor import EnsembleUnavailableError
-from url_analyzer import analyze_urls
-from utils import Pagination, paginate
-from xai_gentle import EducationItem
-from xai_gentle.contracts import EducationTopic
+from backend.services.analysis_service import AnalysisService, InputRejectedError
+from backend.services.ensemble_predictor import EnsembleUnavailableError
+from backend.url_analyzer import analyze_urls
+from backend.utils import Pagination, paginate
+from backend.xai_gentle import EducationItem
+from backend.xai_gentle.contracts import EducationTopic
 
 
 logger = logging.getLogger("fake_job_detection_api.analysis")

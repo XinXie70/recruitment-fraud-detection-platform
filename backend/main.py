@@ -4,16 +4,17 @@ import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-# sys.path setup must happen BEFORE any local imports
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 MODEL_DIR = PROJECT_ROOT / "model"
 
-for import_path in (BACKEND_DIR, PROJECT_ROOT, MODEL_DIR):
-    if str(import_path) not in sys.path:
-        sys.path.insert(0, str(import_path))
+# The model pipelines remain a separately packaged runtime with
+# `final_model_pipelines` as their import root. Backend modules themselves use
+# normal `backend.*` package imports and no longer depend on this path mutation.
+if str(MODEL_DIR) not in sys.path:
+    sys.path.insert(0, str(MODEL_DIR))
 
-from config import settings
+from backend.config import settings
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -24,20 +25,20 @@ from sqlalchemy.exc import IntegrityError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from auth import hash_password
-from auth import router as auth_router
-from database import SessionLocal
-from dependencies import get_analysis_service
-from middleware import (
+from backend.auth import hash_password
+from backend.auth import router as auth_router
+from backend.database import SessionLocal
+from backend.dependencies import get_analysis_service
+from backend.middleware import (
     RequestBodyGuardMiddleware,
     RequestIDMiddleware,
     SecurityHeadersMiddleware,
 )
-from models import User
-from rate_limit import limiter
-from routers.admin import router as admin_router
-from routers.analysis import router as analysis_router
-from services.resilience import ServiceStatus, SystemHealth
+from backend.models import User
+from backend.rate_limit import limiter
+from backend.routers.admin import router as admin_router
+from backend.routers.analysis import router as analysis_router
+from backend.services.resilience import ServiceStatus, SystemHealth
 
 
 

@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from config import settings
-from services.analysis_service import AnalysisService
-from services.cache import TTLCache
-from services.ensemble_predictor import EnsemblePredictor
-from services.model_adapter import ModelRegistry
-from services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
-from xai_gentle import GentleAIService, XAIService
+from backend.config import settings
+from backend.services.analysis_service import AnalysisService
+from backend.services.cache import TTLCache
+from backend.services.ensemble_predictor import EnsemblePredictor
+from backend.services.model_adapter import ModelRegistry
+from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.xai_gentle import GentleAIService, XAIService
 
 
 @lru_cache()

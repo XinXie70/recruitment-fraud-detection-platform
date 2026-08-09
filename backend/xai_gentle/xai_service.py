@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable, NotRequired, Sequence, TypedDict
 
-from config import settings
+from backend.config import settings
 
 from .contracts import EvidenceSpan, XAIResult
 

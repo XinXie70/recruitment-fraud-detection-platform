@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from xai_gentle import EvidenceSpan, GentleAIService, RiskContext, XAIResult
-from xai_gentle.gentle_fallback import build_template_guidance
+from backend.xai_gentle import EvidenceSpan, GentleAIService, RiskContext, XAIResult
+from backend.xai_gentle.gentle_fallback import build_template_guidance
 
 
 def _risk(label="Suspicious", level="medium", score=0.5, action="Review Required"):

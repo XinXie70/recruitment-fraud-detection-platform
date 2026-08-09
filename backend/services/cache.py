@@ -12,7 +12,7 @@ import time
 from collections import OrderedDict
 from typing import Any
 
-from config import settings
+from backend.config import settings
 
 
 class TTLCache:

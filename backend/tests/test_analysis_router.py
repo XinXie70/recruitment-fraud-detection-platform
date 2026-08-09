@@ -7,11 +7,11 @@ from types import SimpleNamespace
 import pytest
 from fastapi import HTTPException
 
-from routers import analysis as analysis_router
-from schemas.analysis import AnalysisRequest
-from services.analysis_service import InputRejectedError
-from services.ensemble_predictor import EnsembleUnavailableError
-from xai_gentle import GentleAIService
+from backend.routers import analysis as analysis_router
+from backend.schemas.analysis import AnalysisRequest
+from backend.services.analysis_service import InputRejectedError
+from backend.services.ensemble_predictor import EnsembleUnavailableError
+from backend.xai_gentle import GentleAIService
 
 
 class RaisingService:

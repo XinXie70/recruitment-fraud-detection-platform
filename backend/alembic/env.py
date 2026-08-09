@@ -5,7 +5,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from config import settings
+from backend.config import settings
 
 # Alembic Config object
 config = context.config
@@ -18,8 +18,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Import all models so Alembic can detect them
-from database import Base
-import models  # noqa: F401 — registers models with Base.metadata
+from backend.database import Base
+from backend import models  # noqa: F401 — registers models with Base.metadata
 
 target_metadata = Base.metadata
 

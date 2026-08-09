@@ -5,8 +5,8 @@ from typing import Any
 
 import httpx
 
-from schemas.analysis import EnsembleResult, ModelMemberOutput
-from services.ensemble_predictor import EnsembleComputation, EnsembleUnavailableError
+from backend.schemas.analysis import EnsembleResult, ModelMemberOutput
+from backend.services.ensemble_predictor import EnsembleComputation, EnsembleUnavailableError
 
 
 _RISK_LEVELS = {"Low": "low", "Suspicious": "medium", "High": "high"}

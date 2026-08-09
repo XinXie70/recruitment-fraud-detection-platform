@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import httpx
 
-from services.model_adapter import HttpModelAdapter, ModelAdapter, ModelRegistry, ModelSpec
+from backend.services.model_adapter import HttpModelAdapter, ModelAdapter, ModelRegistry, ModelSpec
 
 
 class FakeAdapter:

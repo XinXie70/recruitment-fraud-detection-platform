@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from services.ensemble_predictor import (
+from backend.services.ensemble_predictor import (
     CalibrationConfig,
     EnsembleConfig,
     EnsembleConfigurationError,
@@ -13,7 +13,7 @@ from services.ensemble_predictor import (
     EnsembleUnavailableError,
     apply_calibration,
 )
-from services.model_adapter import RawModelResult
+from backend.services.model_adapter import RawModelResult
 
 
 def _config() -> EnsembleConfig:

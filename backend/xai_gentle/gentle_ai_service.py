@@ -4,7 +4,7 @@ import json
 import logging
 from pathlib import Path
 
-from config import settings
+from backend.config import settings
 from pydantic import BaseModel, Field
 
 from .contracts import (

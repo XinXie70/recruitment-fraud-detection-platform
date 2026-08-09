@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import jwt
 
-from config import settings
+from backend.config import settings
 
 
 class TestHealthEndpoints:
@@ -204,7 +204,7 @@ class TestUserHistoryEndpoints:
     def test_user_can_list_and_delete_only_own_history(
         self, client, auth_headers, db_session
     ):
-        from models import AnalysisHistory, User
+        from backend.models import AnalysisHistory, User
 
         owner = db_session.query(User).filter(User.username == "testuser").one()
         other = User(
@@ -292,9 +292,9 @@ class TestAdminEndpoints:
     def test_admin_provisioning_does_not_reset_existing_password(
         self, db_session, monkeypatch
     ):
-        import main
-        from auth import hash_password, verify_password
-        from models import User
+        from backend import main
+        from backend.auth import hash_password, verify_password
+        from backend.models import User
 
         admin = User(
             email="admin@example.com",
@@ -332,7 +332,7 @@ class TestAdminEndpoints:
         assert client.get("/api/admin/model-metrics", headers=auth_headers).status_code == 403
 
     def test_admin_dashboard_queries(self, client, auth_headers, db_session):
-        from models import AnalysisHistory, User
+        from backend.models import AnalysisHistory, User
 
         user = db_session.query(User).filter(User.username == "testuser").one()
         user.is_admin = True
@@ -385,8 +385,8 @@ class TestAdminEndpoints:
         assert len(metrics.json()["models"]) == 8
 
     def test_login_returns_admin_role(self, client, db_session):
-        from auth import hash_password
-        from models import User
+        from backend.auth import hash_password
+        from backend.models import User
 
         admin = User(
             email="admin@example.com",
