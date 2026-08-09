@@ -23,11 +23,10 @@ from backend.core.lifecycle import (
     warm_up_models,
 )
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -44,7 +43,7 @@ from backend.models import User
 from backend.rate_limit import limiter
 from backend.routers.admin import router as admin_router
 from backend.routers.analysis import router as analysis_router
-from backend.services.resilience import ServiceStatus, SystemHealth
+from backend.routers.health import create_health_router
 
 
 
@@ -187,67 +186,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.include_router(auth_router)
 app.include_router(analysis_router)
 app.include_router(admin_router)
-
-
-# Endpoints
-
-class ReadyResponse(BaseModel):
-    status: str
-    model_ready: bool
-    database_connected: bool
-
-
-@app.get("/api/live", include_in_schema=False)
-def liveness_check() -> dict[str, str]:
-    """Process-level probe that does not depend on the database or model runtime."""
-    return {"status": "alive"}
-
-
-@app.get("/api/health")
-@limiter.limit(settings.rate_limit_global)
-def health_check(request: Request):
-    """Rich health endpoint showing ensemble, DB, and external service status."""
-    health = SystemHealth.from_analysis_service(analysis_service)
-    health.database_connected = _check_database()
-    health.ollama_available = analysis_service.gentle_ai.ollama_enabled
-
-    status_code = 503 if health.status == ServiceStatus.UNAVAILABLE else 200
-
-    return JSONResponse(
-        status_code=status_code,
-        content={
-            "status": health.status.value,
-            "service": health.service,
-            "version": health.version,
-            "ensemble": {
-                "available": health.ensemble_members_available,
-                "total": health.ensemble_members_total,
-                "failed_members": sorted(health.failed_members),
-            },
-            "database_connected": health.database_connected,
-            "ollama_available": health.ollama_available,
-        },
-    )
-
-
-@app.get("/api/ready", response_model=ReadyResponse)
-def readiness_check() -> ReadyResponse:
-    model_ready = analysis_service.ready
-    database_connected = _check_database()
-    if not model_ready or not database_connected:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "Service dependencies are not ready.",
-                "model_ready": model_ready,
-                "database_connected": database_connected,
-            },
-        )
-    return ReadyResponse(
-        status="ready",
-        model_ready=True,
-        database_connected=True,
-    )
+app.include_router(create_health_router(analysis_service, _check_database))
 
 
 if __name__ == "__main__":
