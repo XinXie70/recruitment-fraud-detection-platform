@@ -21,7 +21,7 @@ flowchart TB
 
     subgraph gcp["Google Cloud project"]
         vm["Compute Engine VM"]
-        model["Model Inference API<br/>/health and /predict/batch"]
+        model["Model Inference API<br/>/health and model-specific prediction endpoints"]
         artifacts["Model artifacts<br/>LR, SVM, XGBoost, DNN,<br/>RNN, BiLSTM, BERT, RoBERTa"]
         vm --- model
         model --- artifacts

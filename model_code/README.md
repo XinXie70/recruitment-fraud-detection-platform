@@ -5,25 +5,30 @@ Use this directory together with the repository-level `model_weights/`,
 
 ## Install dependencies
 
-```powershell
-. E:\ml\activate.ps1
+From the repository root, activate the project virtual environment and install
+the dependencies:
+
+```bash
+source .venv/bin/activate
 pip install -r model_code/requirements-bert.txt
 pip install -r requirements.txt
 ```
 
+On Windows PowerShell, use `.\.venv\Scripts\Activate.ps1` for activation.
+
 ## Run class-weighted BERT
 
-```powershell
-cd model_code/bert
-
+```bash
 # Train the class-weighted model and write weights to ../../model_weights/bert/bert_class_weighted
-python train_bert.py
+python model_code/bert/train_bert.py
 
 # Evaluate saved weights on the test split
-python evaluate_bert.py --checkpoint_dir ..\..\model_weights\bert\bert_class_weighted\best
+python model_code/bert/evaluate_bert.py \
+  --checkpoint_dir model_weights/bert/bert_class_weighted/best
 
 # Run inference on one record
-python predict_bert.py --text "Urgent work-from-home role. Send bank details."
+python model_code/bert/predict_bert.py \
+  --text "Urgent work-from-home role. Send bank details."
 ```
 
 ## Git LFS for model weights
@@ -31,7 +36,7 @@ python predict_bert.py --text "Urgent work-from-home role. Send bank details."
 The BERT `model.safetensors` file is approximately 418 MB, which exceeds
 GitHub's 100 MB regular-file limit. Use Git LFS:
 
-```powershell
+```bash
 git lfs install
 git lfs pull
 ```
