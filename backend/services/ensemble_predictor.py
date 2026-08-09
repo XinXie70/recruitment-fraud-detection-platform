@@ -4,7 +4,7 @@ import json
 import math
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Sequence
+from typing import Callable, Literal, Sequence, cast
 
 from backend.config import settings
 
@@ -248,20 +248,31 @@ class EnsemblePredictor:
             self.config.low_threshold,
             self.config.high_threshold,
         )
-        risk_level = {
-            "Likely Legitimate": "low",
-            "Suspicious": "medium",
-            "Likely Deceptive": "high",
-        }[mapping["classification_label"]]
+        risk_level = cast(
+            Literal["low", "medium", "high"],
+            {
+                "Likely Legitimate": "low",
+                "Suspicious": "medium",
+                "Likely Deceptive": "high",
+            }[mapping["classification_label"]],
+        )
         failed_count = len(raw_results) - len(successful)
-        status = "degraded" if failed_count else "success"
+        status: Literal["success", "degraded"] = (
+            "degraded" if failed_count else "success"
+        )
         ensemble = EnsembleResult(
             status=status,
             risk_score=risk_score,
-            classification_label=mapping["classification_label"],
+            classification_label=cast(
+                Literal["Likely Legitimate", "Suspicious", "Likely Deceptive"],
+                mapping["classification_label"],
+            ),
             risk_level=risk_level,
-            prediction=mapping["prediction"],
-            recommended_action=mapping["recommended_action"],
+            prediction=cast(Literal["real", "fake"], mapping["prediction"]),
+            recommended_action=cast(
+                Literal["Safe", "Review Required", "High Risk Warning"],
+                mapping["recommended_action"],
+            ),
             low_threshold=self.config.low_threshold,
             high_threshold=self.config.high_threshold,
             active_model_count=len(successful),

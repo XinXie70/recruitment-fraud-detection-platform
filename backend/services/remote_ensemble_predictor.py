@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal, cast
 
 import httpx
 
@@ -122,7 +122,10 @@ class RemoteFinalEnsemblePredictor:
                 lr_score, bert_score, risk = self._try_legacy_api(text)
         try:
             risk_score = self._probability(risk["risk_score"], "risk_score")
-            risk_level = _RISK_LEVELS[risk["risk_level"]]
+            risk_level = cast(
+                Literal["low", "medium", "high"],
+                _RISK_LEVELS[risk["risk_level"]],
+            )
             thresholds = risk["thresholds"]
             low_threshold = self._probability(
                 thresholds["bert_low_threshold"], "bert_low_threshold"
@@ -133,9 +136,10 @@ class RemoteFinalEnsemblePredictor:
             lr_gate_threshold = self._probability(
                 thresholds["lr_gate"], "lr_gate"
             )
-            source = str(risk["risk_score_source"])
-            if source not in {"bert", "lr_gate"}:
+            raw_source = str(risk["risk_score_source"])
+            if raw_source not in {"bert", "lr_gate"}:
                 raise TypeError
+            source = cast(Literal["bert", "lr_gate"], raw_source)
             gate_triggered = risk["gate_triggered"]
             if not isinstance(gate_triggered, bool):
                 raise TypeError
@@ -145,14 +149,21 @@ class RemoteFinalEnsemblePredictor:
                 "Remote final ensemble response does not match its API contract."
             ) from exc
 
-        labels = {
+        labels: dict[
+            Literal["low", "medium", "high"],
+            tuple[
+                Literal["Likely Legitimate", "Suspicious", "Likely Deceptive"],
+                Literal["real", "fake"],
+                Literal["Safe", "Review Required", "High Risk Warning"],
+            ],
+        ] = {
             "low": ("Likely Legitimate", "real", "Safe"),
             "medium": ("Suspicious", "fake", "Review Required"),
             "high": ("Likely Deceptive", "fake", "High Risk Warning"),
         }
         classification, prediction, action = labels[risk_level]
         scores = {"lr": lr_score, "bert": bert_score}
-        roles = {
+        roles: dict[str, Literal["primary_score", "false_positive_gate"]] = {
             "lr": "false_positive_gate",
             "bert": "primary_score",
         }

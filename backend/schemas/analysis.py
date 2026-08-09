@@ -28,11 +28,11 @@ class ModelMemberOutput(BaseModel):
     key: str
     display_name: str
     status: Literal["success", "error", "timeout"]
-    raw_score: float | None = Field(None, ge=0, le=1)
-    calibrated_score: float | None = Field(None, ge=0, le=1)
-    configured_weight: float | None = Field(None, ge=0, le=1)
-    effective_weight: float | None = Field(None, ge=0, le=1)
-    weighted_contribution: float | None = Field(None, ge=0, le=1)
+    raw_score: float | None = Field(default=None, ge=0, le=1)
+    calibrated_score: float | None = Field(default=None, ge=0, le=1)
+    configured_weight: float | None = Field(default=None, ge=0, le=1)
+    effective_weight: float | None = Field(default=None, ge=0, le=1)
+    weighted_contribution: float | None = Field(default=None, ge=0, le=1)
     role: Literal["weighted_member", "primary_score", "false_positive_gate"] | None = None
     decision_active: bool | None = None
     error: str | None = None
@@ -60,9 +60,9 @@ class EnsembleResult(BaseModel):
     risk_score_source: Literal["bert", "lr_gate"] | None = None
     gate_triggered: bool | None = None
     decision_reason: str | None = None
-    bert_low_threshold: float | None = Field(None, ge=0, le=1)
-    bert_high_threshold: float | None = Field(None, ge=0, le=1)
-    lr_gate_threshold: float | None = Field(None, ge=0, le=1)
+    bert_low_threshold: float | None = Field(default=None, ge=0, le=1)
+    bert_high_threshold: float | None = Field(default=None, ge=0, le=1)
+    lr_gate_threshold: float | None = Field(default=None, ge=0, le=1)
 
     @computed_field  # type: ignore[prop-decorator]
     @property

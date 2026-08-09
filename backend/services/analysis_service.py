@@ -67,6 +67,7 @@ class AnalysisService:
 
     @classmethod
     def from_environment(cls) -> "AnalysisService":
+        ensemble: EnsemblePredictor | RemoteFinalEnsemblePredictor
         if settings.model_server_url.strip():
             ensemble = RemoteFinalEnsemblePredictor(
                 settings.model_server_url,
