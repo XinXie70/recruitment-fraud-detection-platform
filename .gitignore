@@ -21,6 +21,9 @@ checkpoints/
 venv/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 .coverage.*
 htmlcov/
@@ -34,6 +37,9 @@ frontend/playwright-report/
 frontend/test-results/
 api_flask/server.*.log
 backend/test.db
+*.sqlite
+*.sqlite3
+*.pid
 .DS_Store
 .ipynb_checkpoints/
 .idea/
@@ -42,3 +48,9 @@ backend/test.db
 # Training runtime output is local-only; retain placeholder directories.
 model_results/**/logs/*
 !model_results/**/logs/.gitkeep
+
+# Reproducible experiment outputs may include metrics, predictions, and figures,
+# but transient process logs must not be committed.
+experiments/**/logs/*
+retrain_*/results/logs/*
+retrain_*/results/*.log

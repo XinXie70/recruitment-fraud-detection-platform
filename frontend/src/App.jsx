@@ -26,6 +26,12 @@ import {
 } from 'react-router';
 import { SAMPLES } from './utils/analysisUtils';
 import { analyzeJobScore, analyzeJobText } from './features/analysis/api';
+import {
+  LAST_ANALYSIS_STORAGE_KEY,
+  saveAnalysisHistory,
+} from './features/analysis/analysisStorage';
+import { clearStoredAuth, loadStoredAuth, saveStoredAuth } from './features/auth/authStorage';
+import { formatApiError } from './features/auth/errors';
 import AttributionTable from './features/xai_gentle/AttributionTable';
 import ExplanationText from './features/xai_gentle/ExplanationText';
 import GentleGuidance from './features/xai_gentle/GentleGuidance';
@@ -37,67 +43,7 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const DashboardPage = lazy(() => import('./components/DashboardPage'));
 const EducationLibrary = lazy(() => import('./features/education/EducationLibrary'));
 
-const AUTH_STORAGE_KEY = 'fake_job_auth';
-const HISTORY_STORAGE_KEY = 'fake_job_history';
-const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
-
-function saveAnalysisHistory(result) {
-  try {
-    const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
-    const history = raw ? JSON.parse(raw) : [];
-
-    const entry = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      riskLevel: result.ensemble.risk_level,
-      riskScore: Math.round(result.ensemble.risk_score * 100),
-      prediction: result.ensemble.classification_label,
-      modelCount: result.ensemble.active_model_count,
-      inputText: result.inputText,
-      analysisResult: result,
-    };
-
-    const updatedHistory = [entry, ...history].slice(0, 50);
-
-    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory));
-  } catch (error) {
-    console.error('Failed to save analysis history:', error);
-  }
-}
-
 const HERO_TITLE = 'Detect Fake Job Advertisements';
-
-function loadStoredAuth() {
-  try {
-    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function formatApiError(detail, fallback = 'Authentication failed.') {
-  if (typeof detail === 'string' && detail.trim()) {
-    return detail;
-  }
-
-  if (Array.isArray(detail)) {
-    const messages = detail
-      .map((item) => (typeof item?.msg === 'string' ? item.msg : null))
-      .filter(Boolean)
-      .map((message) => message.replace(/^Value error,\s*/i, ''));
-
-    if (messages.length > 0) {
-      return messages.join(' ');
-    }
-  }
-
-  if (detail && typeof detail === 'object' && typeof detail.message === 'string') {
-    return detail.message;
-  }
-
-  return fallback;
-}
 
 function AnimatedTitle({ text }) {
   let letterIndex = 0;
@@ -777,12 +723,12 @@ function AppShell() {
   const navigate = useNavigate();
 
   const handleAuth = (authData) => {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+    saveStoredAuth(authData);
     setAuth(authData);
   };
 
   const handleLogout = () => {
-    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    clearStoredAuth();
     setAuth(null);
     navigate('/login');
   };

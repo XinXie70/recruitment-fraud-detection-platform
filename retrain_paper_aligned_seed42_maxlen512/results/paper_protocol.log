@@ -1,4 +1,0 @@
-2026-08-02 12:07:54 | WARNING | Project B/seed42 metrics not found; comparison will be paper-only
-2026-08-02 12:07:57 | INFO | Paper split train: n=12873 fraud=624
-2026-08-02 12:07:57 | INFO | Paper split validation: n=1431 fraud=69
-2026-08-02 12:07:57 | INFO | Paper split test: n=3576 fraud=173

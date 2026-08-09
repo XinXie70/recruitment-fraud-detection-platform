@@ -1,5 +1,11 @@
 # Fake Job Advertisement Detection Platform
 
+> **Product entry points:** use `frontend/` for the web client and
+> `backend.main:app` for the application API. The code under `src/api/` is a
+> reproducible reference model API, while `api_flask/` is a retained legacy
+> implementation. See the [code ownership guide](docs/architecture/code-ownership.md)
+> before adding cross-directory dependencies.
+
 This project combines a React web application, an authenticated FastAPI backend,
 and separately deployable model inference services. The application backend can
 orchestrate eight model families, while the locked reference API retains the
