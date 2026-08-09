@@ -12,7 +12,8 @@ These directories form the supported web application:
 - `backend/`: authenticated FastAPI application, persistence, administration,
   analysis orchestration, XAI, and educational guidance.
 - `model/final_model_pipelines/`: model adapters and artifacts used by the
-  application backend when local inference is enabled.
+  application backend when local inference is enabled. It is installed as the
+  `almond-model-pipelines` distribution and imported as `final_model_pipelines`.
 
 The supported product backend entry point is `backend.main:app`.
 

@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests", "backend/tests"]
-pythonpath = [".", "model"]
+pythonpath = ["."]
 addopts = "-ra"
 
 [tool.ruff]

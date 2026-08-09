@@ -21,6 +21,7 @@ checkpoints/
 venv/
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -44,6 +45,10 @@ backend/test.db
 .ipynb_checkpoints/
 .idea/
 .vscode/
+
+# Historical integration snapshot. The audited copy was removed from Git, but
+# some developers may still keep a local checkout for comparison.
+XAI&Gentle_AI/
 
 # Training runtime output is local-only; retain placeholder directories.
 model_results/**/logs/*

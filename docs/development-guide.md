@@ -30,6 +30,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r backend/requirements-dev.txt
+pip install -e model
 ```
 
 Create the local environment file and replace its example secret:

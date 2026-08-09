@@ -6,8 +6,8 @@ BERT sees the same diagnostic Train / Validation / Holdout partitions as the
 LR and Linear SVM runs.
 
 Usage (PowerShell):
-  . E:\\ml\\activate.ps1
-  cd F:\\final-version-1\\capstone-project-26t2-9900-h09c-almond\\model_code\\bert
+  . .venv\\Scripts\\Activate.ps1
+  cd model_code\\bert
   python run_bert_split_leakage.py
   python run_bert_split_leakage.py --conditions A B C --seeds 0 1 2
 """

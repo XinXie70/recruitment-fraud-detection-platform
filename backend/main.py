@@ -1,18 +1,9 @@
 import logging
-import sys
 import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = BACKEND_DIR.parent
-MODEL_DIR = PROJECT_ROOT / "model"
-
-# The model pipelines remain a separately packaged runtime with
-# `final_model_pipelines` as their import root. Backend modules themselves use
-# normal `backend.*` package imports and no longer depend on this path mutation.
-if str(MODEL_DIR) not in sys.path:
-    sys.path.insert(0, str(MODEL_DIR))
 
 from backend.config import settings
 from backend.core.logging import configure_logging

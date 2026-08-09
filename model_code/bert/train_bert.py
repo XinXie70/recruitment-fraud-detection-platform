@@ -1,8 +1,8 @@
 """Experiment A: end-to-end BERT fine-tuning on fixed train/val/test splits.
 
-Usage (PowerShell, E: CUDA env):
-  . E:\\ml\\activate.ps1
-  cd F:\\final-version\\independent_ml_workflow\\models\\bert
+Usage (PowerShell):
+  . .venv\\Scripts\\Activate.ps1
+  cd model_code\\bert
   python train_bert.py --use_class_weights true
   python train_bert.py --use_class_weights false --run_name bert_no_class_weight
 """

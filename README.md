@@ -66,6 +66,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r model_code/requirements-bert.txt
+pip install -e model
 ```
 
 On Windows PowerShell, activate the environment with
@@ -103,6 +104,7 @@ apply the database migrations before starting it:
 
 ```bash
 pip install -r backend/requirements-dev.txt
+pip install -e model
 cp backend/env.example .env
 python -m alembic -c backend/alembic.ini upgrade head
 uvicorn backend.main:app --host 0.0.0.0 --port 8000

@@ -1,8 +1,8 @@
 """Single-ad / batch inference for the fine-tuned BERT classifier.
 
 Examples (PowerShell):
-  . E:\\ml\\activate.ps1
-  cd F:\\final-version\\independent_ml_workflow\\model_code\\bert
+  . .venv\\Scripts\\Activate.ps1
+  cd model_code\\bert
   python predict_bert.py --text "Urgent work-from-home job. Send bank details to apply."
   python predict_bert.py --csv path\\to\\ads.csv --text_column combined_text
 """
