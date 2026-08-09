@@ -29,8 +29,9 @@ with the authenticated application backend.
 ## Legacy implementation
 
 - `api_flask/`: retained FP-gate Flask model service.
-- `XAI&Gentle_AI/`: historical integration snapshot pending archive after its
-  remaining differences have been audited against the product directories.
+- The historical `XAI&Gentle_AI/` integration snapshot was removed after its
+  differences were audited against the product directories. Git history retains
+  it for reference.
 
 Product code must not add imports from these legacy directories.
 
@@ -58,5 +59,5 @@ frontend -> backend -> model/final_model_pipelines
                     -> database
 ```
 
-Product runtime code must not import from `api_flask/`, `XAI&Gentle_AI/`, or an
+Product runtime code must not import from `api_flask/`, legacy snapshots, or an
 offline experiment directory. Moving a directory does not change that rule.
