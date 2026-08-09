@@ -1,9 +1,4 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
-import ReactEChartsCore from 'echarts-for-react/esm/core.js';
-import * as echarts from 'echarts/core';
-import { BarChart, PieChart } from 'echarts/charts';
-import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
+import React, { lazy, Suspense, useCallback, useState, useEffect, useMemo } from 'react';
 import {
   Award,
   BarChart3,
@@ -28,7 +23,15 @@ import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
 import { apiUrl } from '../utils/api';
 
-echarts.use([BarChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer]);
+const EChart = lazy(() => import('./charts/EChart'));
+
+function ChartFallback() {
+  return (
+    <div className="loading-state" role="status" style={{ height: 340 }}>
+      Loading chart…
+    </div>
+  );
+}
 
 const MODEL_ARCHITECTURES = {
   'Logistic Reg.': {
@@ -347,13 +350,9 @@ export default function AdminDashboard({ auth, onLogout }) {
               <h2>Live Risk Distribution</h2>
               <span className="admin-badge">{adminStats?.total_analyses ?? 0} analyses</span>
             </div>
-            <ReactEChartsCore
-              echarts={echarts}
-              option={riskChartOption}
-              style={{ height: 340 }}
-              notMerge
-              lazyUpdate
-            />
+            <Suspense fallback={<ChartFallback />}>
+              <EChart option={riskChartOption} />
+            </Suspense>
           </article>
           <article className="admin-card admin-chart-card admin-chart-card-wide">
             <div className="admin-card-header">
@@ -365,13 +364,9 @@ export default function AdminDashboard({ auth, onLogout }) {
                   : 'Loading metrics'}
               </span>
             </div>
-            <ReactEChartsCore
-              echarts={echarts}
-              option={modelChartOption}
-              style={{ height: 340 }}
-              notMerge
-              lazyUpdate
-            />
+            <Suspense fallback={<ChartFallback />}>
+              <EChart option={modelChartOption} />
+            </Suspense>
           </article>
         </section>
 

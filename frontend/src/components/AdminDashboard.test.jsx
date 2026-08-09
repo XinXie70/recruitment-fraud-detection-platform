@@ -80,7 +80,7 @@ describe('AdminDashboard', () => {
     expect(await screen.findByText('12')).toBeVisible();
     expect(screen.getByText('48')).toBeVisible();
     expect(screen.getByText('25.0%')).toBeVisible();
-    expect(screen.getAllByTestId('echart')).toHaveLength(2);
+    expect(await screen.findAllByTestId('echart')).toHaveLength(2);
     expect(screen.getByText('EMS CAD held-out test set · v2026.07')).toBeVisible();
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('/api/admin/stats', {
