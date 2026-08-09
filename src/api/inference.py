@@ -16,11 +16,16 @@ BERT_CODE_DIR = PROJECT_ROOT / "model_code" / "bert"
 if str(BERT_CODE_DIR) not in sys.path:
     sys.path.insert(0, str(BERT_CODE_DIR))
 
-from model import BertForFraudClassification, softmax_fraud_proba  # noqa: E402
+from model import (  # type: ignore[attr-defined]  # noqa: E402
+    BertForFraudClassification,
+    softmax_fraud_proba,
+)
 from preprocessing import clean_text  # noqa: E402
 from utils import get_device, load_json  # noqa: E402
 
-LR_ARTIFACT = PROJECT_ROOT / "model_weights" / "logistic_regression" / "logistic_regression_baseline.joblib"
+LR_ARTIFACT = (
+    PROJECT_ROOT / "model_weights" / "logistic_regression" / "logistic_regression_baseline.joblib"
+)
 LR_METRICS = PROJECT_ROOT / "reports" / "models" / "logistic_regression" / "validation_metrics.json"
 BERT_CHECKPOINT = PROJECT_ROOT / "model_weights" / "bert" / "bert_class_weighted" / "best"
 ENSEMBLE_CONFIG = PROJECT_ROOT / "reports" / "models" / "ensemble_lr_bert" / "ensemble_config.json"
@@ -31,10 +36,10 @@ class ModelService:
 
     def __init__(self, allow_cpu: bool = True) -> None:
         self.allow_cpu = allow_cpu
-        self._lr_model = None
+        self._lr_model: Any = None
         self._lr_threshold: float | None = None
-        self._bert_model = None
-        self._bert_tokenizer = None
+        self._bert_model: Any = None
+        self._bert_tokenizer: Any = None
         self._bert_threshold: float | None = None
         self._device: torch.device | None = None
         self._ensemble_config: dict | None = None
@@ -82,6 +87,7 @@ class ModelService:
     def predict_lr(self, text: str) -> dict[str, Any]:
         self.load_lr()
         cleaned = clean_text(text)
+        assert self._lr_threshold is not None
         score = float(self._lr_model.predict_proba([cleaned])[0, 1])
         threshold = self._lr_threshold
         prediction = 1 if score >= threshold else 0
@@ -96,6 +102,9 @@ class ModelService:
     @torch.no_grad()
     def predict_bert(self, text: str, max_length: int = 256) -> dict[str, Any]:
         self.load_bert()
+        assert self._bert_model is not None
+        assert self._bert_tokenizer is not None
+        assert self._bert_threshold is not None
         cleaned = clean_text(text)
         enc = self._bert_tokenizer(
             cleaned,

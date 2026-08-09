@@ -57,9 +57,7 @@ def load_predictions(path: Path, expected_model_name: str) -> pd.DataFrame:
     if df["record_id"].duplicated().any():
         raise ValueError(f"{path.name} contains duplicate record_id values")
     if not df["model_name"].eq(expected_model_name).all():
-        raise ValueError(
-            f"{path.name} does not contain only model_name={expected_model_name}"
-        )
+        raise ValueError(f"{path.name} does not contain only model_name={expected_model_name}")
     return df
 
 
@@ -89,10 +87,9 @@ def select_best_blend(merged: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
 
     for weight_classic in WEIGHT_GRID:
         weight_bert = 1.0 - weight_classic
-        scores = (
-            weight_classic * merged["fraud_score_classic"].to_numpy(dtype=float)
-            + weight_bert * merged["fraud_score_bert"].to_numpy(dtype=float)
-        )
+        scores = weight_classic * merged["fraud_score_classic"].to_numpy(
+            dtype=float
+        ) + weight_bert * merged["fraud_score_bert"].to_numpy(dtype=float)
         for threshold in THRESHOLD_GRID:
             metrics = calculate_metrics(labels, scores, float(threshold))
             row = {
@@ -119,6 +116,8 @@ def select_best_blend(merged: pd.DataFrame) -> tuple[dict, pd.DataFrame]:
             if current_key > best_key:
                 best = row
 
+    if best is None:
+        raise ValueError("The ensemble search grid produced no candidates")
     return best, pd.DataFrame(candidates)
 
 
@@ -249,10 +248,9 @@ def run_validation() -> None:
         raise ValueError("Classic and BERT true_label columns do not match after merge")
 
     best, candidates = select_best_blend(merged)
-    ensemble_scores = (
-        best["weight_classic"] * merged["fraud_score_classic"].to_numpy(dtype=float)
-        + best["weight_bert"] * merged["fraud_score_bert"].to_numpy(dtype=float)
-    )
+    ensemble_scores = best["weight_classic"] * merged["fraud_score_classic"].to_numpy(
+        dtype=float
+    ) + best["weight_bert"] * merged["fraud_score_bert"].to_numpy(dtype=float)
     labels = merged["true_label_classic"].to_numpy(dtype=int)
     predictions = (ensemble_scores >= best["threshold"]).astype(int)
 
@@ -299,9 +297,7 @@ def run_validation() -> None:
             BERT_KEY: best["weight_bert"],
         },
         "selected_threshold": best,
-        "score_correlation": float(
-            merged["fraud_score_classic"].corr(merged["fraud_score_bert"])
-        ),
+        "score_correlation": float(merged["fraud_score_classic"].corr(merged["fraud_score_bert"])),
         "prediction_disagreement_count": int(
             (merged["prediction_classic"] != merged["prediction_bert"]).sum()
         ),
@@ -318,10 +314,7 @@ def run_validation() -> None:
     ).to_csv(ensemble_dir / "weight_threshold_search.csv", index=False)
 
     print(f"Wrote predictions to {ensemble_dir / 'validation_predictions.csv'}")
-    print(
-        f"Selected weights: lr={best['weight_classic']:.2f}, "
-        f"bert={best['weight_bert']:.2f}"
-    )
+    print(f"Selected weights: lr={best['weight_classic']:.2f}, bert={best['weight_bert']:.2f}")
     print(f"Selected threshold: {best['threshold']:.2f}")
     print(f"Validation PR-AUC: {best['pr_auc']:.4f}")
     print(f"Validation fraud F1: {best['fraud_f1']:.4f}")
@@ -331,9 +324,7 @@ def run_test() -> None:
     ensemble_dir = REPORTS_DIR / ENSEMBLE_DIR_NAME
     config_path = ensemble_dir / "ensemble_config.json"
     if not config_path.exists():
-        raise FileNotFoundError(
-            "Run --mode validation first to produce ensemble_config.json"
-        )
+        raise FileNotFoundError("Run --mode validation first to produce ensemble_config.json")
     config = json.loads(config_path.read_text(encoding="utf-8"))
     w_classic = config["weights"][CLASSIC_KEY]
     w_bert = config["weights"][BERT_KEY]
@@ -364,10 +355,9 @@ def run_test() -> None:
     if not merged["true_label_classic"].equals(merged["true_label_bert"]):
         raise ValueError("LR and BERT true_label columns do not match after merge")
 
-    ensemble_scores = (
-        w_classic * merged["fraud_score_classic"].to_numpy(dtype=float)
-        + w_bert * merged["fraud_score_bert"].to_numpy(dtype=float)
-    )
+    ensemble_scores = w_classic * merged["fraud_score_classic"].to_numpy(
+        dtype=float
+    ) + w_bert * merged["fraud_score_bert"].to_numpy(dtype=float)
     labels = merged["true_label_classic"].to_numpy(dtype=int)
     predictions = (ensemble_scores >= threshold).astype(int)
 

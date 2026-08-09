@@ -38,7 +38,6 @@ from config import (
     BertFinetuneConfig,
     ensure_directories,
 )
-from metrics import binary_metrics
 from train_bert import run_training
 from utils import save_json, setup_logging
 

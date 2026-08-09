@@ -95,6 +95,7 @@ def predict_batch_with_all_models(input_texts: list[str]) -> list[dict]:
             bilstm_results,
             bert_results,
             roberta_results,
+            strict=True,
         )
     ]
 

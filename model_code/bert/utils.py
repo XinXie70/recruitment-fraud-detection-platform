@@ -9,11 +9,14 @@ import random
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import numpy as np
 
 from config import LOGS_DIR, ensure_directories
+
+if TYPE_CHECKING:
+    import torch
 
 
 def set_seed(seed: int = 42) -> None:

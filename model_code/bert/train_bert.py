@@ -172,7 +172,7 @@ def train_one_epoch(
                 )
                 loss = criterion(outputs.logits, y) / grad_accum
             scaler.scale(loss).backward()
-        except torch.cuda.OutOfMemoryError:
+        except torch.cuda.OutOfMemoryError as exc:
             torch.cuda.empty_cache()
             raise RuntimeError(
                 "CUDA OOM during BERT fine-tuning. Try in order:\n"
@@ -181,7 +181,7 @@ def train_one_epoch(
                 "  3) decrease --max_length\n"
                 "  4) enable --gradient_checkpointing\n"
                 "Do NOT silently continue on CPU for long training."
-            )
+            ) from exc
 
         running += float(loss.item()) * grad_accum
         n_steps += 1

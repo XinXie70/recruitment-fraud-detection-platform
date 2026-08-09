@@ -6,8 +6,6 @@ Writes metrics into ../results_eval and compares against the reported 0.9003.
 from __future__ import annotations
 
 import json
-import sys
-from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader

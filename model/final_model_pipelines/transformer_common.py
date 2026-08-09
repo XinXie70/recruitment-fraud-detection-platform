@@ -54,7 +54,7 @@ def encode_texts(tokenizer, texts: list[str] | pd.Series, max_len: int) -> dict[
         max_length=max_len,
         return_tensors="pt",
     )
-    return {key: value for key, value in encoded.items()}
+    return dict(encoded.items())
 
 
 def _class_weight_tensor(class_weight: dict[int, float], device: torch.device) -> torch.Tensor:

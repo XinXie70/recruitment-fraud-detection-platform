@@ -23,7 +23,8 @@ def build_combined_text(row: pd.Series) -> str:
 
 def encode_labels(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
-    out[LABEL_COL] = out[LABEL_COL].map({"t": 1, "f": 0, True: 1, False: 0, 1: 1, 0: 0})
+    # Boolean labels compare equal to 1/0, so the numeric keys cover both forms.
+    out[LABEL_COL] = out[LABEL_COL].map({"t": 1, "f": 0, 1: 1, 0: 0})
     if out[LABEL_COL].isna().any():
         raise ValueError("Unrecognized label values in the fraudulent column.")
     return out

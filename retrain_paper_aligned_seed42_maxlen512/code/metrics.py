@@ -6,7 +6,7 @@ Primary selection metric: validation fraud-class F1 (not accuracy alone).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -90,7 +90,7 @@ def threshold_sweep(
     if thresholds is None:
         thresholds = np.round(np.arange(0.01, 1.0, float(step)), 4)
         # Always include the endpoints used historically for comparability.
-        thresholds = sorted(set([0.01, *thresholds.tolist(), 0.99]))
+        thresholds = sorted({0.01, *thresholds.tolist(), 0.99})
     rows = []
     for thr in thresholds:
         m = binary_metrics(y_true, y_prob, threshold=float(thr))
@@ -429,7 +429,8 @@ def plot_model_comparison(comparison_csv: Path, out_path: Path) -> None:
         plot_df[col] = pd.to_numeric(plot_df[col], errors="coerce")
 
     labels = [
-        f"{m}\n({i})" for m, i in zip(plot_df["Model"], plot_df["Imbalance method"])
+        f"{m}\n({i})"
+        for m, i in zip(plot_df["Model"], plot_df["Imbalance method"], strict=True)
     ]
     x = np.arange(len(plot_df))
     width = 0.25

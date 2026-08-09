@@ -133,7 +133,7 @@ def generate_predictions(
             close()
 
     payload = {**outputs, **_cache_metadata(frame)}
-    np.savez_compressed(CACHE_PATH, **payload)
+    np.savez_compressed(CACHE_PATH, **payload)  # type: ignore[arg-type]
     print(f"Saved verified prediction cache to {CACHE_PATH}")
     return outputs
 

@@ -8,6 +8,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TypedDict
 
 import joblib
 import pandas as pd
@@ -25,11 +26,16 @@ from sklearn.metrics import (
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_DIR / "data" / "splits"
 TEST_FILE = DATA_DIR / "test.csv"
-EXPECTED_TEST_SHA256 = (
-    "85457e3dc60c05a68aaea9e9f433b2fb8bc9cb775dbf0221d61efe2e1cbd6257"
-)
+EXPECTED_TEST_SHA256 = "85457e3dc60c05a68aaea9e9f433b2fb8bc9cb775dbf0221d61efe2e1cbd6257"
 
-MODEL = {
+
+class ModelDefinition(TypedDict):
+    name: str
+    artifact: Path
+    report_dir: Path
+
+
+MODEL: ModelDefinition = {
     "name": "logistic_regression_baseline",
     "artifact": PROJECT_DIR
     / "model_weights/logistic_regression/logistic_regression_baseline.joblib",
@@ -65,28 +71,20 @@ def check_group_isolation(test):
         other = load_split(DATA_DIR / f"{split_name}.csv")
         overlap = set(test["group_id"]) & set(other["group_id"])
         if overlap:
-            raise ValueError(
-                f"{len(overlap)} groups overlap between {split_name} and Test"
-            )
+            raise ValueError(f"{len(overlap)} groups overlap between {split_name} and Test")
 
 
 def calculate_metrics(labels, scores, threshold):
     predictions = (scores >= threshold).astype(int)
-    tn, fp, fn, tp = confusion_matrix(
-        labels, predictions, labels=[0, 1]
-    ).ravel()
+    tn, fp, fn, tp = confusion_matrix(labels, predictions, labels=[0, 1]).ravel()
     return {
         "threshold": float(threshold),
         "test_rows": int(len(labels)),
         "test_fraud": int(labels.sum()),
         "pr_auc": float(average_precision_score(labels, scores)),
         "roc_auc": float(roc_auc_score(labels, scores)),
-        "fraud_precision": float(
-            precision_score(labels, predictions, zero_division=0)
-        ),
-        "fraud_recall": float(
-            recall_score(labels, predictions, zero_division=0)
-        ),
+        "fraud_precision": float(precision_score(labels, predictions, zero_division=0)),
+        "fraud_recall": float(recall_score(labels, predictions, zero_division=0)),
         "fraud_f1": float(f1_score(labels, predictions, zero_division=0)),
         "accuracy": float(accuracy_score(labels, predictions)),
         "confusion_matrix": {
@@ -107,9 +105,7 @@ def main():
 
     actual_hash = file_sha256(TEST_FILE)
     if actual_hash != EXPECTED_TEST_SHA256:
-        raise ValueError(
-            "Test SHA-256 does not match the locked Data Contract version"
-        )
+        raise ValueError("Test SHA-256 does not match the locked Data Contract version")
 
     test = load_split(TEST_FILE)
     check_group_isolation(test)
