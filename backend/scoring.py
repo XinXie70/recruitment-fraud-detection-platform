@@ -94,7 +94,7 @@ def compute_combined_score(model_results: list[dict[str, Any]]) -> CombinedResul
 
     # Risk tier
     if risk_score >= HIGH_RISK_THRESHOLD:
-        risk_level = "high"
+        risk_level: Literal["low", "medium", "high"] = "high"
     elif risk_score >= LOW_RISK_THRESHOLD:
         risk_level = "medium"
     else:
@@ -102,7 +102,7 @@ def compute_combined_score(model_results: list[dict[str, Any]]) -> CombinedResul
 
     # Binary prediction
     if all_real and combined_prob < BINARY_THRESHOLD:
-        prediction = "legitimate"
+        prediction: Literal["fake", "legitimate"] = "legitimate"
     elif all_fake:
         prediction = "fake"
     else:

@@ -61,7 +61,7 @@ def test_history_failure_rolls_back_without_crashing() -> None:
         member_outputs=[SimpleNamespace(status="success")],
     )
     db = FailingDB()
-    analysis_router._save_history("listing", result, 1, db)
+    assert analysis_router._save_history("listing", result, 1, db) is False
     assert db.rolled_back is True
 
 
@@ -80,6 +80,36 @@ def test_history_preview_redacts_contact_details() -> None:
     assert "[REDACTED_PHONE]" in preview
     assert "[REDACTED_URL]" in preview
     assert "api_key=[REDACTED]" in preview
+
+
+def test_saved_result_does_not_contain_unredacted_input() -> None:
+    class RecordingDB:
+        saved = None
+
+        def add(self, value):
+            self.saved = value
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+    result = SimpleNamespace(
+        ensemble=SimpleNamespace(risk_score=0.8, risk_level="high"),
+        status="success",
+        member_outputs=[SimpleNamespace(status="success")],
+        model_dump=lambda **_kwargs: {"status": "success"},
+    )
+    db = RecordingDB()
+    text = "Contact private@example.com and use api_key=super-secret"
+
+    assert analysis_router._save_history(text, result, 1, db) is True
+    assert db.saved is not None
+    stored_text = db.saved.analysis_result["inputText"]
+    assert "private@example.com" not in stored_text
+    assert "super-secret" not in stored_text
+    assert "[REDACTED" in stored_text
 
 
 def test_history_hash_is_keyed_and_deterministic(monkeypatch) -> None:

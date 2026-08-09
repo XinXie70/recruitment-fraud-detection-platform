@@ -67,7 +67,7 @@ def _save_history(
     result: AnalysisResponse,
     user_id: int,
     db,
-) -> None:
+) -> bool:
 
 
     try:
@@ -84,15 +84,19 @@ def _save_history(
             ensemble_total=len(result.member_outputs),
             analysis_result={
                 **result.model_dump(mode="json"),
-                "inputText": text,
+                # Never persist the unredacted advert: it can contain contact
+                # details, credentials, or other personal information.
+                "inputText": _redact_history_preview(text),
             },
             created_at=datetime.now(timezone.utc),
         )
         db.add(history)
         db.commit()
+        return True
     except Exception:
         db.rollback()
         logger.exception("Failed to persist analysis history")
+        return False
 
 
 def _run_analysis(
@@ -178,13 +182,15 @@ def analyze_score_v1(
 def analyze_v1(
     request: Request,
     payload: AnalysisRequest,
+    response: Response,
     current_user: User = Depends(get_current_user),
     service: AnalysisService = Depends(get_analysis_service),
     request_id: str = Depends(get_request_id),
     db=Depends(get_db),
 ) -> AnalysisResponse:
     result = _run_analysis(payload, service, request_id)
-    _save_history(payload.text, result, current_user.id, db)
+    persisted = _save_history(payload.text, result, current_user.id, db)
+    response.headers["X-History-Persisted"] = str(persisted).lower()
     return result
 
 
@@ -193,6 +199,7 @@ def analyze_v1(
 def predict_compatibility(
     request: Request,
     payload: AnalysisRequest,
+    response: Response,
     current_user: User = Depends(get_current_user),
     service: AnalysisService = Depends(get_analysis_service),
     request_id: str = Depends(get_request_id),
@@ -200,7 +207,8 @@ def predict_compatibility(
 ) -> AnalysisResponse:
     """Backward-compatible alias for /api/v1/analyze (used by legacy React frontend)."""
     result = _run_analysis(payload, service, request_id)
-    _save_history(payload.text, result, current_user.id, db)
+    persisted = _save_history(payload.text, result, current_user.id, db)
+    response.headers["X-History-Persisted"] = str(persisted).lower()
     return result
 
 

@@ -97,6 +97,21 @@ def test_score_phase_skips_xai_batch_scoring() -> None:
     assert registry.batch_calls == 0
 
 
+def test_complete_cache_does_not_change_score_phase_contract() -> None:
+    service, registry = _service()
+    text = "A legitimate software engineering role"
+
+    complete = service.analyze(text)
+    score = service.score(text)
+    cached_score = service.score(text)
+
+    assert complete.phase == "complete"
+    assert score.phase == "score"
+    assert score.xai.status == "unavailable"
+    assert cached_score == score
+    assert registry.calls == 2
+
+
 def test_invalid_input_is_rejected_before_model_execution() -> None:
     service, registry = _service(
         validator=lambda text: {

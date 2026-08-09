@@ -19,9 +19,6 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+psycopg2://postgres:postgres@localhost:5432/fake_job_detection"
     )
-    async_database_url: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/fake_job_detection"
-    )
     db_pool_size: int = Field(default=5, ge=1, le=50)
     db_max_overflow: int = Field(default=5, ge=0, le=50)
     db_pool_timeout_seconds: int = Field(default=10, ge=1, le=120)

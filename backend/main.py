@@ -20,12 +20,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from auth import hash_password
 from auth import router as auth_router
-from database import Base, SessionLocal, engine
+from database import SessionLocal
 from dependencies import get_analysis_service
 from middleware import (
     RequestBodyGuardMiddleware,
@@ -91,13 +92,22 @@ analysis_service = get_analysis_service()
 
 
 def _init_database() -> None:
-    if settings.app_env == "production":
-
+    if settings.app_env in {"test", "production"}:
         return
-    Base.metadata.create_all(bind=engine)
+
+    # Development must follow the same versioned schema path as production.
+    # create_all() does not stamp alembic_version and breaks later upgrades.
+    from alembic import command
+    from alembic.config import Config
+
+    command.upgrade(Config(str(BACKEND_DIR / "alembic.ini")), "head")
 
 
 def _provision_admin() -> None:
+
+    if settings.app_env == "test":
+        logger.info("Skipping administrator provisioning in test environment.")
+        return
 
     credentials = (
         settings.admin_email.strip().lower(),
@@ -144,10 +154,12 @@ def _provision_admin() -> None:
         else:
             admin.email = email
             admin.username = username
-            admin.password_hash = hash_password(password)
             admin.is_admin = True
         db.commit()
         logger.info("Dedicated administrator account is ready: %s", username)
+    except IntegrityError:
+        db.rollback()
+        logger.warning("Dedicated administrator provisioning hit a race; continuing.")
     except Exception:
         db.rollback()
         raise
@@ -190,6 +202,8 @@ async def lifespan(app: FastAPI):
         _provision_admin()
     except Exception:
         logger.exception("Database initialisation failed.")
+        if settings.app_env == "production":
+            raise
 
     # Start model warm-up in background
     if settings.app_env != "test":
@@ -212,7 +226,12 @@ app = FastAPI(
 
 # Rate limiter attach state + exception handler
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# SlowAPI's handler is runtime-compatible with Starlette, but its published
+# callable annotation narrows the exception parameter to RateLimitExceeded.
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler,  # type: ignore[arg-type]
+)
 
 
 @app.exception_handler(RequestValidationError)
@@ -272,6 +291,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-History-Persisted"],
 )
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)

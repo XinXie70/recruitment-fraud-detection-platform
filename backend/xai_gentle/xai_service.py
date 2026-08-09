@@ -4,7 +4,7 @@ import math
 import logging
 import re
 from dataclasses import dataclass
-from typing import Callable, Sequence
+from typing import Callable, NotRequired, Sequence, TypedDict
 
 from config import settings
 
@@ -65,6 +65,11 @@ class PartitionAttribution:
     segments: list[TextSegment]
     contributions: list[float]
     base_value: float | None
+
+
+class TokenizerOutput(TypedDict):
+    input_ids: list[str]
+    offset_mapping: NotRequired[list[tuple[int, int]]]
 
 
 def _build_segments(text: str, max_segments: int) -> list[TextSegment]:
@@ -543,11 +548,13 @@ class XAIService:
         if not original_segments:
             raise ValueError("No explainable text spans were found in the input")
 
-        def tokenizer(candidate: str, return_offsets_mapping: bool = True) -> dict:
+        def tokenizer(
+            candidate: str, return_offsets_mapping: bool = True
+        ) -> TokenizerOutput:
             segments = segment_builder(candidate)
             if not segments and candidate:
                 segments = [TextSegment(0, len(candidate))]
-            output = {
+            output: TokenizerOutput = {
                 "input_ids": [candidate[item.start : item.end] for item in segments]
             }
             if return_offsets_mapping:

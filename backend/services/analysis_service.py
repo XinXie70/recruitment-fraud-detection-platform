@@ -94,7 +94,7 @@ class AnalysisService:
 
     def analyze(self, text: str) -> AnalysisResponse:
         # Check cache first — avoid re-running the full pipeline for duplicates.
-        cache_key = TTLCache.text_key(text)
+        cache_key = f"complete:{TTLCache.text_key(text)}"
         cached = self.cache.get(cache_key)
         if cached is not None:
             logger.info("Analysis cache hit", extra={"cache_key": cache_key[:16]})
@@ -162,7 +162,10 @@ class AnalysisService:
 
     def score(self, text: str) -> AnalysisResponse:
 
-        cache_key = TTLCache.text_key(text)
+        # Score responses intentionally omit the expensive XAI phase. Keep them
+        # separate from complete-analysis entries so request order cannot change
+        # the response contract for this endpoint.
+        cache_key = f"score:{TTLCache.text_key(text)}"
         cached = self.cache.get(cache_key)
         if cached is not None:
             logger.info(
@@ -205,7 +208,7 @@ class AnalysisService:
             url_failed = True
             url_result = empty_url_analysis("URL analysis is temporarily unavailable.")
 
-        return AnalysisResponse(
+        result = AnalysisResponse(
             phase="score",
             status=(
                 "degraded"
@@ -219,3 +222,5 @@ class AnalysisService:
             gentle_ai=gentle_result,
             url_analysis=url_result,
         )
+        self.cache.set(cache_key, result)
+        return result
