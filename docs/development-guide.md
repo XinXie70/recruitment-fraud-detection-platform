@@ -25,6 +25,11 @@ pip install -r backend/requirements-dev.txt
 cp backend/env.example .env
 ```
 
+This installs the lightweight application API plus test and lint tools. It does
+not install the model runtime: the backend calls the model API over HTTP and
+never imports TensorFlow, PyTorch, Transformers, or XGBoost. Those dependencies
+belong only to `model_service/requirements.txt`.
+
 Ensure the new LR artifact and BERT checkpoint exist, then start the model API:
 
 ```bash
