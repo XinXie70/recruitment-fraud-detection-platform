@@ -1,133 +1,212 @@
-"""Train Logistic Regression (TF-IDF + LR) on sprint1 70/15/15 splits.
-
-- Fit TF-IDF on train only
-- Choose decision threshold on validation by max Fraud F1
-- Evaluate once on test
-- Save: result/test_metrics.json (fraud F1 / Recall / Precision)
-         weight/lr_tfidf.joblib (+ threshold.json)
-"""
-
+#LR for EMSCAD data.
 from __future__ import annotations
-
-import json
-import os
-import random
+import json, os, random, joblib, numpy as np, pandas as pd
 from pathlib import Path
-
-os.environ.setdefault("PYTHONHASHSEED", "42")
-
-import joblib
-import numpy as np
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score, precision_recall_curve, precision_score, recall_score
+from sklearn.metrics import (
+    f1_score,precision_recall_curve,precision_score,recall_score,
+)
 from sklearn.pipeline import Pipeline
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT.parent / "data" / "splits"
-RESULT_DIR = ROOT / "result"
-WEIGHT_DIR = ROOT / "weight"
-SEED = 42
+os.environ.setdefault("PYTHONHASHSEED", "42")
+BASE_PATH = Path(__file__).resolve().parents[1]
+SPLIT_PATH = BASE_PATH.parent / "data" / "splits"
+OUTPUT_PATH = BASE_PATH / "result"
+MODEL_PATH = BASE_PATH / "weight"
+RANDOM_SEED = 42
+MAX_VOCABULARY = 50_000
 
 
-def set_seed(seed: int = SEED) -> None:
+def initialize_seed(seed: int = RANDOM_SEED) -> None:
     random.seed(seed)
     np.random.seed(seed)
-
-
-def load_split(name: str) -> pd.DataFrame:
-    path = DATA_DIR / f"{name}.csv"
-    df = pd.read_csv(path, usecols=["record_id", "label", "combined_text"])
-    df["combined_text"] = df["combined_text"].fillna("").astype(str)
-    return df
-
-
-def select_fraud_f1_threshold(labels: np.ndarray, scores: np.ndarray) -> float:
-    precision, recall, thresholds = precision_recall_curve(labels, scores)
-    if len(thresholds) == 0:
-        return 0.5
-    f1_values = (
-        2 * precision[:-1] * recall[:-1]
-        / np.maximum(precision[:-1] + recall[:-1], 1e-12)
+def read_split(split_name: str) -> pd.DataFrame:
+    csv_path = SPLIT_PATH / f"{split_name}.csv"
+    dataframe = pd.read_csv(
+        csv_path,
+        usecols=["record_id","label","combined_text",],
     )
-    best = float(np.max(f1_values))
-    idx = int(np.flatnonzero(np.isclose(f1_values, best))[0])
-    return float(thresholds[idx])
+
+    dataframe["combined_text"] = (
+        dataframe["combined_text"].fillna("").astype(str)
+    )
+    return dataframe
+
+def build_classifier() -> Pipeline:
+    vectorizer = TfidfVectorizer(
+        lowercase=True,
+        min_df=2,max_df=0.98,
+        max_features=MAX_VOCABULARY,
+        sublinear_tf=True,ngram_range=(1, 2),
+    )
+    classifier = LogisticRegression(
+        solver="liblinear",max_iter=1000,
+        random_state=RANDOM_SEED,C=1.0,class_weight=None,
+    )
+    return Pipeline(
+        steps=[
+            ("tfidf", vectorizer),("classifier", classifier),]
+    )
 
 
-def fraud_metrics(labels: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
-    preds = (scores >= threshold).astype(int)
+def calculate_best_threshold(
+    labels: np.ndarray,probabilities: np.ndarray,
+) -> float:
+    precision_values, recall_values, thresholds = precision_recall_curve(
+        labels,probabilities,
+    )
+    if thresholds.size == 0:
+        return 0.5
+    numerator = (
+        2.0* precision_values[:-1]* recall_values[:-1]
+    )
+    denominator = np.maximum(
+        precision_values[:-1] + recall_values[:-1],1e-12,
+    )
+
+    f1_values = numerator / denominator
+    highest_f1 = np.max(f1_values)
+    best_indices = np.flatnonzero(
+        np.isclose(f1_values,highest_f1,)
+    )
+    best_index = int(best_indices[0])
+    return float(
+        thresholds[best_index]
+    )
+
+def evaluate_predictions(
+    labels: np.ndarray,probabilities: np.ndarray,threshold: float,
+) -> dict:
+    predictions = np.where(
+        probabilities >= threshold, 1,0,
+    )
+    precision = precision_score(
+        labels,predictions,zero_division=0,
+    )
+
+    recall = recall_score(
+        labels,predictions,zero_division=0,
+    )
+
+    f1 = f1_score(
+        labels,predictions,zero_division=0,
+    )
     return {
-        "fraud_precision": float(precision_score(labels, preds, zero_division=0)),
-        "fraud_recall": float(recall_score(labels, preds, zero_division=0)),
-        "fraud_f1": float(f1_score(labels, preds, zero_division=0)),
+        "fraud_precision": float(precision),
+        "fraud_recall": float(recall),
+        "fraud_f1": float(f1),
         "threshold": float(threshold),
     }
 
-
-def main() -> None:
-    set_seed(SEED)
-    RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    WEIGHT_DIR.mkdir(parents=True, exist_ok=True)
-
-    train = load_split("train")
-    validation = load_split("validation")
-    test = load_split("test")
-
-    model = Pipeline(
-        [
-            (
-                "tfidf",
-                TfidfVectorizer(
-                    lowercase=True,
-                    min_df=2,
-                    max_df=0.98,
-                    max_features=50_000,
-                    sublinear_tf=True,
-                    ngram_range=(1, 2),
-                ),
-            ),
-            (
-                "clf",
-                LogisticRegression(
-                    solver="liblinear",
-                    max_iter=1_000,
-                    random_state=SEED,
-                    C=1.0,
-                    class_weight=None,
-                ),
-            ),
-        ]
+def train_model(
+    train_data: pd.DataFrame,
+) -> Pipeline:
+    model = build_classifier()
+    model.fit(
+        train_data["combined_text"],train_data["label"],
     )
-    model.fit(train["combined_text"], train["label"])
+    return model
 
-    val_scores = model.predict_proba(validation["combined_text"])[:, 1]
-    threshold = select_fraud_f1_threshold(
-        validation["label"].to_numpy(), val_scores
+def get_fraud_probabilities(
+    model: Pipeline,dataframe: pd.DataFrame,
+) -> np.ndarray:
+    probability_matrix = model.predict_proba(
+        dataframe["combined_text"]
+    )
+    return probability_matrix[:, 1]
+
+def prepare_directories() -> None:
+    OUTPUT_PATH.mkdir(
+        parents=True,exist_ok=True,
+    )
+    MODEL_PATH.mkdir(
+        parents=True,exist_ok=True,
     )
 
-    test_scores = model.predict_proba(test["combined_text"])[:, 1]
-    metrics = fraud_metrics(test["label"].to_numpy(), test_scores, threshold)
-    # Keep only the required test metrics in result/.
+def save_result(
+    metrics: dict,
+) -> Path:
     result = {
         "fraud_f1": metrics["fraud_f1"],
         "fraud_recall": metrics["fraud_recall"],
         "fraud_precision": metrics["fraud_precision"],
     }
-
-    (RESULT_DIR / "test_metrics.json").write_text(
-        json.dumps(result, indent=2), encoding="utf-8"
+    result_path = (
+        OUTPUT_PATH
+        / "test_metrics.json"
     )
+    result_path.write_text(
+        json.dumps(result,indent=2,
+        ),
+        encoding="utf-8",
+    )
+    return result_path
 
-    weight_path = WEIGHT_DIR / "lr_tfidf.joblib"
-    joblib.dump({"model": model, "threshold": threshold}, weight_path)
-
-    print(json.dumps(result, indent=2))
-    print(f"Saved weight: {weight_path}")
-    print(f"Saved result: {RESULT_DIR / 'test_metrics.json'}")
-    print(f"threshold={threshold:.4f}")
-
-
+def save_model(
+    model: Pipeline,
+    threshold: float,
+) -> Path:
+    model_file = (
+        MODEL_PATH
+        / "lr_tfidf.joblib"
+    )
+    model_package = {
+        "model": model,"threshold": float(threshold),
+    }
+    joblib.dump(
+        model_package,model_file,
+    )
+    return model_file
+def main() -> None:
+    initialize_seed()
+    prepare_directories()
+    train_data = read_split("train")
+    validation_data = read_split("validation")
+    test_data = read_split("test")
+    classifier = train_model(train_data)
+    validation_probabilities = get_fraud_probabilities(
+        classifier,validation_data,
+    )
+    validation_labels = (
+        validation_data["label"].to_numpy()
+    )
+    decision_threshold = calculate_best_threshold(
+        validation_labels,validation_probabilities,
+    )
+    test_probabilities = get_fraud_probabilities(
+        classifier,test_data,
+    )
+    test_labels = (
+        test_data["label"].to_numpy()
+    )
+    test_metrics = evaluate_predictions(
+        test_labels,test_probabilities,decision_threshold,
+    )
+    result = {
+        "fraud_f1": test_metrics["fraud_f1"],
+        "fraud_recall": test_metrics["fraud_recall"],
+        "fraud_precision": test_metrics["fraud_precision"],
+    }
+    result_file = save_result(
+        test_metrics
+    )
+    model_file = save_model(
+        classifier,decision_threshold,
+    )
+    print(
+        json.dumps(
+            result,indent=2,
+        )
+    )
+    print(
+        f"Saved weight: {model_file}"
+    )
+    print(
+        f"Saved result: {result_file}"
+    )
+    print(
+        f"threshold={decision_threshold:.4f}"
+    )
 if __name__ == "__main__":
     main()

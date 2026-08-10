@@ -1,170 +1,201 @@
-"""Sprint1 data preparation for EMSCAD.
-
-Steps:
-  1) Load emscad_v1.csv
-  2) Clean / normalise the five text fields; missing text -> empty string
-  3) Drop exact-duplicate combined_text rows (keep first by source order)
-  4) Stratified 70 / 15 / 15 train / validation / test split (seed=42)
-
-Outputs under ./splits/:
-  train.csv, validation.csv, test.csv, split_meta.json
-"""
+#Prepare EMSCAD data for Sprint 1.
 
 from __future__ import annotations
-
 import html
 import json
 import re
 import unicodedata
 from pathlib import Path
-
-import numpy as np
+from typing import Dict
 import pandas as pd
 from sklearn.model_selection import train_test_split
+BASE_DIR = Path(__file__).resolve().parent
+SOURCE_FILE = BASE_DIR / "emscad_v1.csv"
+SPLIT_DIR = BASE_DIR / "splits"
+RANDOM_SEED = 42
+TEXT_FIELDS = (
+    "title","company_profile","description","requirements","benefits",)
 
-DATA_DIR = Path(__file__).resolve().parent
-RAW_CSV = DATA_DIR / "emscad_v1.csv"
-OUT_DIR = DATA_DIR / "splits"
-SEED = 42
-
-TEXT_COLUMNS = [
-    "title",
-    "company_profile",
-    "description",
-    "requirements",
-    "benefits",
-]
-
-
-def clean_text(value) -> str:
-    """Shared light text normalisation (DATA_CONTRACT_V1)."""
-    if value is None or (isinstance(value, float) and pd.isna(value)):
+def normalize_text(value: object) -> str:
+    if pd.isna(value):
         return ""
-    text = html.unescape(str(value))
-    text = re.sub(r"<[^>]+>", " ", text)
+    text = str(value)
+    text = html.unescape(text)
+    text = re.sub(r"<[^>]*>", " ", text)
     text = unicodedata.normalize("NFKC", text)
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n\s*\n+", "\n", text)
     return text.strip()
+def parse_fraud_label(value: object) -> int:
+    label = str(value).strip().lower()
+    label_mapping = {"0": 0,"f": 0,"false": 0,"1": 1,"t": 1,"true": 1,}
+    if label not in label_mapping:
+        raise ValueError(f"Unsupported fraudulent label: {value!r}")
+    return label_mapping[label]
 
 
-def convert_label(value) -> int:
-    v = str(value).strip().lower()
-    if v in {"0", "f", "false"}:
-        return 0
-    if v in {"1", "t", "true"}:
-        return 1
-    raise ValueError(f"Unexpected fraudulent label: {value!r}")
+def merge_text_columns(row: pd.Series) -> str:
+    cleaned_parts = []
+    for column in TEXT_FIELDS:
+        cleaned = normalize_text(row.get(column, ""))
+        if cleaned:
+            cleaned_parts.append(cleaned)
+    return "\n".join(cleaned_parts)
 
 
-def combine_fields(row: pd.Series) -> str:
-    parts = [clean_text(row.get(col, "")) for col in TEXT_COLUMNS]
-    return "\n".join(part for part in parts if part)
-
-
-def build_frame(raw_csv: Path) -> pd.DataFrame:
-    raw = pd.read_csv(raw_csv)
-    need = TEXT_COLUMNS + ["fraudulent"]
-    missing = [c for c in need if c not in raw.columns]
-    if missing:
-        raise ValueError(f"Raw CSV missing columns: {missing}")
-
-    rows = []
-    for i, row in raw.iterrows():
-        rows.append(
-            {
-                "record_id": f"emscad_{int(i) + 1:05d}",
-                "combined_text": combine_fields(row),
-                "label": convert_label(row["fraudulent"]),
-            }
+def load_and_prepare_dataset(csv_path: Path) -> pd.DataFrame:
+    raw_df = pd.read_csv(csv_path)
+    required_columns = [*TEXT_FIELDS, "fraudulent"]
+    missing_columns = [
+        column
+        for column in required_columns
+        if column not in raw_df.columns
+    ]
+    if missing_columns:
+        raise ValueError(
+            f"Required columns are missing from the dataset: {missing_columns}"
         )
-    return pd.DataFrame(rows)
 
-
-def drop_exact_duplicates(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
-    before = len(df)
-    # Keep first occurrence in original source order.
-    out = df.drop_duplicates(subset=["combined_text"], keep="first").reset_index(drop=True)
-    return out, before - len(out)
-
-
-def stratified_split(df: pd.DataFrame, seed: int = SEED) -> dict[str, pd.DataFrame]:
-    """70% train, 15% validation, 15% test with stratification on label."""
-    idx = np.arange(len(df))
-    labels = df["label"]
-
-    train_idx, temp_idx = train_test_split(
-        idx,
-        test_size=0.30,
-        stratify=labels,
-        random_state=seed,
+    prepared_df = pd.DataFrame(
+        {
+            "record_id": [
+                f"emscad_{index + 1:05d}"
+                for index in range(len(raw_df))
+            ],
+            "combined_text": raw_df.apply(
+                merge_text_columns,axis=1,
+            ),
+            "label": raw_df["fraudulent"].map(parse_fraud_label),
+        }
     )
-    val_idx, test_idx = train_test_split(
-        temp_idx,
-        test_size=0.50,
-        stratify=labels.iloc[temp_idx],
-        random_state=seed,
+    return prepared_df
+
+
+def remove_duplicate_text(
+    dataframe: pd.DataFrame,) -> tuple[pd.DataFrame, int]:
+    original_size = len(dataframe)
+    deduplicated = (
+        dataframe
+        .drop_duplicates(
+            subset="combined_text",keep="first",
+        )
+        .reset_index(drop=True)
     )
+    removed_count = original_size - len(deduplicated)
+    return deduplicated, removed_count
+
+
+def create_dataset_splits(
+    dataframe: pd.DataFrame,
+    random_seed: int = RANDOM_SEED,) -> Dict[str, pd.DataFrame]:
+    train_df, temporary_df = train_test_split(
+        dataframe,test_size=0.30,stratify=dataframe["label"],random_state=random_seed,
+    )
+
+    validation_df, test_df = train_test_split(
+        temporary_df,test_size=0.50,stratify=temporary_df["label"],random_state=random_seed,
+    )
+
     return {
-        "train": df.iloc[train_idx].reset_index(drop=True),
-        "validation": df.iloc[val_idx].reset_index(drop=True),
-        "test": df.iloc[test_idx].reset_index(drop=True),
+        "train": train_df.reset_index(drop=True),
+        "validation": validation_df.reset_index(drop=True),
+        "test": test_df.reset_index(drop=True),
     }
+
+
+def describe_split(dataframe: pd.DataFrame) -> dict:
+    fraud_mask = dataframe["label"].eq(1)
+
+    return {
+        "n": len(dataframe),"fraud": int(fraud_mask.sum()),"fraud_rate": float(fraud_mask.mean()),
+    }
+
+
+def save_splits(
+    splits: Dict[str, pd.DataFrame],output_dir: Path,) -> dict:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    split_summary = {}
+    for split_name, split_df in splits.items():
+        output_path = output_dir / f"{split_name}.csv"
+        split_df.to_csv(
+            output_path,
+            index=False,
+        )
+        stats = describe_split(split_df)
+        split_summary[split_name] = stats
+        print(
+            f"Saved {output_path.name}: "f"n={stats['n']}, "
+            f"fraud={stats['fraud']}, "
+            f"fraud_rate={stats['fraud_rate']:.4f}"
+        )
+    return split_summary
+
+
+def save_metadata(
+    output_dir: Path,duplicate_count: int,empty_count: int,split_summary: dict,total_rows: int,
+) -> None:
+    metadata = {
+        "seed": RANDOM_SEED,
+        "protocol": "70/15/15 stratified",
+        "source": SOURCE_FILE.name,
+        "exact_duplicates_removed": duplicate_count,
+        "empty_combined_text_rows_kept": empty_count,
+        "split_counts": split_summary,
+        "n_total_after_dedup": total_rows,
+        "columns": ["record_id","combined_text","label",],
+        "cleaning": [
+            "missing text -> empty string",
+            "HTML entity decode","HTML tag removal","Unicode NFKC",
+            "newline / whitespace normalisation",
+            "exact duplicate combined_text dropped (keep first)",],
+    }
+    metadata_path = output_dir / "split_meta.json"
+    metadata_path.write_text(
+        json.dumps(
+            metadata,indent=2,ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    print(json.dumps(metadata, indent=2, ensure_ascii=False))
 
 
 def main() -> None:
-    if not RAW_CSV.exists():
-        raise FileNotFoundError(f"Missing raw dataset: {RAW_CSV}")
-
-    print(f"Loading: {RAW_CSV}")
-    df = build_frame(RAW_CSV)
-    print(f"Raw rows: {len(df)} | fraud: {int((df['label'] == 1).sum())}")
-
-    empty_n = int((df["combined_text"].astype(str).str.strip() == "").sum())
-    print(f"Empty combined_text after missing-text handling: {empty_n}")
-
-    df, n_dropped = drop_exact_duplicates(df)
-    print(f"Dropped exact duplicates: {n_dropped}")
-    print(f"After dedup: {len(df)} | fraud: {int((df['label'] == 1).sum())}")
-
-    splits = stratified_split(df, seed=SEED)
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    counts = {}
-    for name, part in splits.items():
-        path = OUT_DIR / f"{name}.csv"
-        part.to_csv(path, index=False)
-        counts[name] = {
-            "n": int(len(part)),
-            "fraud": int((part["label"] == 1).sum()),
-            "fraud_rate": float((part["label"] == 1).mean()),
-        }
-        print(f"Wrote {path.name}: n={counts[name]['n']} fraud={counts[name]['fraud']}")
-
-    meta = {
-        "seed": SEED,
-        "protocol": "70/15/15 stratified",
-        "source": str(RAW_CSV.name),
-        "exact_duplicates_removed": int(n_dropped),
-        "empty_combined_text_rows_kept": empty_n,
-        "split_counts": counts,
-        "n_total_after_dedup": int(len(df)),
-        "columns": ["record_id", "combined_text", "label"],
-        "cleaning": [
-            "missing text -> empty string",
-            "HTML entity decode",
-            "HTML tag removal",
-            "Unicode NFKC",
-            "newline / whitespace normalisation",
-            "exact duplicate combined_text dropped (keep first)",
-        ],
-    }
-    (OUT_DIR / "split_meta.json").write_text(
-        json.dumps(meta, indent=2, ensure_ascii=False),
-        encoding="utf-8",
+    if not SOURCE_FILE.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {SOURCE_FILE}"
+        )
+    print(f"Loading dataset: {SOURCE_FILE}")
+    dataframe = load_and_prepare_dataset(SOURCE_FILE)
+    fraud_count = int(dataframe["label"].eq(1).sum())
+    print(
+        f"Prepared rows: {len(dataframe)} | "
+        f"Fraud cases: {fraud_count}"
     )
-    print(json.dumps(meta, indent=2, ensure_ascii=False))
+    empty_count = int(
+        dataframe["combined_text"]
+        .astype(str).str.strip().eq("").sum()
+    )
+    print(
+        f"Empty combined_text rows: {empty_count}"
+    )
+    dataframe, duplicate_count = remove_duplicate_text(dataframe)
+    print(
+        f"Removed exact duplicates: {duplicate_count}"
+    )
+    print(
+        f"Rows after deduplication: {len(dataframe)} | "
+        f"Fraud cases: {int(dataframe['label'].eq(1).sum())}"
+    )
+    dataset_splits = create_dataset_splits(dataframe,RANDOM_SEED,)
+    split_summary = save_splits(dataset_splits,SPLIT_DIR,)
+    save_metadata(
+        output_dir=SPLIT_DIR,
+        duplicate_count=duplicate_count,
+        empty_count=empty_count,
+        split_summary=split_summary,
+        total_rows=len(dataframe),
+    )
 
 
 if __name__ == "__main__":

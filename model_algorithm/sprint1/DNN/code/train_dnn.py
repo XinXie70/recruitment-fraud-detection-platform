@@ -1,238 +1,427 @@
-"""Train a TF-IDF + MLP (DNN) classifier on sprint1 70/15/15 splits.
-
-- Fit TF-IDF on train only
-- Train a small feed-forward net with PyTorch (CUDA if available)
-- Choose decision threshold on validation by max Fraud F1
-- Evaluate once on test
-- Save: result/test_metrics.json (fraud F1 / Recall / Precision)
-         weight/dnn_mlp.pt, tfidf.joblib, threshold.json
-"""
-
+#DNN for EMSCAD data.
 from __future__ import annotations
-
-import json
-import os
-import random
-from pathlib import Path
-
+import json, os, random, joblib, numpy as np, pandas as pd, torch, torch.nn as nn; from pathlib import Path; from typing import Dict, Tuple
 os.environ.setdefault("PYTHONHASHSEED", "42")
-
-import joblib
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn as nn
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import f1_score, precision_recall_curve, precision_score, recall_score
+from sklearn.metrics import (
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+)
 from torch.utils.data import DataLoader, TensorDataset
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT.parent / "data" / "splits"
-RESULT_DIR = ROOT / "result"
-WEIGHT_DIR = ROOT / "weight"
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+SPLIT_PATH = PROJECT_DIR.parent / "data" / "splits"
+OUTPUT_PATH = PROJECT_DIR / "result"
+MODEL_PATH = PROJECT_DIR / "weight"
+RANDOM_SEED = 42
+VOCAB_SIZE = 30_000
+HIDDEN_SIZE = 256
+DROP_RATE = 0.3
+TRAIN_BATCH_SIZE = 256
+MAX_EPOCHS = 20
+LEARNING_RATE = 1e-3
+EARLY_STOPPING_PATIENCE = 5
 
-SEED = 42
-MAX_FEATURES = 30_000
-HIDDEN = 256
-DROPOUT = 0.3
-BATCH_SIZE = 256
-EPOCHS = 20
-LR = 1e-3
-PATIENCE = 5
-
-
-def set_seed(seed: int = SEED) -> None:
+def initialize_random_state(seed: int = RANDOM_SEED) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
+def read_dataset_split(split_name: str) -> pd.DataFrame:
+    file_path = SPLIT_PATH / f"{split_name}.csv"
+    dataframe = pd.read_csv(
+        file_path,
+        usecols=[
+            "record_id","label","combined_text",
+        ],
+    )
 
-def load_split(name: str) -> pd.DataFrame:
-    path = DATA_DIR / f"{name}.csv"
-    df = pd.read_csv(path, usecols=["record_id", "label", "combined_text"])
-    df["combined_text"] = df["combined_text"].fillna("").astype(str)
-    return df
+    dataframe["combined_text"] = (
+        dataframe["combined_text"]
+        .fillna("") .astype(str)
+    )
+    return dataframe
 
-
-class FraudMLP(nn.Module):
-    def __init__(self, n_features: int, hidden: int = HIDDEN, dropout: float = DROPOUT):
+class FraudDetectionNetwork(nn.Module):
+    def __init__(
+        self,
+        input_size: int,
+        hidden_size: int = HIDDEN_SIZE,
+        dropout_rate: float = DROP_RATE,
+    ) -> None:
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(n_features, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, hidden // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden // 2, 1),
+        second_hidden_size = hidden_size // 2
+        self.layers = nn.Sequential(
+            nn.Linear(input_size, hidden_size),
+            nn.ReLU(),nn.Dropout(dropout_rate),
+            nn.Linear(hidden_size, second_hidden_size),
+            nn.ReLU(),nn.Dropout(dropout_rate),
+            nn.Linear(second_hidden_size, 1),
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x).squeeze(-1)
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        logits = self.layers(features)
+        return logits.squeeze(dim=-1)
 
+def matrix_to_tensor(matrix) -> torch.Tensor:
+    dense_matrix = (
+        matrix.toarray()
+        if hasattr(matrix, "toarray")
+        else matrix
+    )
 
-def to_dense_tensor(matrix) -> torch.Tensor:
-    if hasattr(matrix, "toarray"):
-        matrix = matrix.toarray()
-    return torch.tensor(matrix, dtype=torch.float32)
-
+    return torch.as_tensor(
+        dense_matrix,dtype=torch.float32,
+    )
 
 @torch.no_grad()
-def predict_scores(model: nn.Module, x: torch.Tensor, device: torch.device) -> np.ndarray:
-    model.eval()
-    loader = DataLoader(TensorDataset(x), batch_size=BATCH_SIZE, shuffle=False)
-    outs = []
-    for (batch,) in loader:
-        logits = model(batch.to(device))
-        outs.append(torch.sigmoid(logits).cpu().numpy())
-    return np.concatenate(outs, axis=0)
+def generate_probabilities(
+    network: nn.Module,features: torch.Tensor,device: torch.device,
+) -> np.ndarray:
+    network.eval()
 
-
-def select_fraud_f1_threshold(labels: np.ndarray, scores: np.ndarray) -> float:
-    precision, recall, thresholds = precision_recall_curve(labels, scores)
-    if len(thresholds) == 0:
-        return 0.5
-    f1_values = (
-        2 * precision[:-1] * recall[:-1]
-        / np.maximum(precision[:-1] + recall[:-1], 1e-12)
+    data_loader = DataLoader(
+        TensorDataset(features),batch_size=TRAIN_BATCH_SIZE,shuffle=False,
     )
-    best = float(np.max(f1_values))
-    idx = int(np.flatnonzero(np.isclose(f1_values, best))[0])
-    return float(thresholds[idx])
+    probability_batches = []
+    for (feature_batch,) in data_loader:
+        feature_batch = feature_batch.to(device)
+        logits = network(feature_batch)
+        probabilities = torch.sigmoid(logits)
+        probability_batches.append(
+            probabilities.cpu().numpy()
+        )
+    return np.concatenate(
+        probability_batches,
+        axis=0,
+    )
 
 
-def fraud_metrics(labels: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
-    preds = (scores >= threshold).astype(int)
+def find_optimal_threshold(
+    targets: np.ndarray,
+    probabilities: np.ndarray,
+) -> float:
+    precision_values, recall_values, thresholds = precision_recall_curve(
+        targets,
+        probabilities,
+    )
+
+    if thresholds.size == 0:
+        return 0.5
+
+    numerator = (
+        2* precision_values[:-1]* recall_values[:-1]
+    )
+    denominator = np.maximum(
+        precision_values[:-1] + recall_values[:-1],1e-12,
+    )
+
+    f1_values = numerator / denominator
+    best_f1 = np.max(f1_values)
+    best_index = np.flatnonzero(
+        np.isclose(
+            f1_values,best_f1,
+        )
+    )[0]
+    return float(thresholds[best_index])
+
+
+def calculate_fraud_metrics(
+    targets: np.ndarray,probabilities: np.ndarray,threshold: float,
+) -> Dict[str, float]:
+    predictions = (
+        probabilities >= threshold
+    ).astype(np.int64)
+
+    precision = precision_score(
+        targets,predictions,zero_division=0,
+    )
+
+    recall = recall_score(
+        targets,predictions,zero_division=0,
+    )
+
+    f1 = f1_score(
+        targets,predictions,zero_division=0,
+    )
+
     return {
-        "fraud_precision": float(precision_score(labels, preds, zero_division=0)),
-        "fraud_recall": float(recall_score(labels, preds, zero_division=0)),
-        "fraud_f1": float(f1_score(labels, preds, zero_division=0)),
+        "fraud_precision": float(precision),
+        "fraud_recall": float(recall),
+        "fraud_f1": float(f1),
         "threshold": float(threshold),
     }
 
-
-def main() -> None:
-    set_seed(SEED)
-    RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    WEIGHT_DIR.mkdir(parents=True, exist_ok=True)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
-
-    train = load_split("train")
-    validation = load_split("validation")
-    test = load_split("test")
-
-    vectorizer = TfidfVectorizer(
+def create_vectorizer() -> TfidfVectorizer:
+    return TfidfVectorizer(
         lowercase=True,
-        min_df=2,
-        max_df=0.98,
-        max_features=MAX_FEATURES,
-        sublinear_tf=True,
-        ngram_range=(1, 2),
+        min_df=2,max_df=0.98,max_features=VOCAB_SIZE,sublinear_tf=True,ngram_range=(1, 2),
     )
-    x_train = vectorizer.fit_transform(train["combined_text"])
-    x_val = vectorizer.transform(validation["combined_text"])
-    x_test = vectorizer.transform(test["combined_text"])
 
-    y_train = train["label"].to_numpy().astype(np.float32)
-    y_val = validation["label"].to_numpy().astype(np.float32)
-    y_test = test["label"].to_numpy().astype(np.float32)
 
-    x_train_t = to_dense_tensor(x_train)
-    x_val_t = to_dense_tensor(x_val)
-    x_test_t = to_dense_tensor(x_test)
-    y_train_t = torch.tensor(y_train, dtype=torch.float32)
+def prepare_features(
+    train_df: pd.DataFrame,validation_df: pd.DataFrame,test_df: pd.DataFrame,
+) -> Tuple[
+    TfidfVectorizer,torch.Tensor,torch.Tensor,torch.Tensor,
+]:
+    vectorizer = create_vectorizer()
+    train_matrix = vectorizer.fit_transform(
+        train_df["combined_text"]
+    )
+    validation_matrix = vectorizer.transform(
+        validation_df["combined_text"]
+    )
+    test_matrix = vectorizer.transform(
+        test_df["combined_text"]
+    )
 
-    # Positive class weight for imbalance.
-    n_pos = max(float(y_train.sum()), 1.0)
-    n_neg = float(len(y_train) - n_pos)
-    pos_weight = torch.tensor([n_neg / n_pos], dtype=torch.float32, device=device)
+    return (
+        vectorizer,matrix_to_tensor(train_matrix),matrix_to_tensor(validation_matrix),matrix_to_tensor(test_matrix),
+    )
 
-    model = FraudMLP(n_features=x_train_t.shape[1]).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+def calculate_positive_weight(
+    labels: np.ndarray,
+    device: torch.device,
+) -> torch.Tensor:
+    positive_count = max(
+        float(labels.sum()),1.0,
+    )
+    negative_count = (
+        float(len(labels))- positive_count
+    )
+    weight_value = negative_count / positive_count
+    return torch.tensor(
+        [weight_value],dtype=torch.float32,device=device,
+    )
 
+
+def train_network(
+    network: nn.Module,
+    train_features: torch.Tensor,
+    train_targets: torch.Tensor,
+    validation_features: torch.Tensor,
+    validation_targets: np.ndarray,
+    device: torch.device,
+    positive_weight: torch.Tensor,
+) -> Tuple[dict, float]:
+    optimizer = torch.optim.Adam(
+        network.parameters(),
+        lr=LEARNING_RATE,
+    )
+    loss_function = nn.BCEWithLogitsLoss(
+        pos_weight=positive_weight,
+    )
     train_loader = DataLoader(
-        TensorDataset(x_train_t, y_train_t),
-        batch_size=BATCH_SIZE,
+        TensorDataset(
+            train_features,train_targets,
+        ),
+        batch_size=TRAIN_BATCH_SIZE,
         shuffle=True,
     )
-
-    best_val_f1 = -1.0
-    best_state = None
-    wait = 0
-
-    for epoch in range(1, EPOCHS + 1):
-        model.train()
-        total_loss = 0.0
-        for xb, yb in train_loader:
-            xb = xb.to(device)
-            yb = yb.to(device)
+    best_f1 = -1.0
+    best_parameters = None
+    patience_counter = 0
+    for epoch_number in range(
+        1,MAX_EPOCHS + 1,
+    ):
+        network.train()
+        accumulated_loss = 0.0
+        for feature_batch, target_batch in train_loader:
+            feature_batch = feature_batch.to(device)
+            target_batch = target_batch.to(device)
             optimizer.zero_grad(set_to_none=True)
-            logits = model(xb)
-            loss = criterion(logits, yb)
+            logits = network(feature_batch)
+            loss = loss_function(
+                logits,target_batch,
+            )
             loss.backward()
             optimizer.step()
-            total_loss += float(loss.item()) * len(yb)
+            accumulated_loss += (
+                float(loss.item())* len(target_batch)
+            )
 
-        val_scores = predict_scores(model, x_val_t, device)
-        thr = select_fraud_f1_threshold(y_val, val_scores)
-        val_f1 = fraud_metrics(y_val, val_scores, thr)["fraud_f1"]
-        avg_loss = total_loss / len(y_train)
-        print(
-            f"epoch={epoch:02d} loss={avg_loss:.4f} "
-            f"val_fraud_f1={val_f1:.4f} thr={thr:.4f}"
+        validation_probabilities = generate_probabilities(
+            network,
+            validation_features,
+            device,
         )
-
-        if val_f1 > best_val_f1 + 1e-6:
-            best_val_f1 = val_f1
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
-            wait = 0
+        current_threshold = find_optimal_threshold(
+            validation_targets,validation_probabilities,
+        )
+        validation_metrics = calculate_fraud_metrics(
+            validation_targets,validation_probabilities,current_threshold,
+        )
+        current_f1 = validation_metrics["fraud_f1"]
+        average_loss = (
+            accumulated_loss/ len(train_targets)
+        )
+        print(
+            f"epoch={epoch_number:02d} "
+            f"loss={average_loss:.4f} "
+            f"val_fraud_f1={current_f1:.4f} "
+            f"thr={current_threshold:.4f}"
+        )
+        if current_f1 > best_f1 + 1e-6:
+            best_f1 = current_f1
+            best_parameters = {
+                key: value.detach().cpu().clone()
+                for key, value
+                in network.state_dict().items()
+            }
+            patience_counter = 0
         else:
-            wait += 1
-            if wait >= PATIENCE:
-                print(f"Early stop at epoch {epoch}")
+            patience_counter += 1
+            if patience_counter >= EARLY_STOPPING_PATIENCE:
+                print(
+                    f"Early stop at epoch {epoch_number}"
+                )
                 break
+    if best_parameters is None:
+        raise RuntimeError(
+            "Training failed: no model checkpoint was created"
+        )
+    return best_parameters, best_f1
 
-    if best_state is None:
-        raise RuntimeError("Training failed: no best state saved")
-    model.load_state_dict(best_state)
-    model.to(device)
 
-    val_scores = predict_scores(model, x_val_t, device)
-    threshold = select_fraud_f1_threshold(y_val, val_scores)
-    test_scores = predict_scores(model, x_test_t, device)
-    metrics = fraud_metrics(y_test, test_scores, threshold)
-    result = {
-        "fraud_f1": metrics["fraud_f1"],
-        "fraud_recall": metrics["fraud_recall"],
-        "fraud_precision": metrics["fraud_precision"],
+def save_outputs(
+    vectorizer: TfidfVectorizer,model_state: dict,input_size: int,threshold: float,metrics: dict,
+) -> None:
+    OUTPUT_PATH.mkdir(
+        parents=True,exist_ok=True,
+    )
+    MODEL_PATH.mkdir(
+        parents=True,exist_ok=True,
+    )
+    metrics_file = (
+        OUTPUT_PATH / "test_metrics.json"
+    )
+
+    metrics_file.write_text(
+        json.dumps(
+            metrics,indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    checkpoint = {
+        "model_state_dict": model_state,
+        "n_features": int(input_size),
+        "hidden": HIDDEN_SIZE,
+        "dropout": DROP_RATE,
+        "threshold": float(threshold),
     }
 
-    (RESULT_DIR / "test_metrics.json").write_text(
-        json.dumps(result, indent=2), encoding="utf-8"
-    )
-
     torch.save(
-        {
-            "model_state_dict": best_state,
-            "n_features": int(x_train_t.shape[1]),
-            "hidden": HIDDEN,
-            "dropout": DROPOUT,
-            "threshold": float(threshold),
-        },
-        WEIGHT_DIR / "dnn_mlp.pt",
+        checkpoint,MODEL_PATH / "dnn_mlp.pt",
     )
-    joblib.dump(vectorizer, WEIGHT_DIR / "tfidf.joblib")
 
-    print(json.dumps(result, indent=2))
-    print(f"best_val_fraud_f1={best_val_f1:.4f} threshold={threshold:.4f} device={device}")
-    print(f"Saved weights under: {WEIGHT_DIR}")
-    print(f"Saved result: {RESULT_DIR / 'test_metrics.json'}")
+    joblib.dump(
+        vectorizer, MODEL_PATH / "tfidf.joblib",
+    )
 
 
+def main() -> None:
+    initialize_random_state()
+    OUTPUT_PATH.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    MODEL_PATH.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    device = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "cpu"
+    )
+    print(f"Device: {device}")
+    train_df = read_dataset_split("train")
+    validation_df = read_dataset_split("validation")
+    test_df = read_dataset_split("test")
+    (
+        vectorizer,train_features,validation_features,test_features,
+    ) = prepare_features(
+        train_df,validation_df,test_df,
+    )
+    train_labels = (
+        train_df["label"]
+        .to_numpy().astype(np.float32)
+    )
+    validation_labels = (
+        validation_df["label"]
+        .to_numpy().astype(np.float32)
+    )
+    test_labels = (
+        test_df["label"]
+        .to_numpy().astype(np.float32)
+    )
+    train_targets = torch.tensor(
+        train_labels,dtype=torch.float32,
+    )
+    positive_weight = calculate_positive_weight(
+        train_labels,device,
+    )
+    network = FraudDetectionNetwork(
+        input_size=train_features.shape[1],
+    ).to(device)
+    best_state, best_validation_f1 = train_network(
+        network=network,
+        train_features=train_features,
+        train_targets=train_targets,
+        validation_features=validation_features,
+        validation_targets=validation_labels,
+        device=device,
+        positive_weight=positive_weight,
+    )
+    network.load_state_dict(best_state)
+    network.to(device)
+    validation_probabilities = generate_probabilities(
+        network,validation_features,device,
+    )
+
+    selected_threshold = find_optimal_threshold(
+        validation_labels,validation_probabilities,
+    )
+    test_probabilities = generate_probabilities(
+        network,test_features,device,
+    )
+    test_metrics = calculate_fraud_metrics(
+        test_labels,test_probabilities,selected_threshold,
+    )
+    final_result = {
+        "fraud_f1": test_metrics["fraud_f1"],
+        "fraud_recall": test_metrics["fraud_recall"],
+        "fraud_precision": test_metrics["fraud_precision"],
+    }
+    save_outputs(
+        vectorizer=vectorizer,
+        model_state=best_state,
+        input_size=train_features.shape[1],
+        threshold=selected_threshold,
+        metrics=final_result,
+    )
+    print(
+        json.dumps(
+            final_result,indent=2,
+        )
+    )
+    print(
+        f"best_val_fraud_f1="
+        f"{best_validation_f1:.4f} "
+        f"threshold="
+        f"{selected_threshold:.4f} "
+        f"device={device}"
+    )
+    print(
+        f"Saved weights under: {MODEL_PATH}"
+    )
+    print(
+        f"Saved result: " f"{OUTPUT_PATH / 'test_metrics.json'}"
+    )
 if __name__ == "__main__":
     main()

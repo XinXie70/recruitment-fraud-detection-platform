@@ -1,222 +1,220 @@
-"""Train a Bi-LSTM text classifier on sprint1 splits."""
-
+#Bi-LSTM for EMSCAD data.
 from __future__ import annotations
-
-import json
-import os
-import random
-import re
+import json, os, random, re, numpy as np, pandas as pd, torch, torch.nn as nn
 from collections import Counter
 from pathlib import Path
-
-os.environ.setdefault("PYTHONHASHSEED", "42")
-
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn as nn
 from sklearn.metrics import f1_score, precision_recall_curve, precision_score, recall_score
 from torch.nn.utils.rnn import pack_padded_sequence, pad_sequence
 from torch.utils.data import DataLoader, Dataset
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT.parent.parent / "sprint1" / "data" / "splits"
-RESULT_DIR = ROOT / "result"
-WEIGHT_DIR = ROOT / "weight"
+os.environ.setdefault("PYTHONHASHSEED", "42")
+PROJECT_PATH = Path(__file__).resolve().parents[1]
+SPLIT_PATH = PROJECT_PATH.parent.parent / "sprint1" / "data" / "splits"
+OUTPUT_PATH = PROJECT_PATH / "result"
+MODEL_PATH = PROJECT_PATH / "weight"
+RANDOM_SEED = 42
+SEQUENCE_LIMIT = 200
+WORD_MIN_COUNT = 2
+VOCABULARY_LIMIT = 20_000
+EMBEDDING_SIZE = 128
+LSTM_HIDDEN_SIZE = 128
+TRAIN_BATCH_SIZE = 64
+MAX_EPOCHS = 12
+LEARNING_RATE = 1e-3
+EARLY_STOPPING_LIMIT = 4
+PADDING_INDEX = 0
+UNKNOWN_INDEX = 1
 
-SEED = 42
-MAX_LEN = 200
-MIN_FREQ = 2
-MAX_VOCAB = 20_000
-EMBED_DIM = 128
-HIDDEN = 128
-BATCH_SIZE = 64
-EPOCHS = 12
-LR = 1e-3
-PATIENCE = 4
-PAD_IDX = 0
-UNK_IDX = 1
-
-
-def set_seed(seed: int = SEED) -> None:
+def initialize_random_state(seed: int = RANDOM_SEED) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
-
-def tokenize(text: str) -> list[str]:
+def split_text(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", str(text).lower())
 
+def read_data(split_name: str) -> pd.DataFrame:
+    file_path = SPLIT_PATH / f"{split_name}.csv"
+    dataframe = pd.read_csv(file_path, usecols=["label", "combined_text"])
+    dataframe["combined_text"] = dataframe["combined_text"].fillna("").astype(str)
+    return dataframe
 
-def load_split(name: str) -> pd.DataFrame:
-    df = pd.read_csv(DATA_DIR / f"{name}.csv", usecols=["label", "combined_text"])
-    df["combined_text"] = df["combined_text"].fillna("").astype(str)
-    return df
+def create_vocabulary(text_collection: list[str]) -> dict[str, int]:
+    frequencies = Counter()
+    for sentence in text_collection:
+        frequencies.update(split_text(sentence))
+    vocabulary = {"<PAD>": PADDING_INDEX, "<UNK>": UNKNOWN_INDEX}
+    candidate_words = frequencies.most_common(VOCABULARY_LIMIT)
 
+    for word, frequency in candidate_words:
+        if frequency < WORD_MIN_COUNT:
+            continue
+        if word not in vocabulary:
+            vocabulary[word] = len(vocabulary)
+    return vocabulary
 
-def build_vocab(texts: list[str]) -> dict[str, int]:
-    counter: Counter[str] = Counter()
-    for text in texts:
-        counter.update(tokenize(text))
-    most_common = [w for w, c in counter.most_common(MAX_VOCAB) if c >= MIN_FREQ]
-    vocab = {"<pad>": PAD_IDX, "<unk>": UNK_IDX}
-    for word in most_common:
-        if word not in vocab:
-            vocab[word] = len(vocab)
-    return vocab
+def text_to_indices(text: str, vocabulary: dict[str, int]) -> torch.Tensor:
+    tokens = split_text(text)
+    token_ids = [vocabulary.get(token, UNKNOWN_INDEX) for token in tokens[:SEQUENCE_LIMIT]]
+    if len(token_ids) == 0:
+        token_ids = [UNKNOWN_INDEX]
+    return torch.tensor(token_ids, dtype=torch.long)
 
-
-def encode(text: str, vocab: dict[str, int]) -> torch.Tensor:
-    ids = [vocab.get(tok, UNK_IDX) for tok in tokenize(text)[:MAX_LEN]]
-    if not ids:
-        ids = [UNK_IDX]
-    return torch.tensor(ids, dtype=torch.long)
-
-
-class TextDataset(Dataset):
-    def __init__(self, texts: list[str], labels: np.ndarray, vocab: dict[str, int]):
-        self.seqs = [encode(t, vocab) for t in texts]
-        self.labels = torch.tensor(labels, dtype=torch.float32)
-
+class JobTextDataset(Dataset):
+    def __init__(self, texts: list[str], labels: np.ndarray, vocabulary: dict[str, int]) -> None:
+        self.encoded_texts = [text_to_indices(text, vocabulary) for text in texts]
+        self.targets = torch.as_tensor(labels, dtype=torch.float32)
     def __len__(self) -> int:
-        return len(self.labels)
+        return len(self.targets)
+    def __getitem__(self, index: int):
+        return self.encoded_texts[index], self.targets[index]
 
-    def __getitem__(self, idx: int):
-        return self.seqs[idx], self.labels[idx]
+def batch_collator(batch):
+    sequences, targets = zip(*batch)
+    sequence_lengths = torch.tensor([sequence.size(0) for sequence in sequences], dtype=torch.long)
+    padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=PADDING_INDEX)
+    target_tensor = torch.stack(targets)
+    return padded_sequences, sequence_lengths, target_tensor
 
-
-def collate(batch):
-    seqs, labels = zip(*batch)
-    lengths = torch.tensor([len(s) for s in seqs], dtype=torch.long)
-    padded = pad_sequence(seqs, batch_first=True, padding_value=PAD_IDX)
-    return padded, lengths, torch.stack(labels)
-
-
-class BiLSTMClassifier(nn.Module):
-    def __init__(self, vocab_size: int, embed_dim: int = EMBED_DIM, hidden: int = HIDDEN):
+class FraudBiLSTM(nn.Module):
+    def __init__(self, vocabulary_size: int, embedding_size: int = EMBEDDING_SIZE, hidden_size: int = LSTM_HIDDEN_SIZE) -> None:
         super().__init__()
-        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=PAD_IDX)
-        self.lstm = nn.LSTM(embed_dim, hidden, batch_first=True, bidirectional=True)
-        self.dropout = nn.Dropout(0.3)
-        self.fc = nn.Linear(hidden * 2, 1)
+        self.embedding_layer = nn.Embedding(num_embeddings=vocabulary_size, embedding_dim=embedding_size, padding_idx=PADDING_INDEX)
+        self.recurrent_layer = nn.LSTM(input_size=embedding_size, hidden_size=hidden_size, batch_first=True, bidirectional=True)
+        self.dropout_layer = nn.Dropout(0.3)
+        self.output_layer = nn.Linear(hidden_size * 2, 1)
 
-    def forward(self, x: torch.Tensor, lengths: torch.Tensor) -> torch.Tensor:
-        emb = self.embedding(x)
-        packed = pack_padded_sequence(emb, lengths.cpu(), batch_first=True, enforce_sorted=False)
-        _, (h_n, _) = self.lstm(packed)
-        # h_n: [num_directions, batch, hidden]
-        forward_last = h_n[0]
-        backward_last = h_n[1]
-        out = self.dropout(torch.cat([forward_last, backward_last], dim=-1))
-        return self.fc(out).squeeze(-1)
+    def forward(self, token_ids: torch.Tensor, lengths: torch.Tensor) -> torch.Tensor:
+        embeddings = self.embedding_layer(token_ids)
+        packed_embeddings = pack_padded_sequence(embeddings, lengths.cpu(), batch_first=True, enforce_sorted=False)
+        _, hidden_state = self.recurrent_layer(packed_embeddings)
+        hidden_vectors = hidden_state[0]
+        forward_vector = hidden_vectors[-2]
+        backward_vector = hidden_vectors[-1]
+        representation = torch.cat((forward_vector, backward_vector), dim=1)
+        representation = self.dropout_layer(representation)
+        logits = self.output_layer(representation)
+        return logits.squeeze(dim=-1)
 
+def create_data_loader(dataframe: pd.DataFrame, vocabulary: dict[str, int], shuffle_data: bool) -> DataLoader:
+    dataset = JobTextDataset(texts=dataframe["combined_text"].tolist(), labels=dataframe["label"].to_numpy(), vocabulary=vocabulary)
+    return DataLoader(dataset, batch_size=TRAIN_BATCH_SIZE, shuffle=shuffle_data, collate_fn=batch_collator)
 
 @torch.no_grad()
-def predict_scores(model, loader, device) -> tuple[np.ndarray, np.ndarray]:
+def collect_predictions(model: nn.Module, loader: DataLoader, device: torch.device) -> tuple[np.ndarray, np.ndarray]:
     model.eval()
-    scores, labels = [], []
-    for xb, lengths, yb in loader:
-        logits = model(xb.to(device), lengths)
-        scores.append(torch.sigmoid(logits).cpu().numpy())
-        labels.append(yb.numpy())
-    return np.concatenate(scores), np.concatenate(labels)
+    probability_list = []
+    target_list = []
+    for tokens, lengths, targets in loader:
+        tokens = tokens.to(device)
+        logits = model(tokens, lengths)
+        probabilities = torch.sigmoid(logits)
+        probability_list.append(probabilities.cpu().numpy())
+        target_list.append(targets.numpy())
+    return np.concatenate(probability_list), np.concatenate(target_list)
 
-
-def select_threshold(labels: np.ndarray, scores: np.ndarray) -> float:
-    precision, recall, thresholds = precision_recall_curve(labels, scores)
-    if len(thresholds) == 0:
+def choose_threshold(labels: np.ndarray, probabilities: np.ndarray) -> float:
+    precision_values, recall_values, thresholds = precision_recall_curve(labels, probabilities)
+    if thresholds.size == 0:
         return 0.5
-    f1_values = 2 * precision[:-1] * recall[:-1] / np.maximum(precision[:-1] + recall[:-1], 1e-12)
-    best = float(np.max(f1_values))
-    idx = int(np.flatnonzero(np.isclose(f1_values, best))[0])
-    return float(thresholds[idx])
+    numerator = 2 * precision_values[:-1] * recall_values[:-1]
+    denominator = np.maximum(precision_values[:-1] + recall_values[:-1], 1e-12)
+    f1_values = numerator / denominator
+    maximum_f1 = np.max(f1_values)
+    best_index = np.flatnonzero(np.isclose(f1_values, maximum_f1))[0]
+    return float(thresholds[best_index])
 
+def calculate_metrics(labels: np.ndarray, probabilities: np.ndarray, threshold: float) -> dict:
+    predictions = np.where(probabilities >= threshold, 1, 0)
 
-def fraud_metrics(labels: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
-    preds = (scores >= threshold).astype(int)
     return {
-        "fraud_f1": float(f1_score(labels, preds, zero_division=0)),
-        "fraud_recall": float(recall_score(labels, preds, zero_division=0)),
-        "fraud_precision": float(precision_score(labels, preds, zero_division=0)),
+        "fraud_f1": float(f1_score(labels, predictions, zero_division=0)),
+        "fraud_recall": float(recall_score(labels, predictions, zero_division=0)),
+        "fraud_precision": float(precision_score(labels, predictions, zero_division=0)),
     }
 
+def create_class_weight(labels: np.ndarray, device: torch.device) -> torch.Tensor:
+    positive_count = max(float(labels.sum()), 1.0)
+    negative_count = float(len(labels)) - positive_count
+    return torch.tensor([negative_count / positive_count], dtype=torch.float32, device=device)
 
-def main() -> None:
-    set_seed(SEED)
-    RESULT_DIR.mkdir(parents=True, exist_ok=True)
-    WEIGHT_DIR.mkdir(parents=True, exist_ok=True)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
-
-    train, validation, test = load_split("train"), load_split("validation"), load_split("test")
-    vocab = build_vocab(train["combined_text"].tolist())
-
-    train_ds = TextDataset(train["combined_text"].tolist(), train["label"].to_numpy(), vocab)
-    val_ds = TextDataset(validation["combined_text"].tolist(), validation["label"].to_numpy(), vocab)
-    test_ds = TextDataset(test["combined_text"].tolist(), test["label"].to_numpy(), vocab)
-
-    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate)
-    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate)
-    test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate)
-
-    y_train = train["label"].to_numpy()
-    pos_weight = torch.tensor([(len(y_train) - y_train.sum()) / max(y_train.sum(), 1)], device=device)
-
-    model = BiLSTMClassifier(len(vocab)).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-
-    best_val_f1, best_state, wait = -1.0, None, 0
-    for epoch in range(1, EPOCHS + 1):
+def train_model(model: nn.Module, train_loader: DataLoader, validation_loader: DataLoader, training_labels: np.ndarray, device: torch.device) -> tuple[dict, float]:
+    positive_weight = create_class_weight(training_labels, device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    loss_function = nn.BCEWithLogitsLoss(pos_weight=positive_weight)
+    best_validation_f1 = -1.0
+    best_parameters = None
+    patience_counter = 0
+    for epoch_number in range(1, MAX_EPOCHS + 1):
         model.train()
         total_loss = 0.0
-        for xb, lengths, yb in train_loader:
-            xb, yb = xb.to(device), yb.to(device)
+        sample_count = 0
+        for tokens, lengths, targets in train_loader:
+            tokens = tokens.to(device)
+            targets = targets.to(device)
             optimizer.zero_grad(set_to_none=True)
-            loss = criterion(model(xb, lengths), yb)
+            logits = model(tokens, lengths)
+            loss = loss_function(logits, targets)
             loss.backward()
             optimizer.step()
-            total_loss += float(loss.item()) * len(yb)
+            batch_size = targets.size(0)
+            total_loss += float(loss.item()) * batch_size
+            sample_count += batch_size
 
-        val_scores, val_labels = predict_scores(model, val_loader, device)
-        thr = select_threshold(val_labels, val_scores)
-        val_f1 = fraud_metrics(val_labels, val_scores, thr)["fraud_f1"]
-        print(f"epoch={epoch:02d} loss={total_loss/len(train_ds):.4f} val_f1={val_f1:.4f}")
-
-        if val_f1 > best_val_f1 + 1e-6:
-            best_val_f1 = val_f1
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
-            wait = 0
+        validation_scores, validation_labels = collect_predictions(model, validation_loader, device)
+        current_threshold = choose_threshold(validation_labels, validation_scores)
+        validation_metrics = calculate_metrics(validation_labels, validation_scores, current_threshold)
+        current_f1 = validation_metrics["fraud_f1"]
+        average_loss = total_loss / sample_count
+        print(f"epoch={epoch_number:02d} loss={average_loss:.4f} val_f1={current_f1:.4f}")
+        if current_f1 > best_validation_f1 + 1e-6:
+            best_validation_f1 = current_f1
+            best_parameters = {name: parameter.detach().cpu().clone() for name, parameter in model.state_dict().items()}
+            patience_counter = 0
         else:
-            wait += 1
-            if wait >= PATIENCE:
-                print(f"Early stop at epoch {epoch}")
+            patience_counter += 1
+            if patience_counter >= EARLY_STOPPING_LIMIT:
+                print(f"Early stop at epoch {epoch_number}")
                 break
+    if best_parameters is None:
+        raise RuntimeError("Training failed: no model state was saved")
+    return best_parameters, best_validation_f1
 
+def save_outputs(model_state: dict, vocabulary: dict[str, int], threshold: float, metrics: dict) -> None:
+    OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+    MODEL_PATH.mkdir(parents=True, exist_ok=True)
+    result_file = OUTPUT_PATH / "test_metrics.json"
+    result_file.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+    checkpoint = {"model_state_dict": model_state, "vocab": vocabulary, "threshold": float(threshold), "max_len": SEQUENCE_LIMIT, "embed_dim": EMBEDDING_SIZE, "hidden": LSTM_HIDDEN_SIZE}
+    torch.save(checkpoint, MODEL_PATH / "bilstm.pt")
+
+def main() -> None:
+    initialize_random_state()
+    OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+    MODEL_PATH.mkdir(parents=True, exist_ok=True)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+    training_data = read_data("train")
+    validation_data = read_data("validation")
+    test_data = read_data("test")
+    vocabulary = create_vocabulary(training_data["combined_text"].tolist())
+    training_loader = create_data_loader(training_data, vocabulary, True)
+    validation_loader = create_data_loader(validation_data, vocabulary, False)
+    test_loader = create_data_loader(test_data, vocabulary, False)
+    training_labels = training_data["label"].to_numpy()
+    model = FraudBiLSTM(vocabulary_size=len(vocabulary)).to(device)
+    best_state, best_validation_f1 = train_model(model=model, train_loader=training_loader, validation_loader=validation_loader, training_labels=training_labels, device=device)
     model.load_state_dict(best_state)
     model.to(device)
-    val_scores, val_labels = predict_scores(model, val_loader, device)
-    threshold = select_threshold(val_labels, val_scores)
-    test_scores, test_labels = predict_scores(model, test_loader, device)
-    result = fraud_metrics(test_labels, test_scores, threshold)
-
-    (RESULT_DIR / "test_metrics.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
-    torch.save(
-        {
-            "model_state_dict": best_state,
-            "vocab": vocab,
-            "threshold": float(threshold),
-            "max_len": MAX_LEN,
-            "embed_dim": EMBED_DIM,
-            "hidden": HIDDEN,
-        },
-        WEIGHT_DIR / "bilstm.pt",
-    )
-    print(json.dumps(result, indent=2))
-    print(f"best_val_f1={best_val_f1:.4f} threshold={threshold:.4f}")
-
+    validation_scores, validation_labels = collect_predictions(model, validation_loader, device)
+    selected_threshold = choose_threshold(validation_labels, validation_scores)
+    test_scores, test_labels = collect_predictions(model, test_loader, device)
+    test_result = calculate_metrics(test_labels, test_scores, selected_threshold)
+    save_outputs(model_state=best_state, vocabulary=vocabulary, threshold=selected_threshold, metrics=test_result)
+    print(json.dumps(test_result, indent=2))
+    print(f"best_val_f1={best_validation_f1:.4f} threshold={selected_threshold:.4f}")
 
 if __name__ == "__main__":
     main()
