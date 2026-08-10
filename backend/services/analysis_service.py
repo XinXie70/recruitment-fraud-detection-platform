@@ -204,7 +204,10 @@ class AnalysisService:
             classification_label=computation.ensemble.classification_label,
             recommended_action=computation.ensemble.recommended_action,
         )
-        gentle_result = self.gentle_ai.generate(risk_context, pending_xai)
+        # The score phase must return as soon as the model result is ready. Do
+        # not let the optional Ollama rewrite delay the first result shown in
+        # the UI; the complete analysis performs that richer work separately.
+        gentle_result = self.gentle_ai.generate_local(risk_context, pending_xai)
 
         url_failed = False
         try:

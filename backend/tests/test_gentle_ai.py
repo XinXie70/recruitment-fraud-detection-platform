@@ -46,6 +46,24 @@ def test_disabled_ollama_returns_template_guidance() -> None:
     assert service.get_item("missing") is None
 
 
+def test_generate_local_never_uses_ollama(monkeypatch) -> None:
+    service = GentleAIService(ollama_enabled=True, ollama_model="configured-model")
+    rewrite_calls = 0
+
+    def unexpected_rewrite(template):
+        nonlocal rewrite_calls
+        rewrite_calls += 1
+        return template
+
+    monkeypatch.setattr(service, "_rewrite_with_ollama", unexpected_rewrite)
+
+    result = service.generate_local(_risk(), _xai())
+
+    assert rewrite_calls == 0
+    assert result.provider == "template"
+    assert "fast score phase" in result.message
+
+
 def test_template_explanation_uses_matching_local_education_topic() -> None:
     service = GentleAIService(ollama_enabled=False)
     result = service.generate(_risk(), _xai())
