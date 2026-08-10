@@ -71,8 +71,7 @@ class GentleAIService:
         return selected[:3]
 
     def generate(self, risk: RiskContext, xai: XAIResult) -> GentleAIResult:
-        learning_items = self._select_learning_items(xai)
-        template = build_template_guidance(risk, xai, learning_items)
+        template = self.generate_local(risk, xai)
         if not self.ollama_enabled:
             template.message = "Local template guidance used; Ollama is disabled."
             return template
@@ -86,6 +85,18 @@ class GentleAIService:
             logger.warning("Ollama rewrite failed", exc_info=True)
             template.message = "Local template guidance used because Ollama was unavailable."
             return template
+
+    def generate_local(self, risk: RiskContext, xai: XAIResult) -> GentleAIResult:
+        """Build deterministic guidance without making any network requests.
+
+        The score endpoint uses this path so a ready model score is never held up
+        by the optional Ollama rewrite. Full analyses may still call ``generate``
+        to request that richer rewrite.
+        """
+        learning_items = self._select_learning_items(xai)
+        template = build_template_guidance(risk, xai, learning_items)
+        template.message = "Local template guidance used for the fast score phase."
+        return template
 
     def _rewrite_with_ollama(self, template: GentleAIResult) -> GentleAIResult:
         import httpx

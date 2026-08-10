@@ -113,6 +113,26 @@ def test_score_phase_skips_xai_batch_scoring() -> None:
     assert predictor.batch_calls == 0
 
 
+def test_score_phase_never_calls_ollama(monkeypatch) -> None:
+    service, _ = _service()
+    service.gentle_ai.ollama_enabled = True
+    service.gentle_ai.ollama_model = "configured-model"
+    rewrite_calls = 0
+
+    def unexpected_rewrite(template):
+        nonlocal rewrite_calls
+        rewrite_calls += 1
+        return template
+
+    monkeypatch.setattr(service.gentle_ai, "_rewrite_with_ollama", unexpected_rewrite)
+
+    result = service.score("A legitimate software engineering role")
+
+    assert rewrite_calls == 0
+    assert result.gentle_ai.provider == "template"
+    assert "fast score phase" in result.gentle_ai.message
+
+
 def test_readiness_is_refreshed_from_live_model_probe() -> None:
     service, predictor = _service()
     predictor.is_available = lambda: False
