@@ -76,9 +76,9 @@ def test_predict_batch_validation_errors(client, body, expected_fragment: str) -
 
 
 def test_predict_batch_item_limit(client, monkeypatch: pytest.MonkeyPatch) -> None:
-    import app as app_module
+    import prediction_routes
 
-    monkeypatch.setattr(app_module, "MAX_BATCH_ITEMS", 1)
+    monkeypatch.setattr(prediction_routes, "MAX_BATCH_ITEMS", 1)
 
     response = client.post(
         "/predict/batch",

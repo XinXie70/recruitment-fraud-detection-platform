@@ -37,6 +37,10 @@ pip install -r model_service/requirements.txt
 python model_service/app.py
 ```
 
+Local development may leave `MODEL_API_KEY` empty. Production starts must set
+`APP_ENV=production`, `MODEL_API_KEY`, and restrictive `MODEL_CORS_ORIGINS`;
+configure the backend with the matching `MODEL_SERVER_API_KEY`.
+
 Set `MODEL_SERVER_URL=http://127.0.0.1:5000` in `.env`, apply migrations, and
 start FastAPI:
 

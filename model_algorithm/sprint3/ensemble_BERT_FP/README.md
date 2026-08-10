@@ -8,7 +8,7 @@ legitimate to reduce false positives.
 
 | Branch | Path |
 |---|---|
-| LR | `../lr_none_bigram_no_cv_paper_aligned_seed42` (`class_weight=None`, bigrams, no CV) |
+| LR | `../LR` (`class_weight=None`, bigrams, no CV) |
 | BERT | `../BERT` |
 | Ensemble | This directory (FP-gate) |
 
@@ -22,22 +22,24 @@ already present.
 
 ```bash
 # 1. Export BERT validation scores
-python BERT/code/bert.py export-val
+python model_algorithm/sprint3/BERT/code/bert.py export-val
 
 # 2. Reproduce LR predictions and metrics
-python lr_none_bigram_no_cv_paper_aligned_seed42/code/train_lr_none_bigram_no_cv.py
+python model_algorithm/sprint3/LR/code/train_lr_none_bigram_no_cv.py
 
 # 3. Reproduce the FP-gate ensemble
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/code/run_fp_gate_ensemble.py
+python model_algorithm/sprint3/ensemble_BERT_FP/code/run_fp_gate_ensemble.py
 
 # 4. Select and apply risk boundaries
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/select_risk_boundaries.py \
+python model_algorithm/sprint3/risk_level/select_risk_boundaries.py \
   --mode select
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/select_risk_boundaries.py \
+python model_algorithm/sprint3/risk_level/select_risk_boundaries.py \
   --mode apply-test
 ```
 
-The following artifacts must already exist:
+Download the frozen dataset splits first with
+`model_algorithm/sprint3/data/download_data.sh`. The LR and BERT commands above
+regenerate the prediction artifacts consumed by the ensemble step, including:
 
 - `../BERT/results/bert_validation_predictions.csv`
   (the export script also refreshes `results/bert_validation_predictions.csv` here)
@@ -45,7 +47,7 @@ The following artifacts must already exist:
 - BERT weights under
   `../BERT/weight/best/`
 
-See [Ensemble Risk Score and Three-Level Output](risk_score/RISK_SCORE_AND_LEVEL.md)
+See [Ensemble Risk Score and Three-Level Output](../risk_score/RISK_SCORE_AND_LEVEL.md)
 for the public risk-output contract.
 
 ## Three-level risk boundaries

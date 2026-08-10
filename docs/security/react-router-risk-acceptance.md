@@ -26,9 +26,9 @@ The following checks were run from `frontend/` on 2026-08-09:
   8.3.0; `react-router-dom` is not a direct dependency.
 - `npm audit --omit=dev` reported zero production vulnerabilities.
 
-Functional lint, test, end-to-end, and build evidence is maintained in the
-[archived Final Demo readiness checklist](../archive/final-demo-readiness.md), rather than copied
-into this security record where counts can become stale.
+Functional lint, test, end-to-end, and build checks are maintained in the
+[CI workflow](../../.github/workflows/frontend-ci.yml), rather than copied into
+this security record where counts can become stale.
 
 ## Required controls
 
