@@ -10,12 +10,12 @@ flowchart LR
 
     system["Fake Job Advertisement Detection System<br/>Authentication, analysis, history, education, and administration"]
 
-    model["Model Inference Service<br/>Eight ML models exposed through a batch prediction API"]
+    model["FP-gate Model Service<br/>BERT primary signal + Logistic Regression false-positive gate"]
     ollama["Optional Ollama Service<br/>Rewrites deterministic explanations in friendlier language"]
 
     user -->|"Uses over HTTPS"| system
     admin -->|"Uses over HTTPS"| system
-    system -->|"Requests model probabilities"| model
+    system -->|"Requests final risk and batched perturbation scores"| model
     system -.->|"Optional rewrite request"| ollama
 ```
 

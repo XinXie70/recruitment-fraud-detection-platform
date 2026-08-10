@@ -38,8 +38,10 @@ def test_e2e_predict_all_with_real_weights(sample_payload: dict[str, str]) -> No
 
     import app as app_module
 
-    app_module.lr_service = lr
-    app_module.bert_service = bert
+    import prediction_routes
+
+    prediction_routes.lr_service = lr
+    prediction_routes.bert_service = bert
 
     client = app_module.app.test_client()
     response = client.post("/predict/all", json=sample_payload)

@@ -9,9 +9,9 @@ system. Detailed decision records are linked where available.
 while ML inference has substantially different artifact and compute needs.
 
 **Decision.** Keep authentication, analysis orchestration, history, education,
-and administration in one modular FastAPI application. Access inference through
-a stable model-adapter interface that supports either local pipelines or a
-remote model API.
+and administration in one modular FastAPI application. Run inference in one
+separately deployable model API. The application backend always calls that API
+through `MODEL_SERVER_URL`; it does not load a local fallback model.
 
 **Why.** A modular monolith minimises distributed-system overhead for a small
 team. Separating only the compute-heavy model runtime permits independent VM/GPU
@@ -23,8 +23,8 @@ health reporting, graceful degradation, HTTPS, and service authentication are
 therefore required.
 
 **Evidence.** [ADR-001](adr/001-monolith-over-microservices.md),
-[`backend/services/model_adapter.py`](../backend/services/model_adapter.py), and
-the [deployment diagram](architecture/deployment.md).
+[`backend/services/fp_gate_predictor.py`](../backend/services/fp_gate_predictor.py),
+and the [deployment diagram](architecture/deployment.md).
 
 ## 2. Synchronous API instead of a message queue
 
@@ -41,36 +41,35 @@ bounded timeout address latency directly.
 latency. A queue becomes appropriate if the product later adds bulk imports,
 scheduled processing, or long-running retraining jobs.
 
-## 3. Heterogeneous configurable ensemble
+## 3. BERT-primary false-positive gate
 
-**Context.** Linear, tree, recurrent, dense, and transformer models capture
-different fraud signals and have different failure modes.
+**Context.** BERT provides the primary fraud signal, while Logistic Regression
+offers an independently trained signal that can reduce false positives.
 
-**Decision.** Calibrate each available model score, apply configuration-driven
-weights, and map the weighted probability through low/high thresholds. If a
-member fails, renormalise the successful members' weights; return 503 only if
-all members fail.
+**Decision.** Use the paper-aligned BERT score as the primary decision. When BERT
+classifies an advertisement as fraudulent but the LR score is below the frozen
+gate threshold, change the final decision to legitimate. Frozen high/low risk
+boundaries determine the public risk level. Return `503` if the model service is
+unavailable or violates its response contract.
 
-**Why.** Architectural diversity reduces dependence on a single model and the
-explicit weighted formula remains inspectable. Configuration files allow
-weights and thresholds to be frozen from validation results without changing
-application code.
+**Why.** The rule directly targets BERT false positives and remains inspectable.
+Configuration files freeze validation-selected thresholds without duplicating
+the decision formula in FastAPI.
 
-**Trade-offs.** More models increase latency, memory use, and operational
-surface area. The production configuration must be fitted and locked before the
-Final Demo; the current checked-in `ensemble-v2-eight-model-dev-fallback`
-configuration identifies itself as equal-weight and unfitted.
+**Trade-offs.** The final decision still depends primarily on BERT and requires
+both model artifacts to remain compatible with the frozen gate configuration.
+The operational risk score is a ranking signal, not a calibrated probability.
 
 **Evidence.** [ADR-002](adr/002-ensemble-scoring-formula.md),
-[`backend/services/ensemble_predictor.py`](../backend/services/ensemble_predictor.py),
-and the saved ensemble configuration.
+[`backend/services/fp_gate_predictor.py`](../backend/services/fp_gate_predictor.py),
+and [`model_service/models/ensemble/config.json`](../model_service/models/ensemble/config.json).
 
 ## 4. Model-agnostic explainability with deterministic fallback
 
 **Context.** Users need evidence for a risk result, but the ensemble contains
 models for which gradient-only methods do not work.
 
-**Decision.** Return the validated eight-model risk score first, then request
+**Decision.** Return the validated FP-gate risk result first, then request
 the complete explanation as a second UI phase. Explain the aggregated scoring
 function using SHAP Partition, fall back to occlusion when necessary, then
 convert evidence into deterministic educational language. Ollama rewriting is
@@ -160,18 +159,16 @@ advertisements and is more defensible than optimising against the test set.
 but those scores are more credible. The exact production ensemble artifact must
 still be frozen and labelled with the evaluation version before the demo.
 
-**Evidence.** `src/experiments/split_leakage/`, `data/experiment_splits/`, and
-`reports/models/`.
+**Evidence.** [`DATA_CONTRACT_V1.md`](../DATA_CONTRACT_V1.md), the
+[`sprint3/data` guide](../model_algorithm/sprint3/data/README.md), and the frozen
+experiment metadata under `model_algorithm/sprint3/BERT/results/`.
 
 ## Remaining decisions before production
 
-1. Replace the unfitted equal-weight ensemble fallback with a validation-fitted,
-   versioned, and locked configuration.
-2. Put the remote model API behind HTTPS, service authentication, and restrictive
+1. Put the remote model API behind HTTPS, service authentication, and restrictive
    firewall rules.
-3. Define history-data retention and deletion policy.
-4. Decide whether the production frontend uses a CDN/static host or Nginx.
-5. Continue raising whole-source frontend unit coverage from the current 41.20%
-   statement / 42.41% line baseline. Playwright automates authentication,
+2. Define history-data retention and deletion policy.
+3. Decide whether the production frontend uses a CDN/static host or Nginx.
+4. Continue raising frontend unit coverage. Playwright automates authentication,
    registration, analysis, history, admin routing/health, and the 503 path, but
    its browser execution is reported separately from Vitest's source coverage.

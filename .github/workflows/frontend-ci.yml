@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
@@ -54,11 +56,39 @@ jobs:
         run: ruff check .
 
       - name: Type-check production Python services
-        run: mypy backend model_service --exclude '(^|/)tests/'
+        run: mypy backend model_service
 
       - name: Test backend with coverage
         working-directory: backend
         run: python -m pytest tests -q --cov=. --cov-config=.coveragerc --cov-fail-under=85
+
+  model-service:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      MODEL_API_KEY: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: model_service/requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r model_service/requirements-dev.txt
+
+      - name: Test model service
+        run: >-
+          python -m pytest model_service/tests -q -m "not e2e"
+          --cov=model_service
+          --cov-config=model_service/.coveragerc
+          --cov-report=term-missing
+          --cov-fail-under=90
 
   frontend:
     runs-on: ubuntu-latest
