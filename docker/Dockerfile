@@ -31,7 +31,7 @@ RUN apt-get update \
 COPY model_service/requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip \
     && pip install --index-url https://download.pytorch.org/whl/cpu \
-        torch==2.4.1 \
+        torch==2.11.0 \
     && grep -Ev '^(torch|#)' /tmp/requirements.txt > /tmp/requirements-no-torch.txt \
     && pip install -r /tmp/requirements-no-torch.txt \
     && rm /tmp/requirements.txt /tmp/requirements-no-torch.txt

@@ -1,0 +1,12 @@
+**
+
+!backend/
+!backend/**
+
+backend/.env
+backend/.env.*
+backend/*.log
+backend/.DS_Store
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
