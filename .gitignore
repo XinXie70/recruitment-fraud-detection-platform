@@ -21,6 +21,10 @@ checkpoints/
 *.pth
 *.pkl
 
+# Sprint1 / Sprint2 keep weights local only (code + metrics are tracked).
+model_algorithm/sprint1/**/weight/
+model_algorithm/sprint2/**/weight/
+
 # Local environments and temporary files
 .venv/
 venv/
