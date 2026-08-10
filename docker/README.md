@@ -30,7 +30,8 @@ Alternatively, build and run the CPU image directly:
 
 ```bash
 docker build -f docker/Dockerfile -t fraud-detection-api:latest .
-docker run -d --name fraud-detection-api -p 5000:5000 \
+docker run -d --name fraud-detection-api -p 127.0.0.1:5000:5000 \
+  -e MODEL_API_KEY=replace-me \
   --restart unless-stopped fraud-detection-api:latest
 ```
 
@@ -45,13 +46,18 @@ The first startup preloads LR and BERT and can take one or two minutes.
 | Variable | Default | Description |
 |---|---|---|
 | `PORT` | `5000` | Container listening port |
-| `HOST` | `0.0.0.0` | Bind address |
+| `HOST` | `0.0.0.0` | Bind address inside the container (required for Docker networking) |
+| `MODEL_API_KEY` | _(empty)_ | Shared secret for `/predict/*` (`X-API-Key` / Bearer). Leave empty only for local debugging |
+| `RATE_LIMIT_PREDICT` | `30/minute` | Per-IP rate limit for prediction endpoints |
+| `MAX_CONTENT_LENGTH` | `1048576` | Max JSON request body size in bytes |
+| `MAX_TEXT_CHARS` | `50000` | Max characters per resolved advertisement text |
+| `MAX_BATCH_TOTAL_CHARS` | `500000` | Max total characters across a batch request |
 | `ALLOW_CPU` | `1` | Allow CPU inference when no GPU is available |
 | `GUNICORN_WORKERS` | `1` | Recommended worker count; keep at one to avoid duplicate model memory |
 | `GUNICORN_THREADS` | `4` | Concurrent Gunicorn threads |
 | `GUNICORN_TIMEOUT` | `180` | Request timeout in seconds |
 
-For CPU deployment, use at least 2 vCPUs and 4 GiB of memory.
+Compose publishes the API on `127.0.0.1` only. For CPU deployment, use at least 2 vCPUs and 4 GiB of memory.
 
 ## Cloud deployment
 

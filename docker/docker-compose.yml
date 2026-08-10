@@ -5,8 +5,9 @@ services:
       dockerfile: docker/Dockerfile
     image: fraud-detection-api:latest
     container_name: fraud-detection-api
+    # Bind to loopback on the host to avoid exposing port 5000 on all interfaces.
     ports:
-      - "${PORT:-5000}:5000"
+      - "127.0.0.1:${PORT:-5000}:5000"
     environment:
       PORT: "5000"
       HOST: "0.0.0.0"
@@ -14,6 +15,11 @@ services:
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-180}"
+      MODEL_API_KEY: "${MODEL_API_KEY:-}"
+      RATE_LIMIT_PREDICT: "${RATE_LIMIT_PREDICT:-30/minute}"
+      MAX_CONTENT_LENGTH: "${MAX_CONTENT_LENGTH:-1048576}"
+      MAX_TEXT_CHARS: "${MAX_TEXT_CHARS:-50000}"
+      MAX_BATCH_TOTAL_CHARS: "${MAX_BATCH_TOTAL_CHARS:-500000}"
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
     restart: unless-stopped
