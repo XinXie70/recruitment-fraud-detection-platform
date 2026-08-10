@@ -10,7 +10,7 @@
 
 Users need to understand *why* a job posting was flagged as suspicious. We need an explainability method that:
 
-- Works with an ensemble of 8 heterogeneous models
+- Explains the final BERT-primary + LR false-positive-gate scoring contract
 - Produces human-readable evidence spans
 - Is computationally feasible within a synchronous API response (< 5 seconds)
 
@@ -19,7 +19,7 @@ Users need to understand *why* a job posting was flagged as suspicious. We need 
 Use a **two-tier XAI strategy** (`backend/xai_gentle/`):
 
 1. **Primary: SHAP Partition Explainer**
-   - Runs against the ensemble's aggregated score function
+   - Runs against the model service's final batch-scoring function
    - Produces token-level contribution values
    - Identifies text spans that raise or lower risk
 
@@ -36,12 +36,12 @@ Use a **two-tier XAI strategy** (`backend/xai_gentle/`):
 | Alternative | Why Rejected |
 |-------------|-------------|
 | LIME | Slower than SHAP partition for text; less stable across runs |
-| Integrated Gradients | Requires gradient access to all models; not feasible for sklearn/xgboost |
+| Integrated Gradients | Cannot explain the non-differentiable LR gate as part of the final decision contract |
 | Attention weights only | Does not explain the final BERT + LR gate decision contract |
 | Pure LLM explanation | Non-deterministic; may hallucinate; adds latency + cost |
 
 ## Consequences
 
-- SHAP partition is the most principled method for ensemble text models
+- SHAP Partition provides model-agnostic attribution for the final remote scoring function
 - Two-tier design ensures graceful degradation (occlusion fallback)
 - Gentle AI layer separates *explanation* from *communication*, making each independently testable
