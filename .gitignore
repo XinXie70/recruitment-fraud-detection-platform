@@ -12,6 +12,8 @@ checkpoints/
 *.joblib
 !model_algorithm/sprint3/LR/weight/
 !model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
+!model_algorithm/sprint3/Feature Extraction Method for LR/weight/
+!model_algorithm/sprint3/Feature Extraction Method for LR/weight/*.joblib
 # model_service runtime weights must stay tracked (do not ignore)
 !model_service/models/
 !model_service/models/**
