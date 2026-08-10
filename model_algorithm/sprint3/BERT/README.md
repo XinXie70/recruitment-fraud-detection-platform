@@ -1,59 +1,50 @@
-# Optimized BERT — seed 42 with `max_length=512`
+# Optimized BERT
 
-Settings:
+## Directory Overview
 
-- Model label: **Optimized BERT**
-- 17,880 EMSCAD records with seed 42
-- Original inverse-frequency class weights
-- Learning rate `5e-5` and 3 epochs
-- Threshold selected by maximising Fraud F0.5 on validation data
-- Effective batch size 16; batch size 8 with two accumulation steps on an RTX 3060 to avoid out-of-memory errors
+### `code/` — Source Code
 
-Shared splits: `../data/splits/`  
-Checkpoint: `weight/best/`  
-Summary: `comparison_summary.csv` / `comparison_summary.md`
+- **`run.py` (main entry point)**: Unified launcher for the BERT experiments; running it directly without arguments defaults to `train`, and its subcommands also cover training, evaluation, inference, and validation-score export.
+- **`config.py`**: Centralises paths, constants, hyper-parameter configs, and runtime utilities (random seed, CUDA checks, logging, etc.).
+- **`data_metrics.py`**: Handles text preprocessing, dataset loading, fraud-metric computation, threshold selection, and result visualisation.
+- **`training.py`**: Implements the BERT model wrapper, train/eval loops, and the business logic behind the four `run.py` subcommands.
 
-## Run
+#### Four `run.py` Commands
 
-Code is under `code/`:
+Activate the CUDA environment first, then enter the `code/` directory:
 
-- `run.py` — VS Code / Cursor “Run Python File” entry (defaults to `train`)
-- `bert.py` — CLI entrypoint
-- `config.py` — paths (`weight/`, `results/`), constants, utilities
-- `data_metrics.py` — preprocessing, datasets, metrics, plots
-- `training.py` — model, train/eval loops, CLI command handlers
-- `smoke_train.py` — short train smoke test (tiny subset, does not overwrite `weight/`)
-
-Artifacts write to `weight/` and `results/` (including `results/figures/`).
-
-From `sprint3/`, activate the CUDA environment and run:
-
-```bash
-python BERT/code/run.py train
-python BERT/code/run.py evaluate
-python BERT/code/run.py predict --text "..."
-python BERT/code/run.py export-val
-python BERT/code/smoke_train.py
+```powershell
+. E:\ml\activate.ps1
+cd model_algorithm/sprint3/BERT/code
 ```
 
-Equivalent: `python BERT/code/bert.py <subcommand> ...`
-
-| Subcommand | Purpose |
+| Command | Purpose |
 |---|---|
-| `train` | Fine-tune on fixed train/val/test splits; select threshold on validation (`max_fbeta`, β=0.5) |
-| `evaluate` | Score validation and/or test using `weight/best` (default `--split both`, `max_length` 512) |
-| `predict` | Single-text or CSV inference |
-| `export-val` | Write validation fraud scores for the FP-gate ensemble |
+| `python run.py train` | Fine-tune BERT on the fixed train/val/test splits and save weights plus test metrics |
+| `python run.py evaluate` | Load existing weights and evaluate on validation and/or test (common usage: `evaluate --split test`) |
+| `python run.py predict --text "..."` | Run inference on a single job-ad text (or batch prediction with `--csv`) |
+| `python run.py export-val` | Export validation fraud scores for the downstream ensemble / FP-gate |
 
-## Results naming
+Running `python run.py` with no arguments defaults to `python run.py train`.
 
-Evaluate writes short, stable filenames, for example:
+Common examples:
 
-- `results/metrics_validation.json` / `results/metrics_test.json` / `results/metrics_summary.json`
-- `results/predictions_validation.csv` / `results/predictions_test.csv`
-- `results/error_analysis_validation.csv` / `results/error_analysis_test.csv`
-- `results/validation_predictions.csv` (plus legacy alias `bert_validation_predictions.csv`)
+```bash
+python run.py train
+python run.py evaluate --split test
+python run.py predict --text "Urgent hiring, work from home, send fee first."
+python run.py export-val
+```
 
-Weights go to `weight/`, metrics/plots to `results/`.
+### `results/` — Experiment Outputs
 
-`export-val` refreshes the ensemble copy under `../ensemble_BERT_FP/results/` when that directory exists.
+`results/` stores experiment outputs such as evaluation metrics, predictions, error analysis, and figures (model weights are not stored here).
+
+### `weight/` — Model Weights
+
+`weight/` stores the trained model weights and threshold files (the formal checkpoint lives in `weight/best/`).
+
+### `comparison_summary.csv` — Comparison Summary
+
+`comparison_summary.csv` summarises the gains of our **Optimized BERT** over the paper-reported **Paper BERT** on key test metrics (e.g. test Fraud F1: 0.9053 vs 0.8802); see `comparison_summary.md` for a readable version.  
+Paper reference: https://doi.org/10.1007/s10791-025-09502-8
