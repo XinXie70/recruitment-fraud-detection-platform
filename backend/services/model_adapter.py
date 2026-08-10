@@ -58,19 +58,17 @@ DEFAULT_MODEL_SPECS: tuple[ModelSpec, ...] = (
         "logistic_regression",
         "Logistic Regression",
         "final_model_pipelines.lr_pipeline.predict",
-    ),
-    ModelSpec("svm", "SVM", "final_model_pipelines.svm_pipeline.predict"),
-    ModelSpec("xgboost", "XGBoost", "final_model_pipelines.xgboost_pipeline.predict"),
-    ModelSpec("dnn", "Deep Neural Network", "final_model_pipelines.dnn_pipeline.predict"),
-    ModelSpec("rnn", "RNN", "final_model_pipelines.rnn_pipeline.predict"),
-    ModelSpec("bilstm", "Bi-LSTM", "final_model_pipelines.bilstm_pipeline.predict"),
-    ModelSpec("bert","BERT", "final_model_pipelines.bert_pipeline.predict", artifact_relative_path= ( "model/final_model_pipelines/bert_pipeline/saved_model/model.safetensors"),),
-    ModelSpec(
-        "roberta",
-        "RoBERTa",
-        "final_model_pipelines.roberta_pipeline.predict",
         artifact_relative_path=(
-            "model/final_model_pipelines/roberta_pipeline/saved_model/model.safetensors"
+            "model_algorithm/sprint3/LR/weight/"
+            "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
+        ),
+    ),
+    ModelSpec(
+        "bert",
+        "BERT",
+        "final_model_pipelines.bert_pipeline.predict",
+        artifact_relative_path=(
+            "model_algorithm/sprint3/BERT/weight/best/model.safetensors"
         ),
     ),
 )

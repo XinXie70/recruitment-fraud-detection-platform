@@ -7,15 +7,14 @@
 > before adding cross-directory dependencies.
 
 This project combines a React web application, an authenticated FastAPI backend,
-and separately deployable model inference services. The application backend can
-orchestrate eight model families, while the locked reference API retains the
-three-model LR/BERT experiment:
+and separately deployable model inference services. The application backend uses
+sprint3 Logistic Regression + BERT with an FP-gate ensemble:
 
-| Model                     | Description                        |
-| ------------------------- | ---------------------------------- |
-| **Logistic Regression**   | TF-IDF + LR baseline               |
-| **BERT (class-weighted)** | BERT fine-tuned with class weights |
-| **LR + BERT Ensemble**    | Weighted ensemble with risk bands  |
+| Model                     | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| **Logistic Regression**   | TF-IDF + LR (FP gate)                            |
+| **BERT**                  | Paper-aligned fine-tuned BERT (primary score)    |
+| **BERT + LR Ensemble**    | FP-gate: demote BERT High when LR score is low   |
 
 ## Application services
 
@@ -39,8 +38,9 @@ reproducing or deploying their documented model pipelines.
 ```text
 ├── frontend/                 # React and Vite web client
 ├── backend/                  # Main FastAPI application backend
-├── model/final_model_pipelines/ # Eight application model adapters and pipelines
-├── api_flask/                # Legacy Flask FP-gate model API
+├── model/final_model_pipelines/ # Sprint3 LR+BERT FP-gate adapters for the backend
+├── model_algorithm/sprint3/     # Paper-aligned LR, BERT, FP-gate experiments + weights
+├── api_flask/                # Flask FP-gate model API (uses sprint3 artifacts)
 ├── src/api/                  # Locked LR/BERT FastAPI reference API
 ├── src/models/               # LR training, ensemble, and risk-band scripts
 ├── data/                     # Fixed splits and processed experiment data

@@ -33,6 +33,9 @@ pip install -r backend/requirements-dev.txt
 pip install -e model
 ```
 
+This installs the sprint3 LR + BERT FP-gate adapters under `model/final_model_pipelines`.
+Weights are resolved from `model_algorithm/sprint3/`.
+
 Create the local environment file and replace its example secret:
 
 ```bash

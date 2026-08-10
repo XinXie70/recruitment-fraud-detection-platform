@@ -11,6 +11,7 @@ checkpoints/
 # Generic binary dumps outside the deliverable weight pack
 *.joblib
 !model_weights/**/*.joblib
+!model_algorithm/sprint3/LR/weight/*.joblib
 *.pt
 *.pth
 *.pkl
