@@ -11,7 +11,7 @@ false-positive-gate model. There is no local or weighted-ensemble fallback.
 | --- | --- | --- |
 | Frontend | `frontend/` | Authentication, analysis, reports, history, education, and administration UI |
 | Application API | `backend.main:app` | Users, JWT, validation, analysis orchestration, XAI, guidance, and persistence |
-| FP-gate model API | `api_flask.app:app` | BERT/LR inference, FP-gate decision, risk bands, and batch scoring |
+| FP-gate model API | `model_service.app:app` | BERT/LR inference, FP-gate decision, risk bands, and batch scoring |
 
 The model API loads these frozen experiment assets:
 
@@ -38,8 +38,8 @@ cd ..
 Start the FP-gate model service first:
 
 ```bash
-pip install -r api_flask/requirements.txt
-python api_flask/app.py
+pip install -r model_service/requirements.txt
+python model_service/app.py
 ```
 
 Set `MODEL_SERVER_URL=http://127.0.0.1:5000`, then start the application API:
