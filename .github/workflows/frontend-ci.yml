@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
@@ -84,8 +86,9 @@ jobs:
         run: >-
           python -m pytest model_service/tests -q -m "not e2e"
           --cov=model_service
+          --cov-config=model_service/.coveragerc
           --cov-report=term-missing
-          --cov-fail-under=55
+          --cov-fail-under=90
 
   frontend:
     runs-on: ubuntu-latest
