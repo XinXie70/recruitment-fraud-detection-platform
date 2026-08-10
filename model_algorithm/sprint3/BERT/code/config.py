@@ -32,7 +32,8 @@ TEST_CSV = DATA_DIR / "test.csv.gz"
 WEIGHTS_DIR = PROJECT_ROOT / "weight"
 RESULTS_DIR = PROJECT_ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
-LOGS_DIR = RESULTS_DIR / "logs"
+# Kept for import compatibility; process logs are console-only (never under results/).
+LOGS_DIR = RESULTS_DIR
 BERT_FINETUNED_DIR = WEIGHTS_DIR
 REFERENCE_CHECKPOINT = REFERENCE_BUNDLE / "weights" / "best"
 
@@ -162,7 +163,7 @@ class PredictConfig:
 
 
 def ensure_directories() -> None:
-    for path in (WEIGHTS_DIR, BERT_FINETUNED_DIR, RESULTS_DIR, FIGURES_DIR, LOGS_DIR):
+    for path in (WEIGHTS_DIR, BERT_FINETUNED_DIR, RESULTS_DIR, FIGURES_DIR):
         path.mkdir(parents=True, exist_ok=True)
 
 
@@ -184,7 +185,7 @@ def default_paths_dict() -> Dict[str, str]:
         "weights_dir": str(WEIGHTS_DIR),
         "results_dir": str(RESULTS_DIR),
         "figures_dir": str(FIGURES_DIR),
-        "logs_dir": str(LOGS_DIR),
+        "logs_dir": "console_only",
         "pretrained_model_name": PRETRAINED_MODEL_NAME,
         "text_fields": TEXT_FIELDS,
         "tagged_field_order": TAGGED_FIELD_ORDER,
@@ -214,7 +215,8 @@ def set_seed(seed: int = 42) -> None:
 
 
 def setup_logging(log_name: str = "training.log") -> logging.Logger:
-    """Configure console + file logging under models/bert/logs/."""
+    """Configure console-only logging (no results/logs artifacts)."""
+    _ = log_name  # call-site compatibility; no log files are written
     ensure_directories()
     logger = logging.getLogger("bert_fraud")
     logger.setLevel(logging.INFO)
@@ -225,11 +227,6 @@ def setup_logging(log_name: str = "training.log") -> logging.Logger:
         "%(asctime)s | %(levelname)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-
-    fh = logging.FileHandler(LOGS_DIR / log_name, encoding="utf-8")
-    fh.setFormatter(formatter)
-    fh.setLevel(logging.INFO)
-    logger.addHandler(fh)
 
     sh = logging.StreamHandler(sys.stdout)
     sh.setFormatter(formatter)
