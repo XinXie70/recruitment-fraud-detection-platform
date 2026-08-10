@@ -25,6 +25,7 @@ With coverage:
 ```bash
 pytest model_service/tests -m "not e2e" \
   --cov=model_service \
+  --cov-config=model_service/.coveragerc \
   --cov-report=term-missing \
   --cov-fail-under=90
 ```
@@ -66,6 +67,7 @@ Happy-path and sad-path cases are included for:
 If E2E tests cannot run in CI because of CPU/RAM limits, the skip reason is documented
 above and the mocked integration suite still verifies the HTTP contract.
 
-CI enforces a 90% model-service coverage floor. This includes the production
-package while excluding the opt-in E2E path; mocked BERT-service tests exercise
-loading and inference without loading the real checkpoint.
+CI enforces a 90% production-code coverage floor. The coverage configuration
+excludes test modules, and the opt-in E2E path remains outside the default run;
+mocked BERT-service tests exercise loading and inference without loading the real
+checkpoint.
