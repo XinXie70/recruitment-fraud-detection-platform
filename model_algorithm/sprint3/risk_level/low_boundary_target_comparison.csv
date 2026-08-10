@@ -1,0 +1,5 @@
+minimum_recall_target,bert_low_threshold,meets_90pct_target,rows,fraudulent,legitimate,low_total,low_fraud,low_legitimate,suspicious_total,suspicious_fraud,suspicious_legitimate,high_total,high_fraud,high_legitimate,non_low_fraud,non_low_fraud_recall
+0.9,0.0024,True,1431,69,1362,1331,6,1325,39,5,34,61,58,3,63,0.9130434782608695
+0.925,0.0006,True,1431,69,1362,1245,5,1240,125,6,119,61,58,3,64,0.927536231884058
+0.95,0.00019,True,1431,69,1362,1059,3,1056,311,8,303,61,58,3,66,0.9565217391304348
+0.975,0.00011,True,1431,69,1362,801,1,800,569,10,559,61,58,3,68,0.9855072463768116

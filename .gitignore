@@ -6,13 +6,13 @@ data/processed/*.csv
 /models/
 /outputs/
 artifacts/
-!lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/
-!lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
+!model_algorithm/sprint3/LR/weight/
+!model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
 checkpoints/
 
 # Generic binary dumps outside the deliverable weight pack
 *.joblib
-!lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
+!model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
 *.pt
 *.pth
 *.pkl

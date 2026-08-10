@@ -9,9 +9,10 @@
 
 ## Production model assets
 
-- `retrain_paper_aligned_seed42_maxlen512/`: BERT max-length-512 checkpoint and reproducibility material.
-- `lr_none_bigram_no_cv_paper_aligned_seed42/`: LR bigram configuration and artifact location.
-- `ensemble_bert_fp_gate_lr_none_bigram_maxlen512/`: FP-gate and risk-boundary configuration.
+- `model_algorithm/sprint3/BERT/`: BERT max-length-512 checkpoint and reproducibility material.
+- `model_algorithm/sprint3/LR/`: LR bigram configuration and artifact location.
+- `model_algorithm/sprint3/ensemble_BERT_FP/`: FP-gate configuration.
+- `model_algorithm/sprint3/risk_level/`: frozen risk-boundary configuration.
 
 The dependency direction is:
 

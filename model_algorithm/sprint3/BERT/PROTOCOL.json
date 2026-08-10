@@ -1,0 +1,34 @@
+{
+  "name": "Paper-aligned standalone bundle",
+  "seed": 42,
+  "split_protocol": "stratified 80/20, then 10% of train_pool -> validation",
+  "split_script": "../data/raw/split_paper_aligned_data.py",
+  "raw_data": "../data/raw/emscad_v1.csv",
+  "processed_input": "../data/processed/emscad_condition_a_no_dedup_input_v1.csv.gz",
+  "reference_splits": "../data/splits/{train,validation,test,assignments}.csv.gz",
+  "model": "bert-base-uncased",
+  "recipe": {
+    "max_length": 256,
+    "learning_rate": 5e-05,
+    "epochs": 3,
+    "train_batch_size": 16,
+    "class_weight": "raw inverse-frequency",
+    "text": "structured_combined_text with section word caps"
+  },
+  "weights": "weight/best",
+  "results": "results/",
+  "split_counts": {
+    "train": {
+      "n": 12873,
+      "fraud": 624
+    },
+    "validation": {
+      "n": 1431,
+      "fraud": 69
+    },
+    "test": {
+      "n": 3576,
+      "fraud": 173
+    }
+  }
+}

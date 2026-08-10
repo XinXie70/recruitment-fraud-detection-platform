@@ -15,9 +15,9 @@ false-positive-gate model. There is no local or weighted-ensemble fallback.
 
 The model API loads these frozen experiment assets:
 
-- `retrain_paper_aligned_seed42_maxlen512/`
-- `lr_none_bigram_no_cv_paper_aligned_seed42/`
-- `ensemble_bert_fp_gate_lr_none_bigram_maxlen512/`
+- `model_algorithm/sprint3/BERT/`
+- `model_algorithm/sprint3/LR/`
+- `model_algorithm/sprint3/ensemble_BERT_FP/`
 
 ## Local development
 
