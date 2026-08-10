@@ -48,12 +48,18 @@ class Settings(BaseSettings):
 
     # Model / Ensemble
 
-    model_timeout_seconds: float = 30.0
-    model_max_workers: int = 3
     model_server_url: str = ""
     model_server_timeout: float = 120.0
-    ensemble_config_path: str | None = None
     max_input_chars: int = 50000
+
+    @property
+    def required_model_server_url(self) -> str:
+        value = self.model_server_url.strip()
+        if not value:
+            raise RuntimeError(
+                "MODEL_SERVER_URL must point to the production BERT + LR FP-gate service."
+            )
+        return value
 
 
     # XAI

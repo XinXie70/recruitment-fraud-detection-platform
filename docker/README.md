@@ -1,7 +1,7 @@
 # Fraud Detection API — Docker
 
-This directory contains the container configuration for the legacy Flask model
-inference API in `../api_flask/`. It is separate from the root `compose.yaml`,
+This directory contains the container configuration for the production FP-gate
+model inference API in `../api_flask/`. It is separate from the root `compose.yaml`,
 which runs the FastAPI web application backend, PostgreSQL, and the React frontend.
 
 ## Directory contents

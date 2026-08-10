@@ -4,15 +4,12 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from final_model_pipelines.validation_pipeline import validate_job_input
-
 from backend.config import settings
 from backend.schemas.analysis import AnalysisResponse, URLAnalysis
 from backend.services.cache import TTLCache
-from backend.services.ensemble_predictor import EnsemblePredictor
-from backend.services.model_adapter import ModelRegistry
-from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.services.fp_gate_predictor import FPGatePredictor
 from backend.url_analyzer import analyze_urls
+from backend.validation import validate_job_input
 from backend.xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
 
 logger = logging.getLogger("fake_job_detection_api.analysis")
@@ -48,7 +45,7 @@ def empty_url_analysis(reason: str) -> URLAnalysis:
 class AnalysisService:
     def __init__(
         self,
-        ensemble: EnsemblePredictor | RemoteFinalEnsemblePredictor,
+        ensemble: FPGatePredictor,
         xai: XAIService,
         gentle_ai: GentleAIService,
         validator: Validator = validate_job_input,
@@ -67,15 +64,10 @@ class AnalysisService:
 
     @classmethod
     def from_environment(cls) -> "AnalysisService":
-        ensemble: EnsemblePredictor | RemoteFinalEnsemblePredictor
-        if settings.model_server_url.strip():
-            ensemble = RemoteFinalEnsemblePredictor(
-                settings.model_server_url,
-                timeout_seconds=settings.model_server_timeout,
-            )
-        else:
-            registry = ModelRegistry.default()
-            ensemble = EnsemblePredictor.from_environment(registry)
+        ensemble = FPGatePredictor(
+            settings.required_model_server_url,
+            timeout_seconds=settings.model_server_timeout,
+        )
         return cls(
             ensemble=ensemble,
             xai=XAIService(),

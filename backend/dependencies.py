@@ -7,26 +7,16 @@ from functools import lru_cache
 from backend.config import settings
 from backend.services.analysis_service import AnalysisService
 from backend.services.cache import TTLCache
-from backend.services.ensemble_predictor import EnsemblePredictor
-from backend.services.model_adapter import ModelRegistry
-from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.services.fp_gate_predictor import FPGatePredictor
 from backend.xai_gentle import GentleAIService, XAIService
 
 
 @lru_cache()
-def get_model_registry() -> ModelRegistry:
-
-    return ModelRegistry.default()
-
-
-@lru_cache()
-def get_ensemble_predictor() -> EnsemblePredictor | RemoteFinalEnsemblePredictor:
-    if settings.model_server_url.strip():
-        return RemoteFinalEnsemblePredictor(
-            settings.model_server_url,
-            timeout_seconds=settings.model_server_timeout,
-        )
-    return EnsemblePredictor.from_environment(get_model_registry())
+def get_ensemble_predictor() -> FPGatePredictor:
+    return FPGatePredictor(
+        settings.required_model_server_url,
+        timeout_seconds=settings.model_server_timeout,
+    )
 
 
 @lru_cache()

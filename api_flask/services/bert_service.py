@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import os
-import sys
 import threading
 from typing import Any
 
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from settings import BERT_CHECKPOINT, BERT_CODE_DIR, BERT_MAX_LENGTH, load_runtime_config
+from settings import BERT_CHECKPOINT, BERT_MAX_LENGTH, load_runtime_config
 
 
 class BERTService:
@@ -34,39 +33,32 @@ class BERTService:
             if not BERT_CHECKPOINT.exists():
                 raise FileNotFoundError(f"BERT checkpoint missing: {BERT_CHECKPOINT}")
 
-            # Prefer BERT package modules over any same-named API modules.
-            bert_code = str(BERT_CODE_DIR)
-            if sys.path[:1] != [bert_code]:
-                sys.path = [bert_code] + [p for p in sys.path if p != bert_code]
-
-            from model import BertForFraudClassification, softmax_fraud_proba  # noqa: WPS433
-            from utils import get_device, load_json, setup_logging  # noqa: WPS433
-            import torch.nn as nn  # noqa: WPS433
-            from transformers import AutoModelForSequenceClassification  # noqa: WPS433
-
-            self._softmax_fraud_proba = softmax_fraud_proba
-            logger = setup_logging("api_bert.log")
-            self._device = get_device(allow_cpu=bool(allow_cpu), logger=logger)
+            if torch.cuda.is_available():
+                self._device = torch.device("cuda")
+            elif allow_cpu:
+                self._device = torch.device("cpu")
+            else:
+                raise RuntimeError("CUDA is unavailable and CPU inference is disabled")
             tokenizer = AutoTokenizer.from_pretrained(BERT_CHECKPOINT)
 
             # Load fine-tuned weights directly (no bert-base-uncased re-init).
-            wrapper = BertForFraudClassification.__new__(BertForFraudClassification)
-            nn.Module.__init__(wrapper)
-            wrapper.model = AutoModelForSequenceClassification.from_pretrained(
+            model = AutoModelForSequenceClassification.from_pretrained(
                 BERT_CHECKPOINT
             )
-            wrapper = wrapper.to(self._device)
-            wrapper.eval()
+            model = model.to(self._device)
+            model.eval()
 
             thr_path = BERT_CHECKPOINT / "threshold.json"
             threshold = 0.5
             if thr_path.exists():
-                threshold = float(load_json(thr_path)["threshold"])
+                import json
+
+                threshold = float(json.loads(thr_path.read_text(encoding="utf-8"))["threshold"])
             runtime = load_runtime_config()["bert"]["model_threshold"]
             if runtime is not None:
                 threshold = float(runtime)
 
-            self._model = wrapper
+            self._model = model
             self._tokenizer = tokenizer
             self._model_threshold = threshold
 
@@ -92,7 +84,7 @@ class BERTService:
         )
         enc = {k: v.to(self._device) for k, v in enc.items()}
         logits = self._model(**enc).logits
-        score = float(self._softmax_fraud_proba(logits)[0].cpu().item())
+        score = float(torch.softmax(logits, dim=-1)[0, 1].cpu().item())
         pred = int(score >= thr)
         return {
             "model": "bert",

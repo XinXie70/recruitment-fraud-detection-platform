@@ -25,7 +25,7 @@ from backend.schemas.analysis import (
     UserAnalysisHistoryPage,
 )
 from backend.services.analysis_service import AnalysisService, InputRejectedError
-from backend.services.ensemble_predictor import EnsembleUnavailableError
+from backend.services.fp_gate_predictor import EnsembleUnavailableError
 from backend.url_analyzer import analyze_urls
 from backend.utils import Pagination, paginate
 from backend.xai_gentle import EducationItem
@@ -188,24 +188,6 @@ def analyze_v1(
     request_id: str = Depends(get_request_id),
     db=Depends(get_db),
 ) -> AnalysisResponse:
-    result = _run_analysis(payload, service, request_id)
-    persisted = _save_history(payload.text, result, current_user.id, db)
-    response.headers["X-History-Persisted"] = str(persisted).lower()
-    return result
-
-
-@router.post("/api/predict", response_model=AnalysisResponse)
-@limiter.limit(settings.rate_limit_analyze)
-def predict_compatibility(
-    request: Request,
-    payload: AnalysisRequest,
-    response: Response,
-    current_user: User = Depends(get_current_user),
-    service: AnalysisService = Depends(get_analysis_service),
-    request_id: str = Depends(get_request_id),
-    db=Depends(get_db),
-) -> AnalysisResponse:
-    """Backward-compatible alias for /api/v1/analyze (used by legacy React frontend)."""
     result = _run_analysis(payload, service, request_id)
     persisted = _save_history(payload.text, result, current_user.id, db)
     response.headers["X-History-Persisted"] = str(persisted).lower()

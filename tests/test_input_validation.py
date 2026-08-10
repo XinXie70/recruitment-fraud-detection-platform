@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from final_model_pipelines.validation_pipeline import validate_job_input
+from backend.validation import validate_job_input
 from backend.services.analysis_service import AnalysisService, InputRejectedError
 
 

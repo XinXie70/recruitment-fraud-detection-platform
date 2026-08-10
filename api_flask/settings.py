@@ -11,22 +11,20 @@ CAPSTONE_ROOT = Path(
     os.environ.get("CAPSTONE_ROOT", str(API_ROOT.parent))
 ).resolve()
 
-LR_ROOT = CAPSTONE_ROOT / "lr_none_bigram_no_cv_paper_aligned_seed42"
-BERT_ROOT = CAPSTONE_ROOT / "retrain_paper_aligned_seed42_maxlen512"
-ENSEMBLE_ROOT = CAPSTONE_ROOT / "ensemble_bert_fp_gate_lr_none_bigram_maxlen512"
+SPRINT3_ROOT = CAPSTONE_ROOT / "model_algorithm" / "sprint3"
+LR_ROOT = SPRINT3_ROOT / "LR"
+BERT_ROOT = SPRINT3_ROOT / "BERT"
+ENSEMBLE_ROOT = SPRINT3_ROOT / "ensemble_BERT_FP"
 
-LR_ARTIFACT = LR_ROOT / "artifacts" / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
+LR_ARTIFACT = LR_ROOT / "weight" / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
 LR_CONFIG = LR_ROOT / "results" / "config.json"
-LR_TRAIN_SCRIPT = LR_ROOT / "code" / "train_lr_none_bigram_no_cv.py"
 
-BERT_CHECKPOINT = (
-    BERT_ROOT / "weights" / "bert_paper_protocol_maxlen512" / "best"
-)
+BERT_CHECKPOINT = BERT_ROOT / "weight" / "best"
 BERT_CODE_DIR = BERT_ROOT / "code"
 BERT_MAX_LENGTH = 512
 
 ENSEMBLE_CONFIG = ENSEMBLE_ROOT / "results" / "config.json"
-RISK_BOUNDARY_CONFIG = ENSEMBLE_ROOT / "risk_level" / "risk_boundary_config.json"
+RISK_BOUNDARY_CONFIG = SPRINT3_ROOT / "risk_level" / "risk_boundary_config.json"
 
 TEXT_FIELDS = [
     "title",

@@ -2,19 +2,20 @@
 data/raw/*.csv
 data/processed/*.csv
 
-# Legacy / local-only experiment trees
+# Local-only experiment trees
 /models/
 /outputs/
 artifacts/
+!model_algorithm/sprint3/LR/weight/
+!model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
 checkpoints/
 
 # Generic binary dumps outside the deliverable weight pack
 *.joblib
-!model_weights/**/*.joblib
+!model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
 *.pt
 *.pth
 *.pkl
-!model_weights/**/*.pkl
 
 # Local environments and temporary files
 .venv/
@@ -45,14 +46,6 @@ backend/test.db
 .ipynb_checkpoints/
 .idea/
 .vscode/
-
-# Historical integration snapshot. The audited copy was removed from Git, but
-# some developers may still keep a local checkout for comparison.
-XAI&Gentle_AI/
-
-# Training runtime output is local-only; retain placeholder directories.
-model_results/**/logs/*
-!model_results/**/logs/.gitkeep
 
 # Reproducible experiment outputs may include metrics, predictions, and figures,
 # but transient process logs must not be committed.

@@ -110,8 +110,8 @@ def warm_up_models(analysis_service: Any, logger: logging.Logger) -> None:
         outcomes = analysis_service.warm_up()
         failed = {key: error for key, error in outcomes.items() if error}
         if analysis_service.ready:
-            logger.info("Ensemble runtime is ready. Failed members: %s", failed or "none")
+            logger.info("FP-gate model service is ready. Failures: %s", failed or "none")
         else:
-            logger.error("No ensemble model could be loaded: %s", failed)
+            logger.error("FP-gate model service is unavailable: %s", failed)
     except Exception:
         logger.exception("Background model warm-up failed.")

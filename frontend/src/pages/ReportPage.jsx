@@ -35,9 +35,7 @@ export default function ReportPage({
   const scanType = 'Text / Email Scan';
   const caseId = `TXT-${String(score).padStart(3, '0')}`;
   const evidence = result.xai?.items || [];
-  const usesFpGate =
-    result.ensemble.method === 'bert_lr_fp_gate' ||
-    result.ensemble.weight_source === 'remote_fp_gate';
+  const usesFpGate = result.ensemble.method === 'bert_lr_fp_gate';
 
   return (
     <div className={`report-page ${riskLevel}`}>

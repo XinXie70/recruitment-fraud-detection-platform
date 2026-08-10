@@ -12,8 +12,6 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY --chown=app:app backend /app/backend
-COPY --chown=app:app model /app/model
-RUN pip install --no-cache-dir --no-deps --editable /app/model
 
 USER app
 

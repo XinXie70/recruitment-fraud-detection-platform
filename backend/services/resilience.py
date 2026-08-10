@@ -11,7 +11,7 @@ from typing import Any
 
 class ServiceStatus(str, Enum):
     HEALTHY = "healthy"
-    DEGRADED = "degraded"  # partial model availability, still serving
+    DEGRADED = "degraded"
     UNAVAILABLE = "unavailable"
 
 
@@ -23,9 +23,9 @@ class SystemHealth:
     service: str = "fake_job_detection_api"
     version: str = "2.1.0"
 
-    # Ensemble
+    # Mandatory FP-gate service
     ensemble_members_available: int = 0
-    ensemble_members_total: int = 8
+    ensemble_members_total: int = 1
 
     # External services
     ollama_available: bool = False

@@ -39,23 +39,15 @@ RUN python -m pip install --upgrade pip \
 COPY api_flask/ /app/api_flask/
 COPY docker/entrypoint.sh /app/api_flask/entrypoint.sh
 
-COPY lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/ \
-    /app/lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/
-COPY lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json \
-    /app/lr_none_bigram_no_cv_paper_aligned_seed42/results/config.json
-COPY retrain_paper_aligned_seed42_maxlen512/weights/bert_paper_protocol_maxlen512/best/ \
-    /app/retrain_paper_aligned_seed42_maxlen512/weights/bert_paper_protocol_maxlen512/best/
-COPY retrain_paper_aligned_seed42_maxlen512/code/ \
-    /app/retrain_paper_aligned_seed42_maxlen512/code/
-COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json \
-    /app/ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json
-COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json \
-    /app/ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
+COPY model_algorithm/sprint3/LR/weight/ /app/model_algorithm/sprint3/LR/weight/
+COPY model_algorithm/sprint3/LR/results/config.json /app/model_algorithm/sprint3/LR/results/config.json
+COPY model_algorithm/sprint3/BERT/weight/best/ /app/model_algorithm/sprint3/BERT/weight/best/
+COPY model_algorithm/sprint3/ensemble_BERT_FP/results/config.json /app/model_algorithm/sprint3/ensemble_BERT_FP/results/config.json
+COPY model_algorithm/sprint3/risk_level/risk_boundary_config.json /app/model_algorithm/sprint3/risk_level/risk_boundary_config.json
 
 WORKDIR /app/api_flask
 RUN sed -i 's/\r$//' entrypoint.sh \
     && chmod +x entrypoint.sh \
-    && mkdir -p /app/retrain_paper_aligned_seed42_maxlen512/results/logs \
     && chown -R app:app /app
 
 EXPOSE 5000
