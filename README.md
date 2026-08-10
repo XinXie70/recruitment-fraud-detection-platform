@@ -49,6 +49,15 @@ pip install -r model_service/requirements.txt
 python model_service/app.py
 ```
 
+For any production deployment, set `APP_ENV=production`, a non-empty
+`MODEL_API_KEY`, and restrictive `MODEL_CORS_ORIGINS`. Use the same secret as
+`MODEL_SERVER_API_KEY` in the application backend.
+
+The checked-in Cloud Run workflow deploys the application backend and frontend;
+the model service has a separate release lifecycle. See the
+[deployment ownership and verification checklist](docs/architecture/deployment.md#production-ownership)
+before releasing the application.
+
 Set `MODEL_SERVER_URL=http://127.0.0.1:5000`, then start the application API:
 
 ```bash

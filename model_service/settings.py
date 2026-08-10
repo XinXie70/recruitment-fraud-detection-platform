@@ -42,8 +42,18 @@ RATE_LIMIT_PREDICT = os.environ.get("RATE_LIMIT_PREDICT", "30/minute")
 RATE_LIMIT_PREDICT_BATCH = os.environ.get(
     "RATE_LIMIT_PREDICT_BATCH", "300/minute"
 )
+APP_ENV = os.environ.get("APP_ENV", "development").strip().lower()
 MODEL_API_KEY = os.environ.get("MODEL_API_KEY", "").strip()
-# When MODEL_API_KEY is empty, auth is skipped (local/dev). Set a key in deploy.
+MODEL_CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "MODEL_CORS_ORIGINS", "http://127.0.0.1:8000,http://localhost:8000"
+    ).split(",")
+    if origin.strip()
+]
+
+if APP_ENV == "production" and not MODEL_API_KEY:
+    raise RuntimeError("MODEL_API_KEY must be configured when APP_ENV=production")
 
 
 def _load_json(path: Path) -> dict:

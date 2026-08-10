@@ -6,7 +6,7 @@ from typing import Any
 
 from flask import Flask, jsonify, request
 
-from settings import MAX_CONTENT_LENGTH, MODEL_API_KEY
+from settings import MAX_CONTENT_LENGTH
 from services.text_utils import ResolvedTexts
 
 logger = logging.getLogger("model_service")
@@ -47,10 +47,11 @@ def _extract_api_key() -> str | None:
 def register_http_handlers(app: Flask) -> None:
     @app.before_request
     def require_api_key():
-        if not request.path.startswith("/predict") or not MODEL_API_KEY:
+        model_api_key = str(app.config.get("MODEL_API_KEY", ""))
+        if not request.path.startswith("/predict") or not model_api_key:
             return None
         provided = _extract_api_key()
-        if not provided or not secrets.compare_digest(provided, MODEL_API_KEY):
+        if not provided or not secrets.compare_digest(provided, model_api_key):
             return error_response("Unauthorized", status=401)
         return None
 

@@ -60,6 +60,33 @@ jobs:
         working-directory: backend
         run: python -m pytest tests -q --cov=. --cov-config=.coveragerc --cov-fail-under=85
 
+  model-service:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      MODEL_API_KEY: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: model_service/requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r model_service/requirements-dev.txt
+
+      - name: Test model service
+        run: >-
+          python -m pytest model_service/tests -q -m "not e2e"
+          --cov=model_service
+          --cov-report=term-missing
+          --cov-fail-under=55
+
   frontend:
     runs-on: ubuntu-latest
     defaults:

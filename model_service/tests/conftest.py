@@ -123,14 +123,14 @@ def mock_model_services(
     risk = MagicMock()
     risk.predict.return_value = mock_risk_result
 
-    import api_http
+    import app as app_module
     import prediction_routes
 
     monkeypatch.setattr(prediction_routes, "lr_service", lr)
     monkeypatch.setattr(prediction_routes, "bert_service", bert)
     monkeypatch.setattr(prediction_routes, "ensemble_service", ensemble)
     monkeypatch.setattr(prediction_routes, "risk_service", risk)
-    monkeypatch.setattr(api_http, "MODEL_API_KEY", "")
+    monkeypatch.setitem(app_module.app.config, "MODEL_API_KEY", "")
 
     return {
         "lr": lr,
@@ -152,10 +152,9 @@ def authed_client(
     monkeypatch: pytest.MonkeyPatch,
     mock_model_services: dict[str, MagicMock],
 ):
-    import api_http
     import app as app_module
 
-    monkeypatch.setattr(api_http, "MODEL_API_KEY", "test-secret-key")
+    monkeypatch.setitem(app_module.app.config, "MODEL_API_KEY", "test-secret-key")
     return app_module.app.test_client()
 
 
