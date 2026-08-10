@@ -63,5 +63,5 @@ ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/**
 !ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
 
 # Local API runtime noise
-api_flask/server.*.log
-api_flask/*.log
+model_service/server.*.log
+model_service/*.log

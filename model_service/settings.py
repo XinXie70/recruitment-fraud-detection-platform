@@ -6,9 +6,9 @@ import json
 import os
 from pathlib import Path
 
-API_ROOT = Path(__file__).resolve().parent
+MODEL_SERVICE_ROOT = Path(__file__).resolve().parent
 CAPSTONE_ROOT = Path(
-    os.environ.get("CAPSTONE_ROOT", str(API_ROOT.parent))
+    os.environ.get("CAPSTONE_ROOT", str(MODEL_SERVICE_ROOT.parent))
 ).resolve()
 
 LR_ROOT = CAPSTONE_ROOT / "lr_none_bigram_no_cv_paper_aligned_seed42"

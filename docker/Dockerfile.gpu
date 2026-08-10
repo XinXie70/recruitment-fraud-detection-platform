@@ -36,8 +36,8 @@ RUN python -m pip install --upgrade pip \
     && pip install -r /tmp/requirements-docker.txt \
     && rm /tmp/requirements-docker.txt
 
-COPY api_flask/ /app/api_flask/
-COPY docker/entrypoint.sh /app/api_flask/entrypoint.sh
+COPY model_service/ /app/model_service/
+COPY docker/entrypoint.sh /app/model_service/entrypoint.sh
 
 COPY lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/ \
     /app/lr_none_bigram_no_cv_paper_aligned_seed42/artifacts/
@@ -52,7 +52,7 @@ COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/results/config.json \
 COPY ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json \
     /app/ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/risk_boundary_config.json
 
-WORKDIR /app/api_flask
+WORKDIR /app/model_service
 RUN sed -i 's/\r$//' entrypoint.sh \
     && chmod +x entrypoint.sh \
     && mkdir -p /app/retrain_paper_aligned_seed42_maxlen512/results/logs \
