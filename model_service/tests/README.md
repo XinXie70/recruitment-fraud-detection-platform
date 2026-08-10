@@ -45,9 +45,9 @@ pytest model_service/tests -m e2e -q
 ## Mocking strategy
 
 - **Unit tests** call pure functions directly (`build_texts`, `apply_fp_gate`, `apply_risk`).
-- **Integration tests** patch `app.lr_service`, `app.bert_service`, `app.ensemble_service`,
-  and `app.risk_service` so HTTP routes can be tested without loading PyTorch or joblib
-  artifacts.
+- **Integration tests** patch the service objects imported by `prediction_routes` so HTTP
+  routes can be tested without loading PyTorch or joblib artifacts. Authentication tests
+  set `app.config["MODEL_API_KEY"]`, matching the runtime request hook.
 - **E2E tests** load the frozen files under `model_service/models/` and exercise the real
   `/predict/all` path. They are skipped unless `RUN_MODEL_SERVICE_E2E=1` because they are
   slow and memory-intensive.

@@ -54,7 +54,7 @@ jobs:
         run: ruff check .
 
       - name: Type-check production Python services
-        run: mypy backend model_service --exclude '(^|/)tests/'
+        run: mypy backend model_service
 
       - name: Test backend with coverage
         working-directory: backend
