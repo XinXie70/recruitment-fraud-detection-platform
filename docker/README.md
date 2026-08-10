@@ -113,7 +113,8 @@ Supported model-service endpoints used by the backend:
 | `HOST` | `0.0.0.0` | Bind address inside the container |
 | `MODEL_FILES_ROOT` | `/app/model_service/models` | Override model artifact directory |
 | `MODEL_API_KEY` | _(empty)_ | Shared secret for `/predict/*` (`X-API-Key` / Bearer) |
-| `RATE_LIMIT_PREDICT` | `30/minute` | Per-IP rate limit for prediction endpoints |
+| `RATE_LIMIT_PREDICT` | `30/minute` | Per-IP rate limit for single prediction endpoints |
+| `RATE_LIMIT_PREDICT_BATCH` | `300/minute` | Per-IP rate limit for backend SHAP batch scoring |
 | `MAX_CONTENT_LENGTH` | `1048576` | Max JSON request body size in bytes |
 | `MAX_TEXT_CHARS` | `50000` | Max characters per resolved advertisement text |
 | `MAX_BATCH_ITEMS` | `100` | Max items in a batch request |

@@ -39,6 +39,9 @@ MAX_TEXT_CHARS = int(os.environ.get("MAX_TEXT_CHARS", "50000"))
 MAX_BATCH_ITEMS = int(os.environ.get("MAX_BATCH_ITEMS", "100"))
 MAX_BATCH_TOTAL_CHARS = int(os.environ.get("MAX_BATCH_TOTAL_CHARS", "500000"))
 RATE_LIMIT_PREDICT = os.environ.get("RATE_LIMIT_PREDICT", "30/minute")
+RATE_LIMIT_PREDICT_BATCH = os.environ.get(
+    "RATE_LIMIT_PREDICT_BATCH", "300/minute"
+)
 MODEL_API_KEY = os.environ.get("MODEL_API_KEY", "").strip()
 # When MODEL_API_KEY is empty, auth is skipped (local/dev). Set a key in deploy.
 
