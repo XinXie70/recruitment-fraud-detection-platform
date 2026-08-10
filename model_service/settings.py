@@ -7,24 +7,23 @@ import os
 from pathlib import Path
 
 MODEL_SERVICE_ROOT = Path(__file__).resolve().parent
-CAPSTONE_ROOT = Path(
-    os.environ.get("CAPSTONE_ROOT", str(MODEL_SERVICE_ROOT.parent))
+MODELS_ROOT = Path(
+    os.environ.get("MODEL_FILES_ROOT", str(MODEL_SERVICE_ROOT / "models"))
 ).resolve()
 
-SPRINT3_ROOT = CAPSTONE_ROOT / "model_algorithm" / "sprint3"
-LR_ROOT = SPRINT3_ROOT / "LR"
-BERT_ROOT = SPRINT3_ROOT / "BERT"
-ENSEMBLE_ROOT = SPRINT3_ROOT / "ensemble_BERT_FP"
+LR_ROOT = MODELS_ROOT / "lr"
+BERT_ROOT = MODELS_ROOT / "bert"
+ENSEMBLE_ROOT = MODELS_ROOT / "ensemble"
+RISK_ROOT = MODELS_ROOT / "risk"
 
-LR_ARTIFACT = LR_ROOT / "weight" / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
-LR_CONFIG = LR_ROOT / "results" / "config.json"
+LR_ARTIFACT = LR_ROOT / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
+LR_CONFIG = LR_ROOT / "config.json"
 
-BERT_CHECKPOINT = BERT_ROOT / "weight" / "best"
-BERT_CODE_DIR = BERT_ROOT / "code"
+BERT_CHECKPOINT = BERT_ROOT / "best"
 BERT_MAX_LENGTH = 512
 
-ENSEMBLE_CONFIG = ENSEMBLE_ROOT / "results" / "config.json"
-RISK_BOUNDARY_CONFIG = SPRINT3_ROOT / "risk_level" / "risk_boundary_config.json"
+ENSEMBLE_CONFIG = ENSEMBLE_ROOT / "config.json"
+RISK_BOUNDARY_CONFIG = RISK_ROOT / "risk_boundary_config.json"
 
 TEXT_FIELDS = [
     "title",

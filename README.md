@@ -13,11 +13,13 @@ false-positive-gate model. There is no local or weighted-ensemble fallback.
 | Application API | `backend.main:app` | Users, JWT, validation, analysis orchestration, XAI, guidance, and persistence |
 | FP-gate model API | `model_service.app:app` | BERT/LR inference, FP-gate decision, risk bands, and batch scoring |
 
-The model API loads these frozen experiment assets:
+The model API loads these frozen experiment assets from
+`model_service/models/`:
 
-- `model_algorithm/sprint3/BERT/`
-- `model_algorithm/sprint3/LR/`
-- `model_algorithm/sprint3/ensemble_BERT_FP/`
+- `model_service/models/bert/best/`
+- `model_service/models/lr/`
+- `model_service/models/ensemble/`
+- `model_service/models/risk/`
 
 ## Local development
 

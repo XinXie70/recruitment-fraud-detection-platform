@@ -43,7 +43,7 @@ reports/
 **/*.csv.gz
 **/data/splits/
 
-# Model service Dockerfiles explicitly copy the required sprint3 runtime assets.
+# Model weights/configs ship inside model_service/models/.
 
 # Local API runtime noise
 model_service/server.*.log
