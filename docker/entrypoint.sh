@@ -9,10 +9,11 @@ WORKERS="${GUNICORN_WORKERS:-1}"
 THREADS="${GUNICORN_THREADS:-4}"
 TIMEOUT="${GUNICORN_TIMEOUT:-180}"
 
-echo "Starting fraud-detection API on ${HOST}:${PORT}"
+echo "Starting model_service API on ${HOST}:${PORT}"
+echo "models=${MODEL_FILES_ROOT:-/app/model_service/models}"
 echo "workers=${WORKERS} threads=${THREADS} timeout=${TIMEOUT} ALLOW_CPU=${ALLOW_CPU:-1}"
 
-# Preload models in the master process (BERT is large; keep workers=1).
+# Preload LR + BERT in the master process (keep workers=1 to avoid duplicate memory).
 exec gunicorn \
   --bind "${HOST}:${PORT}" \
   --workers "${WORKERS}" \

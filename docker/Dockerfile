@@ -1,8 +1,8 @@
-# Build from the capstone project root:
-#   docker build -f docker/Dockerfile -t fraud-detection-api .
+# Build from the repository root:
+#   docker build -f docker/Dockerfile -t model-service:latest .
 #
-# Or from this folder:
-#   docker compose up --build
+# Or start with Compose:
+#   docker compose -f docker/docker-compose.yml up --build -d
 
 FROM python:3.12-slim-bookworm
 
@@ -27,15 +27,15 @@ RUN apt-get update \
     && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app \
     && rm -rf /var/lib/apt/lists/*
 
-# CPU PyTorch first (cloud-friendly; no NVIDIA runtime required), then API deps.
-COPY docker/requirements-docker.txt /tmp/requirements-docker.txt
+# Install CPU PyTorch first, then the rest of model_service/requirements.txt.
+COPY model_service/requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip \
     && pip install --index-url https://download.pytorch.org/whl/cpu \
         torch==2.4.1 \
-    && pip install -r /tmp/requirements-docker.txt \
-    && rm /tmp/requirements-docker.txt
+    && grep -Ev '^(torch|#)' /tmp/requirements.txt > /tmp/requirements-no-torch.txt \
+    && pip install -r /tmp/requirements-no-torch.txt \
+    && rm /tmp/requirements.txt /tmp/requirements-no-torch.txt
 
-# --- Runtime layout (weights/configs live under model_service/models/) ---
 COPY model_service/ /app/model_service/
 COPY docker/entrypoint.sh /app/model_service/entrypoint.sh
 

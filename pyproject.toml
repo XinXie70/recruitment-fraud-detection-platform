@@ -1,7 +1,10 @@
 [tool.pytest.ini_options]
-testpaths = ["tests", "backend/tests"]
-pythonpath = ["."]
+testpaths = ["tests", "backend/tests", "model_service/tests"]
+pythonpath = [".", "model_service"]
 addopts = "-ra"
+markers = [
+    "e2e: end-to-end tests that load real model_service weights (slow)",
+]
 
 [tool.ruff]
 target-version = "py312"

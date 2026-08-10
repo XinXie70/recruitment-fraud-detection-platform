@@ -70,9 +70,47 @@ an older model.
 
 ## Tests
 
+Application and model-service tests use **pytest**. Install dev dependencies first:
+
+```bash
+pip install -r backend/requirements-dev.txt
+pip install -r model_service/requirements-dev.txt
+```
+
+Run the full suite from the repository root:
+
 ```bash
 pytest -q
+```
 
+Run only the model service tests (fast, mocked integration layer):
+
+```bash
+pytest model_service/tests -q
+```
+
+Optional slow end-to-end tests that load real BERT/LR weights:
+
+```bash
+RUN_MODEL_SERVICE_E2E=1 pytest model_service/tests -m e2e -q
+```
+
+### model_service coverage
+
+| Area | Tests | Notes |
+| --- | --- | --- |
+| Input validation | `test_text_utils.py` | Happy + sad cases for JSON/text limits |
+| Business logic | `test_ensemble_service.py` | FP-gate and risk-band rules |
+| Race conditions | `test_coalesce.py` | Concurrent identical inference coalescing |
+| HTTP integration | `test_app_integration.py` | Auth, batch limits, sanitized 500 responses |
+| Real weights (opt-in) | `test_app_e2e.py` | Skipped unless `RUN_MODEL_SERVICE_E2E=1` |
+
+See [`model_service/tests/README.md`](model_service/tests/README.md) for the full testing
+approach and mocking strategy.
+
+Frontend checks:
+
+```bash
 cd frontend
 npm run lint
 npm test
