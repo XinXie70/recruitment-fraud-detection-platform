@@ -1,6 +1,12 @@
-# Uncompressed datasets stay local. Compressed experiment inputs may be tracked.
-data/raw/*.csv
-data/processed/*.csv
+# Full datasets and generated splits stay local. Only tiny fixtures are tracked.
+model_algorithm/sprint3/data/raw/*.csv
+model_algorithm/sprint3/data/processed/*
+model_algorithm/sprint3/data/splits/*
+!model_algorithm/sprint3/data/samples/
+!model_algorithm/sprint3/data/samples/**
+!model_algorithm/sprint3/data/README.md
+!model_algorithm/sprint3/data/checksums.sha256
+!model_algorithm/sprint3/data/download_data.sh
 
 # Local-only experiment trees
 /models/
@@ -52,3 +58,8 @@ backend/test.db
 experiments/**/logs/*
 retrain_*/results/logs/*
 retrain_*/results/*.log
+
+# Row-level model outputs are reproducible artifacts, not source files.
+model_algorithm/sprint3/**/results/*predictions*.csv
+model_algorithm/sprint3/**/results/*error_analysis*.csv
+model_algorithm/sprint3/**/results/validation_sweep.csv
