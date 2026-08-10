@@ -35,6 +35,11 @@ npm ci
 cd ..
 ```
 
+`backend/requirements-dev.txt` installs only the lightweight application API
+and its development tools. TensorFlow, PyTorch, Transformers, XGBoost, and
+other model runtimes are not backend dependencies; model-specific packages are
+isolated in `model_service/requirements.txt`.
+
 Start the FP-gate model service first:
 
 ```bash

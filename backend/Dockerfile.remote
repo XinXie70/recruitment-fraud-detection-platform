@@ -9,9 +9,9 @@ WORKDIR /app
 
 RUN groupadd --system app && useradd --system --gid app --no-create-home app
 
-# Install only lightweight backend dependencies (no TensorFlow / PyTorch / transformers)
-COPY backend/requirements-remote.txt /app/backend/requirements-remote.txt
-RUN pip install --no-cache-dir -r /app/backend/requirements-remote.txt
+# The canonical backend requirements contain no model-runtime dependencies.
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Model weights are not copied; inference is delegated to the FP-gate service.
 COPY --chown=app:app backend /app/backend
