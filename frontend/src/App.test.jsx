@@ -22,12 +22,15 @@ const AUTH_RESPONSE = {
 const ANALYSIS_RESPONSE = {
   status: 'success',
   ensemble: {
+    method: 'bert_lr_fp_gate',
     risk_score: 0.86,
     classification_label: 'Likely Deceptive',
     risk_level: 'high',
     recommended_action: 'High Risk Warning',
-    active_model_count: 1,
-    version: 'ensemble-test',
+    active_model_count: 2,
+    version: 'fp-gate-test',
+    bert_high_threshold: 0.3,
+    lr_gate_threshold: 0.06,
   },
   member_outputs: [
     {
@@ -35,9 +38,14 @@ const ANALYSIS_RESPONSE = {
       display_name: 'BERT',
       status: 'success',
       raw_score: 0.86,
-      calibrated_score: 0.86,
-      effective_weight: 1,
-      weighted_contribution: 0.86,
+      role: 'primary_score',
+    },
+    {
+      key: 'lr',
+      display_name: 'Logistic Regression',
+      status: 'success',
+      raw_score: 0.72,
+      role: 'false_positive_gate',
     },
   ],
   xai: {

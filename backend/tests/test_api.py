@@ -222,8 +222,8 @@ class TestUserHistoryEndpoints:
                 risk_score=0.2,
                 risk_level="low",
                 status="success",
-                ensemble_available=8,
-                ensemble_total=8,
+                ensemble_available=2,
+                ensemble_total=2,
                 analysis_result={"inputText": f"Own listing {index}", "status": "success"}
                 if index == 1
                 else None,
@@ -237,8 +237,8 @@ class TestUserHistoryEndpoints:
             risk_score=0.8,
             risk_level="high",
             status="success",
-            ensemble_available=8,
-            ensemble_total=8,
+            ensemble_available=2,
+            ensemble_total=2,
         )
         db_session.add_all([*own_items, other_item])
         db_session.commit()
@@ -345,8 +345,8 @@ class TestAdminEndpoints:
                     risk_score=0.9,
                     risk_level="high",
                     status="success",
-                    ensemble_available=8,
-                    ensemble_total=8,
+                    ensemble_available=2,
+                    ensemble_total=2,
                 ),
                 AnalysisHistory(
                     user_id=user.id,
@@ -355,8 +355,8 @@ class TestAdminEndpoints:
                     risk_score=0.2,
                     risk_level="low",
                     status="success",
-                    ensemble_available=7,
-                    ensemble_total=8,
+                    ensemble_available=1,
+                    ensemble_total=2,
                 ),
             ]
         )
@@ -381,8 +381,8 @@ class TestAdminEndpoints:
 
         metrics = client.get("/api/admin/model-metrics", headers=auth_headers)
         assert metrics.status_code == 200
-        assert metrics.json()["version"] == "2026.07"
-        assert len(metrics.json()["models"]) == 8
+        assert metrics.json()["version"] == "fp-gate-2026.08"
+        assert len(metrics.json()["models"]) == 3
 
     def test_login_returns_admin_role(self, client, db_session):
         from backend.auth import hash_password

@@ -37,7 +37,7 @@ Use a **two-tier XAI strategy** (`backend/xai_gentle/`):
 |-------------|-------------|
 | LIME | Slower than SHAP partition for text; less stable across runs |
 | Integrated Gradients | Requires gradient access to all models; not feasible for sklearn/xgboost |
-| Attention weights only | Only works for transformer models (BERT/RoBERTa), not LR/SVM/XGBoost |
+| Attention weights only | Does not explain the final BERT + LR gate decision contract |
 | Pure LLM explanation | Non-deterministic; may hallucinate; adds latency + cost |
 
 ## Consequences

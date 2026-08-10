@@ -11,8 +11,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from final_model_pipelines.input_validator import validate_input_text
-from final_model_pipelines.job_description_filter import check_job_description_relevance
+from .input_validator import validate_input_text
+from .job_description_filter import check_job_description_relevance
 
 
 def validate_job_input(text: str) -> dict[str, Any]:

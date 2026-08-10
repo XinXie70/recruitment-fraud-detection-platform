@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-cd /app/api_flask
+cd /app/model_service
 
 PORT="${PORT:-5000}"
 HOST="${HOST:-0.0.0.0}"

@@ -8,7 +8,7 @@ sequenceDiagram
     participant API as FastAPI analysis route
     participant Auth as JWT dependency
     participant Service as AnalysisService
-    participant Ensemble as EnsemblePredictor
+    participant Ensemble as FPGatePredictor
     participant Models as Model inference API
     participant XAI as XAI + Gentle AI
     participant DB as PostgreSQL
@@ -30,8 +30,7 @@ sequenceDiagram
             alt No model succeeds
                 Ensemble-->>UI: 503 prediction service unavailable
             else At least one model succeeds
-                Ensemble->>Ensemble: Calibrate scores and renormalise available weights
-                Ensemble-->>Service: Risk score, level, member evidence, status
+            Ensemble-->>Service: BERT score, LR gate evidence, final risk and decision reason
                 Service->>Service: Analyse URLs and mark degraded dependencies
                 Service-->>API: Score-phase response
                 API-->>UI: 200 risk score and model outputs
@@ -61,7 +60,6 @@ while the full request continues. If the explanation request fails, the UI
 keeps the score visible and reports that only the detailed evidence is
 unavailable.
 
-The degraded path is also intentional: if some ensemble members or URL
-analysis fail, the available model weights are renormalised and the response
-explicitly reports degraded status. The service returns 503 only when no model
-succeeds.
+The service returns `503` when the mandatory FP-gate model API is unavailable
+or violates its response contract. URL or XAI failures may still produce a
+structured degraded response after a valid model result is available.

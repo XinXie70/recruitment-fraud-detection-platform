@@ -3,8 +3,8 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from backend.services.ensemble_predictor import EnsembleUnavailableError
-from backend.services.remote_ensemble_predictor import RemoteFinalEnsemblePredictor
+from backend.services.fp_gate_predictor import EnsembleUnavailableError, FPGatePredictor
+
 
 
 def _all_response() -> dict:
@@ -32,7 +32,7 @@ def _all_response() -> dict:
     }
 
 
-def test_remote_predictor_maps_final_ensemble_contract() -> None:
+def test_fp_gate_predictor_maps_final_ensemble_contract() -> None:
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -48,7 +48,7 @@ def test_remote_predictor_maps_final_ensemble_contract() -> None:
             },
         )
 
-    predictor = RemoteFinalEnsemblePredictor("http://model/")
+    predictor = FPGatePredictor("http://model/")
     predictor.client = httpx.Client(transport=httpx.MockTransport(handler))
 
     computation = predictor.predict("job listing")
@@ -62,7 +62,6 @@ def test_remote_predictor_maps_final_ensemble_contract() -> None:
     assert computation.members[0].role == "false_positive_gate"
     assert computation.members[1].role == "primary_score"
     assert computation.members[1].decision_active is True
-    assert computation.members[1].effective_weight is None
     assert computation.ensemble.method == "bert_lr_fp_gate"
     assert computation.ensemble.risk_score_source == "bert"
     assert computation.ensemble.gate_triggered is False
@@ -74,33 +73,8 @@ def test_remote_predictor_maps_final_ensemble_contract() -> None:
     ]
 
 
-def test_remote_predictor_prefers_new_model_api_endpoints() -> None:
-    requests: list[httpx.Request] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        requests.append(request)
-        if request.url.path == "/predict/post_predict_lr":
-            return httpx.Response(200, json={"fraud_score": 0.72})
-        if request.url.path == "/predict/post_predict_bert":
-            return httpx.Response(200, json={"fraud_score": 0.88})
-        return httpx.Response(200, json={"ok": True})
-
-    predictor = RemoteFinalEnsemblePredictor("http://model")
-    predictor.client = httpx.Client(transport=httpx.MockTransport(handler))
-
-    computation = predictor.predict("job listing")
-
-    assert computation.ensemble.risk_score == pytest.approx(0.88)
-    assert computation.ensemble.risk_level == "high"
-    assert computation.ensemble.method == "bert_lr_fp_gate"
-    assert [request.url.path for request in requests] == [
-        "/predict/post_predict_lr",
-        "/predict/post_predict_bert",
-    ]
-
-
-def test_remote_predictor_rejects_contract_mismatch() -> None:
-    predictor = RemoteFinalEnsemblePredictor("http://model")
+def test_fp_gate_predictor_rejects_contract_mismatch() -> None:
+    predictor = FPGatePredictor("http://model")
     predictor.client = httpx.Client(
         transport=httpx.MockTransport(
             lambda request: httpx.Response(200, json={"ok": True})
@@ -119,10 +93,10 @@ def test_remote_predictor_rejects_contract_mismatch() -> None:
         (httpx.Response(200, json=["unexpected"]), "returned an error"),
     ],
 )
-def test_remote_predictor_rejects_request_failures(
+def test_fp_gate_predictor_rejects_request_failures(
     response: httpx.Response, message: str
 ) -> None:
-    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor = FPGatePredictor("http://model")
     predictor.client = httpx.Client(
         transport=httpx.MockTransport(lambda request: response)
     )
@@ -132,10 +106,10 @@ def test_remote_predictor_rejects_request_failures(
 
 
 @pytest.mark.parametrize("value", ["not-a-number", -0.1, 1.1])
-def test_remote_predictor_rejects_invalid_probabilities(value: object) -> None:
+def test_fp_gate_predictor_rejects_invalid_probabilities(value: object) -> None:
     payload = _all_response()
     payload["risk"]["risk_score"] = value
-    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor = FPGatePredictor("http://model")
     predictor.client = httpx.Client(
         transport=httpx.MockTransport(
             lambda request: httpx.Response(200, json=payload)
@@ -146,8 +120,8 @@ def test_remote_predictor_rejects_invalid_probabilities(value: object) -> None:
         predictor.predict("job listing")
 
 
-def test_remote_predictor_warm_up_reports_success_and_failure() -> None:
-    predictor = RemoteFinalEnsemblePredictor("http://model")
+def test_fp_gate_predictor_warm_up_reports_success_and_failure() -> None:
+    predictor = FPGatePredictor("http://model")
     predictor.client = httpx.Client(
         transport=httpx.MockTransport(
             lambda request: httpx.Response(200, json=_all_response())
@@ -161,16 +135,16 @@ def test_remote_predictor_warm_up_reports_success_and_failure() -> None:
         )
     )
     outcome = predictor.warm_up("job listing")
-    assert outcome["final_ensemble"] == "Remote final ensemble request failed."
+    assert outcome["final_ensemble"] == "FP-gate model service request failed."
 
 
-def test_remote_predictor_rejects_batch_contract_mismatch() -> None:
+def test_fp_gate_predictor_rejects_batch_contract_mismatch() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/predict/all":
             return httpx.Response(200, json=_all_response())
         return httpx.Response(200, json={"ok": True, "results": []})
 
-    predictor = RemoteFinalEnsemblePredictor("http://model")
+    predictor = FPGatePredictor("http://model")
     predictor.client = httpx.Client(transport=httpx.MockTransport(handler))
     computation = predictor.predict("job listing")
 

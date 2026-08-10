@@ -16,12 +16,8 @@ WORKDIR /app
 COPY backend/requirements-cloudrun.txt /app/backend/requirements-cloudrun.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements-cloudrun.txt
 
-# Copy backend source and model utility code (risk_mapping, validation_pipeline, etc.)
-# Model weights are NOT copied — inference is delegated to the remote model server.
+# Model weights are not copied; inference is delegated to the FP-gate service.
 COPY backend /app/backend
-COPY model/pyproject.toml /app/model/pyproject.toml
-COPY model/final_model_pipelines /app/model/final_model_pipelines
-RUN pip install --no-cache-dir --no-deps --editable /app/model
 RUN chmod +x /app/backend/docker-entrypoint.sh
 
 # Cloud Run provides $PORT (default 8080)

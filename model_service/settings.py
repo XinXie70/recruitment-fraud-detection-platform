@@ -6,27 +6,25 @@ import json
 import os
 from pathlib import Path
 
-API_ROOT = Path(__file__).resolve().parent
+MODEL_SERVICE_ROOT = Path(__file__).resolve().parent
 CAPSTONE_ROOT = Path(
-    os.environ.get("CAPSTONE_ROOT", str(API_ROOT.parent))
+    os.environ.get("CAPSTONE_ROOT", str(MODEL_SERVICE_ROOT.parent))
 ).resolve()
 
 SPRINT3_ROOT = CAPSTONE_ROOT / "model_algorithm" / "sprint3"
 LR_ROOT = SPRINT3_ROOT / "LR"
 BERT_ROOT = SPRINT3_ROOT / "BERT"
 ENSEMBLE_ROOT = SPRINT3_ROOT / "ensemble_BERT_FP"
-RISK_LEVEL_ROOT = SPRINT3_ROOT / "risk_level"
 
 LR_ARTIFACT = LR_ROOT / "weight" / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
 LR_CONFIG = LR_ROOT / "results" / "config.json"
-LR_TRAIN_SCRIPT = LR_ROOT / "code" / "train_lr_none_bigram_no_cv.py"
 
 BERT_CHECKPOINT = BERT_ROOT / "weight" / "best"
 BERT_CODE_DIR = BERT_ROOT / "code"
 BERT_MAX_LENGTH = 512
 
 ENSEMBLE_CONFIG = ENSEMBLE_ROOT / "results" / "config.json"
-RISK_BOUNDARY_CONFIG = RISK_LEVEL_ROOT / "risk_boundary_config.json"
+RISK_BOUNDARY_CONFIG = SPRINT3_ROOT / "risk_level" / "risk_boundary_config.json"
 
 TEXT_FIELDS = [
     "title",
@@ -65,7 +63,7 @@ def load_runtime_config() -> dict:
             "checkpoint": str(BERT_CHECKPOINT),
             "max_length": BERT_MAX_LENGTH,
             "model_threshold": bert_model_threshold,
-            "experiment": "model_algorithm/sprint3/BERT",
+            "experiment": "retrain_paper_aligned_seed42_maxlen512",
         },
         "ensemble": {
             "bert_threshold": float(ens_cfg["bert_threshold"]),

@@ -1,31 +1,33 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from typing import Any, Literal, cast
 
 import httpx
 
 from backend.schemas.analysis import EnsembleResult, ModelMemberOutput
-from backend.services.ensemble_predictor import EnsembleComputation, EnsembleUnavailableError
+
+
+class EnsembleUnavailableError(RuntimeError):
+    """Raised when the production FP-gate service cannot return a valid result."""
+
+
+@dataclass(frozen=True)
+class EnsembleComputation:
+    ensemble: EnsembleResult
+    members: list[ModelMemberOutput]
+    score_batch: Callable[[Sequence[str]], list[float]]
 
 
 _RISK_LEVELS = {"Low": "low", "Suspicious": "medium", "High": "high"}
 _DISPLAY_NAMES = {"lr": "Logistic Regression", "bert": "BERT"}
-_NEW_API_ENDPOINTS = {
-    "lr": "/predict/post_predict_lr",
-    "bert": "/predict/post_predict_bert",
-}
-_LEGACY_API_ENDPOINTS = {
-    "lr": "/predict/lr",
-    "bert": "/predict/bert",
-}
 
 
-class RemoteFinalEnsemblePredictor:
-    """Adapter for the deployed LR + BERT FP-gate model API."""
+class FPGatePredictor:
+    """Client for the deployed BERT-primary + LR false-positive-gate API."""
 
     def __init__(self, base_url: str, timeout_seconds: float = 120.0):
-        self.raw_base_url = base_url
         self.base_url = base_url.rstrip("/")
         self.client = httpx.Client(timeout=timeout_seconds)
 
@@ -35,13 +37,11 @@ class RemoteFinalEnsemblePredictor:
             response.raise_for_status()
             data = response.json()
         except (httpx.HTTPError, ValueError) as exc:
-            raise EnsembleUnavailableError(
-                "Remote final ensemble request failed."
-            ) from exc
+            raise EnsembleUnavailableError("FP-gate model service request failed.") from exc
         if not isinstance(data, dict):
-            raise EnsembleUnavailableError("Remote final ensemble returned an error.")
+            raise EnsembleUnavailableError("FP-gate model service returned an error.")
         if isinstance(data.get("ok"), bool) and data.get("ok") is False:
-            raise EnsembleUnavailableError("Remote final ensemble returned an error.")
+            raise EnsembleUnavailableError("FP-gate model service returned an error.")
         return data
 
     @staticmethod
@@ -50,11 +50,11 @@ class RemoteFinalEnsemblePredictor:
             score = float(value)
         except (TypeError, ValueError) as exc:
             raise EnsembleUnavailableError(
-                f"Remote final ensemble returned invalid {field}."
+                f"FP-gate model service returned invalid {field}."
             ) from exc
         if not 0 <= score <= 1:
             raise EnsembleUnavailableError(
-                f"Remote final ensemble returned invalid {field}."
+                f"FP-gate model service returned invalid {field}."
             )
         return score
 
@@ -65,33 +65,7 @@ class RemoteFinalEnsemblePredictor:
             return {"final_ensemble": str(exc)}
         return {"final_ensemble": None}
 
-    def _extract_probability(self, payload: dict[str, Any], field: str) -> float:
-        if isinstance(payload, dict) and field in payload:
-            return self._probability(payload[field], field)
-        raise EnsembleUnavailableError(
-            "Remote final ensemble response does not match its API contract."
-        )
-
-    def _try_new_api(self, text: str) -> tuple[float, float, dict[str, Any]]:
-        lr_response = self._post(_NEW_API_ENDPOINTS["lr"], {"text": text})
-        bert_response = self._post(_NEW_API_ENDPOINTS["bert"], {"text": text})
-        lr_score = self._extract_probability(lr_response, "fraud_score")
-        bert_score = self._extract_probability(bert_response, "fraud_score")
-        risk = {
-            "risk_score": max(lr_score, bert_score),
-            "risk_level": "High" if max(lr_score, bert_score) >= 0.5 else "Low",
-            "risk_score_source": "bert",
-            "gate_triggered": False,
-            "decision_reason": "New API fallback: used direct BERT score",
-            "thresholds": {
-                "bert_low_threshold": 0.15,
-                "bert_high_threshold": 0.32,
-                "lr_gate": 0.2,
-            },
-        }
-        return lr_score, bert_score, risk
-
-    def _try_legacy_api(self, text: str) -> tuple[float, float, dict[str, Any]]:
+    def _predict_all(self, text: str) -> tuple[float, float, dict[str, Any]]:
         data = self._post("/predict/all", {"text": text})
         try:
             lr_score = self._probability(data["lr"]["lr_score"], "lr_score")
@@ -101,25 +75,12 @@ class RemoteFinalEnsemblePredictor:
             risk = data["risk"]
         except (KeyError, TypeError) as exc:
             raise EnsembleUnavailableError(
-                "Remote final ensemble response does not match its API contract."
+                "FP-gate response does not match its API contract."
             ) from exc
         return lr_score, bert_score, risk
 
     def predict(self, text: str) -> EnsembleComputation:
-        if self.raw_base_url.endswith("/"):
-            try:
-                lr_score, bert_score, risk = self._try_legacy_api(text)
-            except EnsembleUnavailableError as exc:
-                if str(exc) != "Remote final ensemble response does not match its API contract.":
-                    raise
-                lr_score, bert_score, risk = self._try_new_api(text)
-        else:
-            try:
-                lr_score, bert_score, risk = self._try_new_api(text)
-            except EnsembleUnavailableError as exc:
-                if str(exc) != "Remote final ensemble response does not match its API contract.":
-                    raise
-                lr_score, bert_score, risk = self._try_legacy_api(text)
+        lr_score, bert_score, risk = self._predict_all(text)
         try:
             risk_score = self._probability(risk["risk_score"], "risk_score")
             risk_level = cast(
@@ -146,7 +107,7 @@ class RemoteFinalEnsemblePredictor:
             decision_reason = str(risk["decision_reason"])
         except (KeyError, TypeError) as exc:
             raise EnsembleUnavailableError(
-                "Remote final ensemble response does not match its API contract."
+                "FP-gate response does not match its API contract."
             ) from exc
 
         labels: dict[
@@ -173,7 +134,6 @@ class RemoteFinalEnsemblePredictor:
                 display_name=_DISPLAY_NAMES[key],
                 status="success",
                 raw_score=score,
-                calibrated_score=score,
                 role=roles[key],
                 decision_active=source.startswith(key),
             )
@@ -190,9 +150,9 @@ class RemoteFinalEnsemblePredictor:
             high_threshold=high_threshold,
             active_model_count=2,
             failed_model_count=0,
-            version="remote-lr-bert-fp-gate-v1",
+            version="bert-lr-fp-gate-v1",
             fitted=True,
-            weight_source="remote_fp_gate",
+            decision_strategy="bert_primary_lr_fp_gate",
             method="bert_lr_fp_gate",
             risk_score_source=source,
             gate_triggered=gate_triggered,
@@ -221,7 +181,7 @@ class RemoteFinalEnsemblePredictor:
                     )
                 except (KeyError, TypeError) as exc:
                     raise EnsembleUnavailableError(
-                        "Remote batch response does not match its API contract."
+                        "FP-gate batch response does not match its API contract."
                     ) from exc
             return scores
 
