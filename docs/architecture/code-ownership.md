@@ -4,7 +4,7 @@
 
 - `frontend/`: React web client.
 - `backend/`: authenticated FastAPI application and shared input validation.
-- `api_flask/`: production BERT + LR FP-gate inference service.
+- `model_service/`: production BERT + LR FP-gate inference service.
 - `data/`: fixed experiment inputs.
 
 ## Production model assets

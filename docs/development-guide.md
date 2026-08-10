@@ -9,7 +9,7 @@
 
 ## Service layout
 
-- `api_flask.app:app`: BERT-primary + LR false-positive-gate model API.
+- `model_service.app:app`: BERT-primary + LR false-positive-gate model API.
 - `backend.main:app`: authenticated application API.
 - `frontend/`: React client.
 
@@ -28,8 +28,8 @@ cp backend/env.example .env
 Ensure the new LR artifact and BERT checkpoint exist, then start the model API:
 
 ```bash
-pip install -r api_flask/requirements.txt
-python api_flask/app.py
+pip install -r model_service/requirements.txt
+python model_service/app.py
 ```
 
 Set `MODEL_SERVER_URL=http://127.0.0.1:5000` in `.env`, apply migrations, and

@@ -37,7 +37,7 @@ frontend/dist/
 frontend/coverage/
 frontend/playwright-report/
 frontend/test-results/
-api_flask/server.*.log
+model_service/server.*.log
 backend/test.db
 *.sqlite
 *.sqlite3

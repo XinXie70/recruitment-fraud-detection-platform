@@ -46,5 +46,5 @@ reports/
 # Model service Dockerfiles explicitly copy the required sprint3 runtime assets.
 
 # Local API runtime noise
-api_flask/server.*.log
-api_flask/*.log
+model_service/server.*.log
+model_service/*.log
