@@ -14,6 +14,7 @@ from flask_cors import CORS
 from settings import (
     MAX_CONTENT_LENGTH,
     MODEL_API_KEY,
+    MODEL_CORS_ORIGINS,
     load_runtime_config,
 )
 from services.bert_service import bert_service
@@ -30,7 +31,8 @@ logging.basicConfig(
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
-CORS(app)
+app.config["MODEL_API_KEY"] = MODEL_API_KEY
+CORS(app, origins=MODEL_CORS_ORIGINS)
 
 limiter.init_app(app)
 

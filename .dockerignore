@@ -33,14 +33,15 @@ frontend/.vite
 backend/__pycache__
 backend/**/__pycache__
 
-# Trees not needed by the model_service image
+# Large project trees that are not required by any production image
 model_algorithm/
 data/
 exports/
 paper_comparison/
 reports/
-backend/
-frontend/
+
+# Do not exclude backend/ or frontend/ here. The Cloud Run Dockerfiles use the
+# repository root as their build context and copy those directories explicitly.
 
 # Large split dumps
 **/*.csv.gz

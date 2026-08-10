@@ -112,7 +112,9 @@ Supported model-service endpoints used by the backend:
 | `PORT` | `5000` | Container listening port |
 | `HOST` | `0.0.0.0` | Bind address inside the container |
 | `MODEL_FILES_ROOT` | `/app/model_service/models` | Override model artifact directory |
-| `MODEL_API_KEY` | _(empty)_ | Shared secret for `/predict/*` (`X-API-Key` / Bearer) |
+| `APP_ENV` | `development` | Runtime mode; production requires `MODEL_API_KEY` |
+| `MODEL_API_KEY` | _(empty)_ | Shared secret for `/predict/*` (`X-API-Key` / Bearer); mandatory in production |
+| `MODEL_CORS_ORIGINS` | backend localhost origins | Comma-separated browser origins allowed to call the model API |
 | `RATE_LIMIT_PREDICT` | `30/minute` | Per-IP rate limit for prediction endpoints |
 | `MAX_CONTENT_LENGTH` | `1048576` | Max JSON request body size in bytes |
 | `MAX_TEXT_CHARS` | `50000` | Max characters per resolved advertisement text |
@@ -133,9 +135,11 @@ docker tag model-service:latest <registry>/model-service:latest
 docker push <registry>/model-service:latest
 ```
 
-Deploy to ECS, ACI, Cloud Run, Container Apps, or a VM with Docker. Expose port `5000`
-(or the platform `PORT`), configure `GET /health` as the health check, and allocate at
-least 4 GiB of memory for CPU inference.
+Deploy to ECS, ACI, Cloud Run, Container Apps, or a VM with Docker. Set
+`APP_ENV=production` and provide a non-empty `MODEL_API_KEY` before deployment;
+the service refuses to start without it. Prefer a private service endpoint and
+restrict `MODEL_CORS_ORIGINS`. Configure `GET /health` as the health check and
+allocate at least 4 GiB of memory for CPU inference.
 
 ## Optional GPU image
 
