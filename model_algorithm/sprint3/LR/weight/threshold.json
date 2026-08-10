@@ -1,0 +1,5 @@
+{
+  "threshold": 0.15182349109365842,
+  "selection_rule": "maximum fraud F1 on Validation",
+  "model_file": "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
+}
