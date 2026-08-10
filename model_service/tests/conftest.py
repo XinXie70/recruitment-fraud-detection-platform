@@ -19,6 +19,7 @@ if str(MODEL_SERVICE_ROOT) not in sys.path:
 # Stable defaults for fast, deterministic unit/integration runs.
 os.environ.setdefault("MODEL_API_KEY", "")
 os.environ.setdefault("RATE_LIMIT_PREDICT", "1000/minute")
+os.environ.setdefault("RATE_LIMIT_PREDICT_BATCH", "1000/minute")
 os.environ.setdefault("MAX_TEXT_CHARS", "50000")
 os.environ.setdefault("MAX_BATCH_ITEMS", "100")
 os.environ.setdefault("MAX_BATCH_TOTAL_CHARS", "500000")

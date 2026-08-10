@@ -3,7 +3,13 @@ from __future__ import annotations
 from flask import Blueprint, jsonify
 
 from api_http import error_response as _error, parse_payload as _parse_payload, server_error as _server_error, with_meta as _with_meta
-from settings import MAX_BATCH_ITEMS, MAX_BATCH_TOTAL_CHARS, RATE_LIMIT_PREDICT, load_runtime_config
+from settings import (
+    MAX_BATCH_ITEMS,
+    MAX_BATCH_TOTAL_CHARS,
+    RATE_LIMIT_PREDICT,
+    RATE_LIMIT_PREDICT_BATCH,
+    load_runtime_config,
+)
 from services.bert_service import bert_service
 from services.ensemble_service import ensemble_service, risk_service
 from services.lr_service import lr_service
@@ -348,7 +354,7 @@ def predict_all():
 
 
 @routes.post("/predict/batch")
-@limiter.limit(RATE_LIMIT_PREDICT)
+@limiter.limit(RATE_LIMIT_PREDICT_BATCH)
 def predict_batch():
     """Batch risk prediction for multiple advertisements.
     ---
