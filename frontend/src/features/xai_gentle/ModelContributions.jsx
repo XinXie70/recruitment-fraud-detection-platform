@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, Info, MinusCircle } from 'lucide-react';
+import { CheckCircle2, Info, MinusCircle } from 'lucide-react';
 
 function formatPercent(value) {
   if (value == null || !Number.isFinite(Number(value))) return 'N/A';
@@ -154,69 +154,5 @@ function FpGateDetails({ members, ensemble }) {
 
 export default function ModelContributions({ members, ensemble }) {
   const modelMembers = members || [];
-  const unavailableCount = modelMembers.filter((member) => member.status !== 'success').length;
-  const usesFpGate =
-    ensemble?.method === 'bert_lr_fp_gate' || ensemble?.weight_source === 'remote_fp_gate';
-
-  if (usesFpGate) {
-    return <FpGateDetails members={modelMembers} ensemble={ensemble} />;
-  }
-
-  return (
-    <>
-      {unavailableCount > 0 && (
-        <div className="partial-result-notice" role="status">
-          <AlertTriangle size={20} />
-          <div>
-            <strong>Partial model result</strong>
-            <p>
-              {unavailableCount} of {modelMembers.length} models did not return a usable score. The
-              final result uses the models that completed successfully.
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="model-contribution-list">
-        {modelMembers.map((member) => (
-          <article className={`model-contribution ${member.status}`} key={member.key}>
-            <div className="model-contribution-heading">
-              <strong>{member.display_name}</strong>
-              <span>
-                {member.status === 'success'
-                  ? `Calibrated fake-risk score ${formatPercent(member.calibrated_score)}`
-                  : 'Unavailable'}
-              </span>
-            </div>
-
-            {member.status === 'success' ? (
-              <>
-                <div className="report-score-track" aria-hidden="true">
-                  <div
-                    className="report-score-fill medium"
-                    style={{ width: percentWidth(member.calibrated_score) }}
-                  />
-                </div>
-                <dl className="model-contribution-values">
-                  <div>
-                    <dt>Raw score</dt>
-                    <dd>{formatPercent(member.raw_score)}</dd>
-                  </div>
-                  <div>
-                    <dt>Contribution to final score</dt>
-                    <dd>{formatPercent(member.weighted_contribution)}</dd>
-                  </div>
-                </dl>
-              </>
-            ) : (
-              <p>
-                This model was temporarily unavailable. The remaining successful models were used
-                for the final result.
-              </p>
-            )}
-          </article>
-        ))}
-      </div>
-    </>
-  );
+  return <FpGateDetails members={modelMembers} ensemble={ensemble} />;
 }

@@ -30,7 +30,7 @@ The backend is a single FastAPI application with clear internal boundaries:
 - `xai_gentle/` — explainability + education subdomain
 - `config.py` — centralized configuration
 - `middleware.py` — cross-cutting concerns
-- `services/model_adapter.py` — local/remote inference boundary
+- `services/fp_gate_predictor.py` — mandatory model-service boundary
 
 ## Alternatives Considered
 

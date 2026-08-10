@@ -10,7 +10,7 @@ from fastapi import HTTPException
 from backend.routers import analysis as analysis_router
 from backend.schemas.analysis import AnalysisRequest
 from backend.services.analysis_service import InputRejectedError
-from backend.services.ensemble_predictor import EnsembleUnavailableError
+from backend.services.fp_gate_predictor import EnsembleUnavailableError
 from backend.xai_gentle import GentleAIService
 
 

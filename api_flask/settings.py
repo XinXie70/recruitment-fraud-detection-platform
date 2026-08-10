@@ -17,7 +17,6 @@ ENSEMBLE_ROOT = CAPSTONE_ROOT / "ensemble_bert_fp_gate_lr_none_bigram_maxlen512"
 
 LR_ARTIFACT = LR_ROOT / "artifacts" / "lr_none_bigram_no_cv_paper_aligned_seed42.joblib"
 LR_CONFIG = LR_ROOT / "results" / "config.json"
-LR_TRAIN_SCRIPT = LR_ROOT / "code" / "train_lr_none_bigram_no_cv.py"
 
 BERT_CHECKPOINT = (
     BERT_ROOT / "weights" / "bert_paper_protocol_maxlen512" / "best"

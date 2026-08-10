@@ -33,10 +33,9 @@ XAI public API:
 XAIService.explain(text, score_batch, expected_output) -> XAIResult
 ```
 
-It does not import a concrete model or `EnsemblePredictor`; it only calls the
-`score_batch` callback supplied by the backend. The backend may fulfil that
-callback through local model adapters or a configured remote model service, and
-returns the same formal `risk_score` used by the application.
+It does not import model weights; it calls the `score_batch` callback supplied
+by `FPGatePredictor`. Every perturbation therefore uses the same production
+BERT-primary + LR-gate `risk_score` as the application.
 
 SHAP is the only attribution method. If it cannot run, XAI returns a structured
 `unavailable` result; it does not substitute keyword rules or occlusion scores.

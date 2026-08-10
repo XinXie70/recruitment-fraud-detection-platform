@@ -1,14 +1,33 @@
 {
-  "version": "2026.07",
-  "dataset": "EMS CAD held-out test set",
+  "version": "fp-gate-2026.08",
+  "dataset": "Paper-aligned seed-42 held-out test set",
   "models": [
-    { "model": "Bi-LSTM", "accuracy": 0.9857, "precision": 0.8389, "recall": 0.8728, "f1": 0.8555, "threshold": 0.67, "category": "dl" },
-    { "model": "SVM", "accuracy": 0.979, "precision": 0.7816, "recall": 0.7861, "f1": 0.7839, "threshold": 0.31, "category": "classic" },
-    { "model": "XGBoost", "accuracy": 0.9746, "precision": 0.6864, "recall": 0.8728, "f1": 0.7684, "threshold": 0.17, "category": "classic" },
-    { "model": "DNN", "accuracy": 0.9704, "precision": 0.645, "recall": 0.8613, "f1": 0.7376, "threshold": 0.33, "category": "dl" },
-    { "model": "Logistic Reg.", "accuracy": 0.9175, "precision": 0.4626, "recall": 0.8266, "f1": 0.5934, "threshold": 0.23, "category": "classic" },
-    { "model": "RNN", "accuracy": 0.9763, "precision": 0.7143, "recall": 0.8324, "f1": 0.7689, "threshold": 0.24, "category": "dl" },
-    { "model": "BERT", "accuracy": 0.99, "precision": 0.92, "recall": 0.89, "f1": 0.905, "threshold": 0.5, "category": "transformer" },
-    { "model": "RoBERTa", "accuracy": 0.988, "precision": 0.91, "recall": 0.88, "f1": 0.895, "threshold": 0.5, "category": "transformer" }
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.988255033557047,
+      "precision": 0.9337748344370861,
+      "recall": 0.815028901734104,
+      "f1": 0.8703703703703703,
+      "threshold": 0.15182349109365842,
+      "category": "classic"
+    },
+    {
+      "model": "BERT",
+      "accuracy": 0.9910514541387024,
+      "precision": 0.9386503067484663,
+      "recall": 0.884393063583815,
+      "f1": 0.9053254437869822,
+      "threshold": 0.3,
+      "category": "transformer"
+    },
+    {
+      "model": "BERT + LR FP-gate",
+      "accuracy": 0.9916107382550335,
+      "precision": 0.9386503067484663,
+      "recall": 0.884393063583815,
+      "f1": 0.9107142857142857,
+      "threshold": 0.3,
+      "category": "transformer"
+    }
   ]
 }

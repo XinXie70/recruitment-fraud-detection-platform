@@ -554,7 +554,7 @@ export default function DashboardPage({ auth, onLogout }) {
                         <td className="dash-verdict">{entry.prediction || '—'}</td>
                         <td className="dash-model-count">
                           <TrendingUp size={14} />
-                          {entry.modelCount ?? 8} models
+                          {entry.modelCount ?? 2} models
                         </td>
                         <td>
                           <button

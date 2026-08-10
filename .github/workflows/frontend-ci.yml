@@ -42,9 +42,7 @@ jobs:
           cache-dependency-path: backend/requirements-remote.txt
 
       - name: Install dependencies
-        run: |
-          python -m pip install -r backend/requirements-remote.txt pytest pytest-cov ruff mypy
-          python -m pip install --no-deps --editable ./model
+        run: python -m pip install -r backend/requirements-remote.txt pytest pytest-cov ruff mypy
 
       - name: Apply database migrations
         run: python -m alembic -c backend/alembic.ini upgrade head
