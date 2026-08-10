@@ -35,15 +35,9 @@ RUN pip install --upgrade pip \
     && pip install -r /tmp/requirements-docker.txt \
     && rm /tmp/requirements-docker.txt
 
-# --- Runtime layout (must match model_service/settings.py relative paths) ---
+# --- Runtime layout (weights/configs live under model_service/models/) ---
 COPY model_service/ /app/model_service/
 COPY docker/entrypoint.sh /app/model_service/entrypoint.sh
-
-COPY model_algorithm/sprint3/LR/weight/ /app/model_algorithm/sprint3/LR/weight/
-COPY model_algorithm/sprint3/LR/results/config.json /app/model_algorithm/sprint3/LR/results/config.json
-COPY model_algorithm/sprint3/BERT/weight/best/ /app/model_algorithm/sprint3/BERT/weight/best/
-COPY model_algorithm/sprint3/ensemble_BERT_FP/results/config.json /app/model_algorithm/sprint3/ensemble_BERT_FP/results/config.json
-COPY model_algorithm/sprint3/risk_level/risk_boundary_config.json /app/model_algorithm/sprint3/risk_level/risk_boundary_config.json
 
 WORKDIR /app/model_service
 
