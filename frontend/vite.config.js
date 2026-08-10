@@ -11,10 +11,12 @@ export default defineConfig({
       exclude: ['src/main.jsx'],
       reporter: ['text', 'json-summary', 'html'],
       thresholds: {
-        statements: 45,
-        branches: 30,
-        functions: 35,
-        lines: 45,
+        // Keep the gate just below the verified baseline so coverage cannot
+        // silently fall while allowing small refactors to land incrementally.
+        statements: 78,
+        branches: 71,
+        functions: 71,
+        lines: 81,
       },
     },
   },

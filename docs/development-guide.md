@@ -30,6 +30,10 @@ not install the model runtime: the backend calls the model API over HTTP and
 never imports TensorFlow, PyTorch, Transformers, or XGBoost. Those dependencies
 belong only to `model_service/requirements.txt`.
 
+Runtime requirement files use bounded version ranges to prevent unreviewed
+major-version upgrades. When changing a bound, run the complete verification
+suite and dependency audit in the same pull request.
+
 Ensure the new LR artifact and BERT checkpoint exist, then start the model API:
 
 ```bash
