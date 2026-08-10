@@ -1,5 +1,8 @@
 name: almond
 
+include:
+  - path: docker/docker-compose.yml
+
 services:
   database:
     image: postgres:16-alpine
@@ -26,13 +29,16 @@ services:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@database:5432/fake_job_detection
       SECRET_KEY: local-compose-secret-change-before-production
       CORS_ORIGINS: http://localhost:5190,http://127.0.0.1:5190
-      MODEL_SERVER_URL: ${MODEL_SERVER_URL:?Set MODEL_SERVER_URL to the FP-gate model service}
+      MODEL_SERVER_URL: http://model-service:5000
+      MODEL_SERVER_API_KEY: ${MODEL_API_KEY:-}
       RUN_DATABASE_MIGRATIONS: "false"
     ports:
       - "8000:8000"
     depends_on:
       migrate:
         condition: service_completed_successfully
+      model-service:
+        condition: service_healthy
     healthcheck:
       test:
         - CMD

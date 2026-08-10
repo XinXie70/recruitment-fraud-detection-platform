@@ -1,10 +1,10 @@
 services:
-  fraud-api:
+  model-service:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: fraud-detection-api:latest
-    container_name: fraud-detection-api
+    image: model-service:latest
+    container_name: model-service
     # Bind to loopback on the host to avoid exposing port 5000 on all interfaces.
     ports:
       - "127.0.0.1:${PORT:-5000}:5000"
@@ -15,10 +15,12 @@ services:
       GUNICORN_WORKERS: "${GUNICORN_WORKERS:-1}"
       GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
       GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-180}"
+      MODEL_FILES_ROOT: "${MODEL_FILES_ROOT:-/app/model_service/models}"
       MODEL_API_KEY: "${MODEL_API_KEY:-}"
       RATE_LIMIT_PREDICT: "${RATE_LIMIT_PREDICT:-30/minute}"
       MAX_CONTENT_LENGTH: "${MAX_CONTENT_LENGTH:-1048576}"
       MAX_TEXT_CHARS: "${MAX_TEXT_CHARS:-50000}"
+      MAX_BATCH_ITEMS: "${MAX_BATCH_ITEMS:-100}"
       MAX_BATCH_TOTAL_CHARS: "${MAX_BATCH_TOTAL_CHARS:-500000}"
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
@@ -29,8 +31,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
-    # Cloud tip: give the container enough RAM for BERT on CPU (recommend >= 4GB).
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 4G
+    # BERT on CPU needs headroom; recommend >= 4 GiB for local runs.
+    deploy:
+      resources:
+        limits:
+          memory: 4G

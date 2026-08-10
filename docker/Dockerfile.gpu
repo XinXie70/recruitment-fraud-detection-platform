@@ -1,6 +1,6 @@
 # Optional GPU image (requires NVIDIA Container Toolkit on the host).
-# Build from capstone root:
-#   docker build -f docker/Dockerfile.gpu -t fraud-detection-api:gpu .
+# Build from the repository root:
+#   docker build -f docker/Dockerfile.gpu -t model-service:gpu .
 
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
@@ -37,11 +37,12 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY docker/requirements-docker.txt /tmp/requirements-docker.txt
+COPY model_service/requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip \
     && pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cu121 \
-    && pip install -r /tmp/requirements-docker.txt \
-    && rm /tmp/requirements-docker.txt
+    && grep -Ev '^(torch|#)' /tmp/requirements.txt > /tmp/requirements-no-torch.txt \
+    && pip install -r /tmp/requirements-no-torch.txt \
+    && rm /tmp/requirements.txt /tmp/requirements-no-torch.txt
 
 COPY model_service/ /app/model_service/
 COPY docker/entrypoint.sh /app/model_service/entrypoint.sh
