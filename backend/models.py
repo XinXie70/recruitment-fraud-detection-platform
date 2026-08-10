@@ -75,7 +75,7 @@ class AnalysisHistory(Base):
     risk_level: Mapped[str] = mapped_column(String(10), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     ensemble_available: Mapped[int] = mapped_column(Integer, default=0)
-    ensemble_total: Mapped[int] = mapped_column(Integer, default=8)
+    ensemble_total: Mapped[int] = mapped_column(Integer, default=2)
     analysis_result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

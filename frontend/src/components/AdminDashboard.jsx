@@ -34,45 +34,20 @@ function ChartFallback() {
 }
 
 const MODEL_ARCHITECTURES = {
-  'Logistic Reg.': {
-    type: 'Linear Classifier',
-    params: '~10K',
-    desc: 'Simple linear classifier with TF-IDF features. Fast, interpretable baseline for binary classification.',
-  },
-  SVM: {
-    type: 'Kernel SVM (RBF)',
-    params: '~50K',
-    desc: 'Support Vector Machine with RBF kernel on TF-IDF vectors. Excels on high-dimensional sparse text data.',
-  },
-  XGBoost: {
-    type: 'Gradient Boosting',
-    params: '~200 trees',
-    desc: 'Tree-based ensemble with gradient boosting. Handles mixed feature types and provides feature importance.',
-  },
-  DNN: {
-    type: 'Deep Neural Network',
-    params: '~500K',
-    desc: '3-layer fully connected network with ReLU + dropout. Learns complex non-linear patterns in job descriptions.',
-  },
-  RNN: {
-    type: 'LSTM Network',
-    params: '~300K',
-    desc: 'Long Short-Term Memory network capturing sequential dependencies in text. Good at understanding word order.',
-  },
-  'Bi-LSTM': {
-    type: 'Bidirectional LSTM',
-    params: '~600K',
-    desc: 'Bidirectional LSTM with attention mechanism. Processes text both forward and backward for full context.',
+  'Logistic Regression': {
+    type: 'False-positive gate',
+    params: 'TF-IDF bigrams',
+    desc: 'Conditional gate that can demote a BERT high-risk candidate when the LR score is below the frozen gate threshold.',
   },
   BERT: {
     type: 'Transformer (Encoder)',
     params: '~110M',
-    desc: 'Bidirectional Encoder from Transformers. Pre-trained on BooksCorpus + Wikipedia, fine-tuned for fake job detection.',
+    desc: 'Paper-aligned max-length-512 primary scorer fine-tuned for fake job detection.',
   },
-  RoBERTa: {
-    type: 'Transformer (Encoder)',
-    params: '~125M',
-    desc: 'Robustly Optimized BERT. Trained on more data with dynamic masking, better performance on nuanced classification.',
+  'BERT + LR FP-gate': {
+    type: 'Conditional decision pipeline',
+    params: 'BERT primary + LR gate',
+    desc: 'Production decision contract with frozen BERT risk boundaries and a conditional LR false-positive gate.',
   },
 };
 
@@ -755,7 +730,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>Total Parameters</span>
-              <strong>~236M (across all models)</strong>
+              <strong>~110M BERT + LR gate</strong>
             </div>
             <div className="admin-system-item">
               <span>Framework</span>
@@ -763,7 +738,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>ML Libraries</span>
-              <strong>scikit-learn · XGBoost · TensorFlow · PyTorch · Transformers</strong>
+              <strong>scikit-learn · PyTorch · Transformers</strong>
             </div>
             <div className="admin-system-item">
               <span>Deployment</span>
@@ -771,7 +746,7 @@ export default function AdminDashboard({ auth, onLogout }) {
             </div>
             <div className="admin-system-item">
               <span>Inference Strategy</span>
-              <strong>Weighted model ensemble</strong>
+              <strong>BERT primary + LR false-positive gate</strong>
             </div>
             <div className="admin-system-item">
               <span>Best Model</span>

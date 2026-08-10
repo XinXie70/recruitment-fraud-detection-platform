@@ -36,11 +36,8 @@ backend/**/__pycache__
 # Trees not needed by the standalone final-ensemble image
 data/
 exports/
-model_code/
-model_results/
 paper_comparison/
 reports/
-src/
 
 # Large split dumps
 **/*.csv.gz
@@ -68,13 +65,3 @@ ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/**
 # Local API runtime noise
 api_flask/server.*.log
 api_flask/*.log
-
-# Other model development artifacts
-model/modelversion/
-model/**/__pycache__/
-model/**/outputs/
-model/**/comparison_outputs/
-model/**/*.md
-model/**/*.png
-model/**/*.csv
-model/**/requirements.txt

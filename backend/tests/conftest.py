@@ -19,6 +19,7 @@ os.environ["APP_ENV"] = "test"
 
 # Disable rate limiting during tests.
 os.environ["RATE_LIMIT_ENABLED"] = "false"
+os.environ["MODEL_SERVER_URL"] = "http://model.test"
 
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient

@@ -4,33 +4,56 @@ from __future__ import annotations
 
 import pytest
 
+from backend.schemas.analysis import EnsembleResult, ModelMemberOutput
 from backend.services.analysis_service import AnalysisService, InputRejectedError
 from backend.services.cache import TTLCache
-from backend.services.ensemble_predictor import (
-    CalibrationConfig,
-    EnsembleConfig,
-    EnsembleMemberConfig,
-    EnsemblePredictor,
-)
-from backend.services.model_adapter import RawModelResult
+from backend.services.fp_gate_predictor import EnsembleComputation
 from backend.xai_gentle import GentleAIService, XAIResult
 
 
-class CountingRegistry:
+class CountingPredictor:
     def __init__(self):
         self.calls = 0
         self.batch_calls = 0
 
-    def predict_all(self, text, model_keys, timeout_seconds):
+    def predict(self, text):
         self.calls += 1
-        return [RawModelResult("model", "Model", "success", score=0.8)]
+        ensemble = EnsembleResult(
+            status="success",
+            risk_score=0.8,
+            classification_label="Likely Deceptive",
+            risk_level="high",
+            prediction="fake",
+            recommended_action="High Risk Warning",
+            low_threshold=0.15,
+            high_threshold=0.32,
+            active_model_count=2,
+            failed_model_count=0,
+            version="test-fp-gate",
+            fitted=True,
+            decision_strategy="bert_primary_lr_fp_gate",
+            risk_score_source="bert",
+            gate_triggered=False,
+        )
+        members = [
+            ModelMemberOutput(
+                key="bert",
+                display_name="BERT",
+                status="success",
+                raw_score=0.8,
+                role="primary_score",
+                decision_active=True,
+            )
+        ]
 
-    def predict_raw_batches(self, texts, model_keys, timeout_seconds):
-        self.batch_calls += 1
-        return {"model": [0.8 for _ in texts]}
+        def score_batch(texts):
+            self.batch_calls += 1
+            return [0.8 for _ in texts]
 
-    def warm_up(self, sample, model_keys):
-        return {"model": None}
+        return EnsembleComputation(ensemble, members, score_batch)
+
+    def warm_up(self, sample):
+        return {"final_ensemble": None}
 
 
 class StaticXAIService:
@@ -44,17 +67,9 @@ class StaticXAIService:
 
 
 def _service(*, validator=None, url_analyzer=None):
-    registry = CountingRegistry()
-    config = EnsembleConfig(
-        version="test-v1",
-        fitted=True,
-        weight_source="test",
-        low_threshold=0.3,
-        high_threshold=0.7,
-        models={"model": EnsembleMemberConfig(1.0, CalibrationConfig("identity"))},
-    )
+    predictor = CountingPredictor()
     service = AnalysisService(
-        ensemble=EnsemblePredictor(registry, config),
+        ensemble=predictor,
         xai=StaticXAIService(),
         gentle_ai=GentleAIService(ollama_enabled=False),
         validator=validator
@@ -73,47 +88,43 @@ def _service(*, validator=None, url_analyzer=None):
         ),
         cache=TTLCache(ttl_seconds=60, max_entries=10),
     )
-    return service, registry
+    return service, predictor
 
 
 def test_analysis_result_is_cached() -> None:
-    service, registry = _service()
+    service, predictor = _service()
     first = service.analyze("A legitimate software engineering role")
     second = service.analyze("A legitimate software engineering role")
     assert first == second
-    assert registry.calls == 1
+    assert predictor.calls == 1
 
 
 def test_score_phase_skips_xai_batch_scoring() -> None:
-    service, registry = _service()
-
+    service, predictor = _service()
     result = service.score("A legitimate software engineering role")
-
     assert result.phase == "score"
     assert result.ensemble.risk_score == pytest.approx(0.8)
     assert result.xai.status == "unavailable"
     assert "being prepared" in result.xai.message
-    assert registry.calls == 1
-    assert registry.batch_calls == 0
+    assert predictor.calls == 1
+    assert predictor.batch_calls == 0
 
 
 def test_complete_cache_does_not_change_score_phase_contract() -> None:
-    service, registry = _service()
+    service, predictor = _service()
     text = "A legitimate software engineering role"
-
     complete = service.analyze(text)
     score = service.score(text)
     cached_score = service.score(text)
-
     assert complete.phase == "complete"
     assert score.phase == "score"
     assert score.xai.status == "unavailable"
     assert cached_score == score
-    assert registry.calls == 2
+    assert predictor.calls == 2
 
 
 def test_invalid_input_is_rejected_before_model_execution() -> None:
-    service, registry = _service(
+    service, predictor = _service(
         validator=lambda text: {
             "is_valid": False,
             "status": "not_a_job",
@@ -123,7 +134,7 @@ def test_invalid_input_is_rejected_before_model_execution() -> None:
     )
     with pytest.raises(InputRejectedError, match="Not a job"):
         service.analyze("hello")
-    assert registry.calls == 0
+    assert predictor.calls == 0
 
 
 def test_url_failure_degrades_without_leaking_exception() -> None:
@@ -138,5 +149,5 @@ def test_url_failure_degrades_without_leaking_exception() -> None:
 
 def test_warm_up_sets_readiness() -> None:
     service, _ = _service()
-    assert service.warm_up() == {"model": None}
+    assert service.warm_up() == {"final_ensemble": None}
     assert service.ready is True

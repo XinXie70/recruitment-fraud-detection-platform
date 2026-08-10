@@ -29,11 +29,7 @@ class ModelMemberOutput(BaseModel):
     display_name: str
     status: Literal["success", "error", "timeout"]
     raw_score: float | None = Field(default=None, ge=0, le=1)
-    calibrated_score: float | None = Field(default=None, ge=0, le=1)
-    configured_weight: float | None = Field(default=None, ge=0, le=1)
-    effective_weight: float | None = Field(default=None, ge=0, le=1)
-    weighted_contribution: float | None = Field(default=None, ge=0, le=1)
-    role: Literal["weighted_member", "primary_score", "false_positive_gate"] | None = None
+    role: Literal["primary_score", "false_positive_gate"] | None = None
     decision_active: bool | None = None
     error: str | None = None
     error_code: (
@@ -55,8 +51,8 @@ class EnsembleResult(BaseModel):
     failed_model_count: int = Field(..., ge=0)
     version: str
     fitted: bool
-    weight_source: str
-    method: Literal["calibrated_weighted", "bert_lr_fp_gate"] = "calibrated_weighted"
+    decision_strategy: Literal["bert_primary_lr_fp_gate"] = "bert_primary_lr_fp_gate"
+    method: Literal["bert_lr_fp_gate"] = "bert_lr_fp_gate"
     risk_score_source: Literal["bert", "lr_gate"] | None = None
     gate_triggered: bool | None = None
     decision_reason: str | None = None

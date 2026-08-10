@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import subprocess
-import sys
 import threading
 from typing import Any
 
 import joblib
 
-from settings import LR_ARTIFACT, LR_TRAIN_SCRIPT, load_runtime_config
+from settings import LR_ARTIFACT, load_runtime_config
 
 
 class LRService:
@@ -21,22 +19,7 @@ class LRService:
     def _ensure_artifact(self) -> None:
         if LR_ARTIFACT.exists():
             return
-        if not LR_TRAIN_SCRIPT.exists():
-            raise FileNotFoundError(
-                f"LR artifact missing ({LR_ARTIFACT}) and train script not found"
-            )
-        result = subprocess.run(
-            [sys.executable, str(LR_TRAIN_SCRIPT)],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0 or not LR_ARTIFACT.exists():
-            raise RuntimeError(
-                "Failed to train LR artifact for API use.\n"
-                f"stdout:\n{result.stdout[-2000:]}\n"
-                f"stderr:\n{result.stderr[-2000:]}"
-            )
+        raise FileNotFoundError(f"Required LR artifact is missing: {LR_ARTIFACT}")
 
     def load(self) -> None:
         with self._lock:
