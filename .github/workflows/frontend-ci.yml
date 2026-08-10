@@ -58,7 +58,7 @@ jobs:
 
       - name: Test backend with coverage
         working-directory: backend
-        run: python -m pytest tests -q --cov=. --cov-config=.coveragerc
+        run: python -m pytest tests -q --cov=. --cov-config=.coveragerc --cov-fail-under=85
 
   frontend:
     runs-on: ubuntu-latest
