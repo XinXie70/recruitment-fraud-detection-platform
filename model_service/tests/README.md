@@ -26,7 +26,7 @@ With coverage:
 pytest model_service/tests -m "not e2e" \
   --cov=model_service \
   --cov-report=term-missing \
-  --cov-fail-under=80
+  --cov-fail-under=90
 ```
 
 Slow end-to-end tests (load BERT + LR artifacts):
@@ -66,6 +66,6 @@ Happy-path and sad-path cases are included for:
 If E2E tests cannot run in CI because of CPU/RAM limits, the skip reason is documented
 above and the mocked integration suite still verifies the HTTP contract.
 
-CI enforces an 80% model-service coverage floor. This includes the production
+CI enforces a 90% model-service coverage floor. This includes the production
 package while excluding the opt-in E2E path; mocked BERT-service tests exercise
 loading and inference without loading the real checkpoint.
