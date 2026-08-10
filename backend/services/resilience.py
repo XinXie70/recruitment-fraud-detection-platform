@@ -37,6 +37,9 @@ class SystemHealth:
     @classmethod
     def from_analysis_service(cls, service: Any) -> "SystemHealth":
         """Build a SystemHealth snapshot from the live AnalysisService."""
+        refresh_readiness = getattr(service, "refresh_readiness", None)
+        if callable(refresh_readiness):
+            refresh_readiness()
         warm_up = getattr(service, "warm_up_outcomes", {}) or {}
         available = sum(1 for err in warm_up.values() if err is None)
         total = max(len(warm_up), 1)

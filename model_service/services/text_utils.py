@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
 from settings import TEXT_FIELDS
+
+
+class TextInputs(TypedDict):
+    record_id: str | None
+    combined_text: str
+    model_text: str
 
 
 def _as_str(value: Any) -> str:
@@ -16,7 +22,7 @@ def _as_str(value: Any) -> str:
     return text
 
 
-def build_texts(payload: dict[str, Any]) -> dict[str, str]:
+def build_texts(payload: dict[str, Any]) -> TextInputs:
     """Return plain combined_text (LR) and tagged model_text (BERT)."""
     if not isinstance(payload, dict):
         raise ValueError("Request body must be a JSON object")

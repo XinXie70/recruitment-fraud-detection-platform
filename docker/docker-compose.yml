@@ -6,7 +6,9 @@ services:
     image: fraud-detection-api:latest
     container_name: fraud-detection-api
     ports:
-      - "${PORT:-5000}:5000"
+      # Keep inference private to the host by default. Remote application
+      # services should reach it through a private network or authenticated IAM.
+      - "127.0.0.1:${PORT:-5000}:5000"
     environment:
       PORT: "5000"
       HOST: "0.0.0.0"

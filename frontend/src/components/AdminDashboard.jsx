@@ -23,7 +23,8 @@ import Navigation from './Navigation';
 import MeteorBackground from './MeteorBackground';
 import { apiUrl } from '../utils/api';
 
-const EChart = lazy(() => import('./charts/EChart'));
+const BarEChart = lazy(() => import('./charts/BarEChart'));
+const PieEChart = lazy(() => import('./charts/PieEChart'));
 
 function ChartFallback() {
   return (
@@ -326,7 +327,7 @@ export default function AdminDashboard({ auth, onLogout }) {
               <span className="admin-badge">{adminStats?.total_analyses ?? 0} analyses</span>
             </div>
             <Suspense fallback={<ChartFallback />}>
-              <EChart option={riskChartOption} />
+              <PieEChart option={riskChartOption} />
             </Suspense>
           </article>
           <article className="admin-card admin-chart-card admin-chart-card-wide">
@@ -340,7 +341,7 @@ export default function AdminDashboard({ auth, onLogout }) {
               </span>
             </div>
             <Suspense fallback={<ChartFallback />}>
-              <EChart option={modelChartOption} />
+              <BarEChart option={modelChartOption} />
             </Suspense>
           </article>
         </section>

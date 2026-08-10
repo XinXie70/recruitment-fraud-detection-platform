@@ -44,6 +44,16 @@ class FPGatePredictor:
             raise EnsembleUnavailableError("FP-gate model service returned an error.")
         return data
 
+    def is_available(self) -> bool:
+        """Probe the lightweight model-service health endpoint."""
+        try:
+            response = self.client.get(f"{self.base_url}/health", timeout=2.0)
+            response.raise_for_status()
+            data = response.json()
+        except (httpx.HTTPError, ValueError):
+            return False
+        return isinstance(data, dict) and data.get("ok") is True
+
     @staticmethod
     def _probability(value: str | int | float, field: str) -> float:
         try:

@@ -99,6 +99,8 @@ class Settings(BaseSettings):
     rate_limit_auth_login: str = "10/minute"  # stricter for login
     rate_limit_auth_register: str = "5/minute"  # strictest for registration
     rate_limit_analyze: str = "20/minute"  # per-IP analysis limit
+    # Enable only behind a reverse proxy that overwrites X-Forwarded-For.
+    trust_proxy_headers: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

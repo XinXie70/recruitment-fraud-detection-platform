@@ -25,11 +25,18 @@ import MeteorBackground from './MeteorBackground';
 import { apiUrl } from '../utils/api';
 
 const HISTORY_KEY = 'fake_job_history';
+const HISTORY_PAGE_SIZE = 15;
 
 function loadHistory() {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const history = raw ? JSON.parse(raw) : [];
+    // Migrate older entries by dropping persisted advert text and full reports.
+    const sanitized = history.map(
+      ({ inputText: _inputText, analysisResult: _result, ...entry }) => entry,
+    );
+    if (raw) localStorage.setItem(HISTORY_KEY, JSON.stringify(sanitized));
+    return sanitized;
   } catch {
     return [];
   }
@@ -61,21 +68,13 @@ function normalizeServerHistory(items) {
 function mergeHistory(serverEntries, localEntries) {
   const unusedLocal = [...localEntries];
   const mergedServer = serverEntries.map((serverEntry) => {
-    const serverTime = new Date(serverEntry.date).getTime();
-    const matchIndex = unusedLocal.findIndex((localEntry) => {
-      const localTime = new Date(localEntry.date).getTime();
-      return (
-        localEntry.riskLevel === serverEntry.riskLevel &&
-        Number(localEntry.riskScore) === serverEntry.riskScore &&
-        Number.isFinite(serverTime) &&
-        Number.isFinite(localTime) &&
-        Math.abs(serverTime - localTime) <= 120_000
-      );
-    });
+    const matchIndex = unusedLocal.findIndex(
+      (localEntry) => Number(localEntry.serverId) === Number(serverEntry.serverId),
+    );
 
     if (matchIndex < 0) return serverEntry;
     const [localMatch] = unusedLocal.splice(matchIndex, 1);
-    return { ...localMatch, ...serverEntry, analysisResult: localMatch.analysisResult };
+    return { ...localMatch, ...serverEntry };
   });
 
   return [...mergedServer, ...unusedLocal]
@@ -90,6 +89,8 @@ export default function DashboardPage({ auth, onLogout }) {
   const [syncError, setSyncError] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
   const [loadingResultId, setLoadingResultId] = useState(null);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalPages, setHistoryTotalPages] = useState(1);
 
   const syncHistory = useCallback(async () => {
     if (!accessToken) return;
@@ -99,9 +100,12 @@ export default function DashboardPage({ auth, onLogout }) {
     const localHistory = loadHistory();
 
     try {
-      const response = await fetch(apiUrl('/api/v1/history?page=1&page_size=100'), {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await fetch(
+        apiUrl(`/api/v1/history?page=1&page_size=${HISTORY_PAGE_SIZE}`),
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
 
       if (response.status === 401) {
         onLogout?.();
@@ -111,6 +115,8 @@ export default function DashboardPage({ auth, onLogout }) {
 
       const payload = await response.json();
       setHistory(mergeHistory(normalizeServerHistory(payload.items || []), localHistory));
+      setHistoryPage(1);
+      setHistoryTotalPages(payload.total_pages || 1);
     } catch {
       setHistory(localHistory);
       setSyncError('Could not sync history. Showing results saved in this browser.');
@@ -118,6 +124,38 @@ export default function DashboardPage({ auth, onLogout }) {
       setIsSyncing(false);
     }
   }, [accessToken, onLogout]);
+
+  const loadMoreHistory = async () => {
+    if (!accessToken || isSyncing || historyPage >= historyTotalPages) return;
+    const nextPage = historyPage + 1;
+    setIsSyncing(true);
+    setSyncError('');
+    try {
+      const response = await fetch(
+        apiUrl(`/api/v1/history?page=${nextPage}&page_size=${HISTORY_PAGE_SIZE}`),
+        { headers: { Authorization: `Bearer ${accessToken}` } },
+      );
+      if (response.status === 401) {
+        onLogout?.();
+        return;
+      }
+      if (!response.ok) throw new Error(`History request failed (${response.status})`);
+      const payload = await response.json();
+      const nextEntries = normalizeServerHistory(payload.items || []);
+      setHistory((current) => {
+        const existingIds = new Set(current.map((entry) => entry.id));
+        return [...current, ...nextEntries.filter((entry) => !existingIds.has(entry.id))].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
+      });
+      setHistoryPage(nextPage);
+      setHistoryTotalPages(payload.total_pages || nextPage);
+    } catch {
+      setSyncError('Could not load more history. Please try again.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const h = history;
@@ -167,7 +205,7 @@ export default function DashboardPage({ auth, onLogout }) {
     setHistory((current) =>
       current
         .filter((entry) => entry.source === 'server')
-        .map(({ analysisResult: _analysisResult, ...entry }) => entry),
+        .map(({ analysisResult: _analysisResult, inputText: _inputText, ...entry }) => entry),
     );
   };
 
@@ -535,7 +573,7 @@ export default function DashboardPage({ auth, onLogout }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {history.slice(0, 15).map((entry) => (
+                    {history.map((entry) => (
                       <tr key={entry.id} className="dash-history-row">
                         <td className="dash-date">
                           <Calendar size={14} />
@@ -591,6 +629,16 @@ export default function DashboardPage({ auth, onLogout }) {
                   </tbody>
                 </table>
               </div>
+              {historyPage < historyTotalPages && (
+                <button
+                  type="button"
+                  className="dash-refresh-btn"
+                  onClick={loadMoreHistory}
+                  disabled={isSyncing}
+                >
+                  {isSyncing ? 'Loading…' : 'Load more scans'}
+                </button>
+              )}
             </>
           ) : (
             <div className="dash-empty">

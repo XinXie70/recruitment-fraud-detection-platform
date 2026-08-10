@@ -28,6 +28,7 @@ export default function ReportPage({
   onBack,
   explanationLoading = false,
   explanationError = '',
+  historyWarning = '',
 }) {
   const riskLevel = result.ensemble.risk_level;
   const score = Math.round(result.ensemble.risk_score * 100);
@@ -93,6 +94,15 @@ export default function ReportPage({
         </aside>
 
         <section className="report-main">
+          {historyWarning && (
+            <div className="partial-result-notice" role="status">
+              <AlertTriangle size={20} />
+              <div>
+                <strong>History not saved</strong>
+                <p>{historyWarning}</p>
+              </div>
+            </div>
+          )}
           <div className="report-meta report-module-enter" style={{ '--module-order': 2 }}>
             <span>
               <CalendarClock size={18} />

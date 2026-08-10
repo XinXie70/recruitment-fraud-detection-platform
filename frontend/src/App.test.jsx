@@ -124,7 +124,8 @@ test('logs in and persists authentication before opening the analyser', async ()
   expect(
     await screen.findByRole('heading', { name: 'Detect Fake Job Advertisements' }),
   ).toBeVisible();
-  expect(JSON.parse(window.localStorage.getItem('fake_job_auth'))).toEqual(AUTH_RESPONSE);
+  expect(JSON.parse(window.sessionStorage.getItem('fake_job_auth'))).toEqual(AUTH_RESPONSE);
+  expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
 });
 
 test('shows a backend authentication error without storing credentials', async () => {
@@ -239,6 +240,8 @@ test('renders a successful analysis report and stores it in history', async () =
     riskScore: 86,
     prediction: 'Likely Deceptive',
   });
+  expect(savedHistory[0]).not.toHaveProperty('inputText');
+  expect(savedHistory[0]).not.toHaveProperty('analysisResult');
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
@@ -344,6 +347,7 @@ test('logs out when the analysis API rejects an expired token', async () => {
 
   expect(await screen.findByRole('heading', { name: 'Log In' })).toBeVisible();
   expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
+  expect(window.sessionStorage.getItem('fake_job_auth')).toBeNull();
 });
 
 test('registers a user with the expected payload', async () => {

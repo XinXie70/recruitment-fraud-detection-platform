@@ -202,7 +202,7 @@ import random
 import sys
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -420,7 +420,7 @@ class Timer:
 import html
 import re
 import unicodedata
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Iterable
 
 import pandas as pd
 
@@ -637,10 +637,8 @@ def derive_company_preview(text: str, max_chars: int = 120) -> str:
 # ========================================================================
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Sequence, Tuple
 
-import numpy as np
-import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
@@ -1137,10 +1135,7 @@ def softmax_fraud_proba(logits):
 # ========================================================================
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
 
-import numpy as np
-import pandas as pd
 from torch.utils.data import Dataset
 
 
@@ -1479,10 +1474,7 @@ def dataframe_to_text_dataset(df: pd.DataFrame, tokenizer, max_length: int) -> J
 import argparse
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
 from torch.cuda.amp import GradScaler, autocast
@@ -2088,9 +2080,7 @@ def run_training(
 # CLI COMMANDS: evaluate / predict / export-val
 # ==============================================================================
 
-import argparse
 import shutil
-import traceback
 
 
 def cmd_evaluate(args: argparse.Namespace) -> None:

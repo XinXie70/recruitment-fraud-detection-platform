@@ -56,12 +56,12 @@ def test_history_failure_rolls_back_without_crashing() -> None:
             self.rolled_back = True
 
     result = SimpleNamespace(
-        ensemble=SimpleNamespace(risk_score=0.8, risk_level="high"),
+        ensemble=SimpleNamespace(risk_score=0.8, risk_level="high", version="test-v1"),
         status="success",
         member_outputs=[SimpleNamespace(status="success")],
     )
     db = FailingDB()
-    assert analysis_router._save_history("listing", result, 1, db) is False
+    assert analysis_router._save_history("listing", result, 1, db) is None
     assert db.rolled_back is True
 
 
@@ -90,13 +90,13 @@ def test_saved_result_does_not_contain_unredacted_input() -> None:
             self.saved = value
 
         def commit(self):
-            pass
+            self.saved.id = 42
 
         def rollback(self):
             pass
 
     result = SimpleNamespace(
-        ensemble=SimpleNamespace(risk_score=0.8, risk_level="high"),
+        ensemble=SimpleNamespace(risk_score=0.8, risk_level="high", version="test-v1"),
         status="success",
         member_outputs=[SimpleNamespace(status="success")],
         model_dump=lambda **_kwargs: {"status": "success"},
@@ -104,12 +104,14 @@ def test_saved_result_does_not_contain_unredacted_input() -> None:
     db = RecordingDB()
     text = "Contact private@example.com and use api_key=super-secret"
 
-    assert analysis_router._save_history(text, result, 1, db) is True
+    assert analysis_router._save_history(text, result, 1, db) == 42
     assert db.saved is not None
     stored_text = db.saved.analysis_result["inputText"]
     assert "private@example.com" not in stored_text
     assert "super-secret" not in stored_text
     assert "[REDACTED" in stored_text
+    assert db.saved.analysis_result["storageSchemaVersion"] == "1"
+    assert db.saved.analysis_result["modelVersion"] == "test-v1"
 
 
 def test_history_hash_is_keyed_and_deterministic(monkeypatch) -> None:

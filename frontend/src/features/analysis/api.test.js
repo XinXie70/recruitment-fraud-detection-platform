@@ -63,3 +63,35 @@ test('requests the fast score phase from the new ensemble endpoint', async () =>
     }),
   );
 });
+
+test('attaches the stable server history id to a completed analysis', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: (name) => (name === 'X-History-ID' ? '42' : null) },
+      json: vi.fn().mockResolvedValue({ phase: 'complete', ensemble: { risk_score: 0.42 } }),
+    }),
+  );
+
+  await expect(analyzeJobText('A valid job advertisement.', 'test-token')).resolves.toMatchObject({
+    historyId: 42,
+  });
+});
+
+test('reports when a completed analysis was not persisted to history', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: (name) => (name === 'X-History-Persisted' ? 'false' : null) },
+      json: vi.fn().mockResolvedValue({ phase: 'complete', ensemble: { risk_score: 0.42 } }),
+    }),
+  );
+
+  await expect(analyzeJobText('A valid job advertisement.', 'test-token')).resolves.toMatchObject({
+    historyPersisted: false,
+  });
+});

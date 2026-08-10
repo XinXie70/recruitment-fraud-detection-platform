@@ -10,16 +10,14 @@ from typing import Any
 
 from flasgger import Swagger
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 
 from settings import load_runtime_config
 from services.bert_service import bert_service
 from services.ensemble_service import ensemble_service, risk_service
 from services.lr_service import lr_service
-from services.text_utils import build_texts
+from services.text_utils import TextInputs, build_texts
 
 app = Flask(__name__)
-CORS(app)
 
 swagger_config = {
     "headers": [],
@@ -98,7 +96,7 @@ def _parse_payload() -> dict[str, Any]:
     return payload
 
 
-def _with_meta(result: dict[str, Any], texts: dict[str, str]) -> dict[str, Any]:
+def _with_meta(result: dict[str, Any], texts: TextInputs) -> dict[str, Any]:
     out = {"ok": True, **result}
     if texts.get("record_id"):
         out["record_id"] = texts["record_id"]

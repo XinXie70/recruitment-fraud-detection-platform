@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import threading
+import time
+
 import pytest
 
 from backend.services import cache as cache_module
@@ -43,3 +46,29 @@ def test_cache_rejects_non_positive_limits(
 ) -> None:
     with pytest.raises(ValueError):
         TTLCache(ttl_seconds=ttl_seconds, max_entries=max_entries)
+
+
+def test_cache_coalesces_concurrent_misses() -> None:
+    cache = TTLCache(ttl_seconds=60, max_entries=2)
+    calls = 0
+    barrier = threading.Barrier(4)
+    results: list[int] = []
+
+    def factory() -> int:
+        nonlocal calls
+        calls += 1
+        time.sleep(0.05)
+        return 42
+
+    def worker() -> None:
+        barrier.wait()
+        results.append(cache.get_or_compute("same-key", factory))
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert calls == 1
+    assert results == [42, 42, 42, 42]

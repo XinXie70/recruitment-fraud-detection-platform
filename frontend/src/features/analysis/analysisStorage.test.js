@@ -11,6 +11,7 @@ function result(index) {
       classification_label: 'Suspicious',
       active_model_count: 2,
     },
+    historyId: index,
   };
 }
 
@@ -24,8 +25,9 @@ test('stores the newest analysis first with display-ready fields', () => {
     riskScore: 46,
     prediction: 'Suspicious',
     modelCount: 2,
-    inputText: 'Job 1',
+    serverId: 1,
   });
+  expect(window.localStorage.getItem('fake_job_history')).not.toContain('Job 1');
 });
 
 test('keeps no more than fifty local history entries', () => {
@@ -33,7 +35,7 @@ test('keeps no more than fifty local history entries', () => {
 
   const history = JSON.parse(window.localStorage.getItem('fake_job_history'));
   expect(history).toHaveLength(50);
-  expect(history[0].inputText).toBe('Job 54');
+  expect(history[0].serverId).toBe(54);
 });
 
 test('does not interrupt analysis when local storage is unavailable', () => {

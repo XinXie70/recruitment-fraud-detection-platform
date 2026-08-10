@@ -29,7 +29,7 @@ afterEach(() => {
   cleanup();
 });
 
-test('opens a saved dashboard analysis result from the View button', () => {
+test('removes sensitive payloads from legacy local history', () => {
   const analysisResult = {
     riskLevel: 'high',
     riskScore: 93,
@@ -70,17 +70,10 @@ test('opens a saved dashboard analysis result from the View button', () => {
   expect(screen.getAllByText('93/100').length).toBeGreaterThan(0);
   expect(screen.getByText('Likely Deceptive')).toBeInTheDocument();
 
-  fireEvent.click(
-    screen.getByRole('button', {
-      name: 'Open full analysis result',
-    }),
-  );
-
-  expect(screen.getByTestId('current-location')).toHaveTextContent('/analyze');
-
-  expect(JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'))).toEqual(
-    analysisResult,
-  );
+  expect(
+    screen.queryByRole('button', { name: 'Open full analysis result' }),
+  ).not.toBeInTheDocument();
+  expect(window.localStorage.getItem('fake_job_history')).not.toContain(analysisResult.inputText);
 });
 
 test('loads server history and refreshes it with the access token', async () => {
@@ -118,7 +111,7 @@ test('loads server history and refreshes it with the access token', async () => 
   expect((await screen.findAllByText('82/100')).length).toBeGreaterThan(0);
   expect(screen.getByText('Likely Deceptive')).toBeInTheDocument();
   expect(screen.getByText('7 models')).toBeInTheDocument();
-  expect(fetchMock).toHaveBeenCalledWith('/api/v1/history?page=1&page_size=100', {
+  expect(fetchMock).toHaveBeenCalledWith('/api/v1/history?page=1&page_size=15', {
     headers: { Authorization: 'Bearer dashboard-token' },
   });
 

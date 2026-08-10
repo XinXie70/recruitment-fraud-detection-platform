@@ -32,6 +32,7 @@ export default function AnalyzePage({ auth, onLogout }) {
   const [error, setError] = useState(null);
   const [explanationLoading, setExplanationLoading] = useState(false);
   const [explanationError, setExplanationError] = useState('');
+  const [historyWarning, setHistoryWarning] = useState('');
   const requestSequence = useRef(0);
 
   const handleAnalyze = async () => {
@@ -44,6 +45,7 @@ export default function AnalyzePage({ auth, onLogout }) {
     setResult(null);
     setExplanationLoading(false);
     setExplanationError('');
+    setHistoryWarning('');
     const sequence = requestSequence.current + 1;
     requestSequence.current = sequence;
 
@@ -59,6 +61,11 @@ export default function AnalyzePage({ auth, onLogout }) {
         const data = await analyzeJobText(payloadText, auth.access_token);
         if (requestSequence.current !== sequence) return;
         const completedResult = { ...data, inputText: payloadText };
+        if (data.historyPersisted === false) {
+          setHistoryWarning(
+            'The analysis completed, but it could not be saved to your account history.',
+          );
+        }
         setResult(completedResult);
         window.sessionStorage.setItem(LAST_ANALYSIS_STORAGE_KEY, JSON.stringify(completedResult));
         saveAnalysisHistory(completedResult);
@@ -115,6 +122,7 @@ export default function AnalyzePage({ auth, onLogout }) {
         onBack={handleNewScan}
         explanationLoading={explanationLoading}
         explanationError={explanationError}
+        historyWarning={historyWarning}
       />
     );
   }

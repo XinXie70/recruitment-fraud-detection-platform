@@ -12,8 +12,8 @@ export function saveAnalysisHistory(result) {
       riskScore: Math.round(result.ensemble.risk_score * 100),
       prediction: result.ensemble.classification_label,
       modelCount: result.ensemble.active_model_count,
-      inputText: result.inputText,
-      analysisResult: result,
+      serverId: result.historyId || null,
+      source: result.historyId ? 'server' : 'local',
     };
 
     window.localStorage.setItem(

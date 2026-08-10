@@ -30,7 +30,7 @@ Alternatively, build and run the CPU image directly:
 
 ```bash
 docker build -f docker/Dockerfile -t fraud-detection-api:latest .
-docker run -d --name fraud-detection-api -p 5000:5000 \
+docker run -d --name fraud-detection-api -p 127.0.0.1:5000:5000 \
   --restart unless-stopped fraud-detection-api:latest
 ```
 
@@ -60,13 +60,14 @@ docker tag fraud-detection-api:latest <registry>/fraud-detection-api:latest
 docker push <registry>/fraud-detection-api:latest
 ```
 
-Deploy the image to a container platform such as ECS, ACI, Cloud Run, or
-Container Apps. Expose port `5000` (or the platform-provided `PORT`), configure
-`GET /health` as the health check, and allocate at least 4 GiB of memory.
+Deploy the image to a private service/network on ECS, ACI, Cloud Run, or
+Container Apps. Do not grant unauthenticated public ingress. Expose port `5000`
+only inside that private boundary, configure `GET /health` as the health check,
+and allocate at least 4 GiB of memory.
 
 ## Optional GPU image
 
 ```bash
 docker build -f docker/Dockerfile.gpu -t fraud-detection-api:gpu .
-docker run --gpus all -d -p 5000:5000 -e ALLOW_CPU=0 fraud-detection-api:gpu
+docker run --gpus all -d -p 127.0.0.1:5000:5000 -e ALLOW_CPU=0 fraud-detection-api:gpu
 ```

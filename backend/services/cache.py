@@ -10,9 +10,12 @@ import hashlib
 import threading
 import time
 from collections import OrderedDict
-from typing import Any
+from concurrent.futures import Future
+from typing import Any, Callable, TypeVar, cast
 
 from backend.config import settings
+
+T = TypeVar("T")
 
 
 class TTLCache:
@@ -38,6 +41,7 @@ class TTLCache:
         if self._max_entries <= 0:
             raise ValueError("max_entries must be greater than zero")
         self._store: OrderedDict[str, tuple[float, Any]] = OrderedDict()
+        self._inflight: dict[str, Future[Any]] = {}
         self._lock = threading.Lock()
 
 
@@ -65,6 +69,35 @@ class TTLCache:
     def clear(self) -> None:
         with self._lock:
             self._store.clear()
+
+    def get_or_compute(self, key: str, factory: Callable[[], T]) -> T:
+        """Return a cached value while coalescing concurrent misses per key."""
+        cached = self.get(key)
+        if cached is not None:
+            return cast(T, cached)
+
+        with self._lock:
+            future = self._inflight.get(key)
+            is_leader = future is None
+            if future is None:
+                future = Future()
+                self._inflight[key] = future
+
+        if not is_leader:
+            return cast(T, future.result())
+
+        try:
+            value = factory()
+            self.set(key, value)
+            future.set_result(value)
+            return value
+        except BaseException as exc:
+            future.set_exception(exc)
+            raise
+        finally:
+            with self._lock:
+                if self._inflight.get(key) is future:
+                    del self._inflight[key]
 
     @property
     def size(self) -> int:

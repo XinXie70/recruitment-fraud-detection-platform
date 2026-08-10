@@ -15,8 +15,8 @@ from settings import BERT_CHECKPOINT, BERT_MAX_LENGTH, load_runtime_config
 class BERTService:
     def __init__(self) -> None:
         self._lock = threading.Lock()
-        self._model = None
-        self._tokenizer = None
+        self._model: Any = None
+        self._tokenizer: Any = None
         self._device: torch.device | None = None
         self._model_threshold: float | None = None
 

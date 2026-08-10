@@ -21,7 +21,7 @@ The model API loads these frozen experiment assets:
 
 ## Local development
 
-Requirements: Python 3.12+, Node.js 22.22+, PostgreSQL, and the new model
+Requirements: Python 3.11+, Node.js 22.22+, PostgreSQL, and the new model
 artifacts. Install the application backend and frontend dependencies:
 
 ```bash
