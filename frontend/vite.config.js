@@ -13,10 +13,10 @@ export default defineConfig({
       thresholds: {
         // Keep the gate just below the verified baseline so coverage cannot
         // silently fall while allowing small refactors to land incrementally.
-        statements: 78,
-        branches: 71,
-        functions: 71,
-        lines: 81,
+        statements: 80,
+        branches: 76,
+        functions: 75,
+        lines: 83,
       },
     },
   },
