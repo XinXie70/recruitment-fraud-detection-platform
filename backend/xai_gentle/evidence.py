@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable, NotRequired, Sequence, TypedDict
 
-from .contracts import EvidenceSpan, XAIResult
+from .contracts import EvidenceSpan
 
 BatchScorer = Callable[[Sequence[str]], list[float]]
 WORD_PATTERN = re.compile(r"\b[\w'-]+\b", re.UNICODE)

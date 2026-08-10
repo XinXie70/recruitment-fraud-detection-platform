@@ -9,7 +9,8 @@ from .contracts import EvidenceSpan, XAIResult
 from .evidence import (
     BatchScorer, LONG_TEXT_EVALS_PER_ITEM, LONG_TEXT_PHRASE_WORDS,
     MIN_DISPLAY_ABS_CONTRIBUTION, PartitionAttribution, TextSegment,
-    TokenizerOutput, WORD_PATTERN, _build_coarse_segments, _build_phrase_segments,
+    TokenizerOutput, WORD_PATTERN, _build_coarse_segments as _build_coarse_segments,
+    _build_phrase_segments,
     _build_segments, _top_evidence,
 )
 
