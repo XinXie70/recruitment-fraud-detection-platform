@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from settings import TEXT_FIELDS
+from settings import MAX_TEXT_CHARS, TEXT_FIELDS
 
 
-class TextInputs(TypedDict):
+class ResolvedTexts(TypedDict):
     record_id: str | None
     combined_text: str
     model_text: str
@@ -22,7 +22,14 @@ def _as_str(value: Any) -> str:
     return text
 
 
-def build_texts(payload: dict[str, Any]) -> TextInputs:
+def _enforce_text_length(text: str, *, field: str = "text") -> None:
+    if len(text) > MAX_TEXT_CHARS:
+        raise ValueError(
+            f"{field} exceeds maximum length of {MAX_TEXT_CHARS} characters"
+        )
+
+
+def build_texts(payload: dict[str, Any]) -> ResolvedTexts:
     """Return plain combined_text (LR) and tagged model_text (BERT)."""
     if not isinstance(payload, dict):
         raise ValueError("Request body must be a JSON object")
@@ -68,8 +75,12 @@ def build_texts(payload: dict[str, Any]) -> TextInputs:
     if not combined_text.strip():
         raise ValueError("Resolved text is empty")
 
+    _enforce_text_length(combined_text, field="combined_text")
+    resolved_model = model_text or combined_text
+    _enforce_text_length(resolved_model, field="model_text")
+
     return {
         "record_id": record_id,
         "combined_text": combined_text,
-        "model_text": model_text or combined_text,
+        "model_text": resolved_model,
     }

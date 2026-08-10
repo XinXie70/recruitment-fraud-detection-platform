@@ -8,17 +8,20 @@ from typing import Any
 
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
+from services.coalesce import InferenceCoalescer
 from settings import BERT_CHECKPOINT, BERT_MAX_LENGTH, load_runtime_config
 
 
 class BERTService:
     def __init__(self) -> None:
         self._lock = threading.Lock()
-        self._model: Any = None
-        self._tokenizer: Any = None
+        self._model: Any | None = None
+        self._tokenizer: PreTrainedTokenizerBase | None = None
         self._device: torch.device | None = None
         self._model_threshold: float | None = None
+        self._coalescer = InferenceCoalescer()
 
     def load(self, allow_cpu: bool | None = None) -> None:
         if allow_cpu is None:
@@ -39,7 +42,9 @@ class BERTService:
                 self._device = torch.device("cpu")
             else:
                 raise RuntimeError("CUDA is unavailable and CPU inference is disabled")
-            tokenizer = AutoTokenizer.from_pretrained(BERT_CHECKPOINT)
+            tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
+                BERT_CHECKPOINT
+            )
 
             # Load fine-tuned weights directly (no bert-base-uncased re-init).
             model = AutoModelForSequenceClassification.from_pretrained(
@@ -75,26 +80,33 @@ class BERTService:
         assert self._device is not None and self._model_threshold is not None
 
         thr = float(self._model_threshold if threshold is None else threshold)
-        enc = self._tokenizer(
-            model_text,
-            truncation=True,
-            max_length=BERT_MAX_LENGTH,
-            padding=True,
-            return_tensors="pt",
-        )
-        enc = {k: v.to(self._device) for k, v in enc.items()}
-        logits = self._model(**enc).logits
-        score = float(torch.softmax(logits, dim=-1)[0, 1].cpu().item())
-        pred = int(score >= thr)
-        return {
-            "model": "bert",
-            "bert_score": score,
-            "threshold": thr,
-            "max_length": BERT_MAX_LENGTH,
-            "predicted_label_id": pred,
-            "predicted_label": "Fraudulent" if pred == 1 else "Legitimate",
-            "device": str(self._device),
-        }
+        key = f"bert:{thr}:{model_text}"
+
+        def _infer() -> dict[str, Any]:
+            assert self._model is not None and self._tokenizer is not None
+            assert self._device is not None
+            enc = self._tokenizer(
+                model_text,
+                truncation=True,
+                max_length=BERT_MAX_LENGTH,
+                padding=True,
+                return_tensors="pt",
+            )
+            enc = {k: v.to(self._device) for k, v in enc.items()}
+            logits = self._model(**enc).logits
+            score = float(torch.softmax(logits, dim=-1)[0, 1].cpu().item())
+            pred = int(score >= thr)
+            return {
+                "model": "bert",
+                "bert_score": score,
+                "threshold": thr,
+                "max_length": BERT_MAX_LENGTH,
+                "predicted_label_id": pred,
+                "predicted_label": "Fraudulent" if pred == 1 else "Legitimate",
+                "device": str(self._device),
+            }
+
+        return self._coalescer.run(key, _infer)
 
 
 bert_service = BERTService()

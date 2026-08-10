@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     model_server_url: str = ""
     model_server_timeout: float = 120.0
+    model_server_api_key: str = ""
     max_input_chars: int = 50000
 
     @property
