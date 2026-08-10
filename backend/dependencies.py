@@ -16,6 +16,7 @@ def get_ensemble_predictor() -> FPGatePredictor:
     return FPGatePredictor(
         settings.required_model_server_url,
         timeout_seconds=settings.model_server_timeout,
+        api_key=settings.model_server_api_key,
     )
 
 

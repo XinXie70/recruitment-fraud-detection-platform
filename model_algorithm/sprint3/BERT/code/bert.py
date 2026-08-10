@@ -9,15 +9,61 @@ CLI (from sprint3/):
 
 from __future__ import annotations
 
-
-
 # ========================================================================
 # CONFIG
 # ========================================================================
 
+import argparse
+import html
+import json
+import logging
+import os
+import random
+import re
+import shutil
+import sys
+import time
+import traceback
+import unicodedata
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+)
+
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    roc_curve,
+)
+from torch.cuda.amp import GradScaler, autocast
+from torch.utils.data import DataLoader, Dataset
+from tqdm import tqdm
+from transformers import (
+    AutoConfig,
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    DataCollatorWithPadding,
+    get_linear_schedule_with_warmup,
+)
 
 
 # retrain_* /code → experiment root = parent
@@ -194,21 +240,6 @@ ENSEMBLE_VAL_COPY = (
 # ========================================================================
 # UTILS
 # ========================================================================
-
-import json
-import logging
-import os
-import random
-import sys
-import time
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional
-
-import numpy as np
-
-
-if TYPE_CHECKING:
-    import torch
 
 
 def set_seed(seed: int = 42) -> None:
@@ -416,14 +447,6 @@ class Timer:
 # ========================================================================
 # PREPROCESSING
 # ========================================================================
-
-import html
-import re
-import unicodedata
-from typing import Any, Dict, Iterable, List, Optional
-
-import pandas as pd
-
 
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -635,24 +658,6 @@ def derive_company_preview(text: str, max_chars: int = 120) -> str:
 # ========================================================================
 # METRICS
 # ========================================================================
-
-from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Tuple
-
-import numpy as np
-import pandas as pd
-from sklearn.metrics import (
-    accuracy_score,
-    average_precision_score,
-    classification_report,
-    confusion_matrix,
-    f1_score,
-    precision_recall_curve,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-    roc_curve,
-)
 
 
 def binary_metrics(
@@ -1084,10 +1089,6 @@ def plot_model_comparison(comparison_csv: Path, out_path: Path) -> None:
 # MODEL
 # ========================================================================
 
-import torch.nn as nn
-import torch.nn.functional as F
-from transformers import AutoConfig, AutoModelForSequenceClassification
-
 
 class BertForFraudClassification(nn.Module):
     """Thin wrapper around AutoModelForSequenceClassification."""
@@ -1135,14 +1136,6 @@ def softmax_fraud_proba(logits):
 # ========================================================================
 # DATASET
 # ========================================================================
-
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
-
-import numpy as np
-import pandas as pd
-from torch.utils.data import Dataset
-
 
 
 SPLIT_FILES = {
@@ -1475,21 +1468,6 @@ def dataframe_to_text_dataset(df: pd.DataFrame, tokenizer, max_length: int) -> J
 # ========================================================================
 # TRAINING
 # ========================================================================
-
-import argparse
-import traceback
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
-from torch.utils.data import DataLoader
-from transformers import AutoTokenizer, DataCollatorWithPadding, get_linear_schedule_with_warmup
-from tqdm import tqdm
-
 
 
 def parse_bool(value: str) -> bool:
@@ -2087,10 +2065,6 @@ def run_training(
 # ==============================================================================
 # CLI COMMANDS: evaluate / predict / export-val
 # ==============================================================================
-
-import argparse
-import shutil
-import traceback
 
 
 def cmd_evaluate(args: argparse.Namespace) -> None:

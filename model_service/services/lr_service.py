@@ -7,6 +7,7 @@ from typing import Any
 
 import joblib
 
+from services.coalesce import InferenceCoalescer
 from settings import LR_ARTIFACT, load_runtime_config
 
 
@@ -15,7 +16,7 @@ class LRService:
         self._lock = threading.Lock()
         self._model = None
         self._threshold: float | None = None
-
+        self._coalescer = InferenceCoalescer()
     def _ensure_artifact(self) -> None:
         if LR_ARTIFACT.exists():
             return
@@ -40,15 +41,21 @@ class LRService:
     def predict(self, combined_text: str) -> dict[str, Any]:
         self.load()
         assert self._model is not None and self._threshold is not None
-        score = float(self._model.predict_proba([combined_text])[0, 1])
-        pred = int(score >= self._threshold)
-        return {
-            "model": "lr",
-            "lr_score": score,
-            "threshold": self._threshold,
-            "predicted_label_id": pred,
-            "predicted_label": "Fraudulent" if pred == 1 else "Legitimate",
-        }
+        key = f"lr:{self._threshold}:{combined_text}"
+
+        def _infer() -> dict[str, Any]:
+            assert self._model is not None and self._threshold is not None
+            score = float(self._model.predict_proba([combined_text])[0, 1])
+            pred = int(score >= self._threshold)
+            return {
+                "model": "lr",
+                "lr_score": score,
+                "threshold": self._threshold,
+                "predicted_label_id": pred,
+                "predicted_label": "Fraudulent" if pred == 1 else "Legitimate",
+            }
+
+        return self._coalescer.run(key, _infer)
 
 
 lr_service = LRService()

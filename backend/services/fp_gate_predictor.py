@@ -27,9 +27,18 @@ _DISPLAY_NAMES = {"lr": "Logistic Regression", "bert": "BERT"}
 class FPGatePredictor:
     """Client for the deployed BERT-primary + LR false-positive-gate API."""
 
-    def __init__(self, base_url: str, timeout_seconds: float = 120.0):
+    def __init__(
+        self,
+        base_url: str,
+        timeout_seconds: float = 120.0,
+        api_key: str | None = None,
+    ):
         self.base_url = base_url.rstrip("/")
-        self.client = httpx.Client(timeout=timeout_seconds)
+        headers = {}
+        key = (api_key or "").strip()
+        if key:
+            headers["X-API-Key"] = key
+        self.client = httpx.Client(timeout=timeout_seconds, headers=headers)
 
     def _post(self, path: str, payload: dict) -> dict:
         try:
