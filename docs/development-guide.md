@@ -65,11 +65,18 @@ npm run dev
 
 ```bash
 pytest -q
+ruff check .
+mypy backend model_service
 cd frontend
 npm run lint
-npm test
+npm run format:check
+npm run test:coverage
 npm run build
 ```
+
+The mypy configuration excludes test modules so local checks match CI and focus on
+production Python services. Run `npm test` for a faster frontend test pass when coverage
+reporting is not needed.
 
 If analysis returns `503`, check the model API `/health` endpoint, verify
 `MODEL_SERVER_URL`, and confirm `/predict/all` returns the documented FP-gate

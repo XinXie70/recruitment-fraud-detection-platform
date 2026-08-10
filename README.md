@@ -127,7 +127,8 @@ Frontend checks:
 ```bash
 cd frontend
 npm run lint
-npm test
+npm run format:check
+npm run test:coverage
 npm run build
 ```
 
