@@ -1,5 +1,8 @@
 const HISTORY_STORAGE_KEY = 'fake_job_history';
-export const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
+
+export function clearAnalysisHistory() {
+  window.localStorage.removeItem(HISTORY_STORAGE_KEY);
+}
 
 export function saveAnalysisHistory(result) {
   try {

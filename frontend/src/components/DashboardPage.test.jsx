@@ -175,7 +175,7 @@ test('opens a complete server history result that is not cached on this device',
   expect(globalThis.fetch).toHaveBeenLastCalledWith('/api/v1/history/42', {
     headers: { Authorization: 'Bearer dashboard-token' },
   });
-  expect(JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'))).toEqual(serverResult);
+  expect(window.sessionStorage.getItem('fake_job_last_analysis')).toBeNull();
 });
 
 test('keeps local history when server synchronization fails', async () => {

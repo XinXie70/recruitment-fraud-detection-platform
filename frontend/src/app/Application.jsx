@@ -3,6 +3,7 @@ import { BrowserRouter, useNavigate } from 'react-router';
 
 import ProtectedRoute from '../components/ProtectedRoute';
 import { clearStoredAuth, loadStoredAuth, saveStoredAuth } from '../features/auth/authStorage';
+import { clearAnalysisHistory } from '../features/analysis/analysisStorage';
 import AnalyzePage from '../pages/AnalyzePage';
 import AuthPage from '../pages/AuthPage';
 import EducationPage from '../pages/EducationPage';
@@ -23,6 +24,7 @@ function AppShell() {
 
   const handleLogout = () => {
     clearStoredAuth();
+    clearAnalysisHistory();
     setAuth(null);
     navigate('/login');
   };

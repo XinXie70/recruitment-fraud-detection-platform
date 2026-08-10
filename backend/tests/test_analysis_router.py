@@ -99,7 +99,13 @@ def test_saved_result_does_not_contain_unredacted_input() -> None:
         ensemble=SimpleNamespace(risk_score=0.8, risk_level="high", version="test-v1"),
         status="success",
         member_outputs=[SimpleNamespace(status="success")],
-        model_dump=lambda **_kwargs: {"status": "success"},
+        model_dump=lambda **_kwargs: {
+            "status": "success",
+            "xai": {"items": [{"text": "private@example.com"}]},
+            "gentle_ai": {
+                "evidence_explanations": [{"text": "api_key=super-secret"}]
+            },
+        },
     )
     db = RecordingDB()
     text = "Contact private@example.com and use api_key=super-secret"
@@ -112,6 +118,11 @@ def test_saved_result_does_not_contain_unredacted_input() -> None:
     assert "[REDACTED" in stored_text
     assert db.saved.analysis_result["storageSchemaVersion"] == "1"
     assert db.saved.analysis_result["modelVersion"] == "test-v1"
+    assert db.saved.analysis_result["xai"]["items"][0]["text"] == "[REDACTED_EXCERPT]"
+    assert (
+        db.saved.analysis_result["gentle_ai"]["evidence_explanations"][0]["text"]
+        == "[REDACTED_EXCERPT]"
+    )
 
 
 def test_history_hash_is_keyed_and_deterministic(monkeypatch) -> None:

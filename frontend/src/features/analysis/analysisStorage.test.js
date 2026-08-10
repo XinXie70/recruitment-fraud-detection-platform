@@ -1,6 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 
-import { saveAnalysisHistory } from './analysisStorage';
+import { clearAnalysisHistory, saveAnalysisHistory } from './analysisStorage';
 
 function result(index) {
   return {
@@ -40,10 +40,18 @@ test('keeps no more than fifty local history entries', () => {
 
 test('does not interrupt analysis when local storage is unavailable', () => {
   const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-  vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+  const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
     throw new Error('storage unavailable');
   });
 
   expect(() => saveAnalysisHistory(result(1))).not.toThrow();
   expect(consoleError).toHaveBeenCalled();
+  getItem.mockRestore();
+  consoleError.mockRestore();
+});
+
+test('clears local history summaries', () => {
+  saveAnalysisHistory(result(1));
+  clearAnalysisHistory();
+  expect(window.localStorage.getItem('fake_job_history')).toBeNull();
 });

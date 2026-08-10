@@ -210,7 +210,6 @@ export default function DashboardPage({ auth, onLogout }) {
   };
 
   const openAnalysisResult = (analysisResult) => {
-    window.sessionStorage.setItem('fake_job_last_analysis', JSON.stringify(analysisResult));
     navigate('/analyze', { state: { analysisResult } });
   };
 

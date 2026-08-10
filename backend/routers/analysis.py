@@ -62,6 +62,25 @@ def _hash_history_input(text: str) -> str:
     ).hexdigest()
 
 
+def _result_for_storage(result: AnalysisResponse, text: str) -> dict:
+    """Build a useful historical result without retaining source-text excerpts."""
+    stored = result.model_dump(mode="json")
+    for item in stored.get("xai", {}).get("items", []):
+        if isinstance(item, dict) and "text" in item:
+            item["text"] = "[REDACTED_EXCERPT]"
+    for item in stored.get("gentle_ai", {}).get("evidence_explanations", []):
+        if isinstance(item, dict) and "text" in item:
+            item["text"] = "[REDACTED_EXCERPT]"
+    stored.update(
+        {
+            "storageSchemaVersion": "1",
+            "modelVersion": result.ensemble.version,
+            "inputText": _redact_history_preview(text),
+        }
+    )
+    return stored
+
+
 def _save_history(
     text: str,
     result: AnalysisResponse,
@@ -82,14 +101,7 @@ def _save_history(
                 1 for m in result.member_outputs if m.status == "success"
             ),
             ensemble_total=len(result.member_outputs),
-            analysis_result={
-                **result.model_dump(mode="json"),
-                "storageSchemaVersion": "1",
-                "modelVersion": result.ensemble.version,
-                # Never persist the unredacted advert: it can contain contact
-                # details, credentials, or other personal information.
-                "inputText": _redact_history_preview(text),
-            },
+            analysis_result=_result_for_storage(result, text),
             created_at=datetime.now(timezone.utc),
         )
         db.add(history)

@@ -22,6 +22,21 @@ test('treats malformed stored authentication data as signed out', () => {
   expect(loadStoredAuth()).toBeNull();
 });
 
+test('rejects incomplete authentication payloads', () => {
+  window.sessionStorage.setItem('fake_job_auth', JSON.stringify({ access_token: 'token' }));
+  expect(loadStoredAuth()).toBeNull();
+  expect(window.sessionStorage.getItem('fake_job_auth')).toBeNull();
+});
+
+test('rejects an expired JWT', () => {
+  const payload = window.btoa(JSON.stringify({ exp: 1 })).replaceAll('=', '');
+  window.sessionStorage.setItem(
+    'fake_job_auth',
+    JSON.stringify({ access_token: `header.${payload}.signature`, user: { username: 'tester' } }),
+  );
+  expect(loadStoredAuth()).toBeNull();
+});
+
 test('migrates legacy local authentication into session storage', () => {
   const auth = { access_token: 'legacy-token', user: { username: 'tester' } };
   window.localStorage.setItem('fake_job_auth', JSON.stringify(auth));
