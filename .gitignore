@@ -54,3 +54,5 @@ backend/test.db
 experiments/**/logs/*
 retrain_*/results/logs/*
 retrain_*/results/*.log
+model_algorithm/**/logs/
+model_algorithm/**/*.log

@@ -1,0 +1,134 @@
+{
+  "experiment": "bert + class weight_finetune",
+  "paths": {
+    "bert_code_root": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\code",
+    "project_root": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT",
+    "train_csv": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\data\\splits\\train.csv.gz",
+    "validation_csv": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\data\\splits\\validation.csv.gz",
+    "test_csv": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\data\\splits\\test.csv.gz",
+    "weights_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\weight",
+    "results_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results",
+    "figures_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results\\figures",
+    "logs_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results\\logs",
+    "pretrained_model_name": "bert-base-uncased",
+    "text_fields": [
+      "title",
+      "company_profile",
+      "description",
+      "requirements",
+      "benefits"
+    ],
+    "tagged_field_order": [
+      "title",
+      "company_profile",
+      "description",
+      "requirements",
+      "benefits",
+      "employment_type",
+      "required_experience",
+      "industry",
+      "function"
+    ],
+    "use_tagged_format": true,
+    "prefer_combined_text": false
+  },
+  "config": {
+    "pretrained_model_name": "bert-base-uncased",
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "num_train_epochs": 5,
+    "train_batch_size": 4,
+    "eval_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "max_length": 384,
+    "warmup_ratio": 0.1,
+    "early_stopping_patience": 2,
+    "dropout": 0.1,
+    "random_seed": 42,
+    "fp16": true,
+    "max_grad_norm": 1.0,
+    "use_class_weights": true,
+    "class_weight_transform": "none",
+    "class_weight_max": 100.0,
+    "fraud_oversample_factor": 1.0,
+    "gradient_checkpointing": false,
+    "selection_metric": "fraud_f1",
+    "default_threshold": 0.5,
+    "optimize_threshold": true,
+    "threshold_selection_mode": "max_fraud_f1",
+    "threshold_f_beta": 0.5,
+    "threshold_f1_tolerance": 0.01,
+    "min_fraud_recall_for_threshold": null,
+    "threshold_step": 0.01,
+    "output_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\weight\\class_weight",
+    "run_name": "class_weight",
+    "model_label": "BERT + Class Weight",
+    "write_canonical_aliases": false
+  },
+  "environment": {
+    "python_executable": "E:\\ml\\venv\\Scripts\\python.exe",
+    "python_version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "pytorch_version": "2.11.0+cu128",
+    "transformers_version": "5.13.1",
+    "imbalanced_learn_version": "0.14.2",
+    "sklearn_version": "1.9.0",
+    "numpy_version": "2.4.4",
+    "cuda_available": true,
+    "pytorch_cuda_version": "12.8",
+    "cudnn_version": 91900,
+    "gpu_name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "gpu_count": 1,
+    "current_training_device": "cuda"
+  },
+  "best_checkpoint": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\weight\\class_weight\\best",
+  "best_epoch": 2,
+  "best_validation_metric": 0.8854961832061069,
+  "threshold": 0.36,
+  "token_length_stats": {
+    "n_texts_measured": 3000,
+    "mean": 461.0036666666667,
+    "median": 448.0,
+    "p90": 692.0,
+    "p95": 752.0,
+    "p99": 1046.1399999999967,
+    "pct_over_128": 0.9713333333333334,
+    "pct_over_256": 0.8586666666666667,
+    "pct_over_384": 0.6263333333333333,
+    "pct_over_512": 0.371,
+    "recommended_max_length": 384,
+    "recommendation_reason": "Measured train token lengths: median≈448, 85.9% >256, 62.6% >384, 37.1% >512. Default max_length=384 is chosen for RTX 3060 with batch=4 / accum=4; try 512 only after an OOM check. Long ads may still be truncated."
+  },
+  "training_time_sec": 1630.987946000001,
+  "imbalance_method": "Class weight (none)",
+  "class_weights": [
+    0.5254714670585354,
+    10.314903846153847
+  ],
+  "sample_counts": {
+    "train": {
+      "n": 12873,
+      "fraud": 624
+    },
+    "validation": {
+      "n": 1431,
+      "fraud": 69
+    },
+    "test": {
+      "n": 3576,
+      "fraud": 173
+    }
+  },
+  "train_oversample": {
+    "factor": 1.0,
+    "n_before": 12873,
+    "n_after": 12873,
+    "fraud_before": 624,
+    "fraud_after": 624
+  },
+  "class_weight_transform": "none",
+  "class_weight_max": 100.0,
+  "threshold_step": 0.01,
+  "min_fraud_recall_for_threshold": null,
+  "results_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\result\\class_weight",
+  "figures_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\result\\class_weight\\figures"
+}

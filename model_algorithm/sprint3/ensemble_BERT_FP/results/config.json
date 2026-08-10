@@ -1,8 +1,8 @@
 {
   "experiment": "ensemble_bert_fp_gate_lr_none_bigram_maxlen512",
   "method": "BERT decision + flip to legit when LR_score < lr_gate",
-  "lr_source": "lr_none_bigram_no_cv_paper_aligned_seed42",
-  "bert_source": "retrain_paper_aligned_seed42_maxlen512",
+  "lr_source": "LR",
+  "bert_source": "BERT",
   "bert_threshold": 0.3,
   "lr_gate": 0.06,
   "selection_set": "validation",
@@ -10,15 +10,16 @@
   "test_used_for_selection": false,
   "reported_test_models": [
     "LR (class_weight=None, bigram, no CV)",
-    "BERT max_length=512",
+    "Optimized BERT max_length=512",
     "BERT + LR(None/bigram) FP-gate"
   ],
   "reproducibility": {
     "pythonhashseed": "42",
     "random_seed": 42,
-    "frozen_lr_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\lr_none_bigram_no_cv_paper_aligned_seed42\\results\\test_predictions.csv",
-    "frozen_bert_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\results\\predictions_bert_paper_protocol_maxlen512.csv",
-    "frozen_bert_validation_predictions": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\results\\bert_validation_predictions.csv",
+    "frozen_lr_predictions": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\LR\\results\\test_predictions.csv",
+    "frozen_bert_predictions": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results\\predictions_test.csv",
+    "frozen_bert_validation_predictions": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results\\validation_predictions.csv",
+    "frozen_bert_test_metrics": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\BERT\\results\\metrics_test.json",
     "package_versions": {
       "python": "3.13.7",
       "numpy": "2.4.4",

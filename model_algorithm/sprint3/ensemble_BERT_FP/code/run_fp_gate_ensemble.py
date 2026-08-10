@@ -1,11 +1,14 @@
 """BERT primary + LR FP gate (no class_weight, bigram LR, no CV).
 
-LR scores come from lr_none_bigram_no_cv_paper_aligned_seed42:
+VS Code / Cursor: open this file and click Run Python File to reproduce the
+FP-gate ensemble (writes results under ../results/).
+
+LR scores come from ../LR:
   - class_weight=None
   - unigram + bigram ngram_range=(1, 2)
   - no Train-internal CV
 
-BERT is retrain_paper_aligned_seed42_maxlen512.
+BERT is ../BERT (Optimized BERT, max_length=512).
 
 Test reporting keeps only three arms:
   1) LR (None + bigram)
@@ -20,6 +23,7 @@ import os
 import random
 import sys
 from pathlib import Path
+from typing import Any, Iterable, Optional
 
 os.environ.setdefault("PYTHONHASHSEED", "42")
 
@@ -42,18 +46,97 @@ BERT_ROOT = SPRINT3 / "BERT"
 LR_VAL = LR_ROOT / "results" / "validation_predictions.csv"
 LR_TEST = LR_ROOT / "results" / "test_predictions.csv"
 # Prefer the BERT-side export; fall back to a local frozen copy.
-BERT_VAL_CANONICAL = BERT_ROOT / "results" / "bert_validation_predictions.csv"
-BERT_VAL_LOCAL = ROOT / "results" / "bert_validation_predictions.csv"
-BERT_VAL = BERT_VAL_CANONICAL if BERT_VAL_CANONICAL.exists() else BERT_VAL_LOCAL
-BERT_TEST = (
-    BERT_ROOT / "results" / "predictions_bert_paper_protocol_maxlen512.csv"
+BERT_VAL_CANDIDATES = (
+    BERT_ROOT / "results" / "validation_predictions.csv",
+    BERT_ROOT / "results" / "bert_validation_predictions.csv",
+    ROOT / "results" / "bert_validation_predictions.csv",
+    ROOT / "results" / "validation_predictions.csv",
 )
-LR_TEST_METRICS = LR_ROOT / "results" / "test_metrics.json"
-BERT_TEST_METRICS = (
+BERT_TEST_CANDIDATES = (
+    BERT_ROOT / "results" / "predictions_test.csv",
+    BERT_ROOT / "results" / "predictions_bert_paper_protocol_maxlen512.csv",
+)
+BERT_TEST_METRICS_CANDIDATES = (
+    BERT_ROOT / "results" / "metrics_test.json",
     BERT_ROOT
     / "results"
-    / "bert-paper-protocol_test_metrics_bert_paper_protocol_maxlen512.json"
+    / "bert-paper-protocol_test_metrics_bert_paper_protocol_maxlen512.json",
 )
+LR_TEST_METRICS = LR_ROOT / "results" / "test_metrics.json"
+
+SEED = 42
+BERT_THRESHOLDS = np.round(np.arange(0.05, 0.96, 0.01), 2)
+LR_GATES = np.unique(
+    np.concatenate(
+        [
+            np.array([0.0]),  # never gate (= pure BERT)
+            np.round(np.arange(0.01, 0.51, 0.01), 2),
+            np.round(np.arange(0.55, 1.01, 0.05), 2),
+        ]
+    )
+)
+
+
+def first_existing(paths: Iterable[Path]) -> Optional[Path]:
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+def require_existing(paths: Iterable[Path], label: str) -> Path:
+    found = first_existing(paths)
+    if found is not None:
+        return found
+    tried = "\n".join(f"  - {p}" for p in paths)
+    raise FileNotFoundError(f"Missing {label}. Tried:\n{tried}")
+
+
+def load_bert_reference_metrics(path: Path) -> dict[str, Any]:
+    """Normalize Optimized BERT / legacy paper-protocol metrics JSON."""
+    raw = json.loads(path.read_text(encoding="utf-8"))
+
+    # Current short-name evaluate output: {"metrics": {...}, "macro_*": ...}
+    if "metrics" in raw and isinstance(raw["metrics"], dict):
+        metrics = dict(raw["metrics"])
+        report = metrics.get("classification_report") or {}
+        macro = report.get("macro avg") or {}
+        return {
+            "fraud_precision": float(metrics["fraud_precision"]),
+            "fraud_recall": float(metrics["fraud_recall"]),
+            "fraud_f1": float(metrics["fraud_f1"]),
+            "macro_f1": float(metrics.get("macro_f1", macro.get("f1-score", 0.0))),
+            "macro_precision": float(
+                raw.get("macro_precision", macro.get("precision", 0.0))
+            ),
+            "macro_recall": float(raw.get("macro_recall", macro.get("recall", 0.0))),
+            "pr_auc": float(metrics["pr_auc"]),
+            "roc_auc": float(metrics["roc_auc"]),
+            "classification_report": report,
+            "threshold": float(raw.get("threshold", metrics.get("threshold", 0.5))),
+            "source": str(path),
+        }
+
+    # Legacy training dump: test_metrics.threshold_optimized
+    if "test_metrics" in raw:
+        opt = raw["test_metrics"].get("threshold_optimized") or raw["test_metrics"]
+        report = opt.get("classification_report") or {}
+        macro = report.get("macro avg") or {}
+        return {
+            "fraud_precision": float(opt["fraud_precision"]),
+            "fraud_recall": float(opt["fraud_recall"]),
+            "fraud_f1": float(opt["fraud_f1"]),
+            "macro_f1": float(opt.get("macro_f1", macro.get("f1-score", 0.0))),
+            "macro_precision": float(macro.get("precision", 0.0)),
+            "macro_recall": float(macro.get("recall", 0.0)),
+            "pr_auc": float(opt["pr_auc"]),
+            "roc_auc": float(opt["roc_auc"]),
+            "classification_report": report,
+            "threshold": float(opt.get("threshold", raw.get("threshold", 0.5))),
+            "source": str(path),
+        }
+
+    raise ValueError(f"Unrecognized BERT metrics schema: {path}")
 
 SEED = 42
 BERT_THRESHOLDS = np.round(np.arange(0.05, 0.96, 0.01), 2)
@@ -148,36 +231,36 @@ def metrics_from_predictions(
 def main() -> None:
     set_reproducibility(SEED)
 
-    if not BERT_VAL.exists():
-        raise FileNotFoundError(
-            f"Missing BERT validation predictions.\n"
-            f"Expected: {BERT_VAL_CANONICAL}\n"
-            f"Or local: {BERT_VAL_LOCAL}\n"
-            "Regenerate with:\n"
-            "  python ../BERT/code/bert.py export-val"
-        )
+    bert_val = require_existing(BERT_VAL_CANDIDATES, "BERT validation predictions")
+    bert_test = require_existing(BERT_TEST_CANDIDATES, "BERT test predictions")
+    bert_test_metrics_path = require_existing(
+        BERT_TEST_METRICS_CANDIDATES, "BERT test metrics"
+    )
+
+    if not LR_VAL.exists():
+        raise FileNotFoundError(f"Missing LR validation predictions: {LR_VAL}")
+    if not LR_TEST.exists():
+        raise FileNotFoundError(f"Missing LR test predictions: {LR_TEST}")
     if not LR_TEST_METRICS.exists():
         raise FileNotFoundError(
             f"Missing LR test metrics: {LR_TEST_METRICS}\n"
-            "Run lr_none_bigram_no_cv_paper_aligned_seed42/code/train_lr_none_bigram_no_cv.py first."
+            "Run ../LR training first to regenerate predictions/metrics."
         )
-    if not BERT_TEST_METRICS.exists():
-        raise FileNotFoundError(f"Missing BERT test metrics: {BERT_TEST_METRICS}")
 
-    validation = align_scores(LR_VAL, BERT_VAL, "Validation")
-    test = align_scores(LR_TEST, BERT_TEST, "Test")
+    validation = align_scores(LR_VAL, bert_val, "Validation")
+    test = align_scores(LR_TEST, bert_test, "Test")
     if set(validation["record_id"]) & set(test["record_id"]):
         raise ValueError("Validation and Test IDs overlap")
 
     y_val = validation["label"].to_numpy(dtype=int)
     lr_val = validation["lr_score"].to_numpy()
-    bert_val = validation["bert_score"].to_numpy()
+    bert_val_scores = validation["bert_score"].to_numpy()
 
     sweep_rows = []
     for bert_threshold in BERT_THRESHOLDS:
         for lr_gate in LR_GATES:
             preds, gated, ranks = apply_gate(
-                lr_val, bert_val, float(bert_threshold), float(lr_gate)
+                lr_val, bert_val_scores, float(bert_threshold), float(lr_gate)
             )
             metrics = metrics_from_predictions(y_val, preds, ranks)
             sweep_rows.append(
@@ -200,7 +283,7 @@ def main() -> None:
     lr_gate = float(selected["lr_gate"])
 
     val_preds, val_gated, val_ranks = apply_gate(
-        lr_val, bert_val, bert_threshold, lr_gate
+        lr_val, bert_val_scores, bert_threshold, lr_gate
     )
     validation_metrics = metrics_from_predictions(y_val, val_preds, val_ranks)
     validation_metrics["bert_threshold"] = bert_threshold
@@ -214,9 +297,9 @@ def main() -> None:
 
     y_test = test["label"].to_numpy(dtype=int)
     lr_test = test["lr_score"].to_numpy()
-    bert_test = test["bert_score"].to_numpy()
+    bert_test_scores = test["bert_score"].to_numpy()
     test_preds, test_gated, test_ranks = apply_gate(
-        lr_test, bert_test, bert_threshold, lr_gate
+        lr_test, bert_test_scores, bert_threshold, lr_gate
     )
     test_metrics = metrics_from_predictions(y_test, test_preds, test_ranks)
     test_metrics["bert_threshold"] = bert_threshold
@@ -248,15 +331,16 @@ def main() -> None:
         "test_used_for_selection": False,
         "reported_test_models": [
             "LR (class_weight=None, bigram, no CV)",
-            "BERT max_length=512",
+            "Optimized BERT max_length=512",
             "BERT + LR(None/bigram) FP-gate",
         ],
         "reproducibility": {
             "pythonhashseed": os.environ.get("PYTHONHASHSEED"),
             "random_seed": SEED,
             "frozen_lr_predictions": str(LR_TEST),
-            "frozen_bert_predictions": str(BERT_TEST),
-            "frozen_bert_validation_predictions": str(BERT_VAL),
+            "frozen_bert_predictions": str(bert_test),
+            "frozen_bert_validation_predictions": str(bert_val),
+            "frozen_bert_test_metrics": str(bert_test_metrics_path),
             "package_versions": package_versions(),
         },
         "validation_rows": int(len(validation)),
@@ -282,8 +366,7 @@ def main() -> None:
         legacy.unlink()
 
     lr_ref = json.loads(LR_TEST_METRICS.read_text(encoding="utf-8"))
-    bert_raw = json.loads(BERT_TEST_METRICS.read_text(encoding="utf-8"))
-    bert_opt = bert_raw["test_metrics"]["threshold_optimized"]
+    bert_opt = load_bert_reference_metrics(bert_test_metrics_path)
 
     improved_macro = test_metrics["macro_f1"] > bert_opt["macro_f1"] + 1e-12
     improved_fraud = test_metrics["fraud_f1"] > bert_opt["fraud_f1"] + 1e-12
@@ -291,21 +374,21 @@ def main() -> None:
 
 ## Method
 
-1. Predict with BERT (`max_length=512`) using `bert_threshold`
+1. Predict with Optimized BERT (`max_length=512`) using `bert_threshold`
 2. If BERT predicts fraud **and** `LR_score < lr_gate`, flip to legitimate
 3. Select `(bert_threshold, lr_gate)` on Validation by Fraud F1
 4. Freeze and evaluate once on Test
 
-LR branch: `lr_none_bigram_no_cv_paper_aligned_seed42`
-(`class_weight=None`, unigram+bigram, no Train CV).
+LR branch: `../LR` (`class_weight=None`, unigram+bigram, no Train CV).
 
-BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
+BERT branch: `../BERT` (Optimized BERT, `max_length=512`).
 
 ## Reproducibility
 
 - Selection seed / hash seed: `{SEED}` / `{os.environ.get("PYTHONHASHSEED")}`
 - Frozen LR predictions: `{LR_TEST}`
-- Frozen BERT predictions: `{BERT_TEST}`
+- Frozen BERT predictions: `{bert_test}`
+- Frozen BERT metrics: `{bert_test_metrics_path}`
 - Packages: `{package_versions()}`
 - Test report keeps only: LR / BERT / this ensemble
 
@@ -323,7 +406,7 @@ BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
 | Model | Macro P | Macro R | Macro F1 | PR-AUC | ROC-AUC |
 |---|---:|---:|---:|---:|---:|
 | LR (`None`, bigram, no CV) | {lr_ref["macro_precision"]:.4f} | {lr_ref["macro_recall"]:.4f} | {lr_ref["macro_f1"]:.4f} | {lr_ref["pr_auc"]:.4f} | {lr_ref["roc_auc"]:.4f} |
-| BERT max_length=512 | {bert_opt["classification_report"]["macro avg"]["precision"]:.4f} | {bert_opt["classification_report"]["macro avg"]["recall"]:.4f} | {bert_opt["macro_f1"]:.4f} | {bert_opt["pr_auc"]:.4f} | {bert_opt["roc_auc"]:.4f} |
+| Optimized BERT max_length=512 | {bert_opt["macro_precision"]:.4f} | {bert_opt["macro_recall"]:.4f} | {bert_opt["macro_f1"]:.4f} | {bert_opt["pr_auc"]:.4f} | {bert_opt["roc_auc"]:.4f} |
 | **BERT + LR(None/bigram) FP-gate** | {test_metrics["macro_precision"]:.4f} | {test_metrics["macro_recall"]:.4f} | {test_metrics["macro_f1"]:.4f} | {test_metrics["pr_auc"]:.4f} | {test_metrics["roc_auc"]:.4f} |
 
 ## Test comparison (Fraud metrics)
@@ -331,11 +414,11 @@ BERT branch: `retrain_paper_aligned_seed42_maxlen512`.
 | Model | Fraud P | Fraud R | Fraud F1 |
 |---|---:|---:|---:|
 | LR (`None`, bigram, no CV) | {lr_ref["fraud_precision"]:.4f} | {lr_ref["fraud_recall"]:.4f} | {lr_ref["fraud_f1"]:.4f} |
-| BERT max_length=512 | {bert_opt["fraud_precision"]:.4f} | {bert_opt["fraud_recall"]:.4f} | {bert_opt["fraud_f1"]:.4f} |
+| Optimized BERT max_length=512 | {bert_opt["fraud_precision"]:.4f} | {bert_opt["fraud_recall"]:.4f} | {bert_opt["fraud_f1"]:.4f} |
 | **BERT + LR(None/bigram) FP-gate** | {test_metrics["fraud_precision"]:.4f} | {test_metrics["fraud_recall"]:.4f} | {test_metrics["fraud_f1"]:.4f} |
 
-Macro F1 vs BERT-512 alone: {"higher" if improved_macro else "not higher"} ({bert_opt["macro_f1"]:.4f} → {test_metrics["macro_f1"]:.4f}).
-Fraud F1 vs BERT-512 alone: {"higher" if improved_fraud else "not higher"} ({bert_opt["fraud_f1"]:.4f} → {test_metrics["fraud_f1"]:.4f}).
+Macro F1 vs Optimized BERT alone: {"higher" if improved_macro else "not higher"} ({bert_opt["macro_f1"]:.4f} → {test_metrics["macro_f1"]:.4f}).
+Fraud F1 vs Optimized BERT alone: {"higher" if improved_fraud else "not higher"} ({bert_opt["fraud_f1"]:.4f} → {test_metrics["fraud_f1"]:.4f}).
 
 Confusion matrix on Test: TN {test_metrics["tn"]}, FP {test_metrics["fp"]}, FN {test_metrics["fn"]}, TP {test_metrics["tp"]}.
 """
@@ -343,48 +426,46 @@ Confusion matrix on Test: TN {test_metrics["tn"]}, FP {test_metrics["fp"]}, FN {
     (ROOT / "README.md").write_text(
         """# BERT + LR(None/bigram/no-CV) FP-gate
 
-BERT（`max_length=512`）为主；当 BERT 判欺诈且 LR 分数低于门控阈值时，改判正常（压 FP）。
+Optimized BERT (`max_length=512`) is primary. When BERT predicts fraud and the LR
+score is below the gate threshold, the decision is flipped to legitimate (FP gate).
 
-## 组成
+## Components
 
-| 分支 | 路径 |
+| Branch | Path |
 |---|---|
-| LR | `../lr_none_bigram_no_cv_paper_aligned_seed42`（`class_weight=None`，bigram，无 CV） |
-| BERT | `../retrain_paper_aligned_seed42_maxlen512` |
-| Ensemble | 本目录（FP-gate） |
+| LR | `../LR` (`class_weight=None`, bigram, no CV) |
+| BERT | `../BERT` (Optimized BERT) |
+| Ensemble | This directory (FP-gate) |
 
-Test 结果只报告上述三支：LR / BERT / Ensemble。
+The test report compares only these three arms: LR / BERT / Ensemble.
 
-## 复现步骤
+## Reproduce
+
+From `sprint3/`, activate the CUDA environment and run:
 
 ```powershell
 . E:\\ml\\activate.ps1
 
-# 0) BERT：训练/评测后导出 Validation 分数（若已有冻结文件可跳过）
-cd ..\\retrain_paper_aligned_seed42_maxlen512\\code
-python export_validation_predictions.py
+# 1) BERT: export validation scores (skip if frozen files already exist)
+python BERT/code/run.py export-val
 
-# 1) 复现 LR（写 predictions + metrics）
-cd ..\\..\\lr_none_bigram_no_cv_paper_aligned_seed42\\code
-python train_lr_none_bigram_no_cv.py
+# 2) LR: reproduce predictions + metrics (skip if already present)
+python LR/code/train_lr_none_bigram_no_cv.py
 
-# 2) 复现 FP-gate（依赖 BERT / LR 预测）
-cd ..\\..\\ensemble_bert_fp_gate_lr_none_bigram_maxlen512\\code
-python run_fp_gate_ensemble.py
-
-# 3) Risk score / risk level（Validation 选参，再应用到 Test）
-cd ..\\risk_level
-python select_risk_boundaries.py --mode select
-python select_risk_boundaries.py --mode apply-test
+# 3) FP-gate ensemble
+python ensemble_BERT_FP/code/run_fp_gate_ensemble.py
 ```
 
-需要已存在：
+Required artifacts (short names preferred; legacy long names still accepted):
 
-- `../retrain_paper_aligned_seed42_maxlen512/results/bert_validation_predictions.csv`
-  （或本目录 `results/bert_validation_predictions.csv`）
-- `../retrain_paper_aligned_seed42_maxlen512/results/predictions_bert_paper_protocol_maxlen512.csv`
+- `../BERT/results/validation_predictions.csv` (or `bert_validation_predictions.csv`)
+- `../BERT/results/predictions_test.csv`
+- `../BERT/results/metrics_test.json`
+- `../LR/results/validation_predictions.csv`
+- `../LR/results/test_predictions.csv`
+- `../LR/results/test_metrics.json`
 
-对外风险输出口径见：[risk_score/RISK_SCORE_AND_LEVEL.md](./risk_score/RISK_SCORE_AND_LEVEL.md)
+Risk-score / risk-level docs live under sibling `../risk_score/` and `../risk_level/` when present.
 """,
         encoding="utf-8",
     )

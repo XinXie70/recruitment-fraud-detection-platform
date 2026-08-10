@@ -19,7 +19,7 @@ This is an operational ensemble decision score, not a calibrated probability.
 
 | Split | BERT PR-AUC | Ensemble score PR-AUC | BERT ROC-AUC | Ensemble score ROC-AUC | Gate scores from LR |
 |---|---:|---:|---:|---:|---:|
-| Validation | 0.8561 | 0.8596 | 0.9755 | 0.9756 | 1 |
+| Validation | 0.8895 | 0.8930 | 0.9757 | 0.9758 | 1 |
 | Test | 0.9405 | 0.9478 | 0.9931 | 0.9933 | 3 |
 
 No risk-score parameter or threshold was selected on Test. Test only applies

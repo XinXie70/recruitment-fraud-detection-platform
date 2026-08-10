@@ -14,10 +14,10 @@
   "non_low_fraud": 166,
   "non_low_fraud_recall": 0.9595375722543352,
   "score_summary": {
-    "bert_pr_auc": 0.9404939109364651,
-    "bert_roc_auc": 0.9931079173595554,
-    "ensemble_risk_score_pr_auc": 0.9478307877799469,
-    "ensemble_risk_score_roc_auc": 0.9932913665093195,
+    "bert_pr_auc": 0.9404995407558127,
+    "bert_roc_auc": 0.9930994243433624,
+    "ensemble_risk_score_pr_auc": 0.9478366439313588,
+    "ensemble_risk_score_roc_auc": 0.9932828734931265,
     "gate_triggered": 3,
     "risk_score_from_bert": 3573,
     "risk_score_from_lr_gate": 3

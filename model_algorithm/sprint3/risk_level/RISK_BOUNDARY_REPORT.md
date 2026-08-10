@@ -58,10 +58,10 @@ the raw BERT evidence score and records the score source.
 
 Validation score diagnostics:
 
-- BERT PR-AUC: 0.8561
-- Ensemble risk-score PR-AUC: 0.8596
-- BERT ROC-AUC: 0.9755
-- Ensemble risk-score ROC-AUC: 0.9756
+- BERT PR-AUC: 0.8895
+- Ensemble risk-score PR-AUC: 0.8930
+- BERT ROC-AUC: 0.9757
+- Ensemble risk-score ROC-AUC: 0.9758
 - Gate-triggered scores using LR: 1
 
 ## Validation trade-off
@@ -71,7 +71,7 @@ Validation score diagnostics:
 | 90.0% | 0.00240 | 63/69 (91.30%) | 6 | 39 | 34 |
 | 92.5% | 0.00060 | 64/69 (92.75%) | 5 | 125 | 119 |
 | 95.0% | 0.00019 | 66/69 (95.65%) | 3 | 311 | 303 |
-| 97.5% | 0.00011 | 68/69 (98.55%) | 1 | 569 | 559 |
+| 97.5% | 0.00011 | 68/69 (98.55%) | 1 | 571 | 561 |
 
 ## Final three-level rule
 

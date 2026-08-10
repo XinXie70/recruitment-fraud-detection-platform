@@ -1,96 +1,42 @@
-# BERT + LR (no class weight, bigrams, no CV) FP-gate
+# BERT + LR(None/bigram/no-CV) FP-gate
 
-BERT with `max_length=512` is the primary model. When BERT predicts fraud but
-the LR score is below the gate threshold, the ensemble changes the decision to
-legitimate to reduce false positives.
+Optimized BERT (`max_length=512`) is primary. When BERT predicts fraud and the LR
+score is below the gate threshold, the decision is flipped to legitimate (FP gate).
 
 ## Components
 
 | Branch | Path |
 |---|---|
-| LR | `../lr_none_bigram_no_cv_paper_aligned_seed42` (`class_weight=None`, bigrams, no CV) |
-| BERT | `../BERT` |
+| LR | `../LR` (`class_weight=None`, bigram, no CV) |
+| BERT | `../BERT` (Optimized BERT) |
 | Ensemble | This directory (FP-gate) |
 
-The test report compares only these three branches: LR, BERT, and the ensemble.
+The test report compares only these three arms: LR / BERT / Ensemble.
 
-## Reproduce the experiment
+## Reproduce
 
-From the repository root, activate the project environment and run the steps in
-order. Step 1 may be skipped when the frozen BERT validation predictions are
-already present.
+From `sprint3/`, activate the CUDA environment and run:
 
-```bash
-# 1. Export BERT validation scores
-python BERT/code/bert.py export-val
+```powershell
+. E:\ml\activate.ps1
 
-# 2. Reproduce LR predictions and metrics
-python lr_none_bigram_no_cv_paper_aligned_seed42/code/train_lr_none_bigram_no_cv.py
+# 1) BERT: export validation scores (skip if frozen files already exist)
+python BERT/code/run.py export-val
 
-# 3. Reproduce the FP-gate ensemble
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/code/run_fp_gate_ensemble.py
+# 2) LR: reproduce predictions + metrics (skip if already present)
+python LR/code/train_lr_none_bigram_no_cv.py
 
-# 4. Select and apply risk boundaries
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/select_risk_boundaries.py \
-  --mode select
-python ensemble_bert_fp_gate_lr_none_bigram_maxlen512/risk_level/select_risk_boundaries.py \
-  --mode apply-test
+# 3) FP-gate ensemble
+python ensemble_BERT_FP/code/run_fp_gate_ensemble.py
 ```
 
-The following artifacts must already exist:
+Required artifacts (short names preferred; legacy long names still accepted):
 
-- `../BERT/results/bert_validation_predictions.csv`
-  (the export script also refreshes `results/bert_validation_predictions.csv` here)
-- `../BERT/results/predictions_bert_paper_protocol_maxlen512.csv`
-- BERT weights under
-  `../BERT/weight/best/`
+- `../BERT/results/validation_predictions.csv` (or `bert_validation_predictions.csv`)
+- `../BERT/results/predictions_test.csv`
+- `../BERT/results/metrics_test.json`
+- `../LR/results/validation_predictions.csv`
+- `../LR/results/test_predictions.csv`
+- `../LR/results/test_metrics.json`
 
-See [Ensemble Risk Score and Three-Level Output](risk_score/RISK_SCORE_AND_LEVEL.md)
-for the public risk-output contract.
-
-## Three-level risk boundaries
-
-The original FP-gate validation search determines the High parameters. A
-validation trade-off search determines the Low parameter. Test data is not used
-for parameter selection.
-
-The frozen rule is:
-
-```text
-High: BERT score >= 0.30 and LR score >= 0.06
-Low:  BERT score < 0.0024
-Otherwise: Suspicious
-```
-
-BERT is the primary risk-scoring model. LR is used only as a false-positive
-gate for High candidates and does not participate in the Low boundary.
-
-The operational risk score is:
-
-```text
-Normally:       risk_score = BERT score
-If gate fires:  risk_score = LR score
-Display:        risk_score_100 = risk_score * 100
-```
-
-The risk level must still be calculated with the original BERT–LR gate rule; it
-cannot be reconstructed from the mixed-source risk score alone. The operational
-score is not a calibrated fraud probability. The original BERT and LR scores
-are retained in the output.
-
-Risk-score outputs under `risk_score/`:
-
-- `RISK_SCORE_AND_LEVEL.md`
-- `RISK_SCORE_REPORT.md`
-- `risk_score_metrics.csv`
-
-Risk-level outputs under `risk_level/`:
-
-- `select_risk_boundaries.py`
-- `risk_boundary_config.json`
-- `RISK_BOUNDARY_REPORT.md`
-- `low_boundary_tradeoff.csv`
-- `low_boundary_target_comparison.csv`
-- `validation_risk_levels.csv`
-- `test_risk_levels.csv`
-- `test_risk_level_summary.json`
+Risk-score / risk-level docs live under sibling `../risk_score/` and `../risk_level/` when present.

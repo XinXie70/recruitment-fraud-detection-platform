@@ -30,9 +30,11 @@ from config import (
     FIGURES_DIR,
     LABEL_COLUMN,
     MAX_LENGTH,
+    MODEL_LABEL,
     PRETRAINED_MODEL_NAME,
     RANDOM_SEED,
     RESULTS_DIR,
+    RUN_NAME,
     BertFinetuneConfig,
     Timer,
     collect_environment_info,
@@ -501,7 +503,7 @@ def run_training(
     history_df = pd.DataFrame(history_rows)
     history_path = results_root / f"training_history_{cfg.run_name}.csv"
     history_df.to_csv(history_path, index=False)
-    write_aliases = cfg.write_canonical_aliases and cfg.use_class_weights
+    write_aliases = bool(cfg.write_canonical_aliases)
     # Also keep a canonical name for the default/main BERT run.
     if write_aliases:
         history_df.to_csv(results_root / "training_history.csv", index=False)
@@ -590,11 +592,12 @@ def run_training(
     if write_aliases:
         preds.to_csv(results_root / "predictions.csv", index=False)
 
-    errors = build_error_analysis(preds, splits["test"]["model_text"].tolist())
-    err_path = results_root / f"error_analysis_{cfg.run_name}.csv"
-    errors.to_csv(err_path, index=False)
-    if write_aliases:
-        errors.to_csv(results_root / "error_analysis.csv", index=False)
+    if getattr(cfg, "write_error_analysis", True):
+        errors = build_error_analysis(preds, splits["test"]["model_text"].tolist())
+        err_path = results_root / f"error_analysis_{cfg.run_name}.csv"
+        errors.to_csv(err_path, index=False)
+        if write_aliases:
+            errors.to_csv(results_root / "error_analysis.csv", index=False)
 
     plot_confusion_matrix(
         test_metrics["confusion_matrix"],
@@ -621,8 +624,7 @@ def run_training(
             figures_root / "precision_recall_curve.png",
         )
 
-    metrics_stem = "bert" if cfg.model_label.upper() == "BERT" else cfg.model_label.lower()
-    metrics_path = results_root / f"{metrics_stem}_test_metrics_{cfg.run_name}.json"
+    metrics_path = results_root / f"test_metrics_{cfg.run_name}.json"
     payload = {
         "model": f"{cfg.model_label} fine-tuned",
         "run_name": cfg.run_name,
@@ -641,7 +643,7 @@ def run_training(
     }
     save_json(payload, metrics_path)
     if write_aliases:
-        save_json(payload, results_root / "bert_test_metrics.json")
+        save_json(payload, results_root / "test_metrics.json")
 
     save_comparison_row(
         results_root / "model_comparison.csv",
@@ -718,7 +720,7 @@ def run_training(
 
 
 def cmd_evaluate(args: argparse.Namespace) -> None:
-    """Evaluate a saved checkpoint on the fixed test split."""
+    """Evaluate a saved checkpoint on validation and/or test splits."""
     ensure_directories()
     logger = setup_logging("training.log")
     set_seed(args.random_seed)
@@ -737,72 +739,121 @@ def cmd_evaluate(args: argparse.Namespace) -> None:
         threshold = 0.5
         logger.warning("No threshold.json found; using default 0.5")
 
+    model_label = getattr(args, "model_label", None) or MODEL_LABEL
+    split_arg = getattr(args, "split", "both")
+    if split_arg == "both":
+        splits = ["validation", "test"]
+    else:
+        splits = [split_arg]
+
     tokenizer = AutoTokenizer.from_pretrained(ckpt)
     model = BertForFraudClassification(PRETRAINED_MODEL_NAME)
     model.model = type(model.model).from_pretrained(ckpt)
     model = model.to(device)
 
-    test_df = load_split("test")
-    ds = dataframe_to_text_dataset(test_df, tokenizer, args.max_length)
     collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="longest")
-    loader = DataLoader(
-        ds,
-        batch_size=args.eval_batch_size,
-        shuffle=False,
-        collate_fn=lambda feats: collate_batch(feats, collator),
-        num_workers=0,
-    )
-
-    _, y_true, y_prob, ids, titles, companies, idxs = evaluate_loader(
-        model, loader, device, criterion=None, use_amp=device.type == "cuda"
-    )
-    metrics = binary_metrics(y_true, y_prob, threshold=threshold)
-    metrics_05 = binary_metrics(y_true, y_prob, threshold=0.5)
-
-    preds = build_predictions_frame(
-        record_ids=ids,
-        titles=titles,
-        companies=companies,
-        y_true=y_true,
-        y_prob=y_prob,
-        threshold=threshold,
-        model_name=f"BERT:{ckpt.name}",
-        imbalance_strategy="checkpoint",
-        row_indices=idxs,
-    )
-    preds.to_csv(RESULTS_DIR / "predictions_eval.csv", index=False)
-    errors = build_error_analysis(preds, test_df["model_text"].tolist())
-    errors.to_csv(RESULTS_DIR / "error_analysis_eval.csv", index=False)
-    plot_confusion_matrix(
-        metrics["confusion_matrix"],
-        FIGURES_DIR / "confusion_matrix_eval.png",
-        title="BERT eval Confusion Matrix",
-    )
-    plot_roc_pr(
-        y_true,
-        y_prob,
-        FIGURES_DIR / "roc_curve_eval.png",
-        FIGURES_DIR / "precision_recall_curve_eval.png",
-    )
-
-    payload = {
+    summary: Dict[str, Any] = {
+        "model": model_label,
         "checkpoint": str(ckpt),
         "threshold": threshold,
-        "test_metrics": metrics,
-        "test_metrics_threshold_0_5": metrics_05,
+        "max_length": args.max_length,
     }
-    save_json(payload, RESULTS_DIR / "bert_eval_test_metrics.json")
-    logger.info(
-        "Test fraud_f1=%.4f fraud_recall=%.4f pr_auc=%.4f accuracy=%.4f",
-        metrics["fraud_f1"],
-        metrics["fraud_recall"],
-        metrics["pr_auc"],
-        metrics["accuracy"],
-    )
-    print(f"Fraud F1: {metrics['fraud_f1']:.4f}")
-    print(f"Fraud Recall: {metrics['fraud_recall']:.4f}")
-    print(f"PR-AUC: {metrics['pr_auc']:.4f}")
-    print(f"Threshold: {threshold:.4f}")
+
+    for split in splits:
+        split_df = load_split(split)
+        ds = dataframe_to_text_dataset(split_df, tokenizer, args.max_length)
+        loader = DataLoader(
+            ds,
+            batch_size=args.eval_batch_size,
+            shuffle=False,
+            collate_fn=lambda feats: collate_batch(feats, collator),
+            num_workers=0,
+        )
+
+        _, y_true, y_prob, ids, titles, companies, idxs = evaluate_loader(
+            model, loader, device, criterion=None, use_amp=device.type == "cuda"
+        )
+        metrics = binary_metrics(y_true, y_prob, threshold=threshold)
+        metrics_05 = binary_metrics(y_true, y_prob, threshold=0.5)
+
+        preds = build_predictions_frame(
+            record_ids=ids,
+            titles=titles,
+            companies=companies,
+            y_true=y_true,
+            y_prob=y_prob,
+            threshold=threshold,
+            model_name=model_label,
+            imbalance_strategy="checkpoint",
+            row_indices=idxs,
+        )
+        preds.to_csv(RESULTS_DIR / f"predictions_{split}.csv", index=False)
+        errors = build_error_analysis(preds, split_df["model_text"].tolist())
+        errors.to_csv(RESULTS_DIR / f"error_analysis_{split}.csv", index=False)
+        plot_confusion_matrix(
+            metrics["confusion_matrix"],
+            FIGURES_DIR / f"confusion_matrix_{split}.png",
+            title=f"{model_label} {split} Confusion Matrix",
+        )
+        plot_roc_pr(
+            y_true,
+            y_prob,
+            FIGURES_DIR / f"roc_curve_{split}.png",
+            FIGURES_DIR / f"precision_recall_curve_{split}.png",
+        )
+
+        macro = metrics.get("classification_report", {}).get("macro avg", {})
+        payload = {
+            "model": model_label,
+            "checkpoint": str(ckpt),
+            "split": split,
+            "threshold": threshold,
+            "metrics": metrics,
+            "metrics_threshold_0_5": metrics_05,
+            "macro_precision": macro.get("precision"),
+            "macro_recall": macro.get("recall"),
+            "macro_f1": macro.get("f1-score", metrics.get("macro_f1")),
+        }
+        save_json(payload, RESULTS_DIR / f"metrics_{split}.json")
+        summary[f"{split}_metrics"] = {
+            "fraud_precision": metrics["fraud_precision"],
+            "fraud_recall": metrics["fraud_recall"],
+            "fraud_f1": metrics["fraud_f1"],
+            "macro_precision": payload["macro_precision"],
+            "macro_recall": payload["macro_recall"],
+            "macro_f1": payload["macro_f1"],
+            "pr_auc": metrics["pr_auc"],
+            "roc_auc": metrics["roc_auc"],
+            "accuracy": metrics["accuracy"],
+        }
+        logger.info(
+            "%s fraud_f1=%.4f fraud_recall=%.4f macro_f1=%.4f pr_auc=%.4f accuracy=%.4f",
+            split,
+            metrics["fraud_f1"],
+            metrics["fraud_recall"],
+            float(payload["macro_f1"] or 0.0),
+            metrics["pr_auc"],
+            metrics["accuracy"],
+        )
+        print(
+            f"[{split}] Fraud F1: {metrics['fraud_f1']:.4f} | "
+            f"Macro F1: {float(payload['macro_f1'] or 0.0):.4f} | "
+            f"Threshold: {threshold:.4f}"
+        )
+
+        if split == "validation":
+            # Keep ensemble-friendly validation score export under a short name.
+            val_export = pd.DataFrame(
+                {
+                    "record_id": list(ids),
+                    "label": y_true.astype(int),
+                    "fraud_score": y_prob.astype(float),
+                }
+            )
+            val_export.to_csv(RESULTS_DIR / "validation_predictions.csv", index=False)
+
+    save_json(summary, RESULTS_DIR / "metrics_summary.json")
+    logger.info("Wrote clean evaluate artifacts under %s", RESULTS_DIR)
 
 
 def load_predictor(
@@ -968,9 +1019,13 @@ def cmd_export_val(args: argparse.Namespace) -> None:
             "fraud_score": y_prob.astype(float),
         }
     )
-    out_path = RESULTS_DIR / "bert_validation_predictions.csv"
+    out_path = RESULTS_DIR / "validation_predictions.csv"
     out.to_csv(out_path, index=False)
     logger.info("Wrote %s (%s rows)", out_path, len(out))
+
+    # Keep legacy alias for ensemble consumers that still expect the old name.
+    legacy = RESULTS_DIR / "bert_validation_predictions.csv"
+    out.to_csv(legacy, index=False)
 
     if ENSEMBLE_VAL_COPY.parent.exists():
         shutil.copy2(out_path, ENSEMBLE_VAL_COPY)
@@ -978,9 +1033,8 @@ def cmd_export_val(args: argparse.Namespace) -> None:
 
 
 def cmd_train(args: argparse.Namespace) -> None:
-    run_name = args.run_name
-    if run_name is None:
-        run_name = "bert_cw_improved" if args.use_class_weights else "bert_no_class_weight"
+    run_name = args.run_name or RUN_NAME
+    model_label = getattr(args, "model_label", None) or MODEL_LABEL
     cfg = BertFinetuneConfig(
         pretrained_model_name=args.pretrained_model_name,
         learning_rate=args.learning_rate,
@@ -1007,6 +1061,7 @@ def cmd_train(args: argparse.Namespace) -> None:
         threshold_step=args.threshold_step,
         output_dir=args.output_dir,
         run_name=run_name,
+        model_label=model_label,
     )
     try:
         run_training(cfg)
@@ -1065,15 +1120,27 @@ def build_parser() -> argparse.ArgumentParser:
     p_train.add_argument("--min_fraud_recall_for_threshold", type=float, default=0.85)
     p_train.add_argument("--threshold_step", type=float, default=0.01)
     p_train.add_argument("--run_name", type=str, default=None)
+    p_train.add_argument("--model_label", type=str, default=MODEL_LABEL)
     p_train.add_argument("--output_dir", type=str, default=str(BERT_FINETUNED_DIR))
     p_train.set_defaults(func=cmd_train)
 
-    p_eval = sub.add_parser("evaluate", help="Evaluate checkpoint on fixed test split")
+    p_eval = sub.add_parser(
+        "evaluate",
+        help="Evaluate checkpoint on validation and/or test splits",
+    )
     p_eval.add_argument(
         "--checkpoint_dir",
         type=str,
         default=str(BERT_FINETUNED_DIR / "best"),
     )
+    p_eval.add_argument(
+        "--split",
+        type=str,
+        default="both",
+        choices=["validation", "test", "both"],
+        help="Which split(s) to evaluate (default: both)",
+    )
+    p_eval.add_argument("--model_label", type=str, default=MODEL_LABEL)
     p_eval.add_argument("--threshold", type=float, default=None)
     p_eval.add_argument("--eval_batch_size", type=int, default=8)
     p_eval.add_argument("--max_length", type=int, default=512)

@@ -1,0 +1,7 @@
+{
+  "threshold": 0.01,
+  "default_threshold": 0.5,
+  "model_name": "bert-base-uncased",
+  "run_name": "smote",
+  "imbalance_method": "None"
+}

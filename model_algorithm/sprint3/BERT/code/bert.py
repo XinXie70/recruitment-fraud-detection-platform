@@ -1,12 +1,17 @@
 """BERT fraudulent job-ad detection — CLI entrypoint.
 
+One-click in VS Code / Cursor: open and run ``run.py`` (defaults to train).
+
 CLI (from sprint3/):
   python BERT/code/bert.py train
   python BERT/code/bert.py evaluate
   python BERT/code/bert.py predict --text "..."
   python BERT/code/bert.py export-val
 
+Artifacts write to ``BERT/weight/`` and ``BERT/results/``.
+
 Implementation is split across:
+  - run.py          VS Code "Run Python File" entry (default: train)
   - config.py       paths, constants, configs, utilities
   - data_metrics.py preprocessing, datasets, metrics, plots
   - training.py     model, train/eval loops, CLI commands

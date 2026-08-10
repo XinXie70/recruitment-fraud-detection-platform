@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import random
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -104,6 +105,17 @@ FRAUD_OVERSAMPLE_FACTOR = 3.0
 MIN_FRAUD_RECALL_FOR_THRESHOLD = 0.85
 THRESHOLD_STEP = 0.01
 
+# Display name written into metrics / comparison tables.
+MODEL_LABEL = "Optimized BERT"
+# Short slug used in artifact filenames (keep filenames short and stable).
+RUN_NAME = "optimized"
+
+
+def artifact_slug(text: str) -> str:
+    """Turn a display label into a filesystem-safe short slug."""
+    slug = re.sub(r"[^a-z0-9]+", "_", str(text).strip().lower())
+    return slug.strip("_") or "run"
+
 
 @dataclass
 class BertFinetuneConfig:
@@ -135,9 +147,10 @@ class BertFinetuneConfig:
     min_fraud_recall_for_threshold: Optional[float] = MIN_FRAUD_RECALL_FOR_THRESHOLD
     threshold_step: float = THRESHOLD_STEP
     output_dir: str = str(BERT_FINETUNED_DIR)
-    run_name: str = "bert_cw_improved"
-    model_label: str = "BERT"
-    write_canonical_aliases: bool = False
+    run_name: str = RUN_NAME
+    model_label: str = MODEL_LABEL
+    write_canonical_aliases: bool = True
+    write_error_analysis: bool = True
 
 
 @dataclass

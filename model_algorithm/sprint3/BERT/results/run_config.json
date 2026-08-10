@@ -1,5 +1,5 @@
 {
-  "experiment": "bert-paper-protocol_finetune",
+  "experiment": "optimized_bert_finetune",
   "paths": {
     "bert_code_root": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\code",
     "project_root": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512",
@@ -61,8 +61,8 @@
     "min_fraud_recall_for_threshold": null,
     "threshold_step": 0.01,
     "output_dir": "F:\\better-BERT\\capstone-project-26t2-9900-h09c-almond\\retrain_paper_aligned_seed42_maxlen512\\weights",
-    "run_name": "bert_paper_protocol_maxlen512",
-    "model_label": "BERT-paper-protocol",
+    "run_name": "optimized",
+    "model_label": "Optimized BERT",
     "write_canonical_aliases": false
   },
   "environment": {
