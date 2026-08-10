@@ -7,7 +7,7 @@ from typing import Any, Callable
 from backend.config import settings
 from backend.schemas.analysis import AnalysisResponse, URLAnalysis
 from backend.services.cache import TTLCache
-from backend.services.fp_gate_predictor import FPGatePredictor
+from backend.services.fp_gate_predictor import EnsembleComputation, FPGatePredictor
 from backend.url_analyzer import analyze_urls
 from backend.validation import validate_job_input
 from backend.xai_gentle import GentleAIService, RiskContext, XAIResult, XAIService
@@ -86,6 +86,18 @@ class AnalysisService:
         self.ready = any(error is None for error in self.warm_up_outcomes.values())
         return dict(self.warm_up_outcomes)
 
+    def refresh_readiness(self) -> bool:
+        """Refresh readiness from the live model service instead of startup state."""
+        self.ready = self.ensemble.is_available()
+        self.warm_up_outcomes = {
+            "final_ensemble": None if self.ready else "Model service health probe failed."
+        }
+        return self.ready
+
+    def _get_computation(self, text: str) -> EnsembleComputation:
+        cache_key = f"computation:{TTLCache.text_key(text)}"
+        return self.cache.get_or_compute(cache_key, lambda: self.ensemble.predict(text))
+
     def analyze(self, text: str) -> AnalysisResponse:
         # Check cache first — avoid re-running the full pipeline for duplicates.
         cache_key = f"complete:{TTLCache.text_key(text)}"
@@ -104,7 +116,7 @@ class AnalysisService:
                 job_relevance_score=validation.get("job_relevance_score"),
             )
 
-        computation = self.ensemble.predict(text)
+        computation = self._get_computation(text)
         xai_result = self.xai.explain(
             text=text,
             score_batch=computation.score_batch,
@@ -179,7 +191,7 @@ class AnalysisService:
                 job_relevance_score=validation.get("job_relevance_score"),
             )
 
-        computation = self.ensemble.predict(text)
+        computation = self._get_computation(text)
         pending_xai = XAIResult(
             status="unavailable",
             method="unavailable",

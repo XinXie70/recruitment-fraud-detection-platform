@@ -53,7 +53,7 @@ def create_health_router(
 
     @router.get("/api/ready", response_model=ReadyResponse)
     def readiness_check() -> ReadyResponse:
-        model_ready = analysis_service.ready
+        model_ready = analysis_service.refresh_readiness()
         database_connected = database_check()
         if not model_ready or not database_connected:
             raise HTTPException(

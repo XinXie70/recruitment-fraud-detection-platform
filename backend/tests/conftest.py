@@ -52,9 +52,11 @@ def db_session():
 # FastAPI TestClient with overridden DB dependency
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def client(db_session, monkeypatch):
     """FastAPI TestClient whose ``get_db`` dependency returns the test session."""
-    from backend.main import app
+    from backend.main import analysis_service, app
+
+    monkeypatch.setattr(analysis_service.ensemble, "is_available", lambda: False)
 
     def _override_get_db():
         try:

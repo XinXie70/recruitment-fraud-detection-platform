@@ -1,5 +1,8 @@
 const HISTORY_STORAGE_KEY = 'fake_job_history';
-export const LAST_ANALYSIS_STORAGE_KEY = 'fake_job_last_analysis';
+
+export function clearAnalysisHistory() {
+  window.localStorage.removeItem(HISTORY_STORAGE_KEY);
+}
 
 export function saveAnalysisHistory(result) {
   try {
@@ -12,8 +15,8 @@ export function saveAnalysisHistory(result) {
       riskScore: Math.round(result.ensemble.risk_score * 100),
       prediction: result.ensemble.classification_label,
       modelCount: result.ensemble.active_model_count,
-      inputText: result.inputText,
-      analysisResult: result,
+      serverId: result.historyId || null,
+      source: result.historyId ? 'server' : 'local',
     };
 
     window.localStorage.setItem(

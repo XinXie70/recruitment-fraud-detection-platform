@@ -55,6 +55,9 @@ class CountingPredictor:
     def warm_up(self, sample):
         return {"final_ensemble": None}
 
+    def is_available(self):
+        return True
+
 
 class StaticXAIService:
     def explain(self, text, score_batch, expected_output):
@@ -110,6 +113,17 @@ def test_score_phase_skips_xai_batch_scoring() -> None:
     assert predictor.batch_calls == 0
 
 
+def test_readiness_is_refreshed_from_live_model_probe() -> None:
+    service, predictor = _service()
+    predictor.is_available = lambda: False
+    assert service.refresh_readiness() is False
+    assert service.ready is False
+
+    predictor.is_available = lambda: True
+    assert service.refresh_readiness() is True
+    assert service.ready is True
+
+
 def test_complete_cache_does_not_change_score_phase_contract() -> None:
     service, predictor = _service()
     text = "A legitimate software engineering role"
@@ -120,7 +134,7 @@ def test_complete_cache_does_not_change_score_phase_contract() -> None:
     assert score.phase == "score"
     assert score.xai.status == "unavailable"
     assert cached_score == score
-    assert predictor.calls == 2
+    assert predictor.calls == 1
 
 
 def test_invalid_input_is_rejected_before_model_execution() -> None:

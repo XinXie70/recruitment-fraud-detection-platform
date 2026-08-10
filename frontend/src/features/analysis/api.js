@@ -35,7 +35,13 @@ async function requestAnalysis(path, text, accessToken) {
       throw error;
     }
 
-    return data;
+    const historyId = response.headers?.get?.('X-History-ID');
+    const historyPersisted = response.headers?.get?.('X-History-Persisted');
+    return {
+      ...data,
+      ...(historyId ? { historyId: Number(historyId) } : {}),
+      ...(historyPersisted === 'false' ? { historyPersisted: false } : {}),
+    };
   } catch (error) {
     if (error instanceof TypeError) {
       const networkError = new Error(

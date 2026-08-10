@@ -2,7 +2,10 @@ import { beforeEach, expect, test } from 'vitest';
 
 import { clearStoredAuth, loadStoredAuth, saveStoredAuth } from './authStorage';
 
-beforeEach(() => window.localStorage.clear());
+beforeEach(() => {
+  window.localStorage.clear();
+  window.sessionStorage.clear();
+});
 
 test('stores, loads, and clears authentication data', () => {
   const auth = { access_token: 'token', user: { username: 'tester' } };
@@ -15,6 +18,30 @@ test('stores, loads, and clears authentication data', () => {
 });
 
 test('treats malformed stored authentication data as signed out', () => {
-  window.localStorage.setItem('fake_job_auth', '{not-json');
+  window.sessionStorage.setItem('fake_job_auth', '{not-json');
   expect(loadStoredAuth()).toBeNull();
+});
+
+test('rejects incomplete authentication payloads', () => {
+  window.sessionStorage.setItem('fake_job_auth', JSON.stringify({ access_token: 'token' }));
+  expect(loadStoredAuth()).toBeNull();
+  expect(window.sessionStorage.getItem('fake_job_auth')).toBeNull();
+});
+
+test('rejects an expired JWT', () => {
+  const payload = window.btoa(JSON.stringify({ exp: 1 })).replaceAll('=', '');
+  window.sessionStorage.setItem(
+    'fake_job_auth',
+    JSON.stringify({ access_token: `header.${payload}.signature`, user: { username: 'tester' } }),
+  );
+  expect(loadStoredAuth()).toBeNull();
+});
+
+test('migrates legacy local authentication into session storage', () => {
+  const auth = { access_token: 'legacy-token', user: { username: 'tester' } };
+  window.localStorage.setItem('fake_job_auth', JSON.stringify(auth));
+
+  expect(loadStoredAuth()).toEqual(auth);
+  expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
+  expect(JSON.parse(window.sessionStorage.getItem('fake_job_auth'))).toEqual(auth);
 });
