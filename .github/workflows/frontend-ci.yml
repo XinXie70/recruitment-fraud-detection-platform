@@ -87,7 +87,7 @@ jobs:
           python -m pytest model_service/tests -q -m "not e2e"
           --cov=model_service
           --cov-report=term-missing
-          --cov-fail-under=55
+          --cov-fail-under=80
 
   frontend:
     runs-on: ubuntu-latest

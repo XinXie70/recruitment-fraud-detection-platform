@@ -7,7 +7,7 @@ This directory contains automated tests for the FP-gate inference API in
 
 | Layer | Files | What is exercised |
 | --- | --- | --- |
-| Unit | `test_text_utils.py`, `test_coalesce.py`, `test_ensemble_service.py`, `test_settings.py`, `test_lr_service.py` | Input validation, FP-gate business rules, config loading, request coalescing |
+| Unit | `test_text_utils.py`, `test_coalesce.py`, `test_ensemble_service.py`, `test_settings.py`, `test_lr_service.py`, `test_bert_service.py` | Input validation, FP-gate business rules, config loading, request coalescing, mocked model loading and inference |
 | Integration | `test_app_integration.py` | Flask routes, auth, batch limits, error handling with mocked LR/BERT services |
 | End-to-end | `test_app_e2e.py` | Real model weights and `/predict/all` contract (slow; opt-in) |
 
@@ -26,7 +26,7 @@ With coverage:
 pytest model_service/tests -m "not e2e" \
   --cov=model_service \
   --cov-report=term-missing \
-  --cov-fail-under=55
+  --cov-fail-under=80
 ```
 
 Slow end-to-end tests (load BERT + LR artifacts):
@@ -66,6 +66,6 @@ Happy-path and sad-path cases are included for:
 If E2E tests cannot run in CI because of CPU/RAM limits, the skip reason is documented
 above and the mocked integration suite still verifies the HTTP contract.
 
-CI enforces an initial 55% model-service coverage floor. This deliberately
-includes the production package while excluding the opt-in E2E path; raise the
-floor as BERT-service unit coverage is added.
+CI enforces an 80% model-service coverage floor. This includes the production
+package while excluding the opt-in E2E path; mocked BERT-service tests exercise
+loading and inference without loading the real checkpoint.
