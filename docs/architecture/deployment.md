@@ -11,7 +11,10 @@ flowchart TB
     model --> config["FP-gate and risk-boundary config"]
 ```
 
-Startup order is PostgreSQL, migrations, model API, FastAPI, then frontend.
+The local Compose stack starts PostgreSQL, migrations, the model API, FastAPI,
+and then the frontend in dependency order. The production GitHub Actions
+workflow currently runs the backend migration/deployment job and the frontend
+deployment job in parallel, so it does not enforce that same ordering.
 `MODEL_SERVER_URL` is mandatory. Model service failure is surfaced as `503`;
 there is no local model fallback.
 
