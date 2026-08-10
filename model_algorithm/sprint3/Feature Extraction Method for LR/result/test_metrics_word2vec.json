@@ -1,0 +1,14 @@
+{
+  "method": "word2vec",
+  "Fraud Precision": 0.6174496644295302,
+  "Fraud Recall": 0.5317919075144508,
+  "Fraud F1": 0.5714285714285714,
+  "Accuracy": 0.9614093959731543,
+  "threshold": 0.18597201404493205,
+  "confusion_matrix": {
+    "tn": 3346,
+    "fp": 57,
+    "fn": 81,
+    "tp": 92
+  }
+}

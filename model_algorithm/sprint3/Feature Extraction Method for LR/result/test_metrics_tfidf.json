@@ -1,0 +1,14 @@
+{
+  "method": "tfidf",
+  "Fraud Precision": 0.9337748344370861,
+  "Fraud Recall": 0.815028901734104,
+  "Fraud F1": 0.8703703703703703,
+  "Accuracy": 0.988255033557047,
+  "threshold": 0.15182349109365842,
+  "confusion_matrix": {
+    "tn": 3393,
+    "fp": 10,
+    "fn": 32,
+    "tp": 141
+  }
+}
