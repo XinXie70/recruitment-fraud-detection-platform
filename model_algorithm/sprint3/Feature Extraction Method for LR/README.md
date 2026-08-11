@@ -11,7 +11,6 @@ Compare four text feature extractors with the same Logistic Regression classifie
 
 ## Layout
 
-```
 Feature Extraction Method for LR/
   code/
     train_all.py              # shared helpers + train all methods + comparison chart
@@ -21,7 +20,6 @@ Feature Extraction Method for LR/
     train_lr_char_tfidf.py    # character TF-IDF + LR
   result/                     # test metrics + comparison CSV/PNG only
   weight/                     # joblib weight files only
-```
 
 ## Data
 
@@ -30,14 +28,6 @@ Feature Extraction Method for LR/
 - Size: 12,873 train / 1,431 validation / 3,576 test
 - Text field: `combined_text`
 
-## Feature settings
-
-| Method | Extractor |
-|---|---|
-| TF-IDF | Word `TfidfVectorizer`, `ngram_range=(1, 2)`, `max_features=50000` |
-| BoW | Word `CountVectorizer`, `ngram_range=(1, 2)`, `max_features=50000` |
-| Word2Vec | gensim skip-gram (`vector_size=200`), document = mean word vectors |
-| Char TF-IDF | `analyzer='char_wb'`, `ngram_range=(3, 5)`, `max_features=50000` |
 
 ## How to Run the 5 Scripts
 
@@ -56,50 +46,7 @@ cd "model_algorithm/sprint3/Feature Extraction Method for LR"
 | `code/train_lr_word2vec.py` | Train LR with mean Word2Vec embeddings only (needs `gensim`) | `python code/train_lr_word2vec.py` |
 | `code/train_lr_char_tfidf.py` | Train LR with character TF-IDF features only | `python code/train_lr_char_tfidf.py` |
 
-### 1) `train_all.py` — run everything (recommended)
-
-```powershell
-python code/train_all.py
-```
-
-This trains TF-IDF, BoW, Word2Vec, and Char TF-IDF sequentially, then writes `result/comparison_test.csv` and `result/fraud_metrics_comparison.png`.
-
-Optional variants:
-
-```powershell
-# Train only selected methods
-python code/train_all.py tfidf
-python code/train_all.py bow word2vec
-
-# Rebuild the comparison chart from existing metrics (no retraining)
-python code/train_all.py --plot-only
-```
-
-### 2–5) Single-method scripts
-
-Run one feature extractor at a time from the experiment folder:
-
-```powershell
-python code/train_lr_tfidf.py
-python code/train_lr_bow.py
-python code/train_lr_word2vec.py
-python code/train_lr_char_tfidf.py
-```
-
-Or from inside `code/`:
-
-```powershell
-cd code
-python train_lr_tfidf.py
-python train_lr_bow.py
-python train_lr_word2vec.py
-python train_lr_char_tfidf.py
-```
-
-Each single-method script calls `train_all.run_method(...)`, so outputs still go to the same `result/` and `weight/` folders.
-
 ## Outputs
-
 - `result/test_metrics_<method>.json` — test Fraud Precision / Recall / F1 (plus threshold & confusion matrix)
 - `result/comparison_test.csv` — four-method comparison table
 - `result/fraud_metrics_comparison.png` — grouped bar chart of Fraud Precision / Recall / F1
