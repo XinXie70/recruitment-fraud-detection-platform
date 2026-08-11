@@ -19,6 +19,7 @@ if str(MODEL_SERVICE_ROOT) not in sys.path:
 # Stable defaults for fast, deterministic unit/integration runs.
 os.environ.setdefault("MODEL_API_KEY", "")
 os.environ.setdefault("RATE_LIMIT_PREDICT", "1000/minute")
+os.environ.setdefault("RATE_LIMIT_PREDICT_BATCH", "1000/minute")
 os.environ.setdefault("MAX_TEXT_CHARS", "50000")
 os.environ.setdefault("MAX_BATCH_ITEMS", "100")
 os.environ.setdefault("MAX_BATCH_TOTAL_CHARS", "500000")
@@ -123,12 +124,13 @@ def mock_model_services(
     risk.predict.return_value = mock_risk_result
 
     import app as app_module
+    import prediction_routes
 
-    monkeypatch.setattr(app_module, "lr_service", lr)
-    monkeypatch.setattr(app_module, "bert_service", bert)
-    monkeypatch.setattr(app_module, "ensemble_service", ensemble)
-    monkeypatch.setattr(app_module, "risk_service", risk)
-    monkeypatch.setattr(app_module, "MODEL_API_KEY", "")
+    monkeypatch.setattr(prediction_routes, "lr_service", lr)
+    monkeypatch.setattr(prediction_routes, "bert_service", bert)
+    monkeypatch.setattr(prediction_routes, "ensemble_service", ensemble)
+    monkeypatch.setattr(prediction_routes, "risk_service", risk)
+    monkeypatch.setitem(app_module.app.config, "MODEL_API_KEY", "")
 
     return {
         "lr": lr,
@@ -152,7 +154,7 @@ def authed_client(
 ):
     import app as app_module
 
-    monkeypatch.setattr(app_module, "MODEL_API_KEY", "test-secret-key")
+    monkeypatch.setitem(app_module.app.config, "MODEL_API_KEY", "test-secret-key")
     return app_module.app.test_client()
 
 

@@ -20,6 +20,89 @@ def test_config_returns_runtime_paths(client) -> None:
     assert "ensemble" in payload["config"]
 
 
+def test_config_failure_returns_sanitized_500(
+    client,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import prediction_routes
+
+    monkeypatch.setattr(
+        prediction_routes,
+        "load_runtime_config",
+        lambda: (_ for _ in ()).throw(RuntimeError("private config failure")),
+    )
+
+    response = client.get("/config")
+
+    assert response.status_code == 500
+    assert response.get_json() == {"ok": False, "error": "Internal server error"}
+
+
+@pytest.mark.parametrize(
+    "endpoint,service_name,result_key",
+    [
+        ("/predict/lr", "lr", "lr_score"),
+        ("/predict/bert", "bert", "bert_score"),
+        ("/predict/ensemble", "ensemble", "ranking_score"),
+        ("/predict/risk", "risk", "risk_score"),
+    ],
+)
+def test_individual_prediction_endpoints(
+    client,
+    sample_payload,
+    mock_model_services,
+    endpoint: str,
+    service_name: str,
+    result_key: str,
+) -> None:
+    response = client.post(endpoint, json=sample_payload)
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["ok"] is True
+    assert payload["record_id"] == "demo_001"
+    assert result_key in payload
+    mock_model_services[service_name].predict.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    ["/predict/lr", "/predict/bert", "/predict/ensemble", "/predict/risk"],
+)
+def test_individual_prediction_endpoints_reject_blank_payload(
+    client,
+    endpoint: str,
+) -> None:
+    response = client.post(endpoint, json={"text": "  "})
+
+    assert response.status_code == 400
+    assert "Provide 'text'" in response.get_json()["error"]
+
+
+@pytest.mark.parametrize(
+    "endpoint,service_name",
+    [
+        ("/predict/lr", "lr"),
+        ("/predict/bert", "bert"),
+        ("/predict/ensemble", "ensemble"),
+        ("/predict/risk", "risk"),
+    ],
+)
+def test_individual_prediction_failures_are_sanitized(
+    client,
+    sample_payload,
+    mock_model_services,
+    endpoint: str,
+    service_name: str,
+) -> None:
+    mock_model_services[service_name].predict.side_effect = RuntimeError("private failure")
+
+    response = client.post(endpoint, json=sample_payload)
+
+    assert response.status_code == 500
+    assert response.get_json() == {"ok": False, "error": "Internal server error"}
+
+
 def test_predict_all_happy_path(client, sample_payload, mock_model_services) -> None:
     response = client.post("/predict/all", json=sample_payload)
 
@@ -76,9 +159,9 @@ def test_predict_batch_validation_errors(client, body, expected_fragment: str) -
 
 
 def test_predict_batch_item_limit(client, monkeypatch: pytest.MonkeyPatch) -> None:
-    import app as app_module
+    import prediction_routes
 
-    monkeypatch.setattr(app_module, "MAX_BATCH_ITEMS", 1)
+    monkeypatch.setattr(prediction_routes, "MAX_BATCH_ITEMS", 1)
 
     response = client.post(
         "/predict/batch",
@@ -87,6 +170,32 @@ def test_predict_batch_item_limit(client, monkeypatch: pytest.MonkeyPatch) -> No
 
     assert response.status_code == 400
     assert "Batch size limited" in response.get_json()["error"]
+
+
+def test_predict_batch_total_character_limit(
+    client,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import prediction_routes
+
+    monkeypatch.setattr(prediction_routes, "MAX_BATCH_TOTAL_CHARS", 1)
+
+    response = client.post("/predict/batch", json={"items": [{"text": "too long"}]})
+
+    assert response.status_code == 400
+    assert "total character count" in response.get_json()["error"]
+
+
+def test_predict_batch_failure_is_sanitized(
+    client,
+    mock_model_services,
+) -> None:
+    mock_model_services["risk"].predict.side_effect = RuntimeError("private failure")
+
+    response = client.post("/predict/batch", json={"items": [{"text": "sample"}]})
+
+    assert response.status_code == 500
+    assert response.get_json() == {"ok": False, "error": "Internal server error"}
 
 
 def test_predict_requires_api_key_when_configured(authed_client, sample_payload) -> None:

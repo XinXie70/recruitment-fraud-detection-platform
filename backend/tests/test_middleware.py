@@ -5,6 +5,39 @@ from __future__ import annotations
 import logging
 import re
 
+from starlette.requests import Request
+
+from backend import rate_limit
+
+
+def _request(headers: list[tuple[bytes, bytes]], client: tuple[str, int]) -> Request:
+    return Request({"type": "http", "headers": headers, "client": client})
+
+
+def test_rate_limit_uses_token_bucket_for_authenticated_proxy_users() -> None:
+    first = _request(
+        [(b"authorization", b"Bearer first-token")],
+        ("shared-proxy", 443),
+    )
+    second = _request(
+        [(b"authorization", b"Bearer second-token")],
+        ("shared-proxy", 443),
+    )
+
+    assert rate_limit.get_client_address(first).startswith("token:")
+    assert rate_limit.get_client_address(first) != rate_limit.get_client_address(second)
+
+
+def test_forwarded_address_requires_explicit_proxy_trust(monkeypatch) -> None:
+    request = _request(
+        [(b"x-forwarded-for", b"203.0.113.8, 10.0.0.2")],
+        ("trusted-proxy", 443),
+    )
+    monkeypatch.setattr(rate_limit.settings, "trust_proxy_headers", False)
+    assert rate_limit.get_client_address(request) == "trusted-proxy"
+
+    monkeypatch.setattr(rate_limit.settings, "trust_proxy_headers", True)
+    assert rate_limit.get_client_address(request) == "203.0.113.8"
 
 def test_authentication_body_is_not_written_to_logs(client, caplog) -> None:
     password = "unique-secret-that-must-not-be-logged"

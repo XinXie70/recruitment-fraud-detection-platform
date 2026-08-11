@@ -12,13 +12,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+RUN groupadd --system app && useradd --system --gid app --no-create-home app
+
 # Install only lightweight backend dependencies + Cloud SQL Python connector
 COPY backend/requirements-cloudrun.txt /app/backend/requirements-cloudrun.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements-cloudrun.txt
 
 # Model weights are not copied; inference is delegated to the FP-gate service.
-COPY backend /app/backend
+COPY --chown=app:app backend /app/backend
 RUN chmod +x /app/backend/docker-entrypoint.sh
+
+USER app
 
 # Cloud Run provides $PORT (default 8080)
 EXPOSE 8080

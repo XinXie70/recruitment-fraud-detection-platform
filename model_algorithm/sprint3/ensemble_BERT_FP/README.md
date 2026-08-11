@@ -111,3 +111,52 @@ python ensemble_BERT_FP/code/run_fp_gate_ensemble.py
 python ensemble_BERT_FP/code/show_test_macro_table.py
 ```
 
+See [Ensemble Risk Score and Three-Level Output](../risk_score/RISK_SCORE_AND_LEVEL.md)
+for the public risk-output contract.
+
+## Three-level risk boundaries
+
+The original FP-gate validation search determines the High parameters. A
+validation trade-off search determines the Low parameter. Test data is not used
+for parameter selection.
+
+The frozen rule is:
+
+```text
+High: BERT score >= 0.30 and LR score >= 0.06
+Low:  BERT score < 0.0024
+Otherwise: Suspicious
+```
+
+BERT is the primary risk-scoring model. LR is used only as a false-positive
+gate for High candidates and does not participate in the Low boundary.
+
+The operational risk score is:
+
+```text
+Normally:       risk_score = BERT score
+If gate fires:  risk_score = LR score
+Display:        risk_score_100 = risk_score * 100
+```
+
+The risk level must still be calculated with the original BERT–LR gate rule; it
+cannot be reconstructed from the mixed-source risk score alone. The operational
+score is not a calibrated fraud probability. The original BERT and LR scores
+are retained in the output.
+
+Risk-score outputs under `risk_score/`:
+
+- `RISK_SCORE_AND_LEVEL.md`
+- `RISK_SCORE_REPORT.md`
+- `risk_score_metrics.csv`
+
+Risk-level outputs under `risk_level/`:
+
+- `select_risk_boundaries.py`
+- `risk_boundary_config.json`
+- `RISK_BOUNDARY_REPORT.md`
+- `low_boundary_tradeoff.csv`
+- `low_boundary_target_comparison.csv`
+- `validation_risk_levels.csv`
+- `test_risk_levels.csv`
+- `test_risk_level_summary.json`

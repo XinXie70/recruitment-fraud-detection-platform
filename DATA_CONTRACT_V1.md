@@ -7,7 +7,8 @@ short and can be updated when the team agrees on a change.
 
 - Input: one complete English job advertisement
 - Output label: `0 = legitimate`, `1 = fraudulent`
-- Dataset: EMSCAD (`data/raw/emscad_v1.csv`)
+- Dataset: EMSCAD (`model_algorithm/sprint3/data/raw/emscad_v1.csv`), restored
+  locally with `model_algorithm/sprint3/data/download_data.sh`
 - Source labels: map `f` to `0` and `t` to `1`
 
 The column `in_balanced_dataset` is not a prediction feature. It is only a marker
@@ -56,8 +57,10 @@ near-duplicate texts, but assign them the same `group_id`.
 
 If a duplicate group contains conflicting labels, review it before splitting.
 
-The fixed files are `data/splits/train.csv`, `data/splits/validation.csv`, and
-`data/splits/test.csv`. All six models must use these same files.
+The fixed files are generated locally under `model_algorithm/sprint3/data/splits/`.
+All six models must use these same files. Full datasets and splits are excluded
+from Git; their known SHA-256 digests are recorded in
+`model_algorithm/sprint3/data/checksums.sha256`.
 
 ## 5. Avoiding data leakage
 

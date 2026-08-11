@@ -138,6 +138,23 @@ def test_fp_gate_predictor_warm_up_reports_success_and_failure() -> None:
     assert outcome["final_ensemble"] == "FP-gate model service request failed."
 
 
+@pytest.mark.parametrize(
+    ("response", "available"),
+    [
+        (httpx.Response(200, json={"ok": True}), True),
+        (httpx.Response(200, json={"ok": False}), False),
+        (httpx.Response(503), False),
+    ],
+)
+def test_fp_gate_live_health_probe(response: httpx.Response, available: bool) -> None:
+    predictor = FPGatePredictor("http://model")
+    predictor.client = httpx.Client(
+        transport=httpx.MockTransport(lambda request: response)
+    )
+
+    assert predictor.is_available() is available
+
+
 def test_fp_gate_predictor_rejects_batch_contract_mismatch() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/predict/all":

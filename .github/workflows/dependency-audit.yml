@@ -42,12 +42,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.11"
           cache: pip
-          cache-dependency-path: backend/requirements-remote.txt
+          cache-dependency-path: |
+            backend/requirements-remote.txt
+            model_service/requirements.txt
 
       - name: Install pip-audit
         run: python -m pip install pip-audit
 
       - name: Audit Python dependencies
-        run: pip-audit --requirement backend/requirements-remote.txt
+        run: |
+          pip-audit --requirement backend/requirements-remote.txt
+          pip-audit --requirement model_service/requirements.txt

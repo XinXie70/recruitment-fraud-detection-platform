@@ -23,7 +23,7 @@ The model API loads these frozen experiment assets from
 
 ## Local development
 
-Requirements: Python 3.12+, Node.js 22.22+, PostgreSQL, and the new model
+Requirements: Python 3.11+, Node.js 22.22+, PostgreSQL, and the new model
 artifacts. Install the application backend and frontend dependencies:
 
 ```bash
@@ -37,12 +37,26 @@ npm ci
 cd ..
 ```
 
+`backend/requirements-dev.txt` installs only the lightweight application API
+and its development tools. TensorFlow, PyTorch, Transformers, XGBoost, and
+other model runtimes are not backend dependencies; model-specific packages are
+isolated in `model_service/requirements.txt`.
+
 Start the FP-gate model service first:
 
 ```bash
 pip install -r model_service/requirements.txt
 python model_service/app.py
 ```
+
+For any production deployment, set `APP_ENV=production`, a non-empty
+`MODEL_API_KEY`, and restrictive `MODEL_CORS_ORIGINS`. Use the same secret as
+`MODEL_SERVER_API_KEY` in the application backend.
+
+The checked-in Cloud Run workflow deploys the application backend and frontend;
+the model service has a separate release lifecycle. See the
+[deployment ownership and verification checklist](docs/architecture/deployment.md#production-ownership)
+before releasing the application.
 
 Set `MODEL_SERVER_URL=http://127.0.0.1:5000`, then start the application API:
 
@@ -113,7 +127,8 @@ Frontend checks:
 ```bash
 cd frontend
 npm run lint
-npm test
+npm run format:check
+npm run test:coverage
 npm run build
 ```
 

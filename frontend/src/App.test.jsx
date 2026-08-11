@@ -124,7 +124,8 @@ test('logs in and persists authentication before opening the analyser', async ()
   expect(
     await screen.findByRole('heading', { name: 'Detect Fake Job Advertisements' }),
   ).toBeVisible();
-  expect(JSON.parse(window.localStorage.getItem('fake_job_auth'))).toEqual(AUTH_RESPONSE);
+  expect(JSON.parse(window.sessionStorage.getItem('fake_job_auth'))).toEqual(AUTH_RESPONSE);
+  expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
 });
 
 test('shows a backend authentication error without storing credentials', async () => {
@@ -230,15 +231,16 @@ test('renders a successful analysis report and stores it in history', async () =
     }),
   );
 
-  const savedResult = JSON.parse(window.sessionStorage.getItem('fake_job_last_analysis'));
   const savedHistory = JSON.parse(window.localStorage.getItem('fake_job_history'));
-  expect(savedResult.ensemble.risk_score).toBe(0.86);
+  expect(window.sessionStorage.getItem('fake_job_last_analysis')).toBeNull();
   expect(savedHistory).toHaveLength(1);
   expect(savedHistory[0]).toMatchObject({
     riskLevel: 'high',
     riskScore: 86,
     prediction: 'Likely Deceptive',
   });
+  expect(savedHistory[0]).not.toHaveProperty('inputText');
+  expect(savedHistory[0]).not.toHaveProperty('analysisResult');
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
@@ -327,6 +329,7 @@ test('shows an indeterminate progress bar while the XAI explanation is loading',
 
 test('logs out when the analysis API rejects an expired token', async () => {
   window.localStorage.setItem('fake_job_auth', JSON.stringify(AUTH_RESPONSE));
+  window.localStorage.setItem('fake_job_history', JSON.stringify([{ riskScore: 50 }]));
   window.history.pushState({}, '', '/analyze');
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.stubGlobal(
@@ -344,6 +347,8 @@ test('logs out when the analysis API rejects an expired token', async () => {
 
   expect(await screen.findByRole('heading', { name: 'Log In' })).toBeVisible();
   expect(window.localStorage.getItem('fake_job_auth')).toBeNull();
+  expect(window.sessionStorage.getItem('fake_job_auth')).toBeNull();
+  expect(window.localStorage.getItem('fake_job_history')).toBeNull();
 });
 
 test('registers a user with the expected payload', async () => {

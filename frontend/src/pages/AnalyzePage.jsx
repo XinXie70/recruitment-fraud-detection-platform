@@ -1,14 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Gift, Loader2, Search, X } from 'lucide-react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import AnimatedTitle from '../components/AnimatedTitle';
 import MeteorBackground from '../components/MeteorBackground';
 import Navigation from '../components/Navigation';
 import { analyzeJobScore, analyzeJobText } from '../features/analysis/api';
-import {
-  LAST_ANALYSIS_STORAGE_KEY,
-  saveAnalysisHistory,
-} from '../features/analysis/analysisStorage';
+import { saveAnalysisHistory } from '../features/analysis/analysisStorage';
 import { SAMPLES } from '../utils/analysisUtils';
 import ReportPage from './ReportPage';
 
@@ -16,23 +13,21 @@ const HERO_TITLE = 'Detect Fake Job Advertisements';
 
 export default function AnalyzePage({ auth, onLogout }) {
   const location = useLocation();
-  const restoredResult =
-    location.state?.analysisResult ||
-    (() => {
-      try {
-        const raw = window.sessionStorage.getItem(LAST_ANALYSIS_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch {
-        return null;
-      }
-    })();
-  const [text, setText] = useState(restoredResult?.inputText || '');
-  const [result, setResult] = useState(restoredResult);
+  const navigate = useNavigate();
+  const [text, setText] = useState(() => location.state?.analysisResult?.inputText || '');
+  const [result, setResult] = useState(() => location.state?.analysisResult || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [explanationLoading, setExplanationLoading] = useState(false);
   const [explanationError, setExplanationError] = useState('');
+  const [historyWarning, setHistoryWarning] = useState('');
   const requestSequence = useRef(0);
+
+  useEffect(() => {
+    if (location.state?.analysisResult) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const handleAnalyze = async () => {
     const payloadText = text.trim();
@@ -44,6 +39,7 @@ export default function AnalyzePage({ auth, onLogout }) {
     setResult(null);
     setExplanationLoading(false);
     setExplanationError('');
+    setHistoryWarning('');
     const sequence = requestSequence.current + 1;
     requestSequence.current = sequence;
 
@@ -59,8 +55,12 @@ export default function AnalyzePage({ auth, onLogout }) {
         const data = await analyzeJobText(payloadText, auth.access_token);
         if (requestSequence.current !== sequence) return;
         const completedResult = { ...data, inputText: payloadText };
+        if (data.historyPersisted === false) {
+          setHistoryWarning(
+            'The analysis completed, but it could not be saved to your account history.',
+          );
+        }
         setResult(completedResult);
-        window.sessionStorage.setItem(LAST_ANALYSIS_STORAGE_KEY, JSON.stringify(completedResult));
         saveAnalysisHistory(completedResult);
       } catch (explanationFailure) {
         if (requestSequence.current !== sequence) return;
@@ -99,7 +99,6 @@ export default function AnalyzePage({ auth, onLogout }) {
 
   const handleNewScan = () => {
     requestSequence.current += 1;
-    window.sessionStorage.removeItem(LAST_ANALYSIS_STORAGE_KEY);
     setText('');
     setResult(null);
     setError(null);
@@ -115,6 +114,7 @@ export default function AnalyzePage({ auth, onLogout }) {
         onBack={handleNewScan}
         explanationLoading={explanationLoading}
         explanationError={explanationError}
+        historyWarning={historyWarning}
       />
     );
   }

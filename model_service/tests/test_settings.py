@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import json
 from pathlib import Path
 
@@ -7,6 +8,32 @@ import pytest
 
 import settings
 from settings import load_runtime_config
+
+
+def test_batch_rate_limit_is_configured_independently(
+    monkeypatch: pytest.MonkeyPatch,
+    reload_settings,
+) -> None:
+    monkeypatch.setenv("RATE_LIMIT_PREDICT", "11/minute")
+    monkeypatch.setenv("RATE_LIMIT_PREDICT_BATCH", "222/minute")
+
+    reloaded = importlib.reload(settings)
+
+    assert reloaded.RATE_LIMIT_PREDICT == "11/minute"
+    assert reloaded.RATE_LIMIT_PREDICT_BATCH == "222/minute"
+
+
+def test_production_requires_model_api_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.delenv("MODEL_API_KEY", raising=False)
+
+    with pytest.raises(RuntimeError, match="MODEL_API_KEY"):
+        importlib.reload(settings)
+
+    monkeypatch.setenv("APP_ENV", "test")
+    importlib.reload(settings)
 
 
 def test_load_runtime_config_reads_frozen_artifacts() -> None:

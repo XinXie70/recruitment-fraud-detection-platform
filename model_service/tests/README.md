@@ -7,7 +7,7 @@ This directory contains automated tests for the FP-gate inference API in
 
 | Layer | Files | What is exercised |
 | --- | --- | --- |
-| Unit | `test_text_utils.py`, `test_coalesce.py`, `test_ensemble_service.py`, `test_settings.py`, `test_lr_service.py` | Input validation, FP-gate business rules, config loading, request coalescing |
+| Unit | `test_text_utils.py`, `test_coalesce.py`, `test_ensemble_service.py`, `test_settings.py`, `test_lr_service.py`, `test_bert_service.py` | Input validation, FP-gate business rules, config loading, request coalescing, mocked model loading and inference |
 | Integration | `test_app_integration.py` | Flask routes, auth, batch limits, error handling with mocked LR/BERT services |
 | End-to-end | `test_app_e2e.py` | Real model weights and `/predict/all` contract (slow; opt-in) |
 
@@ -23,7 +23,11 @@ pytest model_service/tests -q
 With coverage:
 
 ```bash
-pytest model_service/tests --cov=model_service --cov-report=term-missing
+pytest model_service/tests -m "not e2e" \
+  --cov=model_service \
+  --cov-config=model_service/.coveragerc \
+  --cov-report=term-missing \
+  --cov-fail-under=90
 ```
 
 Slow end-to-end tests (load BERT + LR artifacts):
@@ -42,9 +46,9 @@ pytest model_service/tests -m e2e -q
 ## Mocking strategy
 
 - **Unit tests** call pure functions directly (`build_texts`, `apply_fp_gate`, `apply_risk`).
-- **Integration tests** patch `app.lr_service`, `app.bert_service`, `app.ensemble_service`,
-  and `app.risk_service` so HTTP routes can be tested without loading PyTorch or joblib
-  artifacts.
+- **Integration tests** patch the service objects imported by `prediction_routes` so HTTP
+  routes can be tested without loading PyTorch or joblib artifacts. Authentication tests
+  set `app.config["MODEL_API_KEY"]`, matching the runtime request hook.
 - **E2E tests** load the frozen files under `model_service/models/` and exercise the real
   `/predict/all` path. They are skipped unless `RUN_MODEL_SERVICE_E2E=1` because they are
   slow and memory-intensive.
@@ -62,3 +66,8 @@ Happy-path and sad-path cases are included for:
 
 If E2E tests cannot run in CI because of CPU/RAM limits, the skip reason is documented
 above and the mocked integration suite still verifies the HTTP contract.
+
+CI enforces a 90% production-code coverage floor. The coverage configuration
+excludes test modules, and the opt-in E2E path remains outside the default run;
+mocked BERT-service tests exercise loading and inference without loading the real
+checkpoint.
