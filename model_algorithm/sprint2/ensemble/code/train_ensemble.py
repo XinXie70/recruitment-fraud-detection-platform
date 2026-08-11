@@ -121,7 +121,8 @@ def score_lr(texts: list[str]) -> np.ndarray:
 
 @torch.no_grad()
 def score_dnn(texts: list[str], device: torch.device) -> np.ndarray:
-    checkpoint = torch.load(require_file(DNN_WEIGHT), map_location=device, weights_only=False)
+    # Offline training artifact only; not loaded from untrusted input.
+    checkpoint = torch.load(require_file(DNN_WEIGHT), map_location=device, weights_only=False)  # nosemgrep: trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
     vectorizer = joblib.load(require_file(DNN_VECTORIZER))
     features = vectorizer.transform(texts)
     dense_matrix = features.toarray() if hasattr(features, "toarray") else features
@@ -152,7 +153,8 @@ def score_xgboost(texts: list[str]) -> np.ndarray:
 
 @torch.no_grad()
 def score_sequence(texts: list[str], checkpoint_path: Path, model_class, device: torch.device) -> np.ndarray:
-    checkpoint = torch.load(require_file(checkpoint_path), map_location=device, weights_only=False)
+    # Offline training artifact only; not loaded from untrusted input.
+    checkpoint = torch.load(require_file(checkpoint_path), map_location=device, weights_only=False)  # nosemgrep: trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
     vocabulary = checkpoint["vocab"]
     max_len = int(checkpoint.get("max_len", 200))
     model = model_class(
