@@ -1,6 +1,5 @@
 """
-Basic Input Validation — runs before job-description relevance filtering and model inference.
-
+Basic Input Validation, runs before job-description relevance filtering and model inference.
 Checks whether user input is syntactically valid text (type, length, format).
 Does NOT judge whether the content is a job posting; see job_description_filter.py.
 """
