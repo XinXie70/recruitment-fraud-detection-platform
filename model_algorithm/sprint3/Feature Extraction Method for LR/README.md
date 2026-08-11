@@ -39,16 +39,45 @@ Feature Extraction Method for LR/
 | Word2Vec | gensim skip-gram (`vector_size=200`), document = mean word vectors |
 | Char TF-IDF | `analyzer='char_wb'`, `ngram_range=(3, 5)`, `max_features=50000` |
 
-## Run
+## How to Run the 5 Scripts
 
-Activate the project environment, then from this experiment folder:
+Activate the CUDA / project environment first:
 
 ```powershell
 . E:\ml\activate.ps1
+cd "model_algorithm/sprint3/Feature Extraction Method for LR"
+```
+
+| Script | Purpose | How to run |
+|---|---|---|
+| `code/train_all.py` | Shared helpers; trains all 4 feature methods in one go and rebuilds the comparison CSV/PNG | `python code/train_all.py` |
+| `code/train_lr_tfidf.py` | Train LR with word-level TF-IDF features only | `python code/train_lr_tfidf.py` |
+| `code/train_lr_bow.py` | Train LR with Bag-of-Words features only | `python code/train_lr_bow.py` |
+| `code/train_lr_word2vec.py` | Train LR with mean Word2Vec embeddings only (needs `gensim`) | `python code/train_lr_word2vec.py` |
+| `code/train_lr_char_tfidf.py` | Train LR with character TF-IDF features only | `python code/train_lr_char_tfidf.py` |
+
+### 1) `train_all.py` — run everything (recommended)
+
+```powershell
 python code/train_all.py
 ```
 
-Train one method only:
+This trains TF-IDF, BoW, Word2Vec, and Char TF-IDF sequentially, then writes `result/comparison_test.csv` and `result/fraud_metrics_comparison.png`.
+
+Optional variants:
+
+```powershell
+# Train only selected methods
+python code/train_all.py tfidf
+python code/train_all.py bow word2vec
+
+# Rebuild the comparison chart from existing metrics (no retraining)
+python code/train_all.py --plot-only
+```
+
+### 2–5) Single-method scripts
+
+Run one feature extractor at a time from the experiment folder:
 
 ```powershell
 python code/train_lr_tfidf.py
@@ -57,11 +86,17 @@ python code/train_lr_word2vec.py
 python code/train_lr_char_tfidf.py
 ```
 
-Rebuild the comparison chart from an existing `result/comparison_test.csv` without retraining:
+Or from inside `code/`:
 
 ```powershell
-python code/train_all.py --plot-only
+cd code
+python train_lr_tfidf.py
+python train_lr_bow.py
+python train_lr_word2vec.py
+python train_lr_char_tfidf.py
 ```
+
+Each single-method script calls `train_all.run_method(...)`, so outputs still go to the same `result/` and `weight/` folders.
 
 ## Outputs
 
