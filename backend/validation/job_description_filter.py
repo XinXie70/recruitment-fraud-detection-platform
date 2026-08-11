@@ -1,6 +1,6 @@
 """
-Job Description Relevance Filter — decides whether text looks like a job posting.
-
+Job Description Relevance Filter
+decides whether text looks like a job posting.
 This module is independent from basic input validation (input_validator.py).
 It does NOT judge whether a posting is fake or real; only whether the topic is job-related.
 """
