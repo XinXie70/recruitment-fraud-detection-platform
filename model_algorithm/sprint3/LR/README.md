@@ -1,14 +1,5 @@
-# LR (no class weight, bigrams, no CV) — paper-aligned seed 42
-
-| Setting | Value |
-|---|---|
-| Bigrams | Fixed `ngram_range=(1, 2)` |
-| Class weight | `None` |
-| Three-fold CV within training data | Disabled; fixed `C=1.0` |
-| Threshold | Maximise Fraud F1 on validation; evaluate test once |
-
-This experiment uses the same seed-42 split and fits TF-IDF on training data only.
-
+# LR  —  seed 42
+-The LR model referenced here, specifically our team's Optimized LR, will be compared against the Literature LR from the paper.
 ## Data
 
 - Source: `../data/splits/`
@@ -41,3 +32,14 @@ python LR/code/train_lr_none_bigram_no_cv.py
 The script writes:
 - model weights to `LR/weight/`
 - metrics and predictions to `LR/results/`
+
+## Comparison with Literature LR
+
+`comparison_summary.csv` summarises the gains of our **Optimized LR** over the literature-reported **Literature LR** on the test set. Optimized LR trades a small drop in Macro Precision for large gains in Macro Recall, Macro F1, and Accuracy.
+
+| Model / Comparison | Macro Precision | Macro Recall | Macro F1 | Accuracy |
+|---|---:|---:|---:|---:|
+| Literature LR | 98.00% | 70.00% | 78.00% | 97.00% |
+| **Optimized LR** | 96.22% | 90.60% | 93.21% | 98.83% |
+
+Paper reference: https://doi.org/10.1007/s10791-025-09502-8
