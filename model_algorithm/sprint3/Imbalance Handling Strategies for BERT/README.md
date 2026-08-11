@@ -21,7 +21,7 @@ batch=`4`, accum=`4`, …).
 | `code/train_smote_bert.py` | **SMOTE** on train TF-IDF → nearest-text map, then fine-tune (no class weight) |
 | `code/common.py` | Shared loaders / SMOTE helper / comparison writer |
 
-Open either train script in Cursor and click **Run Python File** (use the CUDA
+Open either train script in VSCODE and click **Run Python File** (use the CUDA
 env: `E:\ml\venv\Scripts\python.exe`).
 
 ```powershell
