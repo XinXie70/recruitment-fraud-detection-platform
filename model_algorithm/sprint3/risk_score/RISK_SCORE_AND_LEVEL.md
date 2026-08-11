@@ -99,37 +99,3 @@ The level meanings are:
   the LR gate.
 
 Suspicious is an operational review band, not a ground-truth EMSCAD class.
-
-## 6. Recommended output fields
-
-| Field | Description |
-|---|---|
-| `risk_score` | Operational ensemble score on a 0–1 scale |
-| `risk_score_100` | Display version on a 0–100 scale |
-| `risk_level` | `Low`, `Suspicious`, or `High` |
-| `bert_evidence_score` | Original BERT score before gate adjustment |
-| `lr_score` | Original LR score |
-| `risk_score_source` | `bert` or `lr_gate` |
-| `gate_triggered` | Whether the LR gate changed the score and level |
-| `decision_reason` | Short explanation of the final decision |
-
-## 7. Score diagnostics
-
-| Split | BERT PR-AUC | Ensemble score PR-AUC | BERT ROC-AUC | Ensemble score ROC-AUC |
-|---|---:|---:|---:|---:|
-| Validation | 0.8561 | 0.8596 | 0.9755 | 0.9756 |
-| Test | 0.9405 | 0.9478 | 0.9931 | 0.9933 |
-
-Only one Validation row and three Test rows triggered the LR gate. No score
-parameter or threshold was selected on Test.
-
-## 8. Related files
-
-- `risk_score/RISK_SCORE_REPORT.md`
-- `risk_score/risk_score_metrics.csv`
-- `risk_level/select_risk_boundaries.py`
-- `risk_level/risk_boundary_config.json`
-- `risk_level/RISK_BOUNDARY_REPORT.md`
-- `risk_level/validation_risk_levels.csv`
-- `risk_level/test_risk_levels.csv`
-- `risk_level/test_risk_level_summary.json`
