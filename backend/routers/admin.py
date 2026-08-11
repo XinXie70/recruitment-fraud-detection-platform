@@ -1,5 +1,5 @@
 """
-Admin routes — analytics dashboard, user management, and audit log.
+Admin routes,  analytics dashboard, user management, and audit log.
 All endpoints require  s_admin=True  on the authenticated user.
 """
 
