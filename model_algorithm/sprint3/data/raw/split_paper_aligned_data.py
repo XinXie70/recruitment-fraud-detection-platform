@@ -1,47 +1,15 @@
-#!/usr/bin/env python
-"""Paper-aligned data preparation + split (seed=42).
-
-Protocol (matches project Paper-aligned arm):
-  1) Load EMSCAD raw CSV (18 columns)
-  2) Build Condition-A style rows: record_id + combined_text(5 fields) + label
-  3) Build Paper-aligned model_text (structured tags + section word caps)
-  4) Stratified 80/20 test, then 10% of train_pool -> validation (seed=42)
-
-Usage (from this raw/ folder):
-  python split_paper_aligned_data.py
-  python split_paper_aligned_data.py --raw emscad_v1.csv --out ../splits --also_save_processed
-"""
-
+#Split paper-aligned data for EMSCAD data
 from __future__ import annotations
-
-import argparse
-import html
-import json
-import re
-import unicodedata
+import argparse, html, json, re, unicodedata, numpy as np, pandas as pd
 from pathlib import Path
 from typing import Dict, List
-
-import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
-
-# This script lives in sprint3/data/raw/
-RAW_DIR = Path(__file__).resolve().parent
-DATA_DIR = RAW_DIR.parent
-BUNDLE_ROOT = DATA_DIR
-SEED = 42
+RAW_PATH = Path(__file__).resolve().parent
+DATA_PATH = RAW_PATH.parent
+RANDOM_SEED = 42
 ID_COLUMN = "record_id"
 LABEL_COLUMN = "label"
-
-TEXT_COLUMNS_5 = [
-    "title",
-    "company_profile",
-    "description",
-    "requirements",
-    "benefits",
-]
-
+TEXT_COLUMNS = ["title", "company_profile", "description", "requirements", "benefits"]
 SECTION_WORD_CAPS = {
     "title": 20,
     "company_profile": 80,
@@ -50,9 +18,7 @@ SECTION_WORD_CAPS = {
     "benefits": 80,
 }
 
-
-def clean_text_light(value) -> str:
-    """Project shared light cleaning (Condition A / prepare_data)."""
+def clean_text(value) -> str:
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return ""
     text = html.unescape(str(value))
@@ -63,201 +29,138 @@ def clean_text_light(value) -> str:
     text = re.sub(r"\n\s*\n+", "\n", text)
     return text.strip()
 
-
 def convert_label(value) -> int:
-    v = str(value).strip().lower()
-    if v in {"0", "f", "false"}:
-        return 0
-    if v in {"1", "t", "true"}:
-        return 1
-    raise ValueError(f"Unexpected fraudulent label: {value!r}")
-
-
-def combine_five_fields(row: pd.Series) -> str:
-    parts = [clean_text_light(row.get(c, "")) for c in TEXT_COLUMNS_5]
-    return "\n".join(p for p in parts if p)
-
-
-def _cap_words(text: str, max_words: int) -> str:
+    label = str(value).strip().lower()
+    mapping = {"0": 0, "f": 0, "false": 0, "1": 1, "t": 1, "true": 1}
+    if label not in mapping:
+        raise ValueError(f"Unexpected fraudulent label: {value!r}")
+    return mapping[label]
+def combine_text_fields(row: pd.Series) -> str:
+    parts = [clean_text(row.get(column, "")) for column in TEXT_COLUMNS]
+    return "\n".join(part for part in parts if part)
+def cap_words(text: str, max_words: int) -> str:
     words = re.findall(r"\S+", text)
-    if len(words) <= max_words:
-        return " ".join(words)
     return " ".join(words[:max_words])
 
-
-def build_structured_combined_text(combined: str) -> str:
-    """Paper-aligned structured text (section tags + word caps)."""
-    if combined is None or (isinstance(combined, float) and pd.isna(combined)):
+def build_model_text(combined_text: str) -> str:
+    if combined_text is None or (isinstance(combined_text, float) and pd.isna(combined_text)):
         return ""
-    lines = [ln.strip() for ln in str(combined).split("\n") if ln.strip()]
+    lines = [line.strip() for line in str(combined_text).split("\n") if line.strip()]
     if not lines:
         return ""
-
-    parts: List[str] = []
+    parts: List[str] = [f"[TITLE] {cap_words(lines[0], SECTION_WORD_CAPS['title'])}"]
     if len(lines) == 1:
-        parts.append(f"[TITLE] {_cap_words(lines[0], SECTION_WORD_CAPS['title'])}")
         return "\n".join(parts)
-
-    parts.append(f"[TITLE] {_cap_words(lines[0], SECTION_WORD_CAPS['title'])}")
-    rest = lines[1:]
-    if len(rest) == 1:
-        parts.append(
-            f"[DESCRIPTION] {_cap_words(rest[0], SECTION_WORD_CAPS['description'])}"
-        )
+    remaining = lines[1:]
+    if len(remaining) == 1:
+        parts.append(f"[DESCRIPTION] {cap_words(remaining[0], SECTION_WORD_CAPS['description'])}")
         return "\n".join(parts)
-
-    parts.append(
-        f"[COMPANY PROFILE] {_cap_words(rest[0], SECTION_WORD_CAPS['company_profile'])}"
-    )
-    body = rest[1:]
+    parts.append(f"[COMPANY PROFILE] {cap_words(remaining[0], SECTION_WORD_CAPS['company_profile'])}")
+    body = remaining[1:]
     if not body:
         return "\n".join(parts)
-
-    n = len(body)
-    if n == 1:
-        parts.append(
-            f"[DESCRIPTION] {_cap_words(body[0], SECTION_WORD_CAPS['description'])}"
-        )
+    if len(body) == 1:
+        parts.append(f"[DESCRIPTION] {cap_words(body[0], SECTION_WORD_CAPS['description'])}")
         return "\n".join(parts)
 
-    c1 = max(1, n // 3)
-    c2 = max(c1 + 1, (2 * n) // 3)
-    desc = " ".join(body[:c1])
-    reqs = " ".join(body[c1:c2])
-    bens = " ".join(body[c2:])
-    parts.append(f"[DESCRIPTION] {_cap_words(desc, SECTION_WORD_CAPS['description'])}")
-    if reqs.strip():
-        parts.append(
-            f"[REQUIREMENTS] {_cap_words(reqs, SECTION_WORD_CAPS['requirements'])}"
-        )
-    if bens.strip():
-        parts.append(f"[BENEFITS] {_cap_words(bens, SECTION_WORD_CAPS['benefits'])}")
+    first_cut = max(1, len(body) // 3)
+    second_cut = max(first_cut + 1, (2 * len(body)) // 3)
+    description = " ".join(body[:first_cut])
+    requirements = " ".join(body[first_cut:second_cut])
+    benefits = " ".join(body[second_cut:])
+    parts.append(f"[DESCRIPTION] {cap_words(description, SECTION_WORD_CAPS['description'])}")
+
+    if requirements.strip():
+        parts.append(f"[REQUIREMENTS] {cap_words(requirements, SECTION_WORD_CAPS['requirements'])}")
+    if benefits.strip():
+        parts.append(f"[BENEFITS] {cap_words(benefits, SECTION_WORD_CAPS['benefits'])}")
     return "\n".join(parts)
 
-
-def load_raw_to_frame(raw_csv: Path) -> pd.DataFrame:
-    raw = pd.read_csv(raw_csv)
-    need = TEXT_COLUMNS_5 + ["fraudulent"]
-    missing = [c for c in need if c not in raw.columns]
-    if missing:
-        raise ValueError(f"Raw CSV missing columns: {missing}")
-
+def read_raw_data(file_path: Path) -> pd.DataFrame:
+    raw_data = pd.read_csv(file_path)
+    required_columns = TEXT_COLUMNS + ["fraudulent"]
+    missing_columns = [column for column in required_columns if column not in raw_data.columns]
+    if missing_columns:
+        raise ValueError(f"Raw CSV missing columns: {missing_columns}")
     rows = []
-    for i, row in raw.iterrows():
-        rid = f"emscad_{i + 1:05d}"
-        combined = combine_five_fields(row)
-        model_text = build_structured_combined_text(combined)
-        if not str(model_text).strip():
-            model_text = combined
-        rows.append(
-            {
-                ID_COLUMN: rid,
-                "combined_text": combined,
-                "model_text": model_text,
-                LABEL_COLUMN: convert_label(row["fraudulent"]),
-                "title": str(model_text).split("\n", 1)[0][:120],
-                "company": "",
-            }
-        )
+
+    for index, row in raw_data.iterrows():
+        record_id = f"emscad_{index + 1:05d}"
+        combined_text = combine_text_fields(row)
+        model_text = build_model_text(combined_text)
+        if not model_text.strip():
+            model_text = combined_text
+        rows.append({
+            ID_COLUMN: record_id,
+            "combined_text": combined_text,
+            "model_text": model_text,
+            LABEL_COLUMN: convert_label(row["fraudulent"]),
+            "title": str(model_text).split("\n", 1)[0][:120],
+            "company": "",
+        })
+
     return pd.DataFrame(rows)
 
 
-def make_assignment(df: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
-    """80/20 stratified, then 10% of train_pool -> validation."""
-    labels = df[LABEL_COLUMN]
-    idx = np.arange(len(df))
-    train_pool, test_idx = train_test_split(
-        idx, test_size=0.20, stratify=labels, random_state=seed
-    )
-    train_idx, val_idx = train_test_split(
-        train_pool,
-        test_size=0.10,
-        stratify=labels.iloc[train_pool],
-        random_state=seed,
-    )
-    split = pd.Series("", index=df.index)
-    split.iloc[train_idx] = "train"
-    split.iloc[val_idx] = "validation"
-    split.iloc[test_idx] = "test"
-    return pd.DataFrame(
-        {
-            ID_COLUMN: df[ID_COLUMN].astype(str),
-            "seed": seed,
-            "split": split.astype(str),
-        }
-    )
+def create_assignment(dataframe: pd.DataFrame, seed: int = RANDOM_SEED) -> pd.DataFrame:
+    labels = dataframe[LABEL_COLUMN]
+    indices = np.arange(len(dataframe))
+    training_pool, test_indices = train_test_split(indices, test_size=0.20, stratify=labels, random_state=seed)
+    training_indices, validation_indices = train_test_split(training_pool, test_size=0.10, stratify=labels.iloc[training_pool], random_state=seed)
+    split_labels = pd.Series("", index=dataframe.index)
+    split_labels.iloc[training_indices] = "train"
+    split_labels.iloc[validation_indices] = "validation"
+    split_labels.iloc[test_indices] = "test"
+    return pd.DataFrame({ID_COLUMN: dataframe[ID_COLUMN].astype(str), "seed": seed, "split": split_labels.astype(str)})
 
+def save_splits(dataframe: pd.DataFrame, assignment: pd.DataFrame, output_path: Path) -> Dict:
+    output_path.mkdir(parents=True, exist_ok=True)
+    assignment.to_csv(output_path / "assignments.csv.gz", index=False, compression="gzip")
+    merged_data = assignment.merge(dataframe, on=ID_COLUMN, how="left", validate="one_to_one")
+    split_counts = {}
 
-def write_splits(df: pd.DataFrame, assign: pd.DataFrame, out_dir: Path) -> Dict:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    assign.to_csv(out_dir / "assignments.csv.gz", index=False, compression="gzip")
-    merged = assign.merge(df, on=ID_COLUMN, how="left", validate="one_to_one")
-    counts = {}
-    for name in ("train", "validation", "test"):
-        part = merged[merged["split"] == name].copy().reset_index(drop=True)
-        part.to_csv(out_dir / f"{name}.csv.gz", index=False, compression="gzip")
-        counts[name] = {
-            "n": int(len(part)),
-            "fraud": int((part[LABEL_COLUMN] == 1).sum()),
-        }
-    meta = {
-        "seed": int(assign["seed"].iloc[0]),
+    for split_name in ("train", "validation", "test"):
+        split_data = merged_data[merged_data["split"] == split_name].copy().reset_index(drop=True)
+        split_data.to_csv(output_path / f"{split_name}.csv.gz", index=False, compression="gzip")
+        split_counts[split_name] = {"n": int(len(split_data)), "fraud": int((split_data[LABEL_COLUMN] == 1).sum())}
+    metadata = {
+        "seed": int(assignment["seed"].iloc[0]),
         "protocol": "80/20 + 10% val-of-train",
-        "split_counts": counts,
-        "n_total": int(len(df)),
+        "split_counts": split_counts,
+        "n_total": int(len(dataframe)),
     }
-    (out_dir / "split_meta.json").write_text(
-        json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
-    return meta
 
+    (output_path / "split_meta.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
+    return metadata
 
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser()
-    p.add_argument(
-        "--raw",
-        type=Path,
-        default=RAW_DIR / "emscad_v1.csv",
-    )
-    p.add_argument(
-        "--out",
-        type=Path,
-        default=DATA_DIR / "splits",
-    )
-    p.add_argument("--seed", type=int, default=SEED)
-    p.add_argument(
-        "--also_save_processed",
-        action="store_true",
-        help="Also write ../processed/emscad_condition_a_no_dedup_input_v1.csv.gz",
-    )
-    return p.parse_args()
+def save_processed_data(dataframe: pd.DataFrame) -> Path:
+    processed_path = DATA_PATH / "processed"
+    processed_path.mkdir(parents=True, exist_ok=True)
+    output_file = processed_path / "emscad_condition_a_no_dedup_input_v1.csv.gz"
+    dataframe[[ID_COLUMN, "combined_text", LABEL_COLUMN]].to_csv(output_file, index=False, compression="gzip")
+    return output_file
 
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--raw", type=Path, default=RAW_PATH / "emscad_v1.csv")
+    parser.add_argument("--out", type=Path, default=DATA_PATH / "splits")
+    parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument("--also_save_processed", action="store_true", help="Also write ../processed/emscad_condition_a_no_dedup_input_v1.csv.gz")
+    return parser.parse_args()
 
 def main() -> None:
-    args = parse_args()
-    if not args.raw.exists():
-        raise FileNotFoundError(
-            f"Raw EMSCAD not found: {args.raw}\n"
-            "Place emscad_v1.csv next to this script first."
-        )
-    print(f"Loading raw: {args.raw}")
-    df = load_raw_to_frame(args.raw)
-    print(f"Built frame n={len(df)} fraud={int((df[LABEL_COLUMN]==1).sum())}")
-
-    if args.also_save_processed:
-        proc_dir = DATA_DIR / "processed"
-        proc_dir.mkdir(parents=True, exist_ok=True)
-        proc_path = proc_dir / "emscad_condition_a_no_dedup_input_v1.csv.gz"
-        df[[ID_COLUMN, "combined_text", LABEL_COLUMN]].to_csv(
-            proc_path, index=False, compression="gzip"
-        )
-        print(f"Wrote processed: {proc_path}")
-
-    assign = make_assignment(df, seed=args.seed)
-    meta = write_splits(df, assign, args.out)
-    print(json.dumps(meta, indent=2, ensure_ascii=False))
-    print(f"Splits written to: {args.out}")
-
-
+    arguments = parse_arguments()
+    if not arguments.raw.exists():
+        raise FileNotFoundError(f"Raw EMSCAD not found: {arguments.raw}\nPlace emscad_v1.csv next to this script first.")
+    print(f"Loading raw: {arguments.raw}")
+    dataframe = read_raw_data(arguments.raw)
+    print(f"Built frame n={len(dataframe)} fraud={int((dataframe[LABEL_COLUMN] == 1).sum())}")
+    if arguments.also_save_processed:
+        processed_file = save_processed_data(dataframe)
+        print(f"Wrote processed: {processed_file}")
+    assignment = create_assignment(dataframe, arguments.seed)
+    metadata = save_splits(dataframe, assignment, arguments.out)
+    print(json.dumps(metadata, indent=2, ensure_ascii=False))
+    print(f"Splits written to: {arguments.out}")
 if __name__ == "__main__":
     main()
