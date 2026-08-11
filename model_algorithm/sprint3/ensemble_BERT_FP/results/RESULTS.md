@@ -6,18 +6,11 @@
 2. If BERT predicts fraud **and** `LR_score < lr_gate`, flip to legitimate
 3. Select `(bert_threshold, lr_gate)` on Validation by Fraud F1
 4. Freeze and evaluate once on Test
-
 LR branch: `../LR` (`class_weight=None`, unigram+bigram, no Train CV).
 
 BERT branch: `../BERT` (Optimized BERT, `max_length=512`).
 
 ## Reproducibility
-
-- Selection seed / hash seed: `42` / `42`
-- Frozen LR predictions: `G:\9900final\capstone-project-26t2-9900-h09c-almond\model_algorithm\sprint3\LR\results\test_predictions.csv`
-- Frozen BERT predictions: `G:\9900final\capstone-project-26t2-9900-h09c-almond\model_algorithm\sprint3\BERT\results\predictions_test.csv`
-- Frozen BERT metrics: `G:\9900final\capstone-project-26t2-9900-h09c-almond\model_algorithm\sprint3\BERT\results\metrics_test.json`
-- Packages: `{'python': '3.13.7', 'numpy': '2.4.4', 'pandas': '3.0.3', 'scikit_learn': '1.9.0'}`
 - Test report keeps only: LR / BERT / this ensemble
 
 ## Selected configuration
