@@ -1,16 +1,10 @@
-"""Flask API for LR, BERT, FP-gate ensemble, risk score and risk level.
-
-Swagger UI: http://127.0.0.1:5000/apidocs/
-"""
-
+#Flask API for LR, BERT, FP-gate ensemble, risk score and risk level
 from __future__ import annotations
-
 import logging
 import os
 from flasgger import Swagger
 from flask import Flask
 from flask_cors import CORS
-
 from settings import (
     MAX_CONTENT_LENGTH,
     MODEL_API_KEY,
@@ -22,7 +16,6 @@ from services.lr_service import lr_service
 from api_http import register_http_handlers
 from prediction_routes import routes
 from extensions import limiter
-
 logger = logging.getLogger("model_service")
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -33,7 +26,6 @@ app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 app.config["MODEL_API_KEY"] = MODEL_API_KEY
 CORS(app, origins=MODEL_CORS_ORIGINS)
-
 limiter.init_app(app)
 
 swagger_config = {
@@ -76,31 +68,23 @@ swagger_template = {
         {"name": "predict", "description": "Model and risk prediction endpoints"},
     ],
 }
-
 Swagger(app, config=swagger_config, template=swagger_template)
 register_http_handlers(app)
 app.register_blueprint(routes)
-
 if not MODEL_API_KEY:
     logger.warning(
         "MODEL_API_KEY is unset; /predict/* authentication is disabled. "
         "Set MODEL_API_KEY before exposing this service."
     )
-
-
 def create_app() -> Flask:
     return app
-
-
 if __name__ == "__main__":
-    # Eager-load models so the first HTTP call is not cold.
     print("Loading runtime config...")
     print(load_runtime_config())
     print("Loading LR...")
     lr_service.load()
     print("Loading BERT (first request may still warm CUDA kernels)...")
     bert_service.load()
-    # Default to localhost for local runs; Docker sets HOST=0.0.0.0 explicitly.
     host = os.getenv("HOST", "127.0.0.1")
     port = int(os.getenv("PORT", "5000"))
     print(f"Swagger UI: http://127.0.0.1:{port}/apidocs/")

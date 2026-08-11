@@ -1,19 +1,13 @@
-"""BERT inference service (paper-aligned maxlen=512 checkpoint)."""
-
+#BERT inference service for EMSCAD data
 from __future__ import annotations
-
 import os
 import threading
 from typing import Any
-
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
-
 from services.coalesce import InferenceCoalescer
 from settings import BERT_CHECKPOINT, BERT_MAX_LENGTH, load_runtime_config
-
-
 class BERTService:
     def __init__(self) -> None:
         self._lock = threading.Lock()
@@ -78,10 +72,8 @@ class BERTService:
         self.load()
         assert self._model is not None and self._tokenizer is not None
         assert self._device is not None and self._model_threshold is not None
-
         thr = float(self._model_threshold if threshold is None else threshold)
         key = f"bert:{thr}:{model_text}"
-
         def _infer() -> dict[str, Any]:
             assert self._model is not None and self._tokenizer is not None
             assert self._device is not None
@@ -105,8 +97,6 @@ class BERTService:
                 "predicted_label": "Fraudulent" if pred == 1 else "Legitimate",
                 "device": str(self._device),
             }
-
         return self._coalescer.run(key, _infer)
-
 
 bert_service = BERTService()

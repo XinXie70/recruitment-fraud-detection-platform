@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from flask import Blueprint, jsonify
-
 from api_http import error_response as _error, parse_payload as _parse_payload, server_error as _server_error, with_meta as _with_meta
 from settings import (
     MAX_BATCH_ITEMS,
@@ -14,11 +12,8 @@ from services.bert_service import bert_service
 from services.ensemble_service import ensemble_service, risk_service
 from services.lr_service import lr_service
 from services.text_utils import build_texts
-
 from extensions import limiter
-
 routes = Blueprint("prediction_api", __name__)
-
 @routes.get("/health")
 def health():
     """Service health check.
@@ -30,8 +25,6 @@ def health():
         description: Service is up
     """
     return jsonify({"ok": True, "status": "healthy"})
-
-
 @routes.get("/config")
 def get_config():
     """Return frozen thresholds and model paths used by the API.
@@ -102,8 +95,6 @@ def predict_lr():
         return _error(str(exc), status=400)
     except Exception as exc:  # noqa: BLE001
         return _server_error(exc)
-
-
 @routes.post("/predict/bert")
 @limiter.limit(RATE_LIMIT_PREDICT)
 def predict_bert():
@@ -158,7 +149,6 @@ def predict_bert():
         return _error(str(exc), status=400)
     except Exception as exc:  # noqa: BLE001
         return _server_error(exc)
-
 
 @routes.post("/predict/ensemble")
 @limiter.limit(RATE_LIMIT_PREDICT)
@@ -217,7 +207,6 @@ def predict_ensemble():
     except Exception as exc:  # noqa: BLE001
         return _server_error(exc)
 
-
 @routes.post("/predict/risk")
 @limiter.limit(RATE_LIMIT_PREDICT)
 def predict_risk():
@@ -272,7 +261,6 @@ def predict_risk():
         return _error(str(exc), status=400)
     except Exception as exc:  # noqa: BLE001
         return _server_error(exc)
-
 
 @routes.post("/predict/all")
 @limiter.limit(RATE_LIMIT_PREDICT)
@@ -352,7 +340,6 @@ def predict_all():
     except Exception as exc:  # noqa: BLE001
         return _server_error(exc)
 
-
 @routes.post("/predict/batch")
 @limiter.limit(RATE_LIMIT_PREDICT_BATCH)
 def predict_batch():
@@ -405,7 +392,6 @@ def predict_batch():
             raise ValueError("'items' must be a non-empty array")
         if len(items) > MAX_BATCH_ITEMS:
             raise ValueError(f"Batch size limited to {MAX_BATCH_ITEMS} items")
-
         results = []
         total_chars = 0
         for idx, item in enumerate(items):
