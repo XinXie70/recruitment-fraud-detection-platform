@@ -1,14 +1,9 @@
-"""FP-gate ensemble and risk score / risk level services."""
-
+#FP-gate ensemble and risk score 
 from __future__ import annotations
-
 from typing import Any
-
 from settings import load_runtime_config
 from services.bert_service import bert_service
 from services.lr_service import lr_service
-
-
 def _decision_reason(*, risk_level: str, gate_triggered: bool) -> str:
     if gate_triggered:
         return "BERT High candidate was demoted by the LR gate"
@@ -17,8 +12,6 @@ def _decision_reason(*, risk_level: str, gate_triggered: bool) -> str:
     if risk_level == "Low":
         return "BERT score is below the Low boundary"
     return "BERT score is between the Low and High boundaries"
-
-
 def apply_fp_gate(
     bert_score: float,
     lr_score: float,
@@ -42,7 +35,6 @@ def apply_fp_gate(
         "ranking_score": ranking_score,
     }
 
-
 def apply_risk(
     bert_score: float,
     lr_score: float,
@@ -54,7 +46,6 @@ def apply_risk(
     gate_triggered = bool(high_candidate and lr_score < lr_gate)
     high = bool(high_candidate and not gate_triggered)
     low = bool(bert_score < bert_low_threshold)
-
     risk_score = lr_score if gate_triggered else bert_score
     if high:
         risk_level = "High"
@@ -62,7 +53,6 @@ def apply_risk(
         risk_level = "Low"
     else:
         risk_level = "Suspicious"
-
     return {
         "model": "risk",
         "risk_score": float(risk_score),
@@ -84,12 +74,10 @@ def apply_risk(
         },
     }
 
-
 def score_pair(combined_text: str, model_text: str) -> tuple[dict[str, Any], dict[str, Any]]:
     lr = lr_service.predict(combined_text)
     bert = bert_service.predict(model_text)
     return lr, bert
-
 
 class EnsembleService:
     def predict(
@@ -112,7 +100,6 @@ class EnsembleService:
             lr_gate=cfg["ensemble"]["lr_gate"],
         )
 
-
 class RiskService:
     def predict(
         self,
@@ -134,7 +121,5 @@ class RiskService:
             lr_gate=cfg["risk"]["lr_gate"],
             bert_low_threshold=cfg["risk"]["bert_low_threshold"],
         )
-
-
 ensemble_service = EnsembleService()
 risk_service = RiskService()

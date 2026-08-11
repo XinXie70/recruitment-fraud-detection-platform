@@ -1,42 +1,30 @@
 from __future__ import annotations
-
 import pytest
-
-
 def test_health_is_open(client) -> None:
     response = client.get("/health")
-
     assert response.status_code == 200
     assert response.get_json() == {"ok": True, "status": "healthy"}
-
-
 def test_config_returns_runtime_paths(client) -> None:
     response = client.get("/config")
-
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["ok"] is True
     assert "lr" in payload["config"]
     assert "ensemble" in payload["config"]
 
-
 def test_config_failure_returns_sanitized_500(
     client,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import prediction_routes
-
     monkeypatch.setattr(
         prediction_routes,
         "load_runtime_config",
         lambda: (_ for _ in ()).throw(RuntimeError("private config failure")),
     )
-
     response = client.get("/config")
-
     assert response.status_code == 500
     assert response.get_json() == {"ok": False, "error": "Internal server error"}
-
 
 @pytest.mark.parametrize(
     "endpoint,service_name,result_key",
@@ -56,14 +44,12 @@ def test_individual_prediction_endpoints(
     result_key: str,
 ) -> None:
     response = client.post(endpoint, json=sample_payload)
-
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["ok"] is True
     assert payload["record_id"] == "demo_001"
     assert result_key in payload
     mock_model_services[service_name].predict.assert_called_once()
-
 
 @pytest.mark.parametrize(
     "endpoint",
@@ -74,10 +60,8 @@ def test_individual_prediction_endpoints_reject_blank_payload(
     endpoint: str,
 ) -> None:
     response = client.post(endpoint, json={"text": "  "})
-
     assert response.status_code == 400
     assert "Provide 'text'" in response.get_json()["error"]
-
 
 @pytest.mark.parametrize(
     "endpoint,service_name",
@@ -96,16 +80,12 @@ def test_individual_prediction_failures_are_sanitized(
     service_name: str,
 ) -> None:
     mock_model_services[service_name].predict.side_effect = RuntimeError("private failure")
-
     response = client.post(endpoint, json=sample_payload)
-
     assert response.status_code == 500
     assert response.get_json() == {"ok": False, "error": "Internal server error"}
 
-
 def test_predict_all_happy_path(client, sample_payload, mock_model_services) -> None:
     response = client.post("/predict/all", json=sample_payload)
-
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["ok"] is True
@@ -114,34 +94,27 @@ def test_predict_all_happy_path(client, sample_payload, mock_model_services) -> 
     mock_model_services["lr"].predict.assert_called_once()
     mock_model_services["bert"].predict.assert_called_once()
 
-
 def test_predict_all_requires_json_body(client) -> None:
     response = client.post("/predict/all", data="plain-text")
-
     assert response.status_code == 400
     assert response.get_json()["ok"] is False
 
-
 def test_predict_all_rejects_blank_payload(client) -> None:
     response = client.post("/predict/all", json={"title": "   "})
-
     assert response.status_code == 400
     assert "Provide 'text'" in response.get_json()["error"]
-
 
 def test_predict_batch_happy_path(client, sample_payload, mock_model_services) -> None:
     response = client.post(
         "/predict/batch",
         json={"items": [sample_payload, {"text": "Legitimate office role."}]},
     )
-
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["ok"] is True
     assert payload["count"] == 2
     assert len(payload["results"]) == 2
     assert mock_model_services["risk"].predict.call_count == 2
-
 
 @pytest.mark.parametrize(
     "body,expected_fragment",
@@ -153,68 +126,49 @@ def test_predict_batch_happy_path(client, sample_payload, mock_model_services) -
 )
 def test_predict_batch_validation_errors(client, body, expected_fragment: str) -> None:
     response = client.post("/predict/batch", json=body)
-
     assert response.status_code == 400
     assert expected_fragment in response.get_json()["error"]
 
-
 def test_predict_batch_item_limit(client, monkeypatch: pytest.MonkeyPatch) -> None:
     import prediction_routes
-
     monkeypatch.setattr(prediction_routes, "MAX_BATCH_ITEMS", 1)
-
     response = client.post(
         "/predict/batch",
         json={"items": [{"text": "one"}, {"text": "two"}]},
     )
-
     assert response.status_code == 400
     assert "Batch size limited" in response.get_json()["error"]
-
 
 def test_predict_batch_total_character_limit(
     client,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import prediction_routes
-
     monkeypatch.setattr(prediction_routes, "MAX_BATCH_TOTAL_CHARS", 1)
-
     response = client.post("/predict/batch", json={"items": [{"text": "too long"}]})
-
     assert response.status_code == 400
     assert "total character count" in response.get_json()["error"]
-
 
 def test_predict_batch_failure_is_sanitized(
     client,
     mock_model_services,
 ) -> None:
     mock_model_services["risk"].predict.side_effect = RuntimeError("private failure")
-
     response = client.post("/predict/batch", json={"items": [{"text": "sample"}]})
-
     assert response.status_code == 500
     assert response.get_json() == {"ok": False, "error": "Internal server error"}
 
-
 def test_predict_requires_api_key_when_configured(authed_client, sample_payload) -> None:
     response = authed_client.post("/predict/all", json=sample_payload)
-
     assert response.status_code == 401
-
-
 def test_predict_accepts_x_api_key_header(authed_client, sample_payload) -> None:
     response = authed_client.post(
         "/predict/all",
         json=sample_payload,
         headers={"X-API-Key": "test-secret-key"},
     )
-
     assert response.status_code == 200
     assert response.get_json()["ok"] is True
-
-
 def test_predict_accepts_bearer_token(authed_client, sample_payload) -> None:
     response = authed_client.post(
         "/predict/all",
