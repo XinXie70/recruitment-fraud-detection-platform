@@ -207,3 +207,109 @@ test('keeps local history when server synchronization fails', async () => {
   );
   expect(screen.getAllByText('55/100').length).toBeGreaterThan(0);
 });
+
+test('logs out when history synchronization is unauthorized', async () => {
+  const onLogout = vi.fn();
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: false, status: 401 });
+
+  render(
+    <MemoryRouter>
+      <DashboardPage
+        auth={{ access_token: 'expired-token', user: { username: 'joy' } }}
+        onLogout={onLogout}
+      />
+    </MemoryRouter>,
+  );
+
+  await waitFor(() => expect(onLogout).toHaveBeenCalledOnce());
+});
+
+test('loads another history page without duplicating existing entries', async () => {
+  const firstPage = {
+    items: [
+      {
+        id: 1,
+        input_preview: 'First advert',
+        risk_score: 0.2,
+        risk_level: 'low',
+        status: 'success',
+        created_at: '2026-07-29T02:00:00.000Z',
+      },
+    ],
+    total_pages: 2,
+  };
+  const secondPage = {
+    items: [
+      firstPage.items[0],
+      {
+        id: 2,
+        input_preview: 'Second advert',
+        risk_score: 0.5,
+        risk_level: 'medium',
+        status: 'success',
+        created_at: '2026-07-28T02:00:00.000Z',
+      },
+    ],
+    total_pages: 2,
+  };
+  const fetchMock = vi
+    .spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce({ ok: true, status: 200, json: async () => firstPage })
+    .mockResolvedValueOnce({ ok: true, status: 200, json: async () => secondPage });
+
+  render(
+    <MemoryRouter>
+      <DashboardPage
+        auth={{ access_token: 'dashboard-token', user: { username: 'joy' } }}
+        onLogout={() => {}}
+      />
+    </MemoryRouter>,
+  );
+
+  fireEvent.click(await screen.findByRole('button', { name: /load more/i }));
+  expect(await screen.findByText('50/100')).toBeVisible();
+  expect(screen.getByText('2 records')).toBeVisible();
+  expect(screen.getAllByText('20/100')).toHaveLength(1);
+  expect(fetchMock).toHaveBeenLastCalledWith('/api/v1/history?page=2&page_size=15', {
+    headers: { Authorization: 'Bearer dashboard-token' },
+  });
+});
+
+test('marks an unavailable server result and shows a recoverable error', async () => {
+  vi.spyOn(globalThis, 'fetch')
+    .mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        items: [
+          {
+            id: 42,
+            input_preview: 'Remote advert',
+            risk_score: 0.82,
+            risk_level: 'high',
+            status: 'success',
+            has_result: true,
+            created_at: '2026-07-28T02:00:00.000Z',
+          },
+        ],
+      }),
+    })
+    .mockResolvedValueOnce({ ok: false, status: 404 });
+
+  render(
+    <MemoryRouter>
+      <DashboardPage
+        auth={{ access_token: 'dashboard-token', user: { username: 'joy' } }}
+        onLogout={() => {}}
+      />
+    </MemoryRouter>,
+  );
+
+  fireEvent.click(await screen.findByRole('button', { name: 'Open full analysis result' }));
+  expect(await screen.findByRole('status')).toHaveTextContent(
+    'This full analysis result is no longer available.',
+  );
+  expect(
+    screen.queryByRole('button', { name: 'Open full analysis result' }),
+  ).not.toBeInTheDocument();
+});
