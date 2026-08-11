@@ -55,6 +55,14 @@ def save_predictions(data: pd.DataFrame, scores: np.ndarray, threshold: float, f
     output['prediction'] = (scores >= threshold).astype(int)
     output.to_csv(OUTPUT_DIR / filename, index=False)
 
+def save_comparison_summary(test_metrics: dict) -> Path:
+    comparison_path = ROOT / "comparison_summary.csv"
+    rows = [
+        {"model": "Literature LR", "macro_precision": 0.9800, "macro_recall": 0.7000, "macro_f1": 0.7800, "accuracy": 0.9700},
+        {"model": "Optimized LR", "macro_precision": round(float(test_metrics["macro_precision"]), 4), "macro_recall": round(float(test_metrics["macro_recall"]), 4), "macro_f1": round(float(test_metrics["macro_f1"]), 4), "accuracy": round(float(test_metrics["accuracy"]), 4)},
+    ]
+    pd.DataFrame(rows).to_csv(comparison_path, index=False)
+    return comparison_path
 def main() -> None:
     set_reproducibility(INNER_SEED)
     train = load_split('train')
@@ -84,6 +92,8 @@ def main() -> None:
     vcm = validation_metrics['confusion_matrix']
     results_md = f"# LR (class_weight=None, bigram, no CV) on paper-aligned seed42\n\n## Purpose\n\nFixed-protocol LR on paper-aligned seed42 splits:\n\n- **Included**: unigram + bigram (`ngram_range=(1, 2)`)\n- **Excluded**: `class_weight` (fixed to `None`)\n- **Excluded**: Train-internal 3-fold CV (fixed `C=1.0`)\n\nSame Train/Validation/Test splits as shared `../data/splits`.\n\n## Reproducibility\n\n- Split seed: `42`\n- Model `random_state`: `{INNER_SEED}`\n- `PYTHONHASHSEED`: `{os.environ.get('PYTHONHASHSEED')}`\n- Packages: `{package_versions()}`\n- Threshold selected on Validation only; Test evaluated once\n\n## Fixed configuration\n\n- ngram_range: `{FIXED_NGRAM_RANGE}`\n- C: `{FIXED_C}`\n- class_weight: `{FIXED_CLASS_WEIGHT}`\n- Validation threshold: `{threshold:.4f}`\n\n## Validation\n\n| Metric | Value |\n|---|---:|\n| Fraud Precision | {validation_metrics['fraud_precision']:.4f} |\n| Fraud Recall | {validation_metrics['fraud_recall']:.4f} |\n| Fraud F1 | {validation_metrics['fraud_f1']:.4f} |\n| Macro F1 | {validation_metrics['macro_f1']:.4f} |\n| PR-AUC | {validation_metrics['pr_auc']:.4f} |\n| ROC-AUC | {validation_metrics['roc_auc']:.4f} |\n| TP / FP / FN / TN | {vcm['tp']} / {vcm['fp']} / {vcm['fn']} / {vcm['tn']} |\n\n## Test\n\n| Metric | Value |\n|---|---:|\n| Fraud Precision | {test_metrics['fraud_precision']:.4f} |\n| Fraud Recall | {test_metrics['fraud_recall']:.4f} |\n| Fraud F1 | {test_metrics['fraud_f1']:.4f} |\n| Macro F1 | {test_metrics['macro_f1']:.4f} |\n| PR-AUC | {test_metrics['pr_auc']:.4f} |\n| ROC-AUC | {test_metrics['roc_auc']:.4f} |\n| TP / FP / FN / TN | {cm['tp']} / {cm['fp']} / {cm['fn']} / {cm['tn']} |\n"
     (OUTPUT_DIR / 'RESULTS.md').write_text(results_md, encoding='utf-8')
+    comparison_path = save_comparison_summary(test_metrics)
+    print(f'Saved comparison: {comparison_path}')
     print(f'Fixed parameters: {fixed_parameters}')
     print(f'Validation threshold: {threshold:.4f}')
     print(f"Validation: PR-AUC={validation_metrics['pr_auc']:.4f}, Fraud P={validation_metrics['fraud_precision']:.4f}, Fraud R={validation_metrics['fraud_recall']:.4f}, Fraud F1={validation_metrics['fraud_f1']:.4f}, Macro F1={validation_metrics['macro_f1']:.4f}")
