@@ -82,9 +82,43 @@ FastAPI uses only the following model-service endpoints:
 invalid contract, the application returns `503`; it never silently switches to
 an older model.
 
-## Tests
+## Testing strategy and coverage
 
-Application and model-service tests use **pytest**. Install dev dependencies first:
+Testing is split into four deliberately named layers. The distinction matters: a test is
+only called end-to-end when it crosses real process boundaries rather than intercepting
+those boundaries with mocks.
+
+| Layer | Scope | External dependencies |
+| --- | --- | --- |
+| Unit | Pure functions, services, validation, React components and rendering logic | Mocked or stubbed |
+| Integration | FastAPI/Flask routes, database transactions, model-service HTTP contracts and component/API interaction | Test database or mocked model/network boundary |
+| Mocked browser flow | Browser rendering, navigation, responsive layouts and user interactions across the frontend | API calls intercepted with Playwright `page.route()` |
+| Real E2E / smoke | A real browser, Vite proxy, FastAPI process and isolated SQLite database; separately, the real BERT/LR model artifacts | No mock at the boundary under test |
+
+Happy paths and sad paths are covered at every practical layer. Examples include valid
+and invalid input, authentication failures, database rollback, model timeouts and
+unavailability, sanitized `500` responses, concurrent cache misses, failed inference
+coalescing, frontend submission recovery, and unavailable explanation data.
+
+### Current coverage gates and verified baseline
+
+The following baseline was verified locally on 11 August 2026. CI rejects regressions
+below the configured gates.
+
+| Area | CI gate | Verified baseline | Test focus |
+| --- | --- | --- | --- |
+| Backend | 85% total | 92.16% | Validation, auth, database behavior, business logic, error mapping, cache races |
+| Model service | 90% total | 95.71% | Model loading/inference adapters, FP-gate rules, HTTP contracts, concurrent request coalescing |
+| Frontend | 80% statements, 76% branches, 75% functions, 83% lines | 88.96% statements, 85.01% branches, 86.13% functions, 91.67% lines | Rendering, component behavior, user interaction, routing and API failures |
+
+The verified default suites contain 185 passing Python tests and 65 passing frontend
+tests. Coverage is a regression gate rather than the sole quality measure; assertions
+also check observable behavior, error safety, persistence and concurrency.
+
+### Install test dependencies
+
+Application and model-service tests use **pytest**. Install their development
+dependencies first:
 
 ```bash
 pip install -r backend/requirements-dev.txt
@@ -97,19 +131,73 @@ Run the full suite from the repository root:
 pytest -q
 ```
 
-Run only the model service tests (fast, mocked integration layer):
+Run the backend coverage gate:
+
+```bash
+cd backend
+pytest tests -q --cov=. --cov-config=.coveragerc --cov-fail-under=85
+```
+
+Run only the model-service unit and mocked integration tests:
 
 ```bash
 pytest model_service/tests -q
 ```
 
-Optional slow end-to-end tests that load real BERT/LR weights:
+Run the frontend unit/component coverage gate:
+
+```bash
+cd frontend
+npm ci
+npm run test:coverage
+```
+
+### Browser tests
+
+Install the pinned Chromium build once, then run the mocked browser flows:
+
+```bash
+cd frontend
+npx playwright install chromium
+npm run test:e2e
+```
+
+These flows intentionally intercept API requests. They test frontend navigation,
+rendering, responsive desktop/tablet/mobile layouts, request payloads, successful user
+journeys and recoverable service failures. They do **not** prove that the backend or
+database is reachable.
+
+Run the separate real-backend smoke test with:
+
+```bash
+cd frontend
+npm run test:e2e:real
+```
+
+This test starts Vite on port `5191` and FastAPI on port `8001`, creates a disposable
+SQLite database, registers a user through the real API, and reads that user's history
+through the real API. It performs no `page.route()` interception. The database is
+deleted when the backend test process exits. It deliberately stops at the model-service
+boundary so the fast CI smoke test does not load multi-gigabyte model artifacts.
+
+### Real model-service E2E
+
+The model-service E2E test loads the committed BERT checkpoint and LR artifact and calls
+the real `/predict/all` route without mocking model loading or inference:
 
 ```bash
 RUN_MODEL_SERVICE_E2E=1 pytest model_service/tests -m e2e -q
 ```
 
-### model_service coverage
+It is excluded from the default suite because loading Transformer/PyTorch weights is
+slow and memory intensive, and CPU-only runners can take substantially longer or run out
+of memory. Run it on a machine with enough RAM and disk space; a GPU is optional. A
+failure caused by unavailable memory, missing large artifacts, or runner time limits is
+an environment limitation and must be recorded in the report/CI result rather than
+silently treated as a product assertion failure. Without `RUN_MODEL_SERVICE_E2E=1`,
+pytest reports the test as skipped with the reason.
+
+### Detailed coverage map
 
 | Area | Tests | Notes |
 | --- | --- | --- |
@@ -118,17 +206,25 @@ RUN_MODEL_SERVICE_E2E=1 pytest model_service/tests -m e2e -q
 | Race conditions | `test_coalesce.py` | Concurrent identical inference coalescing |
 | HTTP integration | `test_app_integration.py` | Auth, batch limits, sanitized 500 responses |
 | Real weights (opt-in) | `test_app_e2e.py` | Skipped unless `RUN_MODEL_SERVICE_E2E=1` |
+| Backend routes and persistence | `backend/tests/test_api.py`, `test_analysis_router.py` | Real test database, auth, rollback and safe error mapping |
+| Backend race conditions | `backend/tests/test_cache.py` | Concurrent misses compute once and share the result |
+| Frontend unit/component | `frontend/src/**/*.test.{js,jsx}` | Rendering, interactions, storage and API happy/sad paths |
+| Mocked browser flow | `frontend/e2e/core-flows.spec.js` | Browser journeys against intercepted API responses |
+| Real-backend browser smoke | `frontend/e2e/real-backend-smoke.spec.js` | Browser → Vite proxy → FastAPI → disposable SQLite |
 
 See [`model_service/tests/README.md`](model_service/tests/README.md) for the full testing
 approach and mocking strategy.
 
-Frontend checks:
+Full CI-equivalent frontend checks:
 
 ```bash
 cd frontend
 npm run lint
 npm run format:check
 npm run test:coverage
+npx playwright install chromium
+npm run test:e2e
+npm run test:e2e:real
 npm run build
 ```
 
