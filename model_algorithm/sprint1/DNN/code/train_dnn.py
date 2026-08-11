@@ -315,8 +315,9 @@ def save_outputs(
         "threshold": float(threshold),
     }
 
-    torch.save(
-        checkpoint,MODEL_PATH / "dnn_mlp.pt",
+    # Offline training artifact only; not loaded from untrusted input.
+    torch.save(  # nosemgrep: trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
+        checkpoint, MODEL_PATH / "dnn_mlp.pt",
     )
 
     joblib.dump(

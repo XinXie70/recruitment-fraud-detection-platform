@@ -61,7 +61,7 @@ class JobTextDataset(Dataset):
         return self.encoded_texts[index], self.targets[index]
 
 def batch_collator(batch):
-    sequences, targets = zip(*batch)
+    sequences, targets = zip(*batch, strict=True)
     sequence_lengths = torch.tensor([sequence.size(0) for sequence in sequences], dtype=torch.long)
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=PADDING_INDEX)
     return padded_sequences, sequence_lengths, torch.stack(targets)
@@ -152,7 +152,8 @@ def save_outputs(model_state: dict, vocabulary: dict[str, int], threshold: float
     MODEL_PATH.mkdir(parents=True, exist_ok=True)
     (OUTPUT_PATH / "test_metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     checkpoint = {"model_state_dict": model_state, "vocab": vocabulary, "threshold": float(threshold), "max_len": SEQUENCE_LIMIT, "embed_dim": EMBEDDING_SIZE, "hidden": RNN_HIDDEN_SIZE}
-    torch.save(checkpoint, MODEL_PATH / "rnn.pt")
+    # Offline training artifact only; not loaded from untrusted input.
+    torch.save(checkpoint, MODEL_PATH / "rnn.pt")  # nosemgrep: trailofbits.python.pickles-in-pytorch.pickles-in-pytorch
 
 def main() -> None:
     initialize_random_state()

@@ -157,7 +157,7 @@ def plot_fraud_metrics_comparison(comparison_csv: Path=COMPARISON_CSV, output_pa
     offsets = (-width, 0.0, width)
     ensure_dirs(output_path.parent)
     fig, ax = plt.subplots(figsize=(10, 5.5))
-    for offset, metric in zip(offsets, METRIC_COLUMNS):
+    for offset, metric in zip(offsets, METRIC_COLUMNS, strict=True):
         values = table[metric].astype(float).to_numpy()
         bars = ax.bar(x + offset, values, width=width, label=metric)
         ax.bar_label(bars, fmt='%.3f', padding=2, fontsize=8)
