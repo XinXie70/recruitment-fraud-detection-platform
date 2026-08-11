@@ -1,0 +1,1 @@
+Sprint 1, Sprint 2, and Sprint 3 respectively illustrate the changes in the three-stage model.

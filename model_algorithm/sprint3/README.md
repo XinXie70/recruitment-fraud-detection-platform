@@ -1,0 +1,1 @@
+Sprint 3 demonstrated that our team optimized the BERT and LR models during the sprint 3 phase and proposed the ensemble strategy. Among them, the BERT folder contains the optimized BERT model, the LR folder contains the optimized LR model, and the ensemble folder contains the optimized ensemble strategy.
