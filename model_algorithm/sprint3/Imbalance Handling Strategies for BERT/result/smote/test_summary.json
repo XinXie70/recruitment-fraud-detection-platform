@@ -1,0 +1,9 @@
+{
+  "strategy": "smote",
+  "Accuracy": 0.9899328859060402,
+  "Fraud Precision": 0.9254658385093167,
+  "Fraud Recall": 0.861271676300578,
+  "Fraud F1": 0.8922155688622755,
+  "threshold": 0.01,
+  "weight_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\weight\\smote\\best"
+}

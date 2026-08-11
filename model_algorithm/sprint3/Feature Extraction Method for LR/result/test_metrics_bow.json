@@ -1,0 +1,14 @@
+{
+  "method": "bow",
+  "Fraud Precision": 0.9761904761904762,
+  "Fraud Recall": 0.7109826589595376,
+  "Fraud F1": 0.822742474916388,
+  "Accuracy": 0.985178970917226,
+  "threshold": 0.7097452436577069,
+  "confusion_matrix": {
+    "tn": 3400,
+    "fp": 3,
+    "fn": 50,
+    "tp": 123
+  }
+}

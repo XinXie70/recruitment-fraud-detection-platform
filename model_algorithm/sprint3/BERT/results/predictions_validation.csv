@@ -1,0 +1,1432 @@
+sample_index,original_id,company,title,true_label,predicted_label,legitimate_probability,fraud_probability,threshold,correct,model_name,imbalance_strategy
+0,emscad_00004,,[TITLE] Account Executive - Washington DC,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1,emscad_00011,,"[TITLE] ASP.net Developer Job opportunity at United States,New Jersey",0,0,0.9998948574066162,0.00010514259338378906,0.32,1,Optimized BERT,checkpoint
+2,emscad_00038,,[TITLE] PROJECT MANAGER,0,1,0.00048828125,0.99951171875,0.32,0,Optimized BERT,checkpoint
+3,emscad_00052,,[TITLE] Administrative/Front Desk,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+4,emscad_00070,,[TITLE] Ruby Automation Engineer & Ruby on Rails Engineer - 2 roles,0,0,0.9964618682861328,0.0035381317138671875,0.32,1,Optimized BERT,checkpoint
+5,emscad_00074,,[TITLE] Specialist Obs/Gyn,0,0,0.9998059272766113,0.00019407272338867188,0.32,1,Optimized BERT,checkpoint
+6,emscad_00081,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+7,emscad_00084,,[TITLE] Mail Processing Associate - General Clerk 1,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+8,emscad_00117,,[TITLE] Executive Assistant,0,0,0.9998440742492676,0.00015592575073242188,0.32,1,Optimized BERT,checkpoint
+9,emscad_00137,,[TITLE] Customer Service Associate,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+10,emscad_00146,,[TITLE] .NET Web Developer,0,0,0.9982519149780273,0.0017480850219726562,0.32,1,Optimized BERT,checkpoint
+11,emscad_00163,,[TITLE] Account Manager (Fashion),0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+12,emscad_00169,,[TITLE] Marketing Sales Assistant,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+13,emscad_00182,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+14,emscad_00191,,[TITLE] Entry Level Sales,0,0,0.9999035000801086,9.649991989135742e-05,0.32,1,Optimized BERT,checkpoint
+15,emscad_00201,,[TITLE] Media Planner,0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+16,emscad_00210,,[TITLE] Customer Service Associate,0,0,0.9999121427536011,8.785724639892578e-05,0.32,1,Optimized BERT,checkpoint
+17,emscad_00214,,[TITLE] Customer Service Associate,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+18,emscad_00228,,[TITLE] Telesales,0,0,0.987762451171875,0.012237548828125,0.32,1,Optimized BERT,checkpoint
+19,emscad_00236,,[TITLE] WF5 9HF Recruitment Apprenticeship Available Under NAS 16-24 year olds only!,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+20,emscad_00240,,"[TITLE] Production Supervisor - Chemical Manufacturing Exp - St. Louis, MO",0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+21,emscad_00249,,[TITLE] Head of Investor Development,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+22,emscad_00261,,[TITLE] Chelmsford Customer Service Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+23,emscad_00267,,[TITLE] Assistant Retail Manager -- Must LOVE Dogs,0,0,0.9997612237930298,0.00023877620697021484,0.32,1,Optimized BERT,checkpoint
+24,emscad_00278,,[TITLE] Automated Test Analyst,0,0,0.999907910823822,9.208917617797852e-05,0.32,1,Optimized BERT,checkpoint
+25,emscad_00284,,[TITLE] Account Manager,0,0,0.999448299407959,0.0005517005920410156,0.32,1,Optimized BERT,checkpoint
+26,emscad_00290,,"[TITLE] Intern with Google, Microsoft, Facebook and more! at Studyhall.com",0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+27,emscad_00316,,[TITLE] Project Manager,0,0,0.999907910823822,9.208917617797852e-05,0.32,1,Optimized BERT,checkpoint
+28,emscad_00340,,[TITLE] Principal Security Consultant / Penetration Tester,0,0,0.9972209930419922,0.0027790069580078125,0.32,1,Optimized BERT,checkpoint
+29,emscad_00394,,[TITLE] Receptionist - Part Time,0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+30,emscad_00400,,[TITLE] Senior Scala Engineer,0,0,0.9998747110366821,0.0001252889633178711,0.32,1,Optimized BERT,checkpoint
+31,emscad_00401,,[TITLE] Chief Marketing Officer,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+32,emscad_00405,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998867511749268,0.00011324882507324219,0.32,1,Optimized BERT,checkpoint
+33,emscad_00407,,[TITLE] Paid Internship for Africa Program,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+34,emscad_00408,,"[TITLE] Front End Web Developer - HTML5, CSS3, JavaScript, Bootstrap",0,0,0.9998458623886108,0.00015413761138916016,0.32,1,Optimized BERT,checkpoint
+35,emscad_00409,,[TITLE] Customer Service Team Lead,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+36,emscad_00414,,[TITLE] B2 4RN Business Admin Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+37,emscad_00423,,[TITLE] Senior Frontend Developer,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+38,emscad_00435,,[TITLE] Sr. ServiceNow Implementers,0,0,0.9998670816421509,0.0001329183578491211,0.32,1,Optimized BERT,checkpoint
+39,emscad_00437,,[TITLE] English Teacher Abroad,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+40,emscad_00441,,[TITLE] Ruby developer,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+41,emscad_00446,,[TITLE] Customer Service Associate - Part Time,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+42,emscad_00457,,[TITLE] Customer Service Agent,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+43,emscad_00458,,[TITLE] Community and Social Manager,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+44,emscad_00480,,[TITLE] Customer Service Associate,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+45,emscad_00494,,[TITLE] Admin Assistant/ Receptionist,1,1,0.0009765625,0.9990234375,0.32,1,Optimized BERT,checkpoint
+46,emscad_00502,,[TITLE] Outside Sales Professional-Macomb,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+47,emscad_00524,,[TITLE] Regnskabsassistent,0,0,0.9998956918716431,0.0001043081283569336,0.32,1,Optimized BERT,checkpoint
+48,emscad_00536,,[TITLE] Office Manager,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+49,emscad_00541,,[TITLE] Advertising Sales/Account Executive,0,0,0.9998711347579956,0.00012886524200439453,0.32,1,Optimized BERT,checkpoint
+50,emscad_00544,,[TITLE] Front Desk/Security,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+51,emscad_00556,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+52,emscad_00564,,[TITLE] Product Manager,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+53,emscad_00574,,[TITLE] Senior Engineering Product Manager,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+54,emscad_00619,,[TITLE] Sales & Support role in tech firm,0,0,0.9998147487640381,0.00018525123596191406,0.32,1,Optimized BERT,checkpoint
+55,emscad_00620,,[TITLE] Outside Sales Professional-Windsor,0,0,0.9997602701187134,0.0002397298812866211,0.32,1,Optimized BERT,checkpoint
+56,emscad_00629,,[TITLE] UST Testing Technician II,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+57,emscad_00650,,[TITLE] English Teacher Abroad,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+58,emscad_00669,,[TITLE] Outside Sales Professional-West Chicago,0,0,0.9999004602432251,9.953975677490234e-05,0.32,1,Optimized BERT,checkpoint
+59,emscad_00679,,[TITLE] Telesales,0,0,0.9997241497039795,0.0002758502960205078,0.32,1,Optimized BERT,checkpoint
+60,emscad_00689,,"[TITLE] Consultant, Strategic Services",0,0,0.999713659286499,0.00028634071350097656,0.32,1,Optimized BERT,checkpoint
+61,emscad_00691,,[TITLE] Content Marketer,0,0,0.9998557567596436,0.0001442432403564453,0.32,1,Optimized BERT,checkpoint
+62,emscad_00694,,[TITLE] Web Engineer (Business Process System),0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+63,emscad_00696,,[TITLE] All round web design superstar for cutting edge non-profit websites,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+64,emscad_00739,,[TITLE] Human Resources (HR) Manager,0,0,0.998295783996582,0.0017042160034179688,0.32,1,Optimized BERT,checkpoint
+65,emscad_00772,,"[TITLE] Home Health Aide--Cortez, CO",0,0,0.9997527599334717,0.0002472400665283203,0.32,1,Optimized BERT,checkpoint
+66,emscad_00776,,[TITLE] Claims representatives,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+67,emscad_00777,,[TITLE] Construction Management - West/Northwest Chicagoland,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+68,emscad_00788,,[TITLE] Retirement Plan Account Manager - Charlotte,0,0,0.999868631362915,0.00013136863708496094,0.32,1,Optimized BERT,checkpoint
+69,emscad_00789,,[TITLE] Super Marketing Specialist,0,0,0.9993844032287598,0.0006155967712402344,0.32,1,Optimized BERT,checkpoint
+70,emscad_00795,,[TITLE] Product Manager Assistant,0,0,0.9971771240234375,0.0028228759765625,0.32,1,Optimized BERT,checkpoint
+71,emscad_00812,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+72,emscad_00831,,[TITLE] Senior Open-Source Software Engineer,0,0,0.9998534917831421,0.00014650821685791016,0.32,1,Optimized BERT,checkpoint
+73,emscad_00850,,[TITLE] Software Engineering Director,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+74,emscad_00859,,[TITLE] Direct Support Professional,0,0,0.9998818039894104,0.00011819601058959961,0.32,1,Optimized BERT,checkpoint
+75,emscad_00875,,[TITLE] Financial Analyst,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+76,emscad_00880,,[TITLE] DAS Field Technician,0,0,0.999858021736145,0.00014197826385498047,0.32,1,Optimized BERT,checkpoint
+77,emscad_00881,,[TITLE] Ruby Engineer - Sustaining Engineer,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+78,emscad_00893,,[TITLE] CDL Driver-Savage,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+79,emscad_00935,,[TITLE] Talence Group llc Resume Submission,0,0,0.9993267059326172,0.0006732940673828125,0.32,1,Optimized BERT,checkpoint
+80,emscad_00936,,[TITLE] Junior System Administrator,0,0,0.9998854398727417,0.00011456012725830078,0.32,1,Optimized BERT,checkpoint
+81,emscad_00938,,[TITLE] Health & Environmental Professional,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+82,emscad_00995,,[TITLE] Account Executive/Digital Ad Sales,0,0,0.9997293949127197,0.00027060508728027344,0.32,1,Optimized BERT,checkpoint
+83,emscad_01010,,[TITLE] Release Manager,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+84,emscad_01014,,[TITLE] SOA Tester,0,0,0.9990358352661133,0.0009641647338867188,0.32,1,Optimized BERT,checkpoint
+85,emscad_01043,,[TITLE] Hotel Guest Service Agent,0,0,0.9998522996902466,0.00014770030975341797,0.32,1,Optimized BERT,checkpoint
+86,emscad_01045,,[TITLE] Data Entry,0,0,0.9998440742492676,0.00015592575073242188,0.32,1,Optimized BERT,checkpoint
+87,emscad_01047,,[TITLE] Data Scientist,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+88,emscad_01060,,[TITLE] Android framework Developer in CA,0,0,0.9998751878738403,0.00012481212615966797,0.32,1,Optimized BERT,checkpoint
+89,emscad_01115,,[TITLE] Home Assistant,0,0,0.9997458457946777,0.0002541542053222656,0.32,1,Optimized BERT,checkpoint
+90,emscad_01126,,[TITLE] Trademark Legal Assistant,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+91,emscad_01132,,[TITLE] Senior Android Developer,0,0,0.9998863339424133,0.00011366605758666992,0.32,1,Optimized BERT,checkpoint
+92,emscad_01141,,[TITLE] HP2 7EA Helpdesk Apprentice Under NAS 16-18 Year Olds Only,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+93,emscad_01154,,[TITLE] Sub Arc Welder,0,0,0.9999023675918579,9.763240814208984e-05,0.32,1,Optimized BERT,checkpoint
+94,emscad_01155,,[TITLE] Chief Technology Officer/Co-Founder,0,0,0.999859094619751,0.00014090538024902344,0.32,1,Optimized BERT,checkpoint
+95,emscad_01159,,[TITLE] Programming Associate,0,0,0.9997532367706299,0.0002467632293701172,0.32,1,Optimized BERT,checkpoint
+96,emscad_01168,,[TITLE] Data Analyst,0,0,0.9983129501342773,0.0016870498657226562,0.32,1,Optimized BERT,checkpoint
+97,emscad_01181,,[TITLE] Sales Representative,0,0,0.9996464252471924,0.0003535747528076172,0.32,1,Optimized BERT,checkpoint
+98,emscad_01196,,[TITLE] Product Strategist,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+99,emscad_01224,,[TITLE] Emergency Department Registrar's,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+100,emscad_01225,,"[TITLE] Director, Client Services",0,0,0.9997503757476807,0.00024962425231933594,0.32,1,Optimized BERT,checkpoint
+101,emscad_01227,,[TITLE] Marketing Executive - Mobile,0,0,0.9996614456176758,0.00033855438232421875,0.32,1,Optimized BERT,checkpoint
+102,emscad_01228,,"[TITLE] Project Engineer - Manufacturing - Houston, TX",0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+103,emscad_01234,,[TITLE] Local Representative,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+104,emscad_01265,,[TITLE] Designer: Creative References,0,0,0.9998371601104736,0.0001628398895263672,0.32,1,Optimized BERT,checkpoint
+105,emscad_01291,,[TITLE] Research Assistant,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+106,emscad_01305,,[TITLE] 3D Artist (Modeling + Texturing),0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+107,emscad_01314,,[TITLE] Front-End Developer (HTML/CSS/JAVAScript Guru),0,0,0.999923050403595,7.69495964050293e-05,0.32,1,Optimized BERT,checkpoint
+108,emscad_01317,,[TITLE] Developer,0,0,0.9964885711669922,0.0035114288330078125,0.32,1,Optimized BERT,checkpoint
+109,emscad_01324,,[TITLE] Marketing / Sales Representative,0,0,0.9999020099639893,9.799003601074219e-05,0.32,1,Optimized BERT,checkpoint
+110,emscad_01353,,[TITLE] iOS Developer,0,0,0.9994897842407227,0.0005102157592773438,0.32,1,Optimized BERT,checkpoint
+111,emscad_01361,,[TITLE] Director of Human Resources,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+112,emscad_01364,,[TITLE] Entrepreneurial Executive Assistant,0,0,0.9998522996902466,0.00014770030975341797,0.32,1,Optimized BERT,checkpoint
+113,emscad_01381,,[TITLE] DevOps,0,0,0.9998701810836792,0.00012981891632080078,0.32,1,Optimized BERT,checkpoint
+114,emscad_01392,,[TITLE] Informatica MDM,0,0,0.9998563528060913,0.0001436471939086914,0.32,1,Optimized BERT,checkpoint
+115,emscad_01396,,[TITLE] Field Technician,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+116,emscad_01412,,[TITLE] BigData Consultant,0,0,0.9998845458030701,0.00011545419692993164,0.32,1,Optimized BERT,checkpoint
+117,emscad_01417,,[TITLE] Business Analyst,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+118,emscad_01448,,[TITLE] Real Talent Network,0,0,0.9994664192199707,0.0005335807800292969,0.32,1,Optimized BERT,checkpoint
+119,emscad_01463,,[TITLE] Sales Representative,0,0,0.9998968839645386,0.00010311603546142578,0.32,1,Optimized BERT,checkpoint
+120,emscad_01466,,[TITLE] Customer Service Associate,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+121,emscad_01478,,[TITLE] Experienced Magento Developer,0,0,0.9933700561523438,0.00662994384765625,0.32,1,Optimized BERT,checkpoint
+122,emscad_01487,,[TITLE] Looking for a fun job? HiJames is the place to be !,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+123,emscad_01497,,[TITLE] Food & Beverage Assistant ( Waitress / Waiter / Chef de Rang ),0,0,0.9994640350341797,0.0005359649658203125,0.32,1,Optimized BERT,checkpoint
+124,emscad_01502,,[TITLE] Graphic / Visual Designer for Social Impact,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+125,emscad_01518,,[TITLE] Electrical Controls Engineer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+126,emscad_01524,,[TITLE] Head of Marketing,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+127,emscad_01526,,[TITLE] Financial Controller (part-time),0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+128,emscad_01532,,[TITLE] Quality Engineer,0,0,0.9997988939285278,0.00020110607147216797,0.32,1,Optimized BERT,checkpoint
+129,emscad_01554,,[TITLE] Environmental Scientist,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+130,emscad_01576,,[TITLE] Sales manager,0,0,0.786865234375,0.213134765625,0.32,1,Optimized BERT,checkpoint
+131,emscad_01593,,"[TITLE] Micosoft .NET, ASP.NET, SSIS Developer",0,0,0.9965705871582031,0.003429412841796875,0.32,1,Optimized BERT,checkpoint
+132,emscad_01595,,[TITLE] Love Financial Administration?,0,0,0.9998736381530762,0.00012636184692382812,0.32,1,Optimized BERT,checkpoint
+133,emscad_01669,,[TITLE] Account & Media Manager,0,0,0.9998936057090759,0.00010639429092407227,0.32,1,Optimized BERT,checkpoint
+134,emscad_01694,,[TITLE] Applications Engineer,0,0,0.9993252754211426,0.0006747245788574219,0.32,1,Optimized BERT,checkpoint
+135,emscad_01695,,[TITLE] AngularJS and Bootstrap developers,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+136,emscad_01703,,[TITLE] Business Operations Intern for Social Impact,0,0,0.9998956918716431,0.0001043081283569336,0.32,1,Optimized BERT,checkpoint
+137,emscad_01708,,[TITLE] Appointment Setter,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+138,emscad_01715,,[TITLE] Bookeeper,0,0,0.9850311279296875,0.0149688720703125,0.32,1,Optimized BERT,checkpoint
+139,emscad_01716,,[TITLE] Skilled CNC Millers,0,0,0.9996600151062012,0.0003399848937988281,0.32,1,Optimized BERT,checkpoint
+140,emscad_01727,,[TITLE] Air Environmental Engineer,0,0,0.9998584985733032,0.00014150142669677734,0.32,1,Optimized BERT,checkpoint
+141,emscad_01729,,[TITLE] Registered Nurse,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+142,emscad_01735,,[TITLE] Agile Coach/PM,0,0,0.9998073577880859,0.0001926422119140625,0.32,1,Optimized BERT,checkpoint
+143,emscad_01742,,[TITLE] Administrative Assistant To Lead Pastor,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+144,emscad_01744,,[TITLE] Mortgage Loan Processor,0,0,0.9985761642456055,0.0014238357543945312,0.32,1,Optimized BERT,checkpoint
+145,emscad_01753,,[TITLE] General Manager - Houston,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+146,emscad_01757,,[TITLE] Executive Assistant,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+147,emscad_01771,,[TITLE] Sales Representative - Web Development,0,0,0.9998893737792969,0.000110626220703125,0.32,1,Optimized BERT,checkpoint
+148,emscad_01797,,[TITLE] Operations Manager,0,0,0.999841570854187,0.00015842914581298828,0.32,1,Optimized BERT,checkpoint
+149,emscad_01812,,[TITLE] Sales Representative,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+150,emscad_01830,,[TITLE] Call Center Supervisor,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+151,emscad_01854,,[TITLE] Caregiver/Nursing Student/CNA needed,0,0,0.9997143745422363,0.0002856254577636719,0.32,1,Optimized BERT,checkpoint
+152,emscad_01886,,[TITLE] Lead Process Engineer,0,0,0.9998840689659119,0.00011593103408813477,0.32,1,Optimized BERT,checkpoint
+153,emscad_01901,,"[TITLE] Business, Customer Service, Social Media Internship",0,0,0.9998893737792969,0.000110626220703125,0.32,1,Optimized BERT,checkpoint
+154,emscad_01920,,[TITLE] Customer Service Associate - Part Time,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+155,emscad_01921,,[TITLE] Intern: Production,0,0,0.9997115135192871,0.0002884864807128906,0.32,1,Optimized BERT,checkpoint
+156,emscad_01926,,[TITLE] Part Time Delivery Driver - Oakland CA,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+157,emscad_01936,,[TITLE] Hardware/Electrical Engineer,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+158,emscad_01952,,[TITLE] Data Analyst,0,0,0.9995486736297607,0.0004513263702392578,0.32,1,Optimized BERT,checkpoint
+159,emscad_01961,,[TITLE] Mobile Developer-Back End,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+160,emscad_01962,,[TITLE] Engagement Manager,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+161,emscad_01970,,[TITLE] Car Sales Executive,0,0,0.9998867511749268,0.00011324882507324219,0.32,1,Optimized BERT,checkpoint
+162,emscad_01974,,[TITLE] Office Manager,0,0,0.9999224543571472,7.75456428527832e-05,0.32,1,Optimized BERT,checkpoint
+163,emscad_01986,,[TITLE] Community Development Worker (Strathcona Heights),0,0,0.998661994934082,0.0013380050659179688,0.32,1,Optimized BERT,checkpoint
+164,emscad_01995,,[TITLE] iOS Developer @netguru,0,0,0.9997988939285278,0.00020110607147216797,0.32,1,Optimized BERT,checkpoint
+165,emscad_02011,,[TITLE] Telesales executive,0,0,0.993560791015625,0.006439208984375,0.32,1,Optimized BERT,checkpoint
+166,emscad_02037,,[TITLE] Vaccine Preventable Disease Epidemiologist,0,0,0.9998012781143188,0.00019872188568115234,0.32,1,Optimized BERT,checkpoint
+167,emscad_02041,,[TITLE] VP Sales - B2B SaaS Startup,0,0,0.9998522996902466,0.00014770030975341797,0.32,1,Optimized BERT,checkpoint
+168,emscad_02049,,[TITLE] Manufacturing Engineer - Lean Manufacturing AutoCAD ERP - NC,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+169,emscad_02053,,[TITLE] Accounting Specialist,0,0,0.9998931884765625,0.0001068115234375,0.32,1,Optimized BERT,checkpoint
+170,emscad_02063,,[TITLE] Director of Operations,0,0,0.999858021736145,0.00014197826385498047,0.32,1,Optimized BERT,checkpoint
+171,emscad_02067,,[TITLE] Lead Developer (Freelance),0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+172,emscad_02084,,[TITLE] Assistant Production Manager,0,0,0.96478271484375,0.03521728515625,0.32,1,Optimized BERT,checkpoint
+173,emscad_02102,,"[TITLE] Technical Product Owner ""Data""",0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+174,emscad_02109,,[TITLE] Program Manager/Scrum Master,0,0,0.9999224543571472,7.75456428527832e-05,0.32,1,Optimized BERT,checkpoint
+175,emscad_02121,,[TITLE] Drilling and Completion Foreman,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+176,emscad_02122,,[TITLE] Digital Project Manager,0,0,0.9998876452445984,0.00011235475540161133,0.32,1,Optimized BERT,checkpoint
+177,emscad_02148,,[TITLE] Accounting Associate,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+178,emscad_02182,,[TITLE] Customer Service Associate,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+179,emscad_02193,,[TITLE] Control Engineer jobs in Iowa,0,0,0.9998761415481567,0.00012385845184326172,0.32,1,Optimized BERT,checkpoint
+180,emscad_02198,,[TITLE] Library Director,0,0,0.9996893405914307,0.00031065940856933594,0.32,1,Optimized BERT,checkpoint
+181,emscad_02218,,[TITLE] CFO,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+182,emscad_02231,,[TITLE] Bristol Fragrance and Beauty Promotional Staff,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+183,emscad_02232,,[TITLE] GRADUATE PROJECT ENGINEER(Energy Efficiency),0,0,0.999869704246521,0.0001302957534790039,0.32,1,Optimized BERT,checkpoint
+184,emscad_02253,,[TITLE] Systems Technician,0,0,0.999802827835083,0.0001971721649169922,0.32,1,Optimized BERT,checkpoint
+185,emscad_02281,,[TITLE] Caregiver- Berrien/Cass Counties,0,0,0.9998799562454224,0.00012004375457763672,0.32,1,Optimized BERT,checkpoint
+186,emscad_02284,,[TITLE] QA Automation Engineer,0,0,0.999854564666748,0.00014543533325195312,0.32,1,Optimized BERT,checkpoint
+187,emscad_02296,,[TITLE] PT Prep/Cook,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+188,emscad_02298,,[TITLE] Maintenance Technician - Bowling club,0,0,0.9998893737792969,0.000110626220703125,0.32,1,Optimized BERT,checkpoint
+189,emscad_02305,,[TITLE] Project Manager / Business Analyst,0,0,0.9993762969970703,0.0006237030029296875,0.32,1,Optimized BERT,checkpoint
+190,emscad_02324,,"[TITLE] Administrative Assistant, Business and Economics",0,0,0.998530387878418,0.0014696121215820312,0.32,1,Optimized BERT,checkpoint
+191,emscad_02339,,[TITLE] Software Developer (Web),0,0,0.999671220779419,0.0003287792205810547,0.32,1,Optimized BERT,checkpoint
+192,emscad_02346,,[TITLE] Marketing Manager,0,0,0.9999008178710938,9.918212890625e-05,0.32,1,Optimized BERT,checkpoint
+193,emscad_02380,,[TITLE] Administrative Assistant/Receptionist,1,1,0.00146484375,0.99853515625,0.32,1,Optimized BERT,checkpoint
+194,emscad_02385,,[TITLE] Front-End Developer/HTML/JavaScript/CSS,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+195,emscad_02407,,"[TITLE] The Media and Archive Research Assistant, Broadcast Operations Division",0,0,0.9991893768310547,0.0008106231689453125,0.32,1,Optimized BERT,checkpoint
+196,emscad_02426,,[TITLE] Mobile Applications Developer,0,0,0.9998813271522522,0.00011867284774780273,0.32,1,Optimized BERT,checkpoint
+197,emscad_02437,,[TITLE] SENIOR SOFTWARE ENGINEER,0,0,0.999603271484375,0.000396728515625,0.32,1,Optimized BERT,checkpoint
+198,emscad_02443,,[TITLE] Student MATADORS for Bulls Eye Communications,0,0,0.9998403787612915,0.0001596212387084961,0.32,1,Optimized BERT,checkpoint
+199,emscad_02448,,[TITLE] VP Engineering Operations,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+200,emscad_02453,,[TITLE] Junior Wording & Translation Manager (m/f),0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+201,emscad_02462,,[TITLE] MS Dynamics AX Developer,0,0,0.9998253583908081,0.00017464160919189453,0.32,1,Optimized BERT,checkpoint
+202,emscad_02477,,[TITLE] Technical Intern,0,0,0.9998741149902344,0.000125885009765625,0.32,1,Optimized BERT,checkpoint
+203,emscad_02479,,[TITLE] Junior .NET Developer,0,0,0.9998446702957153,0.00015532970428466797,0.32,1,Optimized BERT,checkpoint
+204,emscad_02485,,[TITLE] Care Assistant,0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+205,emscad_02490,,[TITLE] Mobile Product Manager,0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+206,emscad_02502,,[TITLE] Graduates: English Teacher Abroad,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+207,emscad_02508,,[TITLE] warehouse first line manager/ Shift Manager,0,0,0.999899685382843,0.00010031461715698242,0.32,1,Optimized BERT,checkpoint
+208,emscad_02528,,[TITLE] Cobol Developer,0,0,0.9995460510253906,0.000453948974609375,0.32,1,Optimized BERT,checkpoint
+209,emscad_02534,,[TITLE] Collections Representatives,0,0,0.9998880624771118,0.0001119375228881836,0.32,1,Optimized BERT,checkpoint
+210,emscad_02542,,[TITLE] Web Quality Manager (UI & Functional Testing),0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+211,emscad_02552,,[TITLE] Service Delivery Manager 2,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+212,emscad_02574,,[TITLE] Regional Sales Executive,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+213,emscad_02578,,[TITLE] Leasing Consultant,0,0,0.9997621774673462,0.0002378225326538086,0.32,1,Optimized BERT,checkpoint
+214,emscad_02595,,[TITLE] Licensed Social Worker,0,0,0.99988853931427,0.00011146068572998047,0.32,1,Optimized BERT,checkpoint
+215,emscad_02600,,[TITLE] Sr. PHP developer,0,0,0.9998226165771484,0.0001773834228515625,0.32,1,Optimized BERT,checkpoint
+216,emscad_02644,,[TITLE] Opening For Dermatologist Doctor in Qatar,0,0,0.9998607635498047,0.0001392364501953125,0.32,1,Optimized BERT,checkpoint
+217,emscad_02646,,[TITLE] Customer Service Team Lead,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+218,emscad_02649,,[TITLE] Applications Support Manager,0,0,0.9983224868774414,0.0016775131225585938,0.32,1,Optimized BERT,checkpoint
+219,emscad_02653,,[TITLE] Administrative Assistant,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+220,emscad_02665,,[TITLE] Engagement Manager (Nigeria),0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+221,emscad_02669,,[TITLE] Account Manager,0,0,0.9998126029968262,0.00018739700317382812,0.32,1,Optimized BERT,checkpoint
+222,emscad_02682,,[TITLE] Event Director,0,0,0.9984359741210938,0.00156402587890625,0.32,1,Optimized BERT,checkpoint
+223,emscad_02683,,[TITLE] Medical Social Worker (MSW),0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+224,emscad_02692,,[TITLE] Maid - Cleaner - Housekeeper up to $15 Hr with tips!,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+225,emscad_02731,,[TITLE] Substance Abuse Counselor (Greensboro Center),0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+226,emscad_02740,,[TITLE] Administrative Assistant,1,1,0.001953125,0.998046875,0.32,1,Optimized BERT,checkpoint
+227,emscad_02753,,[TITLE] Marketing Intern,0,0,0.9998183250427246,0.00018167495727539062,0.32,1,Optimized BERT,checkpoint
+228,emscad_02774,,[TITLE] Commercial Real Estate Paralegal- Atlanta-Buckhead,0,0,0.999859094619751,0.00014090538024902344,0.32,1,Optimized BERT,checkpoint
+229,emscad_02784,,[TITLE] TV Master Control Technician,0,0,0.9998081922531128,0.00019180774688720703,0.32,1,Optimized BERT,checkpoint
+230,emscad_02813,,[TITLE] Operations Manager,0,0,0.9996087551116943,0.00039124488830566406,0.32,1,Optimized BERT,checkpoint
+231,emscad_02815,,[TITLE] Class A OTR Driver Home Every W/End,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+232,emscad_02821,,[TITLE] Front-End Developer/HTML/JavaScript/CSS,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+233,emscad_02833,,[TITLE] Assistant Manager,0,0,0.9998897910118103,0.00011020898818969727,0.32,1,Optimized BERT,checkpoint
+234,emscad_02846,,[TITLE] Business Development Strategist,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+235,emscad_02857,,[TITLE] Analista Comercial (Servicio a clientes),0,0,0.9998794794082642,0.00012052059173583984,0.32,1,Optimized BERT,checkpoint
+236,emscad_02864,,[TITLE] Project Analyst in agile environment,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+237,emscad_02865,,[TITLE] Retail Associate,0,0,0.9994330406188965,0.0005669593811035156,0.32,1,Optimized BERT,checkpoint
+238,emscad_02878,,"[TITLE] Pharmaceutical Sales (Loudoun County, VA)",0,0,0.9998639822006226,0.0001360177993774414,0.32,1,Optimized BERT,checkpoint
+239,emscad_02885,,[TITLE] Graduates: English Teacher Abroad,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+240,emscad_02898,,[TITLE] Support Team Member,1,0,0.9975471496582031,0.002452850341796875,0.32,0,Optimized BERT,checkpoint
+241,emscad_02899,,[TITLE] Associate Recruiter,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+242,emscad_02910,,[TITLE] Sales Managers (2x),0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+243,emscad_02931,,[TITLE] Data Entry Clerk,1,1,0.00439453125,0.99560546875,0.32,1,Optimized BERT,checkpoint
+244,emscad_02975,,"[TITLE] Project Engineer (Civil, Mechanical, Electrical)",0,0,0.703857421875,0.296142578125,0.32,1,Optimized BERT,checkpoint
+245,emscad_02987,,[TITLE] Senior Web Producer,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+246,emscad_03009,,[TITLE] Recruitment Consultant,0,0,0.9998799562454224,0.00012004375457763672,0.32,1,Optimized BERT,checkpoint
+247,emscad_03032,,[TITLE] Sales Entrepreneur,0,0,0.999779224395752,0.00022077560424804688,0.32,1,Optimized BERT,checkpoint
+248,emscad_03034,,[TITLE] Escape the City Job Fair,0,0,0.9994587898254395,0.0005412101745605469,0.32,1,Optimized BERT,checkpoint
+249,emscad_03035,,[TITLE] Certificate in Social Innovation Management,0,0,0.999868631362915,0.00013136863708496094,0.32,1,Optimized BERT,checkpoint
+250,emscad_03036,,[TITLE] Senior Engineer (Dev ops),0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+251,emscad_03055,,"[TITLE] International Broadcaster, Vietnamese Service",0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+252,emscad_03060,,"[TITLE] Production Assistant, Indonesian Service",0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+253,emscad_03088,,[TITLE] Software Developer,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+254,emscad_03097,,[TITLE] Hiring Current Students for Best Internships | StudyHall.com,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+255,emscad_03117,,[TITLE] Office Administration Assistant,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+256,emscad_03131,,[TITLE] Jr. Front-End Developer & Graphic Design Intern,0,0,0.9998650550842285,0.00013494491577148438,0.32,1,Optimized BERT,checkpoint
+257,emscad_03140,,[TITLE] National Sales Manager,0,0,0.9998595714569092,0.0001404285430908203,0.32,1,Optimized BERT,checkpoint
+258,emscad_03143,,[TITLE] Graphic Designer,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+259,emscad_03152,,[TITLE] Customer Support hero,0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+260,emscad_03156,,[TITLE] MobileApp-Entwickler,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+261,emscad_03170,,[TITLE] Product Engineer,0,0,0.9998906850814819,0.0001093149185180664,0.32,1,Optimized BERT,checkpoint
+262,emscad_03173,,[TITLE] RTB Account Manager Spain,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+263,emscad_03200,,[TITLE] Social Media Expert,0,0,0.9998494386672974,0.00015056133270263672,0.32,1,Optimized BERT,checkpoint
+264,emscad_03211,,[TITLE] CR0 4XH Customer Service Apprenticeships Under NAS 16-24 Year Olds Only,0,0,0.9998964667320251,0.00010353326797485352,0.32,1,Optimized BERT,checkpoint
+265,emscad_03215,,[TITLE] Office Manager Champion,0,0,0.9997453689575195,0.00025463104248046875,0.32,1,Optimized BERT,checkpoint
+266,emscad_03226,,[TITLE] UX Designer - London,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+267,emscad_03232,,[TITLE] Standards & Practices Executive,0,0,0.9990396499633789,0.0009603500366210938,0.32,1,Optimized BERT,checkpoint
+268,emscad_03238,,[TITLE] Android Developer,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+269,emscad_03256,,[TITLE] Creative Web Designer (Frontend/UX/Wordpress),0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+270,emscad_03257,,[TITLE] Research Associate,0,0,0.9998488426208496,0.00015115737915039062,0.32,1,Optimized BERT,checkpoint
+271,emscad_03259,,[TITLE] Program Manager,0,0,0.9990434646606445,0.0009565353393554688,0.32,1,Optimized BERT,checkpoint
+272,emscad_03262,,[TITLE] iOS Developer,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+273,emscad_03267,,[TITLE] Javascript Web Application Developer,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+274,emscad_03283,,[TITLE] Outbound Sales - Telemarketing for Healthcare IT,0,0,0.9998902678489685,0.00010973215103149414,0.32,1,Optimized BERT,checkpoint
+275,emscad_03296,,[TITLE] Physical Therapist,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+276,emscad_03326,,[TITLE] Speech enhancement and source separation,0,0,0.9997602701187134,0.0002397298812866211,0.32,1,Optimized BERT,checkpoint
+277,emscad_03350,,[TITLE] Requirements Analyst,0,0,0.9998747110366821,0.0001252889633178711,0.32,1,Optimized BERT,checkpoint
+278,emscad_03351,,[TITLE] Bilingual Senior Project Manager,0,0,0.9998785257339478,0.0001214742660522461,0.32,1,Optimized BERT,checkpoint
+279,emscad_03395,,[TITLE] European Sales Executive,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+280,emscad_03402,,[TITLE] Inside Sales Representative at Proto.io,0,0,0.9993772506713867,0.0006227493286132812,0.32,1,Optimized BERT,checkpoint
+281,emscad_03430,,[TITLE] Marketing Analyst (Intern),0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+282,emscad_03451,,[TITLE] Sales Intern,0,0,0.9998726844787598,0.00012731552124023438,0.32,1,Optimized BERT,checkpoint
+283,emscad_03465,,[TITLE] Systems Engineer,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+284,emscad_03467,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+285,emscad_03468,,[TITLE] Manager/Sr.Manager,0,0,0.9998005628585815,0.00019943714141845703,0.32,1,Optimized BERT,checkpoint
+286,emscad_03485,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+287,emscad_03499,,[TITLE] International Contemporary Art Fair Athens Internship,0,0,0.9998936057090759,0.00010639429092407227,0.32,1,Optimized BERT,checkpoint
+288,emscad_03515,,[TITLE] Branch Manager,0,0,0.9998936057090759,0.00010639429092407227,0.32,1,Optimized BERT,checkpoint
+289,emscad_03530,,[TITLE] Marketing PR (Boatswain),0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+290,emscad_03538,,[TITLE] Part Time Cleaner,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+291,emscad_03539,,[TITLE] Community Manager,0,0,0.999183177947998,0.0008168220520019531,0.32,1,Optimized BERT,checkpoint
+292,emscad_03551,,[TITLE] SoftwareTest Analyst with Selenium,0,0,0.9996213912963867,0.00037860870361328125,0.32,1,Optimized BERT,checkpoint
+293,emscad_03555,,[TITLE] Lettings Negotiator,0,0,0.9999020099639893,9.799003601074219e-05,0.32,1,Optimized BERT,checkpoint
+294,emscad_03580,,[TITLE] Marketing and new media assistant,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+295,emscad_03585,,[TITLE] iPhone / iPad Developer,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+296,emscad_03625,,[TITLE] Business System & Support Analyst Consultant with SAP,0,0,0.999666690826416,0.0003333091735839844,0.32,1,Optimized BERT,checkpoint
+297,emscad_03627,,"[TITLE] Sales, Assistant Manager & Market Manager Positions Available",0,0,0.9995906352996826,0.0004093647003173828,0.32,1,Optimized BERT,checkpoint
+298,emscad_03629,,[TITLE] International Broadcaster,0,0,0.9998012781143188,0.00019872188568115234,0.32,1,Optimized BERT,checkpoint
+299,emscad_03651,,[TITLE] Registered Nurse (RN),0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+300,emscad_03669,,"[TITLE] Caregiver's, CNA's and Live-in caregivers needed",0,0,0.9998259544372559,0.00017404556274414062,0.32,1,Optimized BERT,checkpoint
+301,emscad_03670,,[TITLE] Account Executive,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+302,emscad_03687,,[TITLE] ORPOS Developer/Technical Consultant,0,0,0.99603271484375,0.00396728515625,0.32,1,Optimized BERT,checkpoint
+303,emscad_03692,,[TITLE] Producer,0,0,0.9996874332427979,0.00031256675720214844,0.32,1,Optimized BERT,checkpoint
+304,emscad_03699,,[TITLE] Opportunity in Dubai,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+305,emscad_03704,,[TITLE] International Sales Coordinator,0,0,0.9998840689659119,0.00011593103408813477,0.32,1,Optimized BERT,checkpoint
+306,emscad_03710,,[TITLE] Net/C# Web Developer,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+307,emscad_03736,,[TITLE] Chef de partie,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+308,emscad_03821,,[TITLE] Buyer,0,0,0.9999242424964905,7.575750350952148e-05,0.32,1,Optimized BERT,checkpoint
+309,emscad_03830,,[TITLE] Inside Sales,0,0,0.9998770952224731,0.00012290477752685547,0.32,1,Optimized BERT,checkpoint
+310,emscad_03832,,[TITLE] Automotive Internet Sales Representative,0,0,0.9998446702957153,0.00015532970428466797,0.32,1,Optimized BERT,checkpoint
+311,emscad_03835,,[TITLE] 3-month paid marketing and PR internship,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+312,emscad_03838,,"[TITLE] Technician Level I, Broadcast Operations Division",0,0,0.999523401260376,0.00047659873962402344,0.32,1,Optimized BERT,checkpoint
+313,emscad_03843,,[TITLE] Caregiver Cass County,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+314,emscad_03848,,[TITLE] Part Time General Labor,0,0,0.9997686147689819,0.0002313852310180664,0.32,1,Optimized BERT,checkpoint
+315,emscad_03858,,[TITLE] Key Account Manager - Croatia,0,0,0.9998517036437988,0.00014829635620117188,0.32,1,Optimized BERT,checkpoint
+316,emscad_03861,,[TITLE] Pre-Sales Engineer,0,0,0.9990453720092773,0.0009546279907226562,0.32,1,Optimized BERT,checkpoint
+317,emscad_03862,,[TITLE] Software Engineer,0,0,0.9998633861541748,0.0001366138458251953,0.32,1,Optimized BERT,checkpoint
+318,emscad_03870,,"[TITLE] TV Video Editor II, Broadcast Operations Division",0,0,0.9996206760406494,0.00037932395935058594,0.32,1,Optimized BERT,checkpoint
+319,emscad_03900,,[TITLE] Sales Entrepreneur,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+320,emscad_03913,,[TITLE] Back Office Senior PHP Developer,0,0,0.9999221563339233,7.784366607666016e-05,0.32,1,Optimized BERT,checkpoint
+321,emscad_03921,,[TITLE] Healthcare Program Manager,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+322,emscad_03931,,[TITLE] Translator,0,0,0.9998952746391296,0.00010472536087036133,0.32,1,Optimized BERT,checkpoint
+323,emscad_03937,,[TITLE] Oilfield Work,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+324,emscad_03952,,[TITLE] Senior Java Developer with Hadoop Exp,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+325,emscad_03956,,[TITLE] UE/UX Designer,0,0,0.9990415573120117,0.0009584426879882812,0.32,1,Optimized BERT,checkpoint
+326,emscad_03974,,[TITLE] Content Strategist,0,0,0.9997885227203369,0.00021147727966308594,0.32,1,Optimized BERT,checkpoint
+327,emscad_03979,,[TITLE] Vehicle Purchaser,0,0,0.9996140003204346,0.0003859996795654297,0.32,1,Optimized BERT,checkpoint
+328,emscad_03980,,"[TITLE] Interior Designer - Automotive IP/Cluster, HMI, Plastics",0,0,0.9998452663421631,0.00015473365783691406,0.32,1,Optimized BERT,checkpoint
+329,emscad_03997,,"[TITLE] Web developer & hacker (full-time), Athens",0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+330,emscad_04022,,[TITLE] Cosmetics and Beauty Sales Advisor,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+331,emscad_04029,,[TITLE] Data entry / Tech Support,0,0,0.9998043775558472,0.00019562244415283203,0.32,1,Optimized BERT,checkpoint
+332,emscad_04035,,[TITLE] Freelance Translators (m/f) from Danish and German into English,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+333,emscad_04051,,[TITLE] Front-End Developer,0,0,0.9998313188552856,0.00016868114471435547,0.32,1,Optimized BERT,checkpoint
+334,emscad_04062,,[TITLE] Lead Developer,0,0,0.9998770952224731,0.00012290477752685547,0.32,1,Optimized BERT,checkpoint
+335,emscad_04063,,[TITLE] Interactive Designer,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+336,emscad_04067,,[TITLE] .NET Developer,0,0,0.9998540878295898,0.00014591217041015625,0.32,1,Optimized BERT,checkpoint
+337,emscad_04082,,[TITLE] Front end developer (mid-senior),0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+338,emscad_04097,,[TITLE] Hero Developer Evangelist,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+339,emscad_04120,,[TITLE] Associate Digital Producer,0,0,0.9999023675918579,9.763240814208984e-05,0.32,1,Optimized BERT,checkpoint
+340,emscad_04131,,[TITLE] Principal Product Applications Engineer ( FCoE ),0,0,0.9998506307601929,0.0001493692398071289,0.32,1,Optimized BERT,checkpoint
+341,emscad_04139,,[TITLE] Frontend Engineer,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+342,emscad_04149,,[TITLE] Lead Ruby Developer,0,0,0.9999121427536011,8.785724639892578e-05,0.32,1,Optimized BERT,checkpoint
+343,emscad_04178,,[TITLE] Team & Executive Assistant,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+344,emscad_04180,,[TITLE] QA Team Leader,0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+345,emscad_04204,,[TITLE] NY | POOL UI @DS+LW,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+346,emscad_04221,,[TITLE] Court Runner,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+347,emscad_04234,,[TITLE] Marketing Manager SEM France,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+348,emscad_04246,,[TITLE] Web Designer (Front End Developer),0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+349,emscad_04250,,[TITLE] Project Manager,0,0,0.9987211227416992,0.0012788772583007812,0.32,1,Optimized BERT,checkpoint
+350,emscad_04255,,[TITLE] BD18 Dental Receptionist Apprenticeship Under NAS 16-24 Year Olds Only,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+351,emscad_04257,,[TITLE] Software Developer - Mobile (iOS / Android),0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+352,emscad_04258,,[TITLE] Software Developer Intern,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+353,emscad_04259,,[TITLE] L2 Support Analyst,0,0,0.9998893737792969,0.000110626220703125,0.32,1,Optimized BERT,checkpoint
+354,emscad_04266,,[TITLE] Drupal Developer,0,0,0.99988853931427,0.00011146068572998047,0.32,1,Optimized BERT,checkpoint
+355,emscad_04301,,[TITLE] Digital Media Analyst,0,0,0.9998799562454224,0.00012004375457763672,0.32,1,Optimized BERT,checkpoint
+356,emscad_04304,,[TITLE] Android Developer,0,0,0.9999245405197144,7.545948028564453e-05,0.32,1,Optimized BERT,checkpoint
+357,emscad_04309,,[TITLE] Marketing Associate,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+358,emscad_04325,,[TITLE] Account Manager,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+359,emscad_04332,,[TITLE] Sheffield Lettings Agency Office Assistant Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+360,emscad_04333,,[TITLE] Business Development Intern,0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+361,emscad_04346,,[TITLE] Marketing Representative,0,0,0.9998775720596313,0.00012242794036865234,0.32,1,Optimized BERT,checkpoint
+362,emscad_04350,,[TITLE] Structural Engineer,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+363,emscad_04361,,[TITLE] Office Manager,0,0,0.9998506307601929,0.0001493692398071289,0.32,1,Optimized BERT,checkpoint
+364,emscad_04363,,[TITLE] Web Designer,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+365,emscad_04373,,[TITLE] Java Developer,0,0,0.9991669654846191,0.0008330345153808594,0.32,1,Optimized BERT,checkpoint
+366,emscad_04375,,[TITLE] Channel Sales (NY or Paris),0,0,0.9999054074287415,9.459257125854492e-05,0.32,1,Optimized BERT,checkpoint
+367,emscad_04394,,[TITLE] EXPERIENCED WAITER/ESS NEEDED @ YOOBI - LONDON'S 1ST TEMAKERIA - SUSHI RESTAURANT,0,0,0.9999240040779114,7.599592208862305e-05,0.32,1,Optimized BERT,checkpoint
+368,emscad_04404,,[TITLE] Account Executive,0,0,0.9998736381530762,0.00012636184692382812,0.32,1,Optimized BERT,checkpoint
+369,emscad_04417,,[TITLE] Human Resources Assistant,0,0,0.9998574256896973,0.00014257431030273438,0.32,1,Optimized BERT,checkpoint
+370,emscad_04425,,[TITLE] Project Manager,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+371,emscad_04427,,[TITLE] Video and Graphics Executive Intern,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+372,emscad_04438,,[TITLE] User Interface Designer,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+373,emscad_04442,,[TITLE] Verification Specialist,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+374,emscad_04446,,[TITLE] Male caregivers needed Immediate work for Dementia pt pay up to $15/Hr,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+375,emscad_04450,,[TITLE] Valet Overnight Night Auditor,0,0,0.9998470544815063,0.00015294551849365234,0.32,1,Optimized BERT,checkpoint
+376,emscad_04458,,[TITLE] Staffing Consultant,0,0,0.9996373653411865,0.00036263465881347656,0.32,1,Optimized BERT,checkpoint
+377,emscad_04478,,[TITLE] Business Analyst,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+378,emscad_04491,,[TITLE] Chiropractic Office Assistant,0,1,0.11083984375,0.88916015625,0.32,0,Optimized BERT,checkpoint
+379,emscad_04497,,"[TITLE] Regional Executive Manager, Sales Leader - Denver, CO",0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+380,emscad_04528,,[TITLE] Full-time Updater (Office) Positions Available,0,0,0.9997739791870117,0.00022602081298828125,0.32,1,Optimized BERT,checkpoint
+381,emscad_04546,,[TITLE] Account Executive - Charlotte,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+382,emscad_04557,,"[TITLE] freelancers, students required in Web Related Field",0,0,0.9987554550170898,0.0012445449829101562,0.32,1,Optimized BERT,checkpoint
+383,emscad_04564,,"[TITLE] Video Journalist, Russian Language",0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+384,emscad_04575,,[TITLE] Tax Preparer,0,0,0.9978351593017578,0.0021648406982421875,0.32,1,Optimized BERT,checkpoint
+385,emscad_04601,,[TITLE] US Sales Account Executive (travel),0,0,0.9996800422668457,0.0003199577331542969,0.32,1,Optimized BERT,checkpoint
+386,emscad_04608,,[TITLE] CALL CENTER REP,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+387,emscad_04615,,[TITLE] Project Manager,0,0,0.9998035430908203,0.0001964569091796875,0.32,1,Optimized BERT,checkpoint
+388,emscad_04628,,[TITLE] Call Center Supervisor,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+389,emscad_04671,,[TITLE] Front-end Developer,0,0,0.9978923797607422,0.0021076202392578125,0.32,1,Optimized BERT,checkpoint
+390,emscad_04684,,[TITLE] General Manager (Alexandria - Egypt),0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+391,emscad_04687,,[TITLE] Audiologist or Clinical Hearing Screener Required,0,0,0.9996910095214844,0.000308990478515625,0.32,1,Optimized BERT,checkpoint
+392,emscad_04706,,[TITLE] PHP Developer,0,0,0.9998607635498047,0.0001392364501953125,0.32,1,Optimized BERT,checkpoint
+393,emscad_04718,,[TITLE] Temp/Perm Consultant,0,0,0.9998089075088501,0.00019109249114990234,0.32,1,Optimized BERT,checkpoint
+394,emscad_04719,,[TITLE] Jr. Account Executive,0,0,0.9998294115066528,0.00017058849334716797,0.32,1,Optimized BERT,checkpoint
+395,emscad_04755,,"[TITLE] International Broadcaster, Swahili Language",0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+396,emscad_04774,,"[TITLE] .Net, C#, Sitecore, CMS, JavaScript - .Net Sitecore Developer",0,0,0.9998452663421631,0.00015473365783691406,0.32,1,Optimized BERT,checkpoint
+397,emscad_04779,,[TITLE] Drinking Water/Wastewater Operator,0,0,0.9998226165771484,0.0001773834228515625,0.32,1,Optimized BERT,checkpoint
+398,emscad_04789,,[TITLE] Affiliate Manager,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+399,emscad_04796,,[TITLE] Executive Assistant Needed For Rapidly Growing Company,0,0,0.9996423721313477,0.00035762786865234375,0.32,1,Optimized BERT,checkpoint
+400,emscad_04828,,[TITLE] Web Developer - ECommerce,0,0,0.9999164938926697,8.350610733032227e-05,0.32,1,Optimized BERT,checkpoint
+401,emscad_04832,,[TITLE] Senior Software Engineer,0,0,0.9998836517333984,0.0001163482666015625,0.32,1,Optimized BERT,checkpoint
+402,emscad_04841,,[TITLE] Senior Algorithms Developer,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+403,emscad_04845,,[TITLE] Health Safety Environmental Manager,0,0,0.9999234080314636,7.659196853637695e-05,0.32,1,Optimized BERT,checkpoint
+404,emscad_04852,,"[TITLE] Director of Finance - CFO, DOF (Director of Finance)",0,0,0.9998506307601929,0.0001493692398071289,0.32,1,Optimized BERT,checkpoint
+405,emscad_04853,,[TITLE] Data Analyst,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+406,emscad_04859,,[TITLE] PR8 Apprentice Administrator Under NAS 16-18 Year Olds Only,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+407,emscad_04869,,[TITLE] Lead Mobile Producer,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+408,emscad_04899,,[TITLE] Mobile Developer,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+409,emscad_04908,,[TITLE] Marketing Director,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+410,emscad_04911,,[TITLE] Office Assistant III,1,1,0.0009765625,0.9990234375,0.32,1,Optimized BERT,checkpoint
+411,emscad_04934,,[TITLE] HGV Class 1 Driver,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+412,emscad_04950,,[TITLE] Internship (Engineering),0,0,0.9998948574066162,0.00010514259338378906,0.32,1,Optimized BERT,checkpoint
+413,emscad_04957,,[TITLE] Campaign Sales Assistant,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+414,emscad_04974,,[TITLE] English Teacher Abroad,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+415,emscad_05003,,[TITLE] English Teacher Overseas,0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+416,emscad_05004,,"[TITLE] Controller (Equity, Startup w/ substantial growth)",0,0,0.9984989166259766,0.0015010833740234375,0.32,1,Optimized BERT,checkpoint
+417,emscad_05022,,[TITLE] Senior Java Developer,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+418,emscad_05042,,[TITLE] IT Recruitment Consultant - international markets,0,0,0.999779224395752,0.00022077560424804688,0.32,1,Optimized BERT,checkpoint
+419,emscad_05076,,[TITLE] Business Analyst/Quality Assurance Analyst,0,0,0.9985589981079102,0.0014410018920898438,0.32,1,Optimized BERT,checkpoint
+420,emscad_05101,,[TITLE] Web Developer,0,0,0.9991135597229004,0.0008864402770996094,0.32,1,Optimized BERT,checkpoint
+421,emscad_05104,,[TITLE] Advertising Account Manager,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+422,emscad_05106,,[TITLE] Senior Rails & Web App Engineer,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+423,emscad_05109,,[TITLE] Chief Financial Officer,0,0,0.9998858571052551,0.00011414289474487305,0.32,1,Optimized BERT,checkpoint
+424,emscad_05132,,[TITLE] UX Designer for Product Suite,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+425,emscad_05162,,[TITLE] Demonstrator,0,0,0.9995841979980469,0.000415802001953125,0.32,1,Optimized BERT,checkpoint
+426,emscad_05163,,[TITLE] Now Hiring Oil and Energy Professionals,0,0,0.9998931884765625,0.0001068115234375,0.32,1,Optimized BERT,checkpoint
+427,emscad_05166,,[TITLE] Administrative/Clerical,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+428,emscad_05167,,[TITLE] Final Expense Agent,1,0,0.9998066425323486,0.0001933574676513672,0.32,0,Optimized BERT,checkpoint
+429,emscad_05171,,[TITLE] Data Engineer,0,0,0.9998050928115845,0.00019490718841552734,0.32,1,Optimized BERT,checkpoint
+430,emscad_05176,,[TITLE] 10x Client Support - 1 year fixed term,0,0,0.9998390674591064,0.0001609325408935547,0.32,1,Optimized BERT,checkpoint
+431,emscad_05178,,[TITLE] Retail Associate,0,0,0.9994330406188965,0.0005669593811035156,0.32,1,Optimized BERT,checkpoint
+432,emscad_05191,,[TITLE] Key Account Manager,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+433,emscad_05192,,[TITLE] Sonographer - Full and Part Time Opportunities,0,0,0.9999035000801086,9.649991989135742e-05,0.32,1,Optimized BERT,checkpoint
+434,emscad_05229,,[TITLE] UI Designer at Intel,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+435,emscad_05230,,[TITLE] Investor Relations Analyst,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+436,emscad_05255,,[TITLE] Customer Service Specialist,1,0,0.9998822808265686,0.00011771917343139648,0.32,0,Optimized BERT,checkpoint
+437,emscad_05268,,[TITLE] UX Designer - 1871 General Companies,0,0,0.9998785257339478,0.0001214742660522461,0.32,1,Optimized BERT,checkpoint
+438,emscad_05275,,"[TITLE] Brand Ambassador - Marketing, Advertising and PR",0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+439,emscad_05281,,"[TITLE] Mixers/Batch Makers (Commercial Bakery) | North York, ON",0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+440,emscad_05300,,[TITLE] Non-Profit Administrative Assistant,0,0,0.9998936057090759,0.00010639429092407227,0.32,1,Optimized BERT,checkpoint
+441,emscad_05301,,[TITLE] CQ Back End Developer,0,0,0.9986057281494141,0.0013942718505859375,0.32,1,Optimized BERT,checkpoint
+442,emscad_05312,,[TITLE] Full Stack PHP/Python Engineer - OptionsAway,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+443,emscad_05316,,[TITLE] Scrum Master / Agile Coach,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+444,emscad_05325,,[TITLE] Human Resources Manager,0,0,0.9999240040779114,7.599592208862305e-05,0.32,1,Optimized BERT,checkpoint
+445,emscad_05360,,[TITLE] Java Developer with FX,0,0,0.9997909069061279,0.0002090930938720703,0.32,1,Optimized BERT,checkpoint
+446,emscad_05372,,[TITLE] Registered Nurse,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+447,emscad_05376,,[TITLE] Application Developer Java,0,0,0.9998927712440491,0.00010722875595092773,0.32,1,Optimized BERT,checkpoint
+448,emscad_05383,,[TITLE] Software Developer,0,0,0.9998488426208496,0.00015115737915039062,0.32,1,Optimized BERT,checkpoint
+449,emscad_05388,,[TITLE] Internship (Supply Chain),0,0,0.9998968839645386,0.00010311603546142578,0.32,1,Optimized BERT,checkpoint
+450,emscad_05389,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+451,emscad_05407,,[TITLE] Web Agency Sales and Business Development Associate,0,0,0.9998785257339478,0.0001214742660522461,0.32,1,Optimized BERT,checkpoint
+452,emscad_05410,,[TITLE] Data Scientist,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+453,emscad_05425,,[TITLE] Marketing Associate,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+454,emscad_05441,,[TITLE] Systems Administrator (Delhi),0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+455,emscad_05528,,[TITLE] Support Engineer (2 open positions),0,0,0.9992280006408691,0.0007719993591308594,0.32,1,Optimized BERT,checkpoint
+456,emscad_05535,,[TITLE] Recruitment Consultant - 3 month contract,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+457,emscad_05546,,[TITLE] Commercial Banking Officer C&I -SW Chicago Suburbs,0,0,0.999904990196228,9.500980377197266e-05,0.32,1,Optimized BERT,checkpoint
+458,emscad_05559,,[TITLE] Director of Operations,0,0,0.9996626377105713,0.00033736228942871094,0.32,1,Optimized BERT,checkpoint
+459,emscad_05568,,[TITLE] Process Safety Engineer,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+460,emscad_05576,,[TITLE] Campaign Manager,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+461,emscad_05579,,[TITLE] Senior Windows Server Security Administrator Required for Qatar,1,1,0.0009765625,0.9990234375,0.32,1,Optimized BERT,checkpoint
+462,emscad_05584,,[TITLE] Events Marketer,0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+463,emscad_05596,,[TITLE] Localisation Manager,0,0,0.9999082684516907,9.173154830932617e-05,0.32,1,Optimized BERT,checkpoint
+464,emscad_05602,,[TITLE] Client Services Manager,0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+465,emscad_05607,,[TITLE] Front End Developer,0,0,0.9997310638427734,0.0002689361572265625,0.32,1,Optimized BERT,checkpoint
+466,emscad_05631,,[TITLE] Technical Support Engineer,0,0,0.9997694492340088,0.00023055076599121094,0.32,1,Optimized BERT,checkpoint
+467,emscad_05635,,[TITLE] Business Development Associate,0,0,0.9998390674591064,0.0001609325408935547,0.32,1,Optimized BERT,checkpoint
+468,emscad_05689,,[TITLE] Call Center Representative,1,1,0.00146484375,0.99853515625,0.32,1,Optimized BERT,checkpoint
+469,emscad_05702,,[TITLE] Sales Development Associate,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+470,emscad_05705,,[TITLE] UNIX Systems Engineer,0,0,0.9998506307601929,0.0001493692398071289,0.32,1,Optimized BERT,checkpoint
+471,emscad_05735,,[TITLE] Part Time Ground representative,0,0,0.9981069564819336,0.0018930435180664062,0.32,1,Optimized BERT,checkpoint
+472,emscad_05742,,[TITLE] Visual Design Engineer,0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+473,emscad_05774,,[TITLE] Sales Engineer,0,0,0.9999234080314636,7.659196853637695e-05,0.32,1,Optimized BERT,checkpoint
+474,emscad_05785,,"[TITLE] iLog Developer - Contract in Mclean, VA",0,0,0.9998452663421631,0.00015473365783691406,0.32,1,Optimized BERT,checkpoint
+475,emscad_05792,,[TITLE] Headhunter / Recruiter - Looking for Partner,0,0,0.9996359348297119,0.00036406517028808594,0.32,1,Optimized BERT,checkpoint
+476,emscad_05827,,[TITLE] SALES ASSOCIATE,0,0,0.9998286962509155,0.00017130374908447266,0.32,1,Optimized BERT,checkpoint
+477,emscad_05844,,[TITLE] Recruiter/Appointment Setter,0,0,0.9996464252471924,0.0003535747528076172,0.32,1,Optimized BERT,checkpoint
+478,emscad_05853,,[TITLE] Tankage,0,0,0.9957771301269531,0.004222869873046875,0.32,1,Optimized BERT,checkpoint
+479,emscad_05862,,[TITLE] Software Development,0,0,0.9997262954711914,0.00027370452880859375,0.32,1,Optimized BERT,checkpoint
+480,emscad_05878,,[TITLE] .NET Architect,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+481,emscad_05895,,[TITLE] Field Service Tech Capital Equipment 1970,1,1,0.001953125,0.998046875,0.32,1,Optimized BERT,checkpoint
+482,emscad_05900,,[TITLE] Mid Weight Digital Designer,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+483,emscad_05908,,[TITLE] Become a co-Director in Indonesia,0,0,0.9998607635498047,0.0001392364501953125,0.32,1,Optimized BERT,checkpoint
+484,emscad_05918,,[TITLE] IHF Co-Director,0,0,0.999882698059082,0.00011730194091796875,0.32,1,Optimized BERT,checkpoint
+485,emscad_05928,,[TITLE] Front-end designer,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+486,emscad_05932,,[TITLE] Freelance Web Developer,0,0,0.9993000030517578,0.0006999969482421875,0.32,1,Optimized BERT,checkpoint
+487,emscad_05969,,[TITLE] Community Activation Manager - New York City,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+488,emscad_05973,,[TITLE] Mobile App Developer,0,0,0.9996697902679443,0.00033020973205566406,0.32,1,Optimized BERT,checkpoint
+489,emscad_05977,,[TITLE] PeopleSoft HR Functional Lead,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+490,emscad_05978,,[TITLE] Cognos Developer,0,0,0.9997408390045166,0.00025916099548339844,0.32,1,Optimized BERT,checkpoint
+491,emscad_05997,,[TITLE] Drinking Water/Wastewater Operator,0,0,0.9998253583908081,0.00017464160919189453,0.32,1,Optimized BERT,checkpoint
+492,emscad_06005,,[TITLE] Caregiver- Dowagiac/Cassopolis,0,0,0.9996366500854492,0.00036334991455078125,0.32,1,Optimized BERT,checkpoint
+493,emscad_06019,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+494,emscad_06026,,[TITLE] Data Scientist,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+495,emscad_06038,,[TITLE] Web Developer Java/GWT,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+496,emscad_06044,,[TITLE] Customer Service Rep,0,0,0.999887228012085,0.00011277198791503906,0.32,1,Optimized BERT,checkpoint
+497,emscad_06051,,[TITLE] Retail Staff Member,0,0,0.9997900724411011,0.00020992755889892578,0.32,1,Optimized BERT,checkpoint
+498,emscad_06064,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+499,emscad_06069,,[TITLE] ACCOUNTING CLERK / BOOKKEEPER,0,0,0.9984540939331055,0.0015459060668945312,0.32,1,Optimized BERT,checkpoint
+500,emscad_06071,,[TITLE] Production Specialist,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+501,emscad_06090,,[TITLE] Software Developer,0,0,0.9998384714126587,0.0001615285873413086,0.32,1,Optimized BERT,checkpoint
+502,emscad_06121,,[TITLE] Cad Designer,0,0,0.9999242424964905,7.575750350952148e-05,0.32,1,Optimized BERT,checkpoint
+503,emscad_06128,,[TITLE] Front End Developer,0,0,0.9995179176330566,0.0004820823669433594,0.32,1,Optimized BERT,checkpoint
+504,emscad_06138,,[TITLE] Lead Data Scientist,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+505,emscad_06153,,[TITLE] Front-End Web Developer,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+506,emscad_06155,,[TITLE] Software engineer (Python),0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+507,emscad_06159,,[TITLE] Senior UX Consultant,0,0,0.9998923540115356,0.00010764598846435547,0.32,1,Optimized BERT,checkpoint
+508,emscad_06165,,[TITLE] Inside Sales,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+509,emscad_06168,,[TITLE] Chief Operating Officer,0,0,0.9997556209564209,0.00024437904357910156,0.32,1,Optimized BERT,checkpoint
+510,emscad_06181,,"[TITLE] Manager, Customer Analytics",0,0,0.9994254112243652,0.0005745887756347656,0.32,1,Optimized BERT,checkpoint
+511,emscad_06182,,[TITLE] Junior Adwords/SEO Specialist,0,0,0.9998756647109985,0.00012433528900146484,0.32,1,Optimized BERT,checkpoint
+512,emscad_06188,,[TITLE] Sales Associate,0,0,0.999904990196228,9.500980377197266e-05,0.32,1,Optimized BERT,checkpoint
+513,emscad_06197,,[TITLE] Technical Architect (Adobe AEM aka CQ5 CMS),0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+514,emscad_06208,,[TITLE] Sales Development Representative,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+515,emscad_06226,,[TITLE] Account Manager,0,0,0.9998956918716431,0.0001043081283569336,0.32,1,Optimized BERT,checkpoint
+516,emscad_06228,,[TITLE] Entry level QA/BA Training and Placement,0,0,0.9998584985733032,0.00014150142669677734,0.32,1,Optimized BERT,checkpoint
+517,emscad_06229,,[TITLE] Ruby On Rails Engineer,0,0,0.9989795684814453,0.0010204315185546875,0.32,1,Optimized BERT,checkpoint
+518,emscad_06234,,[TITLE] Android Developer,0,0,0.9995794296264648,0.00042057037353515625,0.32,1,Optimized BERT,checkpoint
+519,emscad_06235,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+520,emscad_06270,,"[TITLE] Operations Manager, Athens",0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+521,emscad_06299,,[TITLE] Agile coach,0,0,0.9996969699859619,0.00030303001403808594,0.32,1,Optimized BERT,checkpoint
+522,emscad_06304,,[TITLE] Growth Hacker In Residence,0,0,0.9998650550842285,0.00013494491577148438,0.32,1,Optimized BERT,checkpoint
+523,emscad_06305,,[TITLE] Software engineer,0,0,0.9998464584350586,0.00015354156494140625,0.32,1,Optimized BERT,checkpoint
+524,emscad_06354,,[TITLE] UI MANAGER,0,0,0.9991588592529297,0.0008411407470703125,0.32,1,Optimized BERT,checkpoint
+525,emscad_06363,,[TITLE] Sales Executive for Content Marketing Firm,0,0,0.9993424415588379,0.0006575584411621094,0.32,1,Optimized BERT,checkpoint
+526,emscad_06372,,[TITLE] Scrum Master,0,0,0.999907910823822,9.208917617797852e-05,0.32,1,Optimized BERT,checkpoint
+527,emscad_06394,,[TITLE] Vehicle Purchaser,0,0,0.9997782707214355,0.00022172927856445312,0.32,1,Optimized BERT,checkpoint
+528,emscad_06418,,[TITLE] Graphics Designer at AbZorba Games,0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+529,emscad_06436,,[TITLE] Senior SAP Security Consultant,0,0,0.9962997436523438,0.00370025634765625,0.32,1,Optimized BERT,checkpoint
+530,emscad_06475,,[TITLE] Front - End Developer,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+531,emscad_06526,,[TITLE] Real Estate Attorney,0,0,0.9978809356689453,0.0021190643310546875,0.32,1,Optimized BERT,checkpoint
+532,emscad_06532,,[TITLE] Retail Branch Manager - Dual Site,0,0,0.9998081922531128,0.00019180774688720703,0.32,1,Optimized BERT,checkpoint
+533,emscad_06545,,[TITLE] Practice Manager,0,0,0.9926261901855469,0.007373809814453125,0.32,1,Optimized BERT,checkpoint
+534,emscad_06547,,[TITLE] CUSTOMER OPERATION MANAGER,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+535,emscad_06570,,[TITLE] Java Automation QA,0,0,0.9982690811157227,0.0017309188842773438,0.32,1,Optimized BERT,checkpoint
+536,emscad_06576,,[TITLE] Project Subcontracting Manager,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+537,emscad_06611,,[TITLE] CTAP Center Manager,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+538,emscad_06615,,[TITLE] Part-Time Receptionist,0,0,0.9994826316833496,0.0005173683166503906,0.32,1,Optimized BERT,checkpoint
+539,emscad_06623,,[TITLE] Developer Ruby on Rails @Netguru,0,0,0.99981689453125,0.00018310546875,0.32,1,Optimized BERT,checkpoint
+540,emscad_06625,,[TITLE] Software Engineer - Flex,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+541,emscad_06661,,[TITLE] Sales Associate - The Limited at Ridgedale Center,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+542,emscad_06663,,[TITLE] Bitcoin Tool Developer,0,0,0.997589111328125,0.002410888671875,0.32,1,Optimized BERT,checkpoint
+543,emscad_06682,,[TITLE] Creative Director,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+544,emscad_06693,,[TITLE] Drilling Engineer - Exploration,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+545,emscad_06726,,[TITLE] Business Analyst,0,0,0.996063232421875,0.003936767578125,0.32,1,Optimized BERT,checkpoint
+546,emscad_06741,,[TITLE] Financial Services Professional,0,0,0.9994297027587891,0.0005702972412109375,0.32,1,Optimized BERT,checkpoint
+547,emscad_06753,,"[TITLE] Director, Supply Chain - Strategy",0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+548,emscad_06817,,[TITLE] Product Innovator (Junior),0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+549,emscad_06826,,[TITLE] $950/Week Truck Drivers Needed,0,0,0.9992761611938477,0.0007238388061523438,0.32,1,Optimized BERT,checkpoint
+550,emscad_06832,,[TITLE] Lead Developer,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+551,emscad_06852,,[TITLE] Network Marketing,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+552,emscad_06854,,[TITLE] Microsoft Project Server Admin,0,0,0.9996898174285889,0.0003101825714111328,0.32,1,Optimized BERT,checkpoint
+553,emscad_06880,,[TITLE] Structural Designer,1,0,0.9995753765106201,0.0004246234893798828,0.32,0,Optimized BERT,checkpoint
+554,emscad_06907,,[TITLE] Administrative Assistant,0,0,0.709716796875,0.290283203125,0.32,1,Optimized BERT,checkpoint
+555,emscad_06919,,[TITLE] Siebel Configuration,0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+556,emscad_06927,,[TITLE] Patient Care Coordinator,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+557,emscad_06932,,[TITLE] Java developer,0,0,0.999018669128418,0.0009813308715820312,0.32,1,Optimized BERT,checkpoint
+558,emscad_06954,,[TITLE] Dealer Service Representative,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+559,emscad_06957,,[TITLE] Graphic Designer / Large Format printer operator,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+560,emscad_06994,,[TITLE] Part-Time Personal Assistant (For 2 People with Disabilities),0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+561,emscad_06997,,[TITLE] Account Executive,0,0,0.9998494386672974,0.00015056133270263672,0.32,1,Optimized BERT,checkpoint
+562,emscad_07011,,[TITLE] TapHunter Intern Leadership Program,0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+563,emscad_07021,,[TITLE] Teaching English,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+564,emscad_07028,,[TITLE] Technical Operations Consultant,0,0,0.9992561340332031,0.000743865966796875,0.32,1,Optimized BERT,checkpoint
+565,emscad_07038,,[TITLE] Head of Adoption,0,0,0.9998612403869629,0.00013875961303710938,0.32,1,Optimized BERT,checkpoint
+566,emscad_07039,,[TITLE] Outbound Telemarketing - Charity,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+567,emscad_07043,,[TITLE] Technician (Manufacturing/Production),0,0,0.9989681243896484,0.0010318756103515625,0.32,1,Optimized BERT,checkpoint
+568,emscad_07057,,[TITLE] Public Relations Manager,0,0,0.9975414276123047,0.0024585723876953125,0.32,1,Optimized BERT,checkpoint
+569,emscad_07060,,[TITLE] Elementary School Building Substitute Teacher,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+570,emscad_07078,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+571,emscad_07092,,[TITLE] Scheduling Engineer,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+572,emscad_07106,,[TITLE] Program Manager,0,0,0.9998568296432495,0.00014317035675048828,0.32,1,Optimized BERT,checkpoint
+573,emscad_07122,,[TITLE] WEB DEVELOPER with Angular.JS,0,0,0.9993000030517578,0.0006999969482421875,0.32,1,Optimized BERT,checkpoint
+574,emscad_07133,,[TITLE] General Manager - New York,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+575,emscad_07152,,[TITLE] Chelmsford Customer Service Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+576,emscad_07170,,[TITLE] PL15 9LR Recruitment Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+577,emscad_07180,,[TITLE] ACCOUNTING SUPERVISOR,0,0,0.9997704029083252,0.0002295970916748047,0.32,1,Optimized BERT,checkpoint
+578,emscad_07181,,[TITLE] Sourcing Coordinator,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+579,emscad_07190,,[TITLE] FUNCTIONAL ANALYST,0,0,0.999858021736145,0.00014197826385498047,0.32,1,Optimized BERT,checkpoint
+580,emscad_07215,,[TITLE] Credit Manager / Consultant (Commercial Lending/Factoring),0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+581,emscad_07230,,[TITLE] QA Manager,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+582,emscad_07241,,[TITLE] TW13 Logistics Operative Apprenticeship Under NAS 16-24 Year Olds Only,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+583,emscad_07248,,[TITLE] Contact Resolution Supervisor,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+584,emscad_07249,,[TITLE] Desktop Support / IT Technicians - Various Shifts,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+585,emscad_07259,,[TITLE] Telemarketers Needed,0,0,0.9993433952331543,0.0006566047668457031,0.32,1,Optimized BERT,checkpoint
+586,emscad_07264,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998761415481567,0.00012385845184326172,0.32,1,Optimized BERT,checkpoint
+587,emscad_07267,,[TITLE] Greenwich Driving Goods Vehicle Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+588,emscad_07272,,[TITLE] Guest Services - Team Lead,0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+589,emscad_07302,,[TITLE] Experienced and Senior Java developers (Java SE),0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+590,emscad_07307,,[TITLE] Construction Analyst Safety,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+591,emscad_07319,,[TITLE] Senior Developer,0,0,0.999859094619751,0.00014090538024902344,0.32,1,Optimized BERT,checkpoint
+592,emscad_07321,,[TITLE] International Front End Developer (AngularJS),0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+593,emscad_07337,,[TITLE] Application Support Analyst,0,0,0.9982147216796875,0.0017852783203125,0.32,1,Optimized BERT,checkpoint
+594,emscad_07348,,[TITLE] WF14 0DQ Pets and Aquatics Retail Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999035000801086,9.649991989135742e-05,0.32,1,Optimized BERT,checkpoint
+595,emscad_07351,,[TITLE] Growth Hacking / Ad Campaigns Internship,0,0,0.9997631311416626,0.00023686885833740234,0.32,1,Optimized BERT,checkpoint
+596,emscad_07360,,[TITLE] Senior Account Executive,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+597,emscad_07377,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+598,emscad_07400,,[TITLE] Customer Service Team Lead,0,0,0.9998948574066162,0.00010514259338378906,0.32,1,Optimized BERT,checkpoint
+599,emscad_07402,,[TITLE] Vice President of Marketing,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+600,emscad_07415,,[TITLE] Graphic Designer,0,0,0.9997494220733643,0.0002505779266357422,0.32,1,Optimized BERT,checkpoint
+601,emscad_07416,,[TITLE] Collections Supervisor,0,0,0.9998980760574341,0.00010192394256591797,0.32,1,Optimized BERT,checkpoint
+602,emscad_07417,,[TITLE] Sales Representative,0,0,0.9998358488082886,0.00016415119171142578,0.32,1,Optimized BERT,checkpoint
+603,emscad_07422,,[TITLE] Customer Service Associate,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+604,emscad_07451,,[TITLE] Bar manager in the hotel St. Regis Doha (Qatar),0,0,0.9997997283935547,0.0002002716064453125,0.32,1,Optimized BERT,checkpoint
+605,emscad_07459,,[TITLE] Senior Staff UX Level 3 Designer,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+606,emscad_07462,,[TITLE] Support Analyst,0,0,0.9999242424964905,7.575750350952148e-05,0.32,1,Optimized BERT,checkpoint
+607,emscad_07466,,[TITLE] Operating Room Director,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+608,emscad_07468,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9998751878738403,0.00012481212615966797,0.32,1,Optimized BERT,checkpoint
+609,emscad_07485,,[TITLE] Registered Nurse,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+610,emscad_07514,,[TITLE] UX Guru,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+611,emscad_07559,,[TITLE] Outside Sales | Design Consultant,0,0,0.9978961944580078,0.0021038055419921875,0.32,1,Optimized BERT,checkpoint
+612,emscad_07574,,[TITLE] Contact Resolution Supervisor,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+613,emscad_07584,,[TITLE] Customer Service Associate,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+614,emscad_07590,,"[TITLE] Software Engineer - Angular JS, Ruby on Rails",0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+615,emscad_07592,,[TITLE] Sales Manager,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+616,emscad_07595,,[TITLE] HR Generalist,0,0,0.9999012351036072,9.876489639282227e-05,0.32,1,Optimized BERT,checkpoint
+617,emscad_07596,,[TITLE] Senior Accountant,0,0,0.9997208118438721,0.0002791881561279297,0.32,1,Optimized BERT,checkpoint
+618,emscad_07602,,[TITLE] Sr Software Engineer,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+619,emscad_07613,,[TITLE] Mobile Marketing Specialist,0,0,0.9998427629470825,0.00015723705291748047,0.32,1,Optimized BERT,checkpoint
+620,emscad_07620,,[TITLE] New Product Introduction Engineer,0,0,0.9997860193252563,0.00021398067474365234,0.32,1,Optimized BERT,checkpoint
+621,emscad_07622,,[TITLE] Customer Service Associate,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+622,emscad_07627,,[TITLE] Engineering Support Safety,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+623,emscad_07630,,"[TITLE] Web Design Intern | Part Time, Paid",0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+624,emscad_07631,,[TITLE] WordPress/PHP Engineer,0,0,0.9991426467895508,0.0008573532104492188,0.32,1,Optimized BERT,checkpoint
+625,emscad_07672,,[TITLE] Vice President of Sales,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+626,emscad_07674,,[TITLE] Working from Home,0,0,0.998143196105957,0.0018568038940429688,0.32,1,Optimized BERT,checkpoint
+627,emscad_07680,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+628,emscad_07688,,[TITLE] Entry Level - Production,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+629,emscad_07703,,[TITLE] Software Business Analyst,0,0,0.9980621337890625,0.0019378662109375,0.32,1,Optimized BERT,checkpoint
+630,emscad_07735,,[TITLE] Community/Events Manager,0,0,0.9999082684516907,9.173154830932617e-05,0.32,1,Optimized BERT,checkpoint
+631,emscad_07771,,[TITLE] Marketing Intern (Paid),0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+632,emscad_07794,,[TITLE] Controls Engineer,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+633,emscad_07796,,[TITLE] Customer service associate,0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+634,emscad_07809,,[TITLE] Data Entry Clerk,0,0,0.9995827674865723,0.0004172325134277344,0.32,1,Optimized BERT,checkpoint
+635,emscad_07810,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998761415481567,0.00012385845184326172,0.32,1,Optimized BERT,checkpoint
+636,emscad_07816,,"[TITLE] Business Development/Sales, Full Time with a short trial period",0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+637,emscad_07824,,[TITLE] LS20 8LZ Customer Service Apprenticeship under NAS 16-18 year olds only,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+638,emscad_07836,,[TITLE] Software Engineer (Data Analysis),0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+639,emscad_07842,,[TITLE] Sr. Design Engineer Mechanical - 3D CAD,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+640,emscad_07850,,[TITLE] Entry Level Accounting Specialist,0,0,0.9931755065917969,0.006824493408203125,0.32,1,Optimized BERT,checkpoint
+641,emscad_07858,,[TITLE] Account Executive,0,0,0.9995834827423096,0.0004165172576904297,0.32,1,Optimized BERT,checkpoint
+642,emscad_07877,,[TITLE] Project Manager (Hydraulic Fracturing),0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+643,emscad_07879,,[TITLE] Sales Director - Replise US Operations,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+644,emscad_07894,,[TITLE] Registered Nurse,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+645,emscad_07910,,[TITLE] Business Development Specialist,0,0,0.9998050928115845,0.00019490718841552734,0.32,1,Optimized BERT,checkpoint
+646,emscad_07923,,[TITLE] Head of Customer Success,0,0,0.9994897842407227,0.0005102157592773438,0.32,1,Optimized BERT,checkpoint
+647,emscad_07933,,[TITLE] Sr. Java Developer with RESTful and Hadoop skills,0,0,0.9996547698974609,0.0003452301025390625,0.32,1,Optimized BERT,checkpoint
+648,emscad_07951,,[TITLE] Greeter / Spotter,0,0,0.9998081922531128,0.00019180774688720703,0.32,1,Optimized BERT,checkpoint
+649,emscad_07958,,[TITLE] Blender Developer,0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+650,emscad_07968,,[TITLE] Alliance Data - Pricing & Profit Analyst Job,0,0,0.9998396635055542,0.00016033649444580078,0.32,1,Optimized BERT,checkpoint
+651,emscad_08002,,[TITLE] Enterprise Account Executive EU,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+652,emscad_08018,,[TITLE] Senior Sharepoint Developer,0,0,0.9998176097869873,0.0001823902130126953,0.32,1,Optimized BERT,checkpoint
+653,emscad_08024,,[TITLE] Front-end engineers,0,0,0.9998446702957153,0.00015532970428466797,0.32,1,Optimized BERT,checkpoint
+654,emscad_08027,,[TITLE] Curam Developer,0,0,0.9911727905273438,0.00882720947265625,0.32,1,Optimized BERT,checkpoint
+655,emscad_08036,,[TITLE] Operations & Partners Associate,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+656,emscad_08044,,[TITLE] Assistant Project Manager,0,0,0.9998568296432495,0.00014317035675048828,0.32,1,Optimized BERT,checkpoint
+657,emscad_08084,,"[TITLE] Client Services Administrator - Lafayette, CA",0,0,0.9998464584350586,0.00015354156494140625,0.32,1,Optimized BERT,checkpoint
+658,emscad_08091,,[TITLE] SQL/Server DBA,0,0,0.9997518062591553,0.00024819374084472656,0.32,1,Optimized BERT,checkpoint
+659,emscad_08106,,[TITLE] Sales Support Medewerker (3 dagen per week),0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+660,emscad_08110,,[TITLE] Senior Bookkeeper / Accounting Assistant,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+661,emscad_08113,,[TITLE] Database Administrator,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+662,emscad_08119,,[TITLE] Event Intern,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+663,emscad_08124,,[TITLE] Pricing Analyst/Data Scientist - OptionsAway,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+664,emscad_08135,,[TITLE] Office Manager,0,0,0.9993038177490234,0.0006961822509765625,0.32,1,Optimized BERT,checkpoint
+665,emscad_08162,,[TITLE] Driver - Medium Duty (Kent),0,0,0.9999023675918579,9.763240814208984e-05,0.32,1,Optimized BERT,checkpoint
+666,emscad_08167,,[TITLE] Python Backend Developer,0,0,0.9997833967208862,0.00021660327911376953,0.32,1,Optimized BERT,checkpoint
+667,emscad_08173,,[TITLE] Marketing & PR Internship,0,0,0.9997631311416626,0.00023686885833740234,0.32,1,Optimized BERT,checkpoint
+668,emscad_08181,,[TITLE] Maintenance Supervisor,0,0,0.9998660087585449,0.00013399124145507812,0.32,1,Optimized BERT,checkpoint
+669,emscad_08234,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+670,emscad_08241,,[TITLE] Sr. Developer,0,0,0.9998660087585449,0.00013399124145507812,0.32,1,Optimized BERT,checkpoint
+671,emscad_08252,,[TITLE] Senior Visual Designer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+672,emscad_08256,,[TITLE] Hardware & Software Technician,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+673,emscad_08264,,[TITLE] Project Engineer- New Product Development,0,0,0.9998968839645386,0.00010311603546142578,0.32,1,Optimized BERT,checkpoint
+674,emscad_08279,,[TITLE] Community Manager,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+675,emscad_08282,,[TITLE] Channel Representative,0,0,0.9997900724411011,0.00020992755889892578,0.32,1,Optimized BERT,checkpoint
+676,emscad_08300,,[TITLE] Executive Assistant / Office Manager,0,0,0.9999224543571472,7.75456428527832e-05,0.32,1,Optimized BERT,checkpoint
+677,emscad_08345,,[TITLE] Video and Marketing Producer for Startup Company | StudyHall.com,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+678,emscad_08357,,[TITLE] Director of Product Management,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+679,emscad_08359,,[TITLE] DevOps Engineer,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+680,emscad_08394,,"[TITLE] Weekly CASH Jobs, Hiring Part Time Workers.",1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+681,emscad_08416,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9998876452445984,0.00011235475540161133,0.32,1,Optimized BERT,checkpoint
+682,emscad_08446,,[TITLE] DIVISION ELECTRICAL ENGINEER,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+683,emscad_08448,,[TITLE] ****SALARY/COMMISSION for AGENT/ADMIN!! -,0,0,0.9998799562454224,0.00012004375457763672,0.32,1,Optimized BERT,checkpoint
+684,emscad_08469,,[TITLE] Software Engineer,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+685,emscad_08484,,[TITLE] Software Engineer,0,0,0.999608039855957,0.00039196014404296875,0.32,1,Optimized BERT,checkpoint
+686,emscad_08517,,[TITLE] Recovery Specialists,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+687,emscad_08542,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+688,emscad_08579,,"[TITLE] Pfizer - Sr Director, Global Health & Value - Pricing Analytics Lead",0,0,0.9997981786727905,0.00020182132720947266,0.32,1,Optimized BERT,checkpoint
+689,emscad_08581,,[TITLE] Cook/Food Prep,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+690,emscad_08582,,[TITLE] Robust speech separation and recognition,0,0,0.9996922016143799,0.0003077983856201172,0.32,1,Optimized BERT,checkpoint
+691,emscad_08585,,[TITLE] Customer Service Associate,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+692,emscad_08626,,[TITLE] Senior Strategist,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+693,emscad_08634,,[TITLE] CPA Accounting Manager / Medical Billing,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+694,emscad_08646,,[TITLE] Engineer at Pollfish,0,0,0.9992775917053223,0.0007224082946777344,0.32,1,Optimized BERT,checkpoint
+695,emscad_08666,,[TITLE] Product Manager,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+696,emscad_08669,,[TITLE] UI / UX Design Lead,0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+697,emscad_08672,,[TITLE] Systems Engineers/Network Administrators/Tiers I-III,0,0,0.9998470544815063,0.00015294551849365234,0.32,1,Optimized BERT,checkpoint
+698,emscad_08674,,[TITLE] Accounting and Retail Coordinator,0,0,0.999873161315918,0.00012683868408203125,0.32,1,Optimized BERT,checkpoint
+699,emscad_08685,,[TITLE] Data Entry / Customer Service,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+700,emscad_08715,,[TITLE] Vice President of Marketing,0,0,0.9998722076416016,0.0001277923583984375,0.32,1,Optimized BERT,checkpoint
+701,emscad_08716,,[TITLE] Traffic Manager (China),0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+702,emscad_08720,,[TITLE] Dialysis Equipment Technician,0,0,0.9997463226318359,0.0002536773681640625,0.32,1,Optimized BERT,checkpoint
+703,emscad_08727,,[TITLE] eCommerce Manager,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+704,emscad_08729,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998761415481567,0.00012385845184326172,0.32,1,Optimized BERT,checkpoint
+705,emscad_08743,,[TITLE] Editorial Associate,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+706,emscad_08748,,[TITLE] Accounts Administrator,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+707,emscad_08759,,[TITLE] Business Development Associate,0,0,0.9990129470825195,0.0009870529174804688,0.32,1,Optimized BERT,checkpoint
+708,emscad_08772,,[TITLE] Contract Administrator,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+709,emscad_08783,,[TITLE] Network Engineer,0,0,0.9998476505279541,0.00015234947204589844,0.32,1,Optimized BERT,checkpoint
+710,emscad_08791,,[TITLE] Stage / Internship Backend (PHP),0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+711,emscad_08796,,[TITLE] Mirfield Warehousing Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+712,emscad_08805,,[TITLE] Copywriter,0,0,0.9996025562286377,0.0003974437713623047,0.32,1,Optimized BERT,checkpoint
+713,emscad_08817,,[TITLE] Desktop Support Technician,0,0,0.9998706579208374,0.00012934207916259766,0.32,1,Optimized BERT,checkpoint
+714,emscad_08911,,[TITLE] Outbound B2B Lead Generation Advisor (Mon-Fri 8.30-5.30),0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+715,emscad_08916,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9998751878738403,0.00012481212615966797,0.32,1,Optimized BERT,checkpoint
+716,emscad_08921,,[TITLE] Growth Marketing Manager - New York City,0,0,0.9998989105224609,0.0001010894775390625,0.32,1,Optimized BERT,checkpoint
+717,emscad_08936,,[TITLE] NARRATIVE: Director of Content Development,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+718,emscad_08952,,[TITLE] Data Scientist,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+719,emscad_08960,,[TITLE] Male caregivers needed Immediate work for Dementia pt pay up to $15/Hr,0,0,0.9999221563339233,7.784366607666016e-05,0.32,1,Optimized BERT,checkpoint
+720,emscad_08961,,[TITLE] Application Developer - SharePoint,0,0,0.9998902678489685,0.00010973215103149414,0.32,1,Optimized BERT,checkpoint
+721,emscad_08965,,[TITLE] Seeking Chef (Recent Graduate only),0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+722,emscad_08979,,[TITLE] Marketing Manager,0,0,0.9983806610107422,0.0016193389892578125,0.32,1,Optimized BERT,checkpoint
+723,emscad_08989,,[TITLE] Customer Service Associate,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+724,emscad_08994,,[TITLE] EHS Manager,0,0,0.9998766183853149,0.0001233816146850586,0.32,1,Optimized BERT,checkpoint
+725,emscad_09014,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+726,emscad_09019,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9999008178710938,9.918212890625e-05,0.32,1,Optimized BERT,checkpoint
+727,emscad_09025,,[TITLE] TRAINING OFFICER,0,0,0.9934883117675781,0.006511688232421875,0.32,1,Optimized BERT,checkpoint
+728,emscad_09036,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9998785257339478,0.0001214742660522461,0.32,1,Optimized BERT,checkpoint
+729,emscad_09059,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+730,emscad_09066,,[TITLE] Executive Assistant For Rapidly Growing Startup (Temp-to-Perm) - $36K,0,0,0.999647855758667,0.0003521442413330078,0.32,1,Optimized BERT,checkpoint
+731,emscad_09067,,[TITLE] Mechanical Engineer,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+732,emscad_09085,,[TITLE] MN Domestic Violence Advocate (Part-time),0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+733,emscad_09113,,[TITLE] .Net & Cross Platform Developer ( Jr. & Sr. ),0,0,0.999683141708374,0.00031685829162597656,0.32,1,Optimized BERT,checkpoint
+734,emscad_09154,,[TITLE] Healthcare IT Recruiter,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+735,emscad_09157,,[TITLE] Personal Assistant to the CEO (m/f),0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+736,emscad_09163,,[TITLE] Account Manager (Germany),0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+737,emscad_09167,,[TITLE] Senior Airframe Structures Design Engineer,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+738,emscad_09178,,[TITLE] Product Marketing Manager,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+739,emscad_09193,,[TITLE] Contracts & Compliance Manager,0,0,0.9998706579208374,0.00012934207916259766,0.32,1,Optimized BERT,checkpoint
+740,emscad_09199,,"[TITLE] Manufacturing Engineering - Lean Manufacture-Cedar Falls,IA",0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+741,emscad_09202,,[TITLE] Sr. Oracle PL/SQL Developer,0,0,0.9998147487640381,0.00018525123596191406,0.32,1,Optimized BERT,checkpoint
+742,emscad_09228,,[TITLE] Senior Software Engineer,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+743,emscad_09230,,[TITLE] Minnesota Part time Maintenance,0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+744,emscad_09234,,[TITLE] Specialist Teaching Associate,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+745,emscad_09245,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+746,emscad_09284,,[TITLE] iOS Developer,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+747,emscad_09285,,[TITLE] Project Manager,0,0,0.9998681545257568,0.00013184547424316406,0.32,1,Optimized BERT,checkpoint
+748,emscad_09301,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+749,emscad_09314,,[TITLE] INSTALLERS NEEDED,0,0,0.9903488159179688,0.00965118408203125,0.32,1,Optimized BERT,checkpoint
+750,emscad_09319,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+751,emscad_09369,,[TITLE] Software Developer,0,0,0.9998050928115845,0.00019490718841552734,0.32,1,Optimized BERT,checkpoint
+752,emscad_09390,,[TITLE] Administrative Assistant,0,0,0.9998534917831421,0.00014650821685791016,0.32,1,Optimized BERT,checkpoint
+753,emscad_09401,,[TITLE] Graduates: English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+754,emscad_09408,,[TITLE] Python Developer,0,0,0.999904990196228,9.500980377197266e-05,0.32,1,Optimized BERT,checkpoint
+755,emscad_09437,,[TITLE] Director of Sales - Weave The People,0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+756,emscad_09442,,[TITLE] Account Manager - WeDeliver,0,0,0.9998952746391296,0.00010472536087036133,0.32,1,Optimized BERT,checkpoint
+757,emscad_09479,,[TITLE] Director of Marketing,0,0,0.9995541572570801,0.0004458427429199219,0.32,1,Optimized BERT,checkpoint
+758,emscad_09487,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+759,emscad_09536,,[TITLE] Hotel Management Trainee,0,0,0.999666690826416,0.0003333091735839844,0.32,1,Optimized BERT,checkpoint
+760,emscad_09537,,[TITLE] Graduates: English Teacher Abroad,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+761,emscad_09538,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+762,emscad_09564,,[TITLE] FrontEnd Developer,0,0,0.9998540878295898,0.00014591217041015625,0.32,1,Optimized BERT,checkpoint
+763,emscad_09582,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+764,emscad_09585,,[TITLE] Sales Territories Available - Healthcare Electronic Medical Records/Billing,0,0,0.9997453689575195,0.00025463104248046875,0.32,1,Optimized BERT,checkpoint
+765,emscad_09591,,"[TITLE] Operations Assistant (Tech, Internet, Media, Mobile)",0,0,0.9998488426208496,0.00015115737915039062,0.32,1,Optimized BERT,checkpoint
+766,emscad_09597,,[TITLE] Windows Phone Application Developer,0,0,0.9996063709259033,0.0003936290740966797,0.32,1,Optimized BERT,checkpoint
+767,emscad_09602,,[TITLE] Growth Hacker/Head of Marketing,0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+768,emscad_09603,,[TITLE] Web/Systems Developer,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+769,emscad_09651,,[TITLE] Database Administrator,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+770,emscad_09657,,[TITLE] Systems Engineer - Infrastructure Services - Kuwait,0,0,0.9998906850814819,0.0001093149185180664,0.32,1,Optimized BERT,checkpoint
+771,emscad_09661,,[TITLE] User Acquisition Strategist,0,0,0.9998964667320251,0.00010353326797485352,0.32,1,Optimized BERT,checkpoint
+772,emscad_09674,,[TITLE] S20 1AH Business Admin Apprenticeship Available Under NAS 16-18 year olds only!,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+773,emscad_09685,,[TITLE] Tech Lab Scientist,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+774,emscad_09706,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+775,emscad_09742,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+776,emscad_09760,,[TITLE] Senior iOS Mobile Engineer,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+777,emscad_09779,,[TITLE] Account Manager,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+778,emscad_09808,,[TITLE] Legal Counsel,0,0,0.9998927712440491,0.00010722875595092773,0.32,1,Optimized BERT,checkpoint
+779,emscad_09811,,[TITLE] Web Designer,0,0,0.9993939399719238,0.0006060600280761719,0.32,1,Optimized BERT,checkpoint
+780,emscad_09815,,[TITLE] Sales Representative/ Workforce Acquisition Consultant,0,0,0.978973388671875,0.021026611328125,0.32,1,Optimized BERT,checkpoint
+781,emscad_09833,,[TITLE] Credit Support Officer / Junior Broker,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+782,emscad_09841,,[TITLE] Care Worker (Personal Assistant),0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+783,emscad_09860,,[TITLE] Graduates: English Teacher Abroad,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+784,emscad_09880,,[TITLE] Business Development,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+785,emscad_09945,,[TITLE] Manufacturing Engineering Manager - Cedar Falls,0,0,0.9998923540115356,0.00010764598846435547,0.32,1,Optimized BERT,checkpoint
+786,emscad_09976,,[TITLE] Military Veterans Wanted for Solar Energy Construction,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+787,emscad_09982,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+788,emscad_10005,,[TITLE] Junior Business Analyst/Project Manager,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+789,emscad_10023,,[TITLE] Shipper (Santa Fe Springs),0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+790,emscad_10025,,[TITLE] Electrician,0,0,0.9996685981750488,0.0003314018249511719,0.32,1,Optimized BERT,checkpoint
+791,emscad_10056,,[TITLE] Director - Product Verification & Testing,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+792,emscad_10069,,[TITLE] Portuguese Speaking Customer Support Representative,0,0,0.9999004602432251,9.953975677490234e-05,0.32,1,Optimized BERT,checkpoint
+793,emscad_10079,,[TITLE] English Teacher Abroad,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+794,emscad_10080,,[TITLE] Senior Engineer - Embedded Design,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+795,emscad_10110,,[TITLE] SysAdmin,0,0,0.9998050928115845,0.00019490718841552734,0.32,1,Optimized BERT,checkpoint
+796,emscad_10116,,[TITLE] Software Engineer,0,0,0.9996800422668457,0.0003199577331542969,0.32,1,Optimized BERT,checkpoint
+797,emscad_10121,,[TITLE] Hemel Hempstead Apprenticeships Under NAS 16-18 Year Olds Only,0,0,0.999899685382843,0.00010031461715698242,0.32,1,Optimized BERT,checkpoint
+798,emscad_10130,,[TITLE] Customer Service Associate - Part Time,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+799,emscad_10131,,[TITLE] Product QA Specialist,0,0,0.9998940229415894,0.00010597705841064453,0.32,1,Optimized BERT,checkpoint
+800,emscad_10164,,[TITLE] Customer Service Associate - Part Time,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+801,emscad_10166,,[TITLE] Domain Expert,0,0,0.9998133182525635,0.00018668174743652344,0.32,1,Optimized BERT,checkpoint
+802,emscad_10167,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+803,emscad_10247,,[TITLE] Driver - Light Duty (Portland),0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+804,emscad_10266,,[TITLE] Customer Service Team Lead,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+805,emscad_10296,,[TITLE] Customer Service Techincal Specialist - Part Time,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+806,emscad_10297,,[TITLE] Quality Assurance Analyst,0,0,0.9996147155761719,0.000385284423828125,0.32,1,Optimized BERT,checkpoint
+807,emscad_10305,,[TITLE] Night and weekend Delivery Driver - NYC,0,0,0.9998980760574341,0.00010192394256591797,0.32,1,Optimized BERT,checkpoint
+808,emscad_10321,,[TITLE] Marketing Director,0,0,0.9999035000801086,9.649991989135742e-05,0.32,1,Optimized BERT,checkpoint
+809,emscad_10326,,[TITLE] Business Manager,0,0,0.9998902678489685,0.00010973215103149414,0.32,1,Optimized BERT,checkpoint
+810,emscad_10369,,[TITLE] Community Relations Manager,0,0,0.9998936057090759,0.00010639429092407227,0.32,1,Optimized BERT,checkpoint
+811,emscad_10381,,[TITLE] Wakefield Apprentice Fundraiser and Social Developer Under NAS 16-18 Year Olds Only,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+812,emscad_10390,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+813,emscad_10398,,[TITLE] Mid Level Attorney M&A,0,0,0.999647855758667,0.0003521442413330078,0.32,1,Optimized BERT,checkpoint
+814,emscad_10403,,[TITLE] CDL Driver-Tinley Park,0,0,0.9999008178710938,9.918212890625e-05,0.32,1,Optimized BERT,checkpoint
+815,emscad_10405,,[TITLE] Director of Sales - EMEA - m/f,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+816,emscad_10419,,[TITLE] User Experience Lead,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+817,emscad_10424,,[TITLE] Aya Networking Happy Hour Event,0,0,0.9997434616088867,0.00025653839111328125,0.32,1,Optimized BERT,checkpoint
+818,emscad_10428,,[TITLE] Email Marketing Coordinator,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+819,emscad_10469,,[TITLE] Production Supervisor - Production Supervisory Exp - IL,0,0,0.9999181032180786,8.189678192138672e-05,0.32,1,Optimized BERT,checkpoint
+820,emscad_10471,,[TITLE] Overnight Caregiver for 2 Cool Men with Disabilities,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+821,emscad_10480,,[TITLE] Branch Associate,0,0,0.9998681545257568,0.00013184547424316406,0.32,1,Optimized BERT,checkpoint
+822,emscad_10485,,[TITLE] Lead QA Engineer,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+823,emscad_10493,,[TITLE] Accounts Payable Associate,0,0,0.9982519149780273,0.0017480850219726562,0.32,1,Optimized BERT,checkpoint
+824,emscad_10517,,[TITLE] Care at Home Specialist,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+825,emscad_10521,,[TITLE] Substance Abuse Counselor (Asheville & Weaverville Center),0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+826,emscad_10527,,[TITLE] Automotive Accounting Office,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+827,emscad_10528,,[TITLE] Senior Back End Developer (Ruby on Rails),0,0,0.9998012781143188,0.00019872188568115234,0.32,1,Optimized BERT,checkpoint
+828,emscad_10542,,[TITLE] Ruby Developer,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+829,emscad_10549,,[TITLE] DH2 1AN Business Admin Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+830,emscad_10564,,[TITLE] iOS Developer - 1871 General Companies,0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+831,emscad_10588,,[TITLE] Corporate Travel Counselor On-Site,0,0,0.9997251033782959,0.00027489662170410156,0.32,1,Optimized BERT,checkpoint
+832,emscad_10599,,[TITLE] Blipp Developer Turkey,0,0,0.9999181032180786,8.189678192138672e-05,0.32,1,Optimized BERT,checkpoint
+833,emscad_10607,,[TITLE] Sr. Vice President - Global & Strategic Accounts,0,0,0.9998706579208374,0.00012934207916259766,0.32,1,Optimized BERT,checkpoint
+834,emscad_10612,,[TITLE] IT Recruiter,0,0,0.99988853931427,0.00011146068572998047,0.32,1,Optimized BERT,checkpoint
+835,emscad_10619,,[TITLE] Store Manager position,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+836,emscad_10643,,[TITLE] Language Specialist,0,0,0.9998618364334106,0.00013816356658935547,0.32,1,Optimized BERT,checkpoint
+837,emscad_10659,,[TITLE] Penrith Business Admin Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+838,emscad_10678,,[TITLE] Manchester Business Admin Apprenticeships available under NAS 16-18 year olds only!,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+839,emscad_10679,,[TITLE] Production Engineer,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+840,emscad_10706,,[TITLE] Outside Sales Professional-Macomb,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+841,emscad_10745,,[TITLE] Project Manager,0,0,0.999899685382843,0.00010031461715698242,0.32,1,Optimized BERT,checkpoint
+842,emscad_10747,,[TITLE] Sales Associate,0,0,0.9996273517608643,0.0003726482391357422,0.32,1,Optimized BERT,checkpoint
+843,emscad_10770,,[TITLE] General Clerk I,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+844,emscad_10776,,[TITLE] Customer Service Associate,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+845,emscad_10790,,[TITLE] Technical Site Representative,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+846,emscad_10821,,[TITLE] Agent-Inbound Sales Position,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+847,emscad_10826,,[TITLE] Sales Professional,0,0,0.9996922016143799,0.0003077983856201172,0.32,1,Optimized BERT,checkpoint
+848,emscad_10832,,[TITLE] Aberdeen Driving Goods Vehicle Apprenticeship Under NAS 18 Year Olds Only,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+849,emscad_10840,,[TITLE] Driver - Heavy Duty (Phoenix),0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+850,emscad_10842,,[TITLE] Dinosaur hunter / Junior developer,0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+851,emscad_10852,,[TITLE] Senior Software Developer,0,0,0.9998931884765625,0.0001068115234375,0.32,1,Optimized BERT,checkpoint
+852,emscad_10873,,[TITLE] Hardware Systems Design Engineer (US),0,0,0.9998989105224609,0.0001010894775390625,0.32,1,Optimized BERT,checkpoint
+853,emscad_10878,,[TITLE] Assembly & Test Engineer,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+854,emscad_10879,,[TITLE] Customer Service Associate,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+855,emscad_10886,,[TITLE] Agent-Inbound Sales Position,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+856,emscad_10899,,[TITLE] SN3 Logistics Apprentice/Warehousing Apprenticeship Under NAS 16-18 Year Olds Only,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+857,emscad_10903,,[TITLE] Agent-Inbound Sales Position,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+858,emscad_10904,,[TITLE] S70 2JB Business Admin Apprenticeship Available Under NAS 16-18 year olds only!,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+859,emscad_10905,,[TITLE] Customer Service Associate,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+860,emscad_10908,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+861,emscad_10940,,[TITLE] Customer Service Imaging Technician - Part Time,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+862,emscad_10990,,[TITLE] CH1 1DD Business Admin Apprentice Available Under NAS 16-18 year olds only,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+863,emscad_10997,,"[TITLE] Research Assistant, Online Publication",0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+864,emscad_11025,,[TITLE] CH45 1JR Customer Service Apprenticeship available under NAS 16-18 year olds only!,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+865,emscad_11027,,[TITLE] Science Tutor,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+866,emscad_11045,,[TITLE] System Administrator,0,0,0.99945068359375,0.00054931640625,0.32,1,Optimized BERT,checkpoint
+867,emscad_11056,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+868,emscad_11062,,"[TITLE] City Manager, Los Angeles",0,0,0.999880850315094,0.00011914968490600586,0.32,1,Optimized BERT,checkpoint
+869,emscad_11097,,[TITLE] Customer Service Associate,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+870,emscad_11130,,[TITLE] Web Developer,0,0,0.9989347457885742,0.0010652542114257812,0.32,1,Optimized BERT,checkpoint
+871,emscad_11133,,[TITLE] Customer Service Associate,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+872,emscad_11139,,[TITLE] Luxury Returns Specialist,0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+873,emscad_11141,,[TITLE] Associate - Leverage Finance,0,0,0.9991354942321777,0.0008645057678222656,0.32,1,Optimized BERT,checkpoint
+874,emscad_11153,,[TITLE] Customer Service Associate,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+875,emscad_11163,,[TITLE] Operations Coordinator,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+876,emscad_11183,,[TITLE] Wireless Sales Consultants Wanted - Hiring This Week!!!,0,0,0.9988594055175781,0.001140594482421875,0.32,1,Optimized BERT,checkpoint
+877,emscad_11188,,[TITLE] Publisher Relations Manager,0,0,0.9998897910118103,0.00011020898818969727,0.32,1,Optimized BERT,checkpoint
+878,emscad_11197,,[TITLE] Administrative Assistant,0,0,0.9998952746391296,0.00010472536087036133,0.32,1,Optimized BERT,checkpoint
+879,emscad_11199,,[TITLE] Case Management Coach (Work From Home In the Midwest--Plus 50% Travel),0,0,0.999657392501831,0.0003426074981689453,0.32,1,Optimized BERT,checkpoint
+880,emscad_11259,,[TITLE] Restaurant Manager - Hiring now!,0,0,0.9998140335083008,0.00018596649169921875,0.32,1,Optimized BERT,checkpoint
+881,emscad_11264,,[TITLE] M16 9HQ Business Admin Apprenticeship available under NAS 16-18 year olds only,0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+882,emscad_11270,,[TITLE] Software Developer,0,0,0.9991064071655273,0.0008935928344726562,0.32,1,Optimized BERT,checkpoint
+883,emscad_11307,,[TITLE] Marketing Designer,0,0,0.9946670532226562,0.00533294677734375,0.32,1,Optimized BERT,checkpoint
+884,emscad_11311,,[TITLE] Senior Software Engineer,0,0,0.9999181032180786,8.189678192138672e-05,0.32,1,Optimized BERT,checkpoint
+885,emscad_11314,,[TITLE] OUD: Business Controller 5.,0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+886,emscad_11359,,"[TITLE] Coating Specialist (Phoenix, AZ)",0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+887,emscad_11366,,[TITLE] Customer Service Associate (French Speaker),0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+888,emscad_11374,,[TITLE] Social Business Strategist,0,0,0.9998766183853149,0.0001233816146850586,0.32,1,Optimized BERT,checkpoint
+889,emscad_11383,,[TITLE] OUD: Business Controller 7,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+890,emscad_11398,,[TITLE] Senior PHP Developer,0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+891,emscad_11400,,[TITLE] SF Bay Area Field Organizer,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+892,emscad_11412,,[TITLE] Chemical Dependency Counselor,0,0,0.9988813400268555,0.0011186599731445312,0.32,1,Optimized BERT,checkpoint
+893,emscad_11428,,[TITLE] Head of Performance Marketing,0,0,0.9994025230407715,0.0005974769592285156,0.32,1,Optimized BERT,checkpoint
+894,emscad_11442,,[TITLE] Data Scientist,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+895,emscad_11458,,[TITLE] CNC Setup Operator - Multi (2nd Shift),0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+896,emscad_11479,,[TITLE] Training Manager,0,0,0.9994888305664062,0.00051116943359375,0.32,1,Optimized BERT,checkpoint
+897,emscad_11480,,[TITLE] Cambridge Fragrance and Beauty Promotional Staff,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+898,emscad_11487,,[TITLE] SAP BI Analyst Trainee (Fresher),0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+899,emscad_11489,,[TITLE] Software Engineer - Frontend,0,0,0.9998154640197754,0.00018453598022460938,0.32,1,Optimized BERT,checkpoint
+900,emscad_11540,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+901,emscad_11547,,[TITLE] Community Development Intern,0,0,0.9999151825904846,8.481740951538086e-05,0.32,1,Optimized BERT,checkpoint
+902,emscad_11557,,[TITLE] AVP / VP Solutions - SAP BI & Analytics,0,0,0.9998880624771118,0.0001119375228881836,0.32,1,Optimized BERT,checkpoint
+903,emscad_11563,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+904,emscad_11565,,[TITLE] Content Writer (Freelancer),0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+905,emscad_11581,,[TITLE] Title Insurance: Reader-Residential & Commercial-NYC & Long Island,0,0,0.9998775720596313,0.00012242794036865234,0.32,1,Optimized BERT,checkpoint
+906,emscad_11597,,[TITLE] Marketing Executive,0,0,0.9998670816421509,0.0001329183578491211,0.32,1,Optimized BERT,checkpoint
+907,emscad_11607,,[TITLE] Agent-Inbound Sales Position,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+908,emscad_11613,,[TITLE] Frontend Developer @netguru,0,0,0.9997988939285278,0.00020110607147216797,0.32,1,Optimized BERT,checkpoint
+909,emscad_11616,,[TITLE] Production and Marketing Director,0,0,0.9998371601104736,0.0001628398895263672,0.32,1,Optimized BERT,checkpoint
+910,emscad_11618,,[TITLE] Accounts Receivable Specialist,0,0,0.9993147850036621,0.0006852149963378906,0.32,1,Optimized BERT,checkpoint
+911,emscad_11619,,[TITLE] Web-Designer (m/f),0,0,0.9999004602432251,9.953975677490234e-05,0.32,1,Optimized BERT,checkpoint
+912,emscad_11620,,[TITLE] Sr. Software Engineer/Researcher,0,0,0.9987859725952148,0.0012140274047851562,0.32,1,Optimized BERT,checkpoint
+913,emscad_11628,,[TITLE] Care Assistant,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+914,emscad_11646,,[TITLE] UI Developer,0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+915,emscad_11650,,[TITLE] Business Analytics Specialist,0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+916,emscad_11674,,[TITLE] Studio Jr. Visual Designer,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+917,emscad_11678,,[TITLE] Senior Python Backend Developer,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+918,emscad_11689,,[TITLE] Experienced Front End developer,0,0,0.9998964667320251,0.00010353326797485352,0.32,1,Optimized BERT,checkpoint
+919,emscad_11692,,[TITLE] Senior Frontend Developer,0,0,0.9997621774673462,0.0002378225326538086,0.32,1,Optimized BERT,checkpoint
+920,emscad_11718,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+921,emscad_11746,,[TITLE] General Labor - Part Time,0,0,0.9997267723083496,0.0002732276916503906,0.32,1,Optimized BERT,checkpoint
+922,emscad_11752,,[TITLE] PHP Developer,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+923,emscad_11757,,[TITLE] UST Testing Technician III,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+924,emscad_11761,,[TITLE] Process Safety Engineer,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+925,emscad_11762,,[TITLE] Electrical Controls Engineer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+926,emscad_11766,,[TITLE] Marketing & Sales Intern,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+927,emscad_11772,,[TITLE] Accounts Receivable Specialist,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+928,emscad_11773,,[TITLE] Mobile Games Developers: Android & iOS,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+929,emscad_11791,,[TITLE] Data Engineer,0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+930,emscad_11800,,[TITLE] Community Manager - Social Media Executive,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+931,emscad_11846,,[TITLE] Frontend Web Developer,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+932,emscad_11857,,[TITLE] Telesales Opportunities,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+933,emscad_11863,,[TITLE] Quality Assurance Engineer,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+934,emscad_11864,,[TITLE] Recruiter,0,1,0.00146484375,0.99853515625,0.32,0,Optimized BERT,checkpoint
+935,emscad_11866,,[TITLE] Hiring for Sales Account Director(advertising/digital sales),0,0,0.9998756647109985,0.00012433528900146484,0.32,1,Optimized BERT,checkpoint
+936,emscad_11883,,[TITLE] Warehouse Management,0,0,0.9998736381530762,0.00012636184692382812,0.32,1,Optimized BERT,checkpoint
+937,emscad_11893,,[TITLE] Freelance Writer,0,0,0.9995253086090088,0.00047469139099121094,0.32,1,Optimized BERT,checkpoint
+938,emscad_11904,,[TITLE] We are recruiting fragrance and beauty promotional staff in Scotland,0,0,0.9998956918716431,0.0001043081283569336,0.32,1,Optimized BERT,checkpoint
+939,emscad_11925,,[TITLE] Junior Software Engineer,0,0,0.999904990196228,9.500980377197266e-05,0.32,1,Optimized BERT,checkpoint
+940,emscad_11942,,[TITLE] Systems Engineers/Network Administrators/Tiers I-III,0,0,0.9998470544815063,0.00015294551849365234,0.32,1,Optimized BERT,checkpoint
+941,emscad_11960,,[TITLE] Spin-out/ Start-up CEOs,0,0,0.9998952746391296,0.00010472536087036133,0.32,1,Optimized BERT,checkpoint
+942,emscad_11964,,[TITLE] Online Marketing Specialist,0,0,0.9998118877410889,0.0001881122589111328,0.32,1,Optimized BERT,checkpoint
+943,emscad_11970,,[TITLE] Founding Software Engineer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+944,emscad_11971,,"[TITLE] QA Engineer Job opportunity at Atlanta, Georgia",0,0,0.9998691082000732,0.0001308917999267578,0.32,1,Optimized BERT,checkpoint
+945,emscad_11984,,[TITLE] API Developer,0,0,0.9998190402984619,0.00018095970153808594,0.32,1,Optimized BERT,checkpoint
+946,emscad_11997,,[TITLE] Passport and Visa Specialist,0,0,0.9998706579208374,0.00012934207916259766,0.32,1,Optimized BERT,checkpoint
+947,emscad_12005,,[TITLE] Suneris - Market Research and Strategy Internship Program,0,0,0.99988853931427,0.00011146068572998047,0.32,1,Optimized BERT,checkpoint
+948,emscad_12012,,[TITLE] Inside Sales Representative,0,0,0.9998211860656738,0.00017881393432617188,0.32,1,Optimized BERT,checkpoint
+949,emscad_12028,,[TITLE] Web Product Content Editor,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+950,emscad_12050,,[TITLE] Sales Development Representative,0,0,0.9997739791870117,0.00022602081298828125,0.32,1,Optimized BERT,checkpoint
+951,emscad_12056,,[TITLE] BI Solutions Intern,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+952,emscad_12063,,[TITLE] Retail Intern,0,0,0.9993906021118164,0.0006093978881835938,0.32,1,Optimized BERT,checkpoint
+953,emscad_12084,,[TITLE] Communication / Brand Designer,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+954,emscad_12089,,[TITLE] Sales Operations Analyst,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+955,emscad_12098,,[TITLE] Technical Support Engineer,0,0,0.9998623132705688,0.00013768672943115234,0.32,1,Optimized BERT,checkpoint
+956,emscad_12116,,[TITLE] Construction Safety Specialist,0,0,0.9997949600219727,0.00020503997802734375,0.32,1,Optimized BERT,checkpoint
+957,emscad_12119,,[TITLE] Head of Talent Acquisition,0,0,0.9999121427536011,8.785724639892578e-05,0.32,1,Optimized BERT,checkpoint
+958,emscad_12126,,[TITLE] SENIOR BACKEND DEVELOPER,0,0,0.9988861083984375,0.0011138916015625,0.32,1,Optimized BERT,checkpoint
+959,emscad_12146,,[TITLE] Cad Designer,0,0,0.9999234080314636,7.659196853637695e-05,0.32,1,Optimized BERT,checkpoint
+960,emscad_12161,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9999023675918579,9.763240814208984e-05,0.32,1,Optimized BERT,checkpoint
+961,emscad_12197,,[TITLE] Software Engineer,0,0,0.9998629093170166,0.00013709068298339844,0.32,1,Optimized BERT,checkpoint
+962,emscad_12200,,[TITLE] Mechanical Engineer,0,0,0.9894485473632812,0.01055145263671875,0.32,1,Optimized BERT,checkpoint
+963,emscad_12204,,[TITLE] Videographer / Editor / Photographer,0,0,0.9995810985565186,0.0004189014434814453,0.32,1,Optimized BERT,checkpoint
+964,emscad_12227,,[TITLE] PHP DEVELOPER WITH WORDPRESS,0,0,0.9997498989105225,0.00025010108947753906,0.32,1,Optimized BERT,checkpoint
+965,emscad_12235,,[TITLE] Regional Field Sales Representative,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+966,emscad_12241,,[TITLE] Shipper (Seattle),0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+967,emscad_12247,,[TITLE] SENIOR .NET DEVELOPER,0,0,0.9994869232177734,0.0005130767822265625,0.32,1,Optimized BERT,checkpoint
+968,emscad_12262,,[TITLE] Sales Executive/Business Development Manager - Funnelback,0,0,0.9998980760574341,0.00010192394256591797,0.32,1,Optimized BERT,checkpoint
+969,emscad_12269,,[TITLE] General Category,0,0,0.9998458623886108,0.00015413761138916016,0.32,1,Optimized BERT,checkpoint
+970,emscad_12304,,[TITLE] Purchasing Agent,0,0,0.992523193359375,0.007476806640625,0.32,1,Optimized BERT,checkpoint
+971,emscad_12331,,[TITLE] Relocation Services Sales Representative,0,0,0.9898529052734375,0.0101470947265625,0.32,1,Optimized BERT,checkpoint
+972,emscad_12351,,[TITLE] Quality Assurance Engineer,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+973,emscad_12389,,[TITLE] Outside Sales Professional-Herculaneum,0,0,0.9998854398727417,0.00011456012725830078,0.32,1,Optimized BERT,checkpoint
+974,emscad_12390,,[TITLE] Customer Service Intern (paid),0,0,0.9998944401741028,0.0001055598258972168,0.32,1,Optimized BERT,checkpoint
+975,emscad_12416,,[TITLE] Sheffield DGV Apprenticeships Under NAS 18 Year Olds Only,0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+976,emscad_12421,,[TITLE] Senior Systems Engineer,0,0,0.9998722076416016,0.0001277923583984375,0.32,1,Optimized BERT,checkpoint
+977,emscad_12425,,[TITLE] Media Advertising Sales Representative (3-5 years sales exp. a must),0,0,0.999361515045166,0.0006384849548339844,0.32,1,Optimized BERT,checkpoint
+978,emscad_12427,,"[TITLE] Director, iOS",0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+979,emscad_12437,,[TITLE] Ruby on Rails Developer (Multiple Positions),0,0,0.9999237060546875,7.62939453125e-05,0.32,1,Optimized BERT,checkpoint
+980,emscad_12450,,[TITLE] Research Scientist -- Marketing Sciences,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+981,emscad_12472,,[TITLE] Quality Assurance Analyst,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+982,emscad_12482,,[TITLE] Social Media Manager,0,0,0.9994339942932129,0.0005660057067871094,0.32,1,Optimized BERT,checkpoint
+983,emscad_12486,,[TITLE] Nurse Manager,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+984,emscad_12527,,[TITLE] Senior Project Manager (Software),0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+985,emscad_12528,,[TITLE] Sales Assistant,0,0,0.9998021125793457,0.00019788742065429688,0.32,1,Optimized BERT,checkpoint
+986,emscad_12542,,[TITLE] Police Officer,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+987,emscad_12565,,[TITLE] Business Development Manager,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+988,emscad_12606,,[TITLE] Experienced Line Cook,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+989,emscad_12628,,[TITLE] Community Manager,0,0,0.9999161958694458,8.380413055419922e-05,0.32,1,Optimized BERT,checkpoint
+990,emscad_12645,,[TITLE] 8th Grade Science Teacher,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+991,emscad_12672,,"[TITLE] School Bus Driver - Kitchener-Waterloo, Wellington County",0,0,0.9998989105224609,0.0001010894775390625,0.32,1,Optimized BERT,checkpoint
+992,emscad_12674,,[TITLE] Awesome Coder,0,0,0.9996867179870605,0.0003132820129394531,0.32,1,Optimized BERT,checkpoint
+993,emscad_12675,,[TITLE] Process Engineer,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+994,emscad_12679,,[TITLE] Data Scientist,0,0,0.9998893737792969,0.000110626220703125,0.32,1,Optimized BERT,checkpoint
+995,emscad_12685,,[TITLE] SAP BI Program / Delivery Manager,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+996,emscad_12688,,[TITLE] Product Manager,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+997,emscad_12707,,[TITLE] UI Designer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+998,emscad_12719,,[TITLE] Sales Rep,0,0,0.9994673728942871,0.0005326271057128906,0.32,1,Optimized BERT,checkpoint
+999,emscad_12722,,[TITLE] Finance Analyst (Fixed term contract),0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1000,emscad_12734,,[TITLE] Deployment Coordinator (Temp to Hire),0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1001,emscad_12760,,[TITLE] Regional Manager,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+1002,emscad_12773,,[TITLE] Store Manager - Papa John's Pizza,0,0,0.999882698059082,0.00011730194091796875,0.32,1,Optimized BERT,checkpoint
+1003,emscad_12775,,[TITLE] Marketing Representative,0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+1004,emscad_12785,,[TITLE] Devops/Cloud/Aws Engineer,0,0,0.999237060546875,0.000762939453125,0.32,1,Optimized BERT,checkpoint
+1005,emscad_12786,,[TITLE] Linux Support Engineer,0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+1006,emscad_12792,,[TITLE] Sales Account Manager,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1007,emscad_12800,,"[TITLE] Life Insurance Agent - Orlando, FL",0,0,0.9998470544815063,0.00015294551849365234,0.32,1,Optimized BERT,checkpoint
+1008,emscad_12815,,[TITLE] JavaScript Developer,0,0,0.9997413158416748,0.0002586841583251953,0.32,1,Optimized BERT,checkpoint
+1009,emscad_12834,,[TITLE] Web Designer / Front End Developer,0,0,0.9991321563720703,0.0008678436279296875,0.32,1,Optimized BERT,checkpoint
+1010,emscad_12936,,[TITLE] Licensed Counselor,0,0,0.9998747110366821,0.0001252889633178711,0.32,1,Optimized BERT,checkpoint
+1011,emscad_12962,,[TITLE] Sales & Marketing Manager - Business Management Exp Database - CT,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1012,emscad_12973,,[TITLE] Analista de Recursos Humanos,0,0,0.999589204788208,0.0004107952117919922,0.32,1,Optimized BERT,checkpoint
+1013,emscad_12982,,[TITLE] Front End Developer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1014,emscad_12992,,[TITLE] Languages & Communications Manager,0,0,0.9995326995849609,0.0004673004150390625,0.32,1,Optimized BERT,checkpoint
+1015,emscad_13008,,[TITLE] Support Engineer,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1016,emscad_13022,,[TITLE] We are recruiting fragrance and beauty promotional staff in Leeds,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+1017,emscad_13037,,[TITLE] Manager of Process Design and Improvement,0,0,0.9997973442077637,0.00020265579223632812,0.32,1,Optimized BERT,checkpoint
+1018,emscad_13046,,[TITLE] Home Inspector/ Consultant,0,0,0.9998840689659119,0.00011593103408813477,0.32,1,Optimized BERT,checkpoint
+1019,emscad_13054,,[TITLE] Global Strategic Alliance Manager,0,0,0.9997513294219971,0.0002486705780029297,0.32,1,Optimized BERT,checkpoint
+1020,emscad_13055,,[TITLE] Customer Service Associate - Part Time,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1021,emscad_13058,,"[TITLE] Software Architect - C# Java SOA VB TSQL UNIX SQL - Albany, NY",0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+1022,emscad_13059,,[TITLE] Assistant Personal Chef,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+1023,emscad_13084,,[TITLE] Director - Data Management,0,0,0.9997165203094482,0.0002834796905517578,0.32,1,Optimized BERT,checkpoint
+1024,emscad_13088,,[TITLE] Data Scientist,0,0,0.9998897910118103,0.00011020898818969727,0.32,1,Optimized BERT,checkpoint
+1025,emscad_13096,,[TITLE] Junior WebDeveloper [Intern],0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+1026,emscad_13114,,[TITLE] Sales Support Representative/ $20hr,0,0,0.9700775146484375,0.0299224853515625,0.32,1,Optimized BERT,checkpoint
+1027,emscad_13126,,[TITLE] Principal User Researcher,0,0,0.9997241497039795,0.0002758502960205078,0.32,1,Optimized BERT,checkpoint
+1028,emscad_13127,,[TITLE] Biddable Media Manager,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1029,emscad_13128,,"[TITLE] Clinical Optometrists, Nationwide",0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+1030,emscad_13135,,[TITLE] Branch Manager,0,0,0.9996316432952881,0.00036835670471191406,0.32,1,Optimized BERT,checkpoint
+1031,emscad_13137,,[TITLE] Senior Enterprise Java Developer,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+1032,emscad_13138,,[TITLE] Software Testing Analyst,0,0,0.9996323585510254,0.0003676414489746094,0.32,1,Optimized BERT,checkpoint
+1033,emscad_13140,,[TITLE] Automotive Controls Engineer,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1034,emscad_13170,,[TITLE] Training Field Supervisor (Head Coach),0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1035,emscad_13179,,[TITLE] Receptionist,0,0,0.9999020099639893,9.799003601074219e-05,0.32,1,Optimized BERT,checkpoint
+1036,emscad_13182,,"[TITLE] Make $32/hr to $88/hr All Professional Makeup Artists, Hair Stylists, Estheticians, and Massage Therapists",0,0,0.9996922016143799,0.0003077983856201172,0.32,1,Optimized BERT,checkpoint
+1037,emscad_13186,,[TITLE] Human Centered Industrial Designer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1038,emscad_13196,,[TITLE] Tools Engineer,0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+1039,emscad_13202,,[TITLE] Cyber Security Engineers - C++ ARM WLAN WIMAX Bluetooth - MD,0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+1040,emscad_13211,,[TITLE] Growth Hacker / Data Analyst Manager,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1041,emscad_13219,,[TITLE] Content Marketing/SEO Manager,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+1042,emscad_13224,,[TITLE] Outside Sales Professional-Des Moines,0,0,0.9998482465744019,0.00015175342559814453,0.32,1,Optimized BERT,checkpoint
+1043,emscad_13230,,[TITLE] Web Designer,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+1044,emscad_13254,,[TITLE] Take First Steps (Intern),0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1045,emscad_13262,,[TITLE] Finance Controller,0,0,0.9998818039894104,0.00011819601058959961,0.32,1,Optimized BERT,checkpoint
+1046,emscad_13280,,[TITLE] Web-analyst,0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint
+1047,emscad_13281,,[TITLE] Regional Inside Sales Representative,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1048,emscad_13294,,[TITLE] Head of Market Development,0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+1049,emscad_13300,,[TITLE] Senior Ruby on Rails Engineer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1050,emscad_13303,,[TITLE] Teaching positions across Thailand,0,0,0.9998989105224609,0.0001010894775390625,0.32,1,Optimized BERT,checkpoint
+1051,emscad_13304,,[TITLE] Group Sales Executive,0,0,0.9998607635498047,0.0001392364501953125,0.32,1,Optimized BERT,checkpoint
+1052,emscad_13305,,[TITLE] Implementation Manager for Growing Healthcare IT Startup,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1053,emscad_13318,,"[TITLE] None of your openings fit me, hire me anyway!",0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+1054,emscad_13321,,[TITLE] CS Student-Matific,0,0,0.9995036125183105,0.0004963874816894531,0.32,1,Optimized BERT,checkpoint
+1055,emscad_13353,,[TITLE] Line Cook & Dishwashers,0,0,0.9999245405197144,7.545948028564453e-05,0.32,1,Optimized BERT,checkpoint
+1056,emscad_13359,,[TITLE] Senior Sales Executive - West,0,0,0.9998836517333984,0.0001163482666015625,0.32,1,Optimized BERT,checkpoint
+1057,emscad_13370,,[TITLE] Senior JAVA Developer,0,0,0.999880850315094,0.00011914968490600586,0.32,1,Optimized BERT,checkpoint
+1058,emscad_13373,,[TITLE] Jr SQL Developer - BigTime Software,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+1059,emscad_13390,,[TITLE] UI / Web Design,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1060,emscad_13395,,[TITLE] High School Physics/Living Environment Teacher,0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+1061,emscad_13397,,[TITLE] Expert PHP Web Application Developer,0,0,0.9993386268615723,0.0006613731384277344,0.32,1,Optimized BERT,checkpoint
+1062,emscad_13400,,[TITLE] Senior Web Engineer (Business Process System),0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1063,emscad_13411,,[TITLE] Javascript and Node.JS Software Developer,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+1064,emscad_13414,,[TITLE] Linux System Administrator,0,0,0.9998931884765625,0.0001068115234375,0.32,1,Optimized BERT,checkpoint
+1065,emscad_13416,,[TITLE] Manufacturing Operations Supervisor,0,0,0.9999242424964905,7.575750350952148e-05,0.32,1,Optimized BERT,checkpoint
+1066,emscad_13430,,[TITLE] Art Director Interactive / Design,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1067,emscad_13431,,[TITLE] Integrated Marketing Manager,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1068,emscad_13447,,[TITLE] Senior Developer,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+1069,emscad_13457,,[TITLE] Open Applications,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1070,emscad_13465,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+1071,emscad_13466,,[TITLE] Production Supervisor,0,0,0.9999248385429382,7.516145706176758e-05,0.32,1,Optimized BERT,checkpoint
+1072,emscad_13487,,[TITLE] Linux Systems/Security Engineer,0,0,0.9997367858886719,0.000263214111328125,0.32,1,Optimized BERT,checkpoint
+1073,emscad_13521,,[TITLE] Community Ambassador UK (Remote),0,0,0.9998902678489685,0.00010973215103149414,0.32,1,Optimized BERT,checkpoint
+1074,emscad_13552,,"[TITLE] Onsite Host (Alexandria, VA)",0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+1075,emscad_13567,,[TITLE] Uncle Maddio's Restaurant - Hiring all Positions!,0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+1076,emscad_13575,,[TITLE] C# / SQL and BI Developer (all levels),0,0,0.9998849630355835,0.0001150369644165039,0.32,1,Optimized BERT,checkpoint
+1077,emscad_13585,,[TITLE] Asbestos Worker,0,0,0.9996471405029297,0.0003528594970703125,0.32,1,Optimized BERT,checkpoint
+1078,emscad_13607,,[TITLE] Graduate Program,0,0,0.9998751878738403,0.00012481212615966797,0.32,1,Optimized BERT,checkpoint
+1079,emscad_13627,,[TITLE] Customer Support & Operations Technician,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1080,emscad_13643,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1081,emscad_13651,,"[TITLE] Business Development Director, Alliances & Partners",0,0,0.9998126029968262,0.00018739700317382812,0.32,1,Optimized BERT,checkpoint
+1082,emscad_13660,,[TITLE] Director of Marketing (Social Media Start-Up!),0,0,0.9998458623886108,0.00015413761138916016,0.32,1,Optimized BERT,checkpoint
+1083,emscad_13671,,[TITLE] Teacher - Full Year,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1084,emscad_13677,,[TITLE] Mechanical Engineer,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1085,emscad_13693,,[TITLE] Application Developer,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1086,emscad_13699,,[TITLE] Junior Developer / Professional Services Agent,0,0,0.9998836517333984,0.0001163482666015625,0.32,1,Optimized BERT,checkpoint
+1087,emscad_13707,,[TITLE] Talented Line Cooks wanted!,0,0,0.9999012351036072,9.876489639282227e-05,0.32,1,Optimized BERT,checkpoint
+1088,emscad_13711,,[TITLE] Internal IT Administrator,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1089,emscad_13754,,[TITLE] Customer Success Manager,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1090,emscad_13776,,[TITLE] Regional Field Sales Representative,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+1091,emscad_13793,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1092,emscad_13842,,[TITLE] Caregiver Paw Paw/Lawton,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1093,emscad_13845,,"[TITLE] Customer Service Ninja, Arabic & English",0,0,0.9999020099639893,9.799003601074219e-05,0.32,1,Optimized BERT,checkpoint
+1094,emscad_13870,,[TITLE] DH7 Business Admin Apprenticeship Under NAS 16-24 Year Olds Only Immediate Start,0,0,0.9999178051948547,8.219480514526367e-05,0.32,1,Optimized BERT,checkpoint
+1095,emscad_13887,,[TITLE] Creative Photographer,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+1096,emscad_13899,,[TITLE] Caregivers needed for Holidays!,0,0,0.9996147155761719,0.000385284423828125,0.32,1,Optimized BERT,checkpoint
+1097,emscad_13901,,[TITLE] Campaign Manager,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+1098,emscad_13925,,[TITLE] Digital Design Trainee,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+1099,emscad_13934,,[TITLE] Engineering Tech,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+1100,emscad_13948,,[TITLE] Administrative Assistant,0,0,0.9998563528060913,0.0001436471939086914,0.32,1,Optimized BERT,checkpoint
+1101,emscad_13958,,[TITLE] Director of HR,0,0,0.9998849630355835,0.0001150369644165039,0.32,1,Optimized BERT,checkpoint
+1102,emscad_13960,,[TITLE] Graphic User Interface Designer,0,0,0.9998747110366821,0.0001252889633178711,0.32,1,Optimized BERT,checkpoint
+1103,emscad_13976,,[TITLE] Marketing Director,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1104,emscad_13981,,[TITLE] Sales Rock Star wanted!!! $150K+,0,0,0.9996678829193115,0.00033211708068847656,0.32,1,Optimized BERT,checkpoint
+1105,emscad_13986,,[TITLE] Senior Project Manager (Hardware),0,0,0.9999174475669861,8.255243301391602e-05,0.32,1,Optimized BERT,checkpoint
+1106,emscad_14004,,[TITLE] Data scientist,0,0,0.9998876452445984,0.00011235475540161133,0.32,1,Optimized BERT,checkpoint
+1107,emscad_14008,,[TITLE] Pre-Sales Executive,0,0,0.9998666048049927,0.00013339519500732422,0.32,1,Optimized BERT,checkpoint
+1108,emscad_14020,,[TITLE] Front-End Engineer,0,0,0.9998911023139954,0.00010889768600463867,0.32,1,Optimized BERT,checkpoint
+1109,emscad_14028,,[TITLE] Restaurant Manager,0,0,0.999907910823822,9.208917617797852e-05,0.32,1,Optimized BERT,checkpoint
+1110,emscad_14043,,[TITLE] Piercing Trainer,0,0,0.9991850852966309,0.0008149147033691406,0.32,1,Optimized BERT,checkpoint
+1111,emscad_14044,,[TITLE] QA Engineer,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+1112,emscad_14072,,[TITLE] Customer Support Representative,0,0,0.9998902678489685,0.00010973215103149414,0.32,1,Optimized BERT,checkpoint
+1113,emscad_14094,,"[TITLE] Account Growth Manager, Religious Organizations",0,0,0.9998377561569214,0.00016224384307861328,0.32,1,Optimized BERT,checkpoint
+1114,emscad_14114,,"[TITLE] Front End Hacker (JS, HTML, CSS)",0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+1115,emscad_14149,,[TITLE] Graduates: English Teacher Abroad (Conversational),0,0,0.9998940229415894,0.00010597705841064453,0.32,1,Optimized BERT,checkpoint
+1116,emscad_14161,,[TITLE] Wakefield Recruitment Company Requires Sales Executives,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1117,emscad_14180,,[TITLE] Director of Software Engineering,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1118,emscad_14192,,[TITLE] UX/UI Designer,0,0,0.9998118877410889,0.0001881122589111328,0.32,1,Optimized BERT,checkpoint
+1119,emscad_14198,,[TITLE] Remote Senior PHP Developer (YII2),0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+1120,emscad_14210,,[TITLE] Customer Service Representative,0,0,0.9998831748962402,0.00011682510375976562,0.32,1,Optimized BERT,checkpoint
+1121,emscad_14223,,[TITLE] UI/UX Designer,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1122,emscad_14265,,[TITLE] IT Operations Assistants,0,0,0.9993185997009277,0.0006814002990722656,0.32,1,Optimized BERT,checkpoint
+1123,emscad_14271,,[TITLE] Northwestern Hospital,1,0,0.727294921875,0.272705078125,0.32,0,Optimized BERT,checkpoint
+1124,emscad_14273,,"[TITLE] Home Health Aide--Egnar, CO",0,0,0.9997704029083252,0.0002295970916748047,0.32,1,Optimized BERT,checkpoint
+1125,emscad_14286,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1126,emscad_14293,,[TITLE] Experienced Bartenders Wanted!,0,0,0.9998741149902344,0.000125885009765625,0.32,1,Optimized BERT,checkpoint
+1127,emscad_14321,,[TITLE] 2015 Undergrad- Institutional Sales Associate,0,0,0.9998956918716431,0.0001043081283569336,0.32,1,Optimized BERT,checkpoint
+1128,emscad_14322,,[TITLE] Office Manager,0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+1129,emscad_14323,,[TITLE] CNC Machinist,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+1130,emscad_14327,,[TITLE] Apple Repair Technician,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+1131,emscad_14335,,[TITLE] Wireless Sales Consultants Wanted - Hiring This Week!!!,0,0,0.9995760917663574,0.0004239082336425781,0.32,1,Optimized BERT,checkpoint
+1132,emscad_14342,,[TITLE] Senior Drupal Developer,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+1133,emscad_14347,,[TITLE] (Javascript) Web Application Developer,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+1134,emscad_14381,,[TITLE] Sr.PHP Developer,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1135,emscad_14382,,[TITLE] Director of Software Development,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+1136,emscad_14390,,[TITLE] PT - NOC LPN,0,0,0.9999104142189026,8.958578109741211e-05,0.32,1,Optimized BERT,checkpoint
+1137,emscad_14417,,[TITLE] Multispectral image coding,0,0,0.9997327327728271,0.00026726722717285156,0.32,1,Optimized BERT,checkpoint
+1138,emscad_14422,,[TITLE] Junior Java Engineer,0,0,0.9996206760406494,0.00037932395935058594,0.32,1,Optimized BERT,checkpoint
+1139,emscad_14425,,[TITLE] Graphic Designer,0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+1140,emscad_14439,,[TITLE] Business Systems Analyst,0,0,0.9997843503952026,0.00021564960479736328,0.32,1,Optimized BERT,checkpoint
+1141,emscad_14444,,[TITLE] HR Advisor - Sports and Leisure,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1142,emscad_14449,,[TITLE] Technical Pre-Sales Specialist,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1143,emscad_14462,,"[TITLE] Senior Backend Engineer, Web Services",0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+1144,emscad_14465,,[TITLE] Quality Assurance Manager - Dairy Manufacturing,0,0,0.9999197125434875,8.028745651245117e-05,0.32,1,Optimized BERT,checkpoint
+1145,emscad_14466,,[TITLE] Onboarding Specialist,0,0,0.9996402263641357,0.0003597736358642578,0.32,1,Optimized BERT,checkpoint
+1146,emscad_14475,,[TITLE] Web Designer/Developer,0,0,0.9996533393859863,0.0003466606140136719,0.32,1,Optimized BERT,checkpoint
+1147,emscad_14492,,[TITLE] Customer Service Representative,0,0,0.9996438026428223,0.0003561973571777344,0.32,1,Optimized BERT,checkpoint
+1148,emscad_14493,,[TITLE] Back-End Ruby Developer,0,0,0.9997704029083252,0.0002295970916748047,0.32,1,Optimized BERT,checkpoint
+1149,emscad_14495,,[TITLE] Network Engineer II,0,0,0.9998813271522522,0.00011867284774780273,0.32,1,Optimized BERT,checkpoint
+1150,emscad_14503,,[TITLE] CRA III,0,0,0.9999020099639893,9.799003601074219e-05,0.32,1,Optimized BERT,checkpoint
+1151,emscad_14515,,[TITLE] Partnership Manager - High Growth Specialty Finance Company,0,0,0.9998096227645874,0.00019037723541259766,0.32,1,Optimized BERT,checkpoint
+1152,emscad_14519,,[TITLE] Senior Frontend Developer (Javascript),0,0,0.9999221563339233,7.784366607666016e-05,0.32,1,Optimized BERT,checkpoint
+1153,emscad_14520,,[TITLE] Beauty & Fragrance consultants needed,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+1154,emscad_14523,,[TITLE] Assistant Accountant,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1155,emscad_14529,,[TITLE] AMHS Counsellor,0,0,0.999741792678833,0.0002582073211669922,0.32,1,Optimized BERT,checkpoint
+1156,emscad_14530,,[TITLE] Junior Communications and Marketing Executive,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1157,emscad_14540,,"[TITLE] Business Development, Client Relations, and Inside Sales Representative",0,0,0.9998980760574341,0.00010192394256591797,0.32,1,Optimized BERT,checkpoint
+1158,emscad_14548,,[TITLE] EMTs (Lift Coaches),0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1159,emscad_14550,,[TITLE] Caregiver/HHA/CNA- Stevensville/St Joseph,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+1160,emscad_14615,,[TITLE] Lead Software Engineer,0,0,0.9998992681503296,0.00010073184967041016,0.32,1,Optimized BERT,checkpoint
+1161,emscad_14625,,[TITLE] Physical Therapist,0,0,0.9998219013214111,0.0001780986785888672,0.32,1,Optimized BERT,checkpoint
+1162,emscad_14662,,[TITLE] Customer Service Agent,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+1163,emscad_14666,,[TITLE] Payroll Clerk $20/hr,0,0,0.951812744140625,0.048187255859375,0.32,1,Optimized BERT,checkpoint
+1164,emscad_14673,,[TITLE] Design manager,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1165,emscad_14676,,[TITLE] Senior Java developers (Java SE),0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1166,emscad_14693,,[TITLE] Account Director,0,0,0.9998948574066162,0.00010514259338378906,0.32,1,Optimized BERT,checkpoint
+1167,emscad_14703,,[TITLE] MEAN Stack Developer,0,0,0.9999012351036072,9.876489639282227e-05,0.32,1,Optimized BERT,checkpoint
+1168,emscad_14706,,[TITLE] Sr. Reservoir Engineer,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+1169,emscad_14709,,[TITLE] Electrical Maintenance Technician,0,0,0.9999227523803711,7.724761962890625e-05,0.32,1,Optimized BERT,checkpoint
+1170,emscad_14721,,"[TITLE] Life Insurance Agent - Tampa, FL",0,0,0.9998666048049927,0.00013339519500732422,0.32,1,Optimized BERT,checkpoint
+1171,emscad_14722,,[TITLE] Data Scientist,0,0,0.9997482299804688,0.00025177001953125,0.32,1,Optimized BERT,checkpoint
+1172,emscad_14736,,[TITLE] UX/UI Designer,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1173,emscad_14747,,[TITLE] Web Designer,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+1174,emscad_14750,,[TITLE] Linux Systems Engineer,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+1175,emscad_14753,,[TITLE] Strategic Partnerships Manager - Digital Media,0,0,0.9999000430107117,9.995698928833008e-05,0.32,1,Optimized BERT,checkpoint
+1176,emscad_14765,,[TITLE] 2015 MBA Internship - Research Associate,0,0,0.9998897910118103,0.00011020898818969727,0.32,1,Optimized BERT,checkpoint
+1177,emscad_14772,,[TITLE] Drupal Developer,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1178,emscad_14775,,[TITLE] Freshers 2015,0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+1179,emscad_14794,,[TITLE] Inverter Integration Engineer,0,0,0.9999054074287415,9.459257125854492e-05,0.32,1,Optimized BERT,checkpoint
+1180,emscad_14806,,[TITLE] Business Analyst- Equity Trading - Fidessa,0,0,0.9997868537902832,0.00021314620971679688,0.32,1,Optimized BERT,checkpoint
+1181,emscad_14807,,[TITLE] Database Developer (PL/SQL),0,0,0.9993252754211426,0.0006747245788574219,0.32,1,Optimized BERT,checkpoint
+1182,emscad_14816,,[TITLE] Web App Developer,0,0,0.999907910823822,9.208917617797852e-05,0.32,1,Optimized BERT,checkpoint
+1183,emscad_14832,,[TITLE] Go Developer,0,0,0.9995810985565186,0.0004189014434814453,0.32,1,Optimized BERT,checkpoint
+1184,emscad_14850,,[TITLE] Caregiver/HHA/CNA-Bridgman,0,0,0.9999027848243713,9.721517562866211e-05,0.32,1,Optimized BERT,checkpoint
+1185,emscad_14857,,[TITLE] Product Manager - Viral Growth,0,0,0.9999224543571472,7.75456428527832e-05,0.32,1,Optimized BERT,checkpoint
+1186,emscad_14858,,[TITLE] Social Media Intern,0,0,0.9989471435546875,0.0010528564453125,0.32,1,Optimized BERT,checkpoint
+1187,emscad_14863,,[TITLE] Back End Developer (Python / MySQL),0,0,0.9998977184295654,0.00010228157043457031,0.32,1,Optimized BERT,checkpoint
+1188,emscad_14867,,[TITLE] SAP Functional Solution Architect,0,0,0.9995574951171875,0.0004425048828125,0.32,1,Optimized BERT,checkpoint
+1189,emscad_14885,,[TITLE] Operations Manager,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1190,emscad_14887,,[TITLE] Card Payments Manager,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+1191,emscad_14894,,[TITLE] Manager of Finance,0,0,0.9999257326126099,7.426738739013672e-05,0.32,1,Optimized BERT,checkpoint
+1192,emscad_14922,,[TITLE] Data Scientist,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1193,emscad_14925,,[TITLE] Recruiting & HR Intern,0,0,0.9998968839645386,0.00010311603546142578,0.32,1,Optimized BERT,checkpoint
+1194,emscad_14926,,[TITLE] Mid-Senior Front-end Developer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1195,emscad_14934,,[TITLE] Server Engineer/DevOPS,0,0,0.9999000430107117,9.995698928833008e-05,0.32,1,Optimized BERT,checkpoint
+1196,emscad_14939,,[TITLE] Outbound Appointment Setter,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+1197,emscad_14944,,[TITLE] Hanley Fragrance and Beauty Promotional Staff,0,0,0.9999054074287415,9.459257125854492e-05,0.32,1,Optimized BERT,checkpoint
+1198,emscad_14950,,[TITLE] Senior Interaction Designer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1199,emscad_14960,,[TITLE] Controls Engineer,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+1200,emscad_14972,,[TITLE] Receptionist - Wellness Practice,0,1,0.00341796875,0.99658203125,0.32,0,Optimized BERT,checkpoint
+1201,emscad_14988,,[TITLE] Receptionist | Administrative Assistant,0,0,0.9998984932899475,0.00010150671005249023,0.32,1,Optimized BERT,checkpoint
+1202,emscad_14990,,[TITLE] Electrical Controls Engineer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1203,emscad_14991,,[TITLE] Live In Caregiver-Lawrence MI,0,0,0.999771237373352,0.00022876262664794922,0.32,1,Optimized BERT,checkpoint
+1204,emscad_15015,,"[TITLE] Sr. Web Application Engineer for Javascript, HTML and CSS with 1 to 5 yrs experience",0,0,0.9999061226844788,9.387731552124023e-05,0.32,1,Optimized BERT,checkpoint
+1205,emscad_15017,,[TITLE] Senior Recruiter,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1206,emscad_15020,,[TITLE] Process Engineer - Troubleshooting Production Exp - LA,0,0,0.999923050403595,7.69495964050293e-05,0.32,1,Optimized BERT,checkpoint
+1207,emscad_15023,,[TITLE] Partnerships Account Manager,0,0,0.9999227523803711,7.724761962890625e-05,0.32,1,Optimized BERT,checkpoint
+1208,emscad_15028,,[TITLE] Product Manager (Mobile),0,0,0.999775767326355,0.00022423267364501953,0.32,1,Optimized BERT,checkpoint
+1209,emscad_15030,,"[TITLE] Home Health CNA--Shelley, ID",0,0,0.9998259544372559,0.00017404556274414062,0.32,1,Optimized BERT,checkpoint
+1210,emscad_15035,,[TITLE] Senior Software Engineer - Big Data,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+1211,emscad_15056,,[TITLE] Future - Tech Specialist - Microsoft Infrastructure,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1212,emscad_15080,,[TITLE] Android Developer,0,0,0.9998140335083008,0.00018596649169921875,0.32,1,Optimized BERT,checkpoint
+1213,emscad_15104,,[TITLE] Site Reliability Engineer (SRE),0,0,0.9997817277908325,0.00021827220916748047,0.32,1,Optimized BERT,checkpoint
+1214,emscad_15106,,[TITLE] Technical Support Engineer,0,0,0.9998915195465088,0.00010848045349121094,0.32,1,Optimized BERT,checkpoint
+1215,emscad_15114,,[TITLE] Telesales Opportunities,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+1216,emscad_15129,,[TITLE] Financial Accountant / Finance Manager (contract to permanent),0,0,0.9998741149902344,0.000125885009765625,0.32,1,Optimized BERT,checkpoint
+1217,emscad_15146,,[TITLE] Direct Sales Representative,0,0,0.9993147850036621,0.0006852149963378906,0.32,1,Optimized BERT,checkpoint
+1218,emscad_15147,,[TITLE] Ethylene Maintenance Superintendent - VCM SAP - TX,0,0,0.9999148845672607,8.511543273925781e-05,0.32,1,Optimized BERT,checkpoint
+1219,emscad_15158,,[TITLE] Helpdesk Analyst,0,0,0.9998775720596313,0.00012242794036865234,0.32,1,Optimized BERT,checkpoint
+1220,emscad_15163,,[TITLE] Manufacturing Engineering Manager,0,0,0.9999227523803711,7.724761962890625e-05,0.32,1,Optimized BERT,checkpoint
+1221,emscad_15166,,[TITLE] Manager of Finance,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+1222,emscad_15168,,"[TITLE] Product Manager, HRIS & Analytics",0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+1223,emscad_15169,,[TITLE] Teaching English,0,0,0.9998818039894104,0.00011819601058959961,0.32,1,Optimized BERT,checkpoint
+1224,emscad_15182,,[TITLE] Travel sales executive,0,0,0.9998670816421509,0.0001329183578491211,0.32,1,Optimized BERT,checkpoint
+1225,emscad_15184,,[TITLE] Pharmacist,0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+1226,emscad_15185,,[TITLE] Application Developer (PHP/LAMP),0,0,0.9999138712882996,8.612871170043945e-05,0.32,1,Optimized BERT,checkpoint
+1227,emscad_15204,,[TITLE] Product Designer,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1228,emscad_15222,,[TITLE] English Teacher Abroad (Conversational),0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+1229,emscad_15251,,[TITLE] Field Sales Representative,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+1230,emscad_15264,,[TITLE] STRATEGIST,0,0,0.9999114871025085,8.851289749145508e-05,0.32,1,Optimized BERT,checkpoint
+1231,emscad_15268,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1232,emscad_15273,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1233,emscad_15278,,[TITLE] Handyman & Independent Contractors (Home Pros),0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+1234,emscad_15320,,[TITLE] iOS Developer,0,0,0.9999039173126221,9.608268737792969e-05,0.32,1,Optimized BERT,checkpoint
+1235,emscad_15322,,[TITLE] 2015 MBA- Advisory & Consulting Associate,0,0,0.9998506307601929,0.0001493692398071289,0.32,1,Optimized BERT,checkpoint
+1236,emscad_15326,,[TITLE] Sale Representatives,0,0,0.9990763664245605,0.0009236335754394531,0.32,1,Optimized BERT,checkpoint
+1237,emscad_15335,,[TITLE] Business Analyst,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+1238,emscad_15363,,[TITLE] Lead Product Manager,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1239,emscad_15368,,[TITLE] Process Engineer,0,0,0.999923050403595,7.69495964050293e-05,0.32,1,Optimized BERT,checkpoint
+1240,emscad_15369,,[TITLE] System Admin (Solaris 9/10) || Uniondale NY or Herndon VA || 4+ Months ||,0,0,0.9997508525848389,0.0002491474151611328,0.32,1,Optimized BERT,checkpoint
+1241,emscad_15376,,[TITLE] .NET Developer,0,0,0.9999242424964905,7.575750350952148e-05,0.32,1,Optimized BERT,checkpoint
+1242,emscad_15378,,[TITLE] MistoBox Growth Intern,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1243,emscad_15425,,"[TITLE] Clinical Management - MSW, PA, NP, DOC, DON",0,0,0.9997000694274902,0.0002999305725097656,0.32,1,Optimized BERT,checkpoint
+1244,emscad_15426,,[TITLE] Media Buyer,0,0,0.9998089075088501,0.00019109249114990234,0.32,1,Optimized BERT,checkpoint
+1245,emscad_15433,,[TITLE] Web Designer,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1246,emscad_15466,,[TITLE] English Teacher Abroad,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1247,emscad_15487,,[TITLE] Digital Copywriter,0,0,0.9998845458030701,0.00011545419692993164,0.32,1,Optimized BERT,checkpoint
+1248,emscad_15491,,[TITLE] SEM Manager Germany,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+1249,emscad_15504,,[TITLE] Senior AR Associate,0,0,0.9996793270111084,0.00032067298889160156,0.32,1,Optimized BERT,checkpoint
+1250,emscad_15508,,[TITLE] Frontend Javascript/AngularJS developer,0,0,0.9999203085899353,7.969141006469727e-05,0.32,1,Optimized BERT,checkpoint
+1251,emscad_15516,,[TITLE] Lead Data Scientist,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1252,emscad_15527,,[TITLE] Senior Software Engineer - NATs Focus,0,0,0.9998722076416016,0.0001277923583984375,0.32,1,Optimized BERT,checkpoint
+1253,emscad_15559,,[TITLE] Digital Marketing Manager - SEO/SEM,0,0,0.9997817277908325,0.00021827220916748047,0.32,1,Optimized BERT,checkpoint
+1254,emscad_15566,,[TITLE] Physical Therapist,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1255,emscad_15578,,[TITLE] Content Manager,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+1256,emscad_15579,,[TITLE] Key Account Manager,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+1257,emscad_15598,,[TITLE] Sr. Digital Marketing Account Manager,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+1258,emscad_15603,,"[TITLE] Senior Mechanical Engineer - Petrochemical P&ID - Tyler, TX",0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+1259,emscad_15632,,[TITLE] RUBY ON RAILS DEVELOPER,0,0,0.9997115135192871,0.0002884864807128906,0.32,1,Optimized BERT,checkpoint
+1260,emscad_15633,,[TITLE] Travel Consultation & Sales,0,0,0.9998897910118103,0.00011020898818969727,0.32,1,Optimized BERT,checkpoint
+1261,emscad_15638,,[TITLE] Senior Accountant,0,0,0.9990301132202148,0.0009698867797851562,0.32,1,Optimized BERT,checkpoint
+1262,emscad_15651,,[TITLE] Contract iOS Developer,0,0,0.99981689453125,0.00018310546875,0.32,1,Optimized BERT,checkpoint
+1263,emscad_15662,,[TITLE] Smartphone HTML5 Game Developer,0,0,0.9999121427536011,8.785724639892578e-05,0.32,1,Optimized BERT,checkpoint
+1264,emscad_15687,,[TITLE] Lean Manufacturing,0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+1265,emscad_15704,,[TITLE] Store Manager - Papa John's Pizza,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+1266,emscad_15722,,[TITLE] Student Delivery Bikers,0,0,0.9998494386672974,0.00015056133270263672,0.32,1,Optimized BERT,checkpoint
+1267,emscad_15746,,[TITLE] Event Coordinator,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1268,emscad_15762,,[TITLE] Technical Support Associate,0,0,0.9998940229415894,0.00010597705841064453,0.32,1,Optimized BERT,checkpoint
+1269,emscad_15777,,[TITLE] Business Development Director,0,0,0.999920666217804,7.933378219604492e-05,0.32,1,Optimized BERT,checkpoint
+1270,emscad_15783,,[TITLE] Manager of Finance,0,0,0.9999257326126099,7.426738739013672e-05,0.32,1,Optimized BERT,checkpoint
+1271,emscad_15809,,[TITLE] Codekit Creator,0,0,0.9998358488082886,0.00016415119171142578,0.32,1,Optimized BERT,checkpoint
+1272,emscad_15853,,[TITLE] Content Marketer,0,0,0.9999187588691711,8.124113082885742e-05,0.32,1,Optimized BERT,checkpoint
+1273,emscad_15865,,"[TITLE] Manufacturing Engineering - Lean Manufacture-Cedar Falls,IA",0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+1274,emscad_15880,,[TITLE] Sr. Design Engineer Mechanical - 3D CAD,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1275,emscad_15916,,[TITLE] French Marketing Executive,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1276,emscad_15947,,[TITLE] Internal Candidates- Lift Coach Part- Time Floater,0,0,0.9998831748962402,0.00011682510375976562,0.32,1,Optimized BERT,checkpoint
+1277,emscad_15959,,[TITLE] Graduate Software Developer,0,0,0.9999057650566101,9.423494338989258e-05,0.32,1,Optimized BERT,checkpoint
+1278,emscad_15967,,[TITLE] Facility Leader,0,0,0.99990314245224,9.685754776000977e-05,0.32,1,Optimized BERT,checkpoint
+1279,emscad_15968,,[TITLE] Front End Developer,0,0,0.9998968839645386,0.00010311603546142578,0.32,1,Optimized BERT,checkpoint
+1280,emscad_15977,,[TITLE] Domestic Cleaner jobs Basingstoke,0,0,0.9979457855224609,0.0020542144775390625,0.32,1,Optimized BERT,checkpoint
+1281,emscad_15980,,[TITLE] Sales Director,0,0,0.9999145269393921,8.547306060791016e-05,0.32,1,Optimized BERT,checkpoint
+1282,emscad_15983,,[TITLE] iOS Application Developer (learn Swift on-the-job),0,0,0.9999158382415771,8.416175842285156e-05,0.32,1,Optimized BERT,checkpoint
+1283,emscad_16023,,"[TITLE] CNC Machinist - Asheboro, NC",0,0,0.9999121427536011,8.785724639892578e-05,0.32,1,Optimized BERT,checkpoint
+1284,emscad_16035,,[TITLE] Jr. Estimator (Material Takeoff),0,0,0.9999218583106995,7.814168930053711e-05,0.32,1,Optimized BERT,checkpoint
+1285,emscad_16058,,[TITLE] Product Marketing Manager,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1286,emscad_16062,,[TITLE] Business Unit Manager,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1287,emscad_16105,,[TITLE] Software Engineer - GIS Specialist,0,0,0.999897301197052,0.00010269880294799805,0.32,1,Optimized BERT,checkpoint
+1288,emscad_16107,,[TITLE] Branch Manager In Training - West Central,0,0,0.9999064803123474,9.351968765258789e-05,0.32,1,Optimized BERT,checkpoint
+1289,emscad_16133,,[TITLE] Field Operations Specialist,0,0,0.9998623132705688,0.00013768672943115234,0.32,1,Optimized BERT,checkpoint
+1290,emscad_16153,,[TITLE] Sr. Linux System Administrator,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1291,emscad_16166,,[TITLE] Art Director,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1292,emscad_16180,,[TITLE] Information Systems Manager,0,0,0.9998880624771118,0.0001119375228881836,0.32,1,Optimized BERT,checkpoint
+1293,emscad_16205,,[TITLE] Specialist Teaching Associate,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1294,emscad_16214,,[TITLE] Manufacturing Engineer,0,0,0.9999227523803711,7.724761962890625e-05,0.32,1,Optimized BERT,checkpoint
+1295,emscad_16227,,[TITLE] Data Scientist,0,0,0.9998313188552856,0.00016868114471435547,0.32,1,Optimized BERT,checkpoint
+1296,emscad_16251,,[TITLE] Back End PHP Developer,0,0,0.9999015927314758,9.840726852416992e-05,0.32,1,Optimized BERT,checkpoint
+1297,emscad_16252,,[TITLE] Senior Account Executive,0,0,0.9998722076416016,0.0001277923583984375,0.32,1,Optimized BERT,checkpoint
+1298,emscad_16274,,[TITLE] Receptionist/Office Clerk,0,0,0.9998446702957153,0.00015532970428466797,0.32,1,Optimized BERT,checkpoint
+1299,emscad_16276,,[TITLE] Social Media/Brand Content Manager,0,0,0.9999125003814697,8.749961853027344e-05,0.32,1,Optimized BERT,checkpoint
+1300,emscad_16283,,[TITLE] Internal Audit & Financial Advisory Senior,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+1301,emscad_16286,,[TITLE] Intern,0,0,0.9999240040779114,7.599592208862305e-05,0.32,1,Optimized BERT,checkpoint
+1302,emscad_16288,,[TITLE] IT Support Analyst,0,0,0.9998889565467834,0.00011104345321655273,0.32,1,Optimized BERT,checkpoint
+1303,emscad_16289,,[TITLE] Regional Sales Manager,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1304,emscad_16310,,[TITLE] VP of Global Sales Operations,0,0,0.9999221563339233,7.784366607666016e-05,0.32,1,Optimized BERT,checkpoint
+1305,emscad_16324,,[TITLE] Business Development Manager,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1306,emscad_16335,,[TITLE] Star (Retail Associate) - Oakbrook Center,0,0,0.999873161315918,0.00012683868408203125,0.32,1,Optimized BERT,checkpoint
+1307,emscad_16345,,[TITLE] Certified Personal Trainer,0,0,0.9998756647109985,0.00012433528900146484,0.32,1,Optimized BERT,checkpoint
+1308,emscad_16363,,[TITLE] Graphic Designer,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1309,emscad_16365,,[TITLE] Mobile RD,0,0,0.999858021736145,0.00014197826385498047,0.32,1,Optimized BERT,checkpoint
+1310,emscad_16388,,[TITLE] Data Scientist,0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+1311,emscad_16390,,[TITLE] Texas Communication Assistant,0,0,0.9998756647109985,0.00012433528900146484,0.32,1,Optimized BERT,checkpoint
+1312,emscad_16395,,[TITLE] 3D Printing Engineer,0,0,0.9998980760574341,0.00010192394256591797,0.32,1,Optimized BERT,checkpoint
+1313,emscad_16407,,[TITLE] Licensed Level Therapist,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1314,emscad_16423,,[TITLE] Associate,0,0,0.9999200105667114,7.998943328857422e-05,0.32,1,Optimized BERT,checkpoint
+1315,emscad_16425,,[TITLE] Corporate Accounting Manager,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1316,emscad_16432,,[TITLE] Sales Representative,0,0,0.9999042749404907,9.572505950927734e-05,0.32,1,Optimized BERT,checkpoint
+1317,emscad_16439,,[TITLE] Software Engineer,0,0,0.9999227523803711,7.724761962890625e-05,0.32,1,Optimized BERT,checkpoint
+1318,emscad_16442,,[TITLE] Print Designer or Junior Print Designer,0,0,0.9999215602874756,7.843971252441406e-05,0.32,1,Optimized BERT,checkpoint
+1319,emscad_16453,,[TITLE] Home-based Inbound Sales Representative,0,0,0.9999093413352966,9.065866470336914e-05,0.32,1,Optimized BERT,checkpoint
+1320,emscad_16473,,[TITLE] Junior Account Executive,0,0,0.9998676776885986,0.0001323223114013672,0.32,1,Optimized BERT,checkpoint
+1321,emscad_16485,,[TITLE] Interactive Designer (Freelance),0,0,0.9999111294746399,8.887052536010742e-05,0.32,1,Optimized BERT,checkpoint
+1322,emscad_16488,,[TITLE] Chief Financial Officer,0,0,0.9998840689659119,0.00011593103408813477,0.32,1,Optimized BERT,checkpoint
+1323,emscad_16496,,[TITLE] Marketing Coordinator,0,0,0.9997267723083496,0.0002732276916503906,0.32,1,Optimized BERT,checkpoint
+1324,emscad_16515,,[TITLE] Digital Marketing Executive,0,0,0.9999209642410278,7.903575897216797e-05,0.32,1,Optimized BERT,checkpoint
+1325,emscad_16537,,"[TITLE] Escrow Officers & Title Insurance Sales - Austin, Texas",0,0,0.9989700317382812,0.00102996826171875,0.32,1,Optimized BERT,checkpoint
+1326,emscad_16544,,[TITLE] Title Insurance & Settlement Sales: Midwestern Account Executive,0,0,0.9997621774673462,0.0002378225326538086,0.32,1,Optimized BERT,checkpoint
+1327,emscad_16551,,[TITLE] Title Insurance: Claims Assistant & Claims Representative,0,0,0.9994964599609375,0.0005035400390625,0.32,1,Optimized BERT,checkpoint
+1328,emscad_16562,,[TITLE] Advertising Territory Manager,0,0,0.999879002571106,0.00012099742889404297,0.32,1,Optimized BERT,checkpoint
+1329,emscad_16565,,[TITLE] JUNIOR WEB DEVELOPER,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+1330,emscad_16570,,[TITLE] Online Business Developers,0,0,0.9997900724411011,0.00020992755889892578,0.32,1,Optimized BERT,checkpoint
+1331,emscad_16583,,[TITLE] Devops engineer,0,0,0.9994339942932129,0.0005660057067871094,0.32,1,Optimized BERT,checkpoint
+1332,emscad_16587,,[TITLE] Software developer,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1333,emscad_16617,,[TITLE] Senior Automation Tester,0,0,0.9986028671264648,0.0013971328735351562,0.32,1,Optimized BERT,checkpoint
+1334,emscad_16622,,[TITLE] Promotions / Marketing Assistant,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+1335,emscad_16627,,[TITLE] Health Coach,0,0,0.9996309280395508,0.00036907196044921875,0.32,1,Optimized BERT,checkpoint
+1336,emscad_16635,,[TITLE] Web Designer,0,0,0.9999135136604309,8.64863395690918e-05,0.32,1,Optimized BERT,checkpoint
+1337,emscad_16638,,[TITLE] Marketing executive,0,0,0.9985074996948242,0.0014925003051757812,0.32,1,Optimized BERT,checkpoint
+1338,emscad_16642,,[TITLE] Technical Architect,0,0,0.999832034111023,0.00016796588897705078,0.32,1,Optimized BERT,checkpoint
+1339,emscad_16670,,[TITLE] Business and Customer Development,0,0,0.999859094619751,0.00014090538024902344,0.32,1,Optimized BERT,checkpoint
+1340,emscad_16677,,[TITLE] Appointment Coordinator,0,0,0.9998822808265686,0.00011771917343139648,0.32,1,Optimized BERT,checkpoint
+1341,emscad_16681,,[TITLE] Web Designer,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+1342,emscad_16685,,[TITLE] Immediate Opening : Dotnet Developer,0,0,0.9993500709533691,0.0006499290466308594,0.32,1,Optimized BERT,checkpoint
+1343,emscad_16702,,[TITLE] Creative Website Bakers,0,0,0.9997626543045044,0.00023734569549560547,0.32,1,Optimized BERT,checkpoint
+1344,emscad_16706,,[TITLE] SEO/SEM Intern,0,0,0.9998845458030701,0.00011545419692993164,0.32,1,Optimized BERT,checkpoint
+1345,emscad_16715,,[TITLE] Internship Program 2013,0,0,0.9992518424987793,0.0007481575012207031,0.32,1,Optimized BERT,checkpoint
+1346,emscad_16745,,[TITLE] Customer Service Representative,0,0,0.9998840689659119,0.00011593103408813477,0.32,1,Optimized BERT,checkpoint
+1347,emscad_16770,,[TITLE] Customer Support Ninjas,0,0,0.999919056892395,8.094310760498047e-05,0.32,1,Optimized BERT,checkpoint
+1348,emscad_16781,,[TITLE] QMS Consultant Required for UAE,0,0,0.9987211227416992,0.0012788772583007812,0.32,1,Optimized BERT,checkpoint
+1349,emscad_16789,,[TITLE] Senior Web Developer,0,0,0.9998854398727417,0.00011456012725830078,0.32,1,Optimized BERT,checkpoint
+1350,emscad_16804,,[TITLE] Customer Service Representative,0,0,0.9998919367790222,0.0001080632209777832,0.32,1,Optimized BERT,checkpoint
+1351,emscad_16839,,[TITLE] Account Manager,0,0,0.9960861206054688,0.00391387939453125,0.32,1,Optimized BERT,checkpoint
+1352,emscad_16860,,"[TITLE] Quality Specialist II, Clinical Programming",1,1,0.009765625,0.990234375,0.32,1,Optimized BERT,checkpoint
+1353,emscad_16884,,[TITLE] Sales Consultant,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+1354,emscad_16893,,[TITLE] Sales Consultant,0,0,0.9998803734779358,0.00011962652206420898,0.32,1,Optimized BERT,checkpoint
+1355,emscad_16930,,[TITLE] Customer Service Positions ($18-$22 an hour),0,0,0.9998722076416016,0.0001277923583984375,0.32,1,Optimized BERT,checkpoint
+1356,emscad_16937,,[TITLE] Friendly Customer Service Employees..Hiring Immediately,0,0,0.9998666048049927,0.00013339519500732422,0.32,1,Optimized BERT,checkpoint
+1357,emscad_16940,,[TITLE] Home Improvement Marketing,0,0,0.9998770952224731,0.00012290477752685547,0.32,1,Optimized BERT,checkpoint
+1358,emscad_16965,,[TITLE] Sales and Management Training,0,0,0.9999171495437622,8.285045623779297e-05,0.32,1,Optimized BERT,checkpoint
+1359,emscad_16975,,[TITLE] Frontend / UI Designer,0,0,0.9999237060546875,7.62939453125e-05,0.32,1,Optimized BERT,checkpoint
+1360,emscad_17001,,[TITLE] Sales and Marketing Positions,0,0,0.9998858571052551,0.00011414289474487305,0.32,1,Optimized BERT,checkpoint
+1361,emscad_17006,,[TITLE] Web Developer,0,0,0.9999194145202637,8.058547973632812e-05,0.32,1,Optimized BERT,checkpoint
+1362,emscad_17026,,[TITLE] Title Account Executive,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+1363,emscad_17032,,[TITLE] Head of Production and Sourcing,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+1364,emscad_17045,,[TITLE] Small Electronics Tester - NEEDED IMMEDIATELY,0,0,0.9991168975830078,0.0008831024169921875,0.32,1,Optimized BERT,checkpoint
+1365,emscad_17087,,[TITLE] Title Account Executive,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+1366,emscad_17092,,[TITLE] Customer Service Associate,0,0,0.9999131560325623,8.684396743774414e-05,0.32,1,Optimized BERT,checkpoint
+1367,emscad_17093,,[TITLE] JS Developer - Platform (w/in 6 months),0,0,0.9998961091041565,0.00010389089584350586,0.32,1,Optimized BERT,checkpoint
+1368,emscad_17110,,[TITLE] SAP Functional Consultant,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1369,emscad_17113,,[TITLE] Sales Support (Entry Level),0,0,0.9998440742492676,0.00015592575073242188,0.32,1,Optimized BERT,checkpoint
+1370,emscad_17127,,[TITLE] Internal Recruiter,0,0,0.9999068379402161,9.316205978393555e-05,0.32,1,Optimized BERT,checkpoint
+1371,emscad_17128,,[TITLE] Customer Service Rep,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1372,emscad_17144,,"[TITLE] Offering CASH Positions, Immediate Start.",1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1373,emscad_17154,,[TITLE] Computer Support Specialist,0,0,0.9998601675033569,0.0001398324966430664,0.32,1,Optimized BERT,checkpoint
+1374,emscad_17161,,[TITLE] Service Delivery Manager SaaS,0,0,0.9999168515205383,8.314847946166992e-05,0.32,1,Optimized BERT,checkpoint
+1375,emscad_17168,,[TITLE] Technical Writer,0,0,0.9999184608459473,8.153915405273438e-05,0.32,1,Optimized BERT,checkpoint
+1376,emscad_17188,,[TITLE] Market development managers / business development managers,0,0,0.9999100565910339,8.994340896606445e-05,0.32,1,Optimized BERT,checkpoint
+1377,emscad_17194,,[TITLE] Editor United Kingdom - Amsterdam,0,0,0.9999107718467712,8.922815322875977e-05,0.32,1,Optimized BERT,checkpoint
+1378,emscad_17238,,[TITLE] Controls Engineer,0,0,0.9999155402183533,8.445978164672852e-05,0.32,1,Optimized BERT,checkpoint
+1379,emscad_17270,,[TITLE] Lead Creative Designer,0,0,0.9999221563339233,7.784366607666016e-05,0.32,1,Optimized BERT,checkpoint
+1380,emscad_17279,,[TITLE] Entry Level Sales,0,0,0.9999035000801086,9.649991989135742e-05,0.32,1,Optimized BERT,checkpoint
+1381,emscad_17287,,[TITLE] Front-End Web Developer,0,0,0.9999212622642517,7.873773574829102e-05,0.32,1,Optimized BERT,checkpoint
+1382,emscad_17289,,[TITLE] Account Manager,0,0,0.9988794326782227,0.0011205673217773438,0.32,1,Optimized BERT,checkpoint
+1383,emscad_17326,,[TITLE] Machine learning and time series analysis,0,0,0.9996953010559082,0.0003046989440917969,0.32,1,Optimized BERT,checkpoint
+1384,emscad_17341,,[TITLE] Part Time Students Or Workers Required.,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1385,emscad_17348,,[TITLE] Patient Care Coordinator,0,0,0.9999071955680847,9.28044319152832e-05,0.32,1,Optimized BERT,checkpoint
+1386,emscad_17352,,[TITLE] Divisional Finance Director EE,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1387,emscad_17353,,[TITLE] Head of Operations,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1388,emscad_17426,,[TITLE] Escrow Officer / Closer,0,0,0.9998511075973511,0.00014889240264892578,0.32,1,Optimized BERT,checkpoint
+1389,emscad_17435,,[TITLE] Hotel Executive Housekeeper,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1390,emscad_17437,,[TITLE] Human Resources Manager,0,0,0.9999128580093384,8.71419906616211e-05,0.32,1,Optimized BERT,checkpoint
+1391,emscad_17448,,[TITLE] Business Development Specialist,0,0,0.9999141693115234,8.58306884765625e-05,0.32,1,Optimized BERT,checkpoint
+1392,emscad_17468,,[TITLE] Human Resources Coordinator,0,0,0.9999046325683594,9.5367431640625e-05,0.32,1,Optimized BERT,checkpoint
+1393,emscad_17473,,[TITLE] Motion Graphics Designer,0,0,0.9999075531959534,9.244680404663086e-05,0.32,1,Optimized BERT,checkpoint
+1394,emscad_17474,,[TITLE] MarketMaker4 Team Lead,0,0,0.999879002571106,0.00012099742889404297,0.32,1,Optimized BERT,checkpoint
+1395,emscad_17487,,[TITLE] Android Developer,0,0,0.998805046081543,0.0011949539184570312,0.32,1,Optimized BERT,checkpoint
+1396,emscad_17489,,[TITLE] Management Accountant,0,0,0.9999117851257324,8.821487426757812e-05,0.32,1,Optimized BERT,checkpoint
+1397,emscad_17500,,[TITLE] Sales/Relationship Management Associate,0,0,0.9998005628585815,0.00019943714141845703,0.32,1,Optimized BERT,checkpoint
+1398,emscad_17530,,[TITLE] Receptionist/Office Clerk,1,1,0.0009765625,0.9990234375,0.32,1,Optimized BERT,checkpoint
+1399,emscad_17535,,[TITLE] Photoshop master,1,0,0.9972000122070312,0.00279998779296875,0.32,0,Optimized BERT,checkpoint
+1400,emscad_17560,,[TITLE] Nurse Shift/Program Supervisor,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1401,emscad_17561,,[TITLE] Job for freelancer working in Saudi Arabia,1,0,0.9999042749404907,9.572505950927734e-05,0.32,0,Optimized BERT,checkpoint
+1402,emscad_17579,,[TITLE] Cash In Hand Jobs To Begin This Week.,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1403,emscad_17582,,[TITLE] Hospital Clerical/Reception: $22 - $24/hr,1,1,0.00244140625,0.99755859375,0.32,1,Optimized BERT,checkpoint
+1404,emscad_17586,,[TITLE] Success is Knocking...,1,0,0.9853973388671875,0.0146026611328125,0.32,0,Optimized BERT,checkpoint
+1405,emscad_17601,,[TITLE] Admin Assistant Position,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1406,emscad_17604,,[TITLE] Call Center Representative,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1407,emscad_17611,,[TITLE] OFFER Part Time Positions (Cash In Hand),1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1408,emscad_17616,,[TITLE] Accounting Clerk($20/hr),1,0,0.9993906021118164,0.0006093978881835938,0.32,0,Optimized BERT,checkpoint
+1409,emscad_17624,,[TITLE] Production Technician 1781,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1410,emscad_17637,,"[TITLE] Weekend Staff Needed, Part Time Cash Jobs.",1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1411,emscad_17643,,[TITLE] Immediate Opening : Linux Administrator for Bahrain,1,1,0.00341796875,0.99658203125,0.32,1,Optimized BERT,checkpoint
+1412,emscad_17665,,[TITLE] Data Entry Admin/Clerical Positions - Work From Home,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1413,emscad_17675,,"[TITLE] Account Sales Managers $80-$130,000/yr",1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1414,emscad_17690,,[TITLE] Administrative Assistant - $19.35 Per Hr,1,1,0.00341796875,0.99658203125,0.32,1,Optimized BERT,checkpoint
+1415,emscad_17704,,[TITLE] Cruise Staff Wanted *URGENT*,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1416,emscad_17733,,[TITLE] Tele RN,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1417,emscad_17739,,[TITLE] Customer Service Representative,1,1,0.3359375,0.6640625,0.32,1,Optimized BERT,checkpoint
+1418,emscad_17745,,[TITLE] Required Assistant Accountant,1,1,0.4384765625,0.5615234375,0.32,1,Optimized BERT,checkpoint
+1419,emscad_17746,,[TITLE] Customer Service Position,1,1,0.6748046875,0.3251953125,0.32,1,Optimized BERT,checkpoint
+1420,emscad_17749,,[TITLE] Administrative,1,1,0.0029296875,0.9970703125,0.32,1,Optimized BERT,checkpoint
+1421,emscad_17761,,[TITLE] Payroll Clerk,1,1,0.0009765625,0.9990234375,0.32,1,Optimized BERT,checkpoint
+1422,emscad_17781,,[TITLE] Junior Project Manager,1,0,0.967041015625,0.032958984375,0.32,0,Optimized BERT,checkpoint
+1423,emscad_17792,,[TITLE] Data Entry Admin/Clerical Positions - Work From Home,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1424,emscad_17804,,[TITLE] Data Entry Admin/Clerical Positions - Work From Home,1,1,0.00048828125,0.99951171875,0.32,1,Optimized BERT,checkpoint
+1425,emscad_17822,,[TITLE] Webcam Model,1,0,0.9998147487640381,0.00018525123596191406,0.32,0,Optimized BERT,checkpoint
+1426,emscad_17835,,[TITLE] Enterprise Account Executive US,0,0,0.999908983707428,9.101629257202148e-05,0.32,1,Optimized BERT,checkpoint
+1427,emscad_17851,,[TITLE] North West Level 2 and 3 DGV NVQ Assessors Under,0,0,0.9999096989631653,9.03010368347168e-05,0.32,1,Optimized BERT,checkpoint
+1428,emscad_17857,,[TITLE] Web Developer - Marketing,0,0,0.9998964667320251,0.00010353326797485352,0.32,1,Optimized BERT,checkpoint
+1429,emscad_17868,,[TITLE] Admin Assistant,0,0,0.9946861267089844,0.005313873291015625,0.32,1,Optimized BERT,checkpoint
+1430,emscad_17877,,[TITLE] Payroll Accountant,0,0,0.9999086260795593,9.137392044067383e-05,0.32,1,Optimized BERT,checkpoint

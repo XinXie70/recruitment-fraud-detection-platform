@@ -18,12 +18,18 @@ checkpoints/
 *.joblib
 !model_algorithm/sprint3/LR/weight/
 !model_algorithm/sprint3/LR/weight/lr_none_bigram_no_cv_paper_aligned_seed42.joblib
+!model_algorithm/sprint3/Feature Extraction Method for LR/weight/
+!model_algorithm/sprint3/Feature Extraction Method for LR/weight/*.joblib
 # model_service runtime weights must stay tracked (do not ignore)
 !model_service/models/
 !model_service/models/**
 *.pt
 *.pth
 *.pkl
+
+# Sprint1 / Sprint2 keep weights local only (code + metrics are tracked).
+model_algorithm/sprint1/**/weight/
+model_algorithm/sprint2/**/weight/
 
 # Local environments and temporary files
 .venv/
@@ -60,6 +66,10 @@ backend/test.db
 experiments/**/logs/*
 retrain_*/results/logs/*
 retrain_*/results/*.log
+model_algorithm/**/logs/
+model_algorithm/**/result/logs/
+model_algorithm/**/results/logs/
+model_algorithm/**/*.log
 
 # Row-level model outputs are reproducible artifacts, not source files.
 model_algorithm/sprint3/**/results/*predictions*.csv

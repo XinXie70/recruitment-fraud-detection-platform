@@ -1,0 +1,9 @@
+{
+  "strategy": "class_weight",
+  "Accuracy": 0.9907718120805369,
+  "Fraud Precision": 0.9487179487179487,
+  "Fraud Recall": 0.8554913294797688,
+  "Fraud F1": 0.8996960486322189,
+  "threshold": 0.36,
+  "weight_dir": "G:\\9900final\\capstone-project-26t2-9900-h09c-almond\\model_algorithm\\sprint3\\Imbalance Handling Strategies for BERT\\weight\\class_weight\\best"
+}

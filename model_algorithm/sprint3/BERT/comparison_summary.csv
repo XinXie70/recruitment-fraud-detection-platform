@@ -1,4 +1,4 @@
-protocol,data,split,seed,max_length,lr,epochs,imbalance,eval_split,threshold,fraud_precision,fraud_recall,fraud_f1,pr_auc,roc_auc,accuracy
-Paper-aligned,EMSCAD full (Cond A input),80/20 + 10%val-of-train,42,256,5e-05,3,class_weight(raw),validation,0.32,0.9354838709677419,0.8405797101449275,0.8854961832061069,0.889459082092736,0.9756645172274363,0.989517819706499
-Paper-aligned,EMSCAD full (Cond A input),80/20 + 10%val-of-train,42,256,5e-05,3,class_weight(raw),test,0.32,0.9272727272727272,0.884393063583815,0.9053254437869822,0.9404939109364651,0.9931079173595554,0.9910514541387024
-Paper reported (reference),EMSCAD (paper),80/20 stratified,42,256,5e-05,3,class_weight,test,,0.913,0.8497,0.8802,,0.9909,0.9888
+protocol,data,split,seed,max_length,lr,epochs,imbalance,eval_split,threshold,fraud_precision,fraud_recall,fraud_f1,macro_precision,macro_recall,macro_f1,pr_auc,roc_auc,accuracy
+Optimized BERT,EMSCAD full,80/20 + 10%val-of-train,42,512,5e-05,3,class_weight(raw),validation,0.32,0.9354838709677419,0.8405797101449275,0.8854961832061069,0.9637244044393128,0.9188214262912596,0.940001844807008,0.8894721013793426,0.9757070803805147,0.989517819706499
+Optimized BERT,EMSCAD full,80/20 + 10%val-of-train,42,512,5e-05,3,class_weight(raw),test,0.32,0.9272727272727272,0.884393063583815,0.9053254437869822,0.9607046720503185,0.9404333816302854,0.95031461505463,0.9404995407558127,0.9930994243433624,0.9910514541387024
+Paper reported (reference),EMSCAD (paper),80/20 stratified,42,256,5e-05,3,class_weight(none),test,,0.913,0.8497,0.8802,0.94,0.92,0.93,,0.9909,0.9888

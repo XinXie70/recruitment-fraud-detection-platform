@@ -1,0 +1,38 @@
+{
+  "seed": 42,
+  "protocol": "70/15/15 stratified",
+  "source": "emscad_v1.csv",
+  "exact_duplicates_removed": 2042,
+  "empty_combined_text_rows_kept": 0,
+  "split_counts": {
+    "train": {
+      "n": 11086,
+      "fraud": 499,
+      "fraud_rate": 0.04501172650189428
+    },
+    "validation": {
+      "n": 2376,
+      "fraud": 107,
+      "fraud_rate": 0.04503367003367004
+    },
+    "test": {
+      "n": 2376,
+      "fraud": 107,
+      "fraud_rate": 0.04503367003367004
+    }
+  },
+  "n_total_after_dedup": 15838,
+  "columns": [
+    "record_id",
+    "combined_text",
+    "label"
+  ],
+  "cleaning": [
+    "missing text -> empty string",
+    "HTML entity decode",
+    "HTML tag removal",
+    "Unicode NFKC",
+    "newline / whitespace normalisation",
+    "exact duplicate combined_text dropped (keep first)"
+  ]
+}

@@ -1,51 +1,115 @@
-# BERT + LR (no class weight, bigrams, no CV) FP-gate
+# BERT + LR  FP-gate
 
-BERT with `max_length=512` is the primary model. When BERT predicts fraud but
-the LR score is below the gate threshold, the ensemble changes the decision to
-legitimate to reduce false positives.
+Optimized BERT is primary. When BERT predicts fraud and the LR
+score is below the gate threshold, the decision is flipped to legitimate (FP gate).
+
+The test-set three-model Macro comparison table is in `test_macro_comparison.csv`.
 
 ## Components
 
 | Branch | Path |
 |---|---|
-| LR | `../LR` (`class_weight=None`, bigrams, no CV) |
+| LR | `../LR` |
 | BERT | `../BERT` |
 | Ensemble | This directory (FP-gate) |
 
-The test report compares only these three branches: LR, BERT, and the ensemble.
+The test report compares only these three arms: LR / BERT / Ensemble.
 
-## Reproduce the experiment
+## Code files
 
-From the repository root, activate the project environment and run the steps in
-order. Step 1 may be skipped when the frozen BERT validation predictions are
-already present.
+| Script | Purpose |
+|---|---|
+| `code/run_fp_gate_ensemble.py` | Main ensemble runner: search FP-gate thresholds on validation, evaluate on test, write metrics/predictions |
+| `code/show_test_macro_table.py` | Read existing LR / BERT / Ensemble test metrics and print a Macro P / R / F1 comparison table |
 
-```bash
-# 1. Export BERT validation scores
-python model_algorithm/sprint3/BERT/code/bert.py export-val
+## Prerequisites
 
-# 2. Reproduce LR predictions and metrics
-python model_algorithm/sprint3/LR/code/train_lr_none_bigram_no_cv.py
+Before running the ensemble scripts, make sure these artifacts exist
+(short names preferred; legacy long names still accepted):
 
-# 3. Reproduce the FP-gate ensemble
-python model_algorithm/sprint3/ensemble_BERT_FP/code/run_fp_gate_ensemble.py
+- `../BERT/results/validation_predictions.csv` (or `bert_validation_predictions.csv`)
+- `../BERT/results/predictions_test.csv`
+- `../BERT/results/metrics_test.json`
+- `../LR/results/validation_predictions.csv`
+- `../LR/results/test_predictions.csv`
+- `../LR/results/test_metrics.json`
 
-# 4. Select and apply risk boundaries
-python model_algorithm/sprint3/risk_level/select_risk_boundaries.py \
-  --mode select
-python model_algorithm/sprint3/risk_level/select_risk_boundaries.py \
-  --mode apply-test
+If they are missing, generate them first from `sprint3/`:
+
+```powershell
+. E:\ml\activate.ps1
+
+# BERT validation scores + test evaluation
+python BERT/code/run.py export-val
+python BERT/code/run.py evaluate --split test
+
+# LR predictions + metrics
+python LR/code/train_lr_none_bigram_no_cv.py
 ```
 
-Download the frozen dataset splits first with
-`model_algorithm/sprint3/data/download_data.sh`. The LR and BERT commands above
-regenerate the prediction artifacts consumed by the ensemble step, including:
+## How to run
 
-- `../BERT/results/bert_validation_predictions.csv`
-  (the export script also refreshes `results/bert_validation_predictions.csv` here)
-- `../BERT/results/predictions_bert_paper_protocol_maxlen512.csv`
-- BERT weights under
-  `../BERT/weight/best/`
+Activate the environment, then work from `sprint3/`:
+
+```powershell
+. E:\ml\activate.ps1
+cd model_algorithm/sprint3
+```
+
+### 1) `run_fp_gate_ensemble.py` — build / refresh the FP-gate ensemble
+
+```powershell
+python ensemble_BERT_FP/code/run_fp_gate_ensemble.py
+```
+
+What it does:
+1. Loads BERT and LR validation/test prediction files
+2. Searches BERT threshold + LR gate on validation (FP-gate rule)
+3. Applies the selected gate on the test set once
+4. Writes ensemble outputs under `ensemble_BERT_FP/results/`
+
+Main outputs:
+- `results/config.json`
+- `results/validation_metrics.json` / `results/test_metrics.json`
+- `results/validation_predictions.csv` / `results/test_predictions.csv`
+- `results/validation_sweep.csv`
+- `results/RESULTS.md`
+
+### 2) `show_test_macro_table.py` — show the three-way Macro comparison
+
+Run this after `run_fp_gate_ensemble.py` (and after LR/BERT metrics exist):
+
+```powershell
+python ensemble_BERT_FP/code/show_test_macro_table.py
+```
+
+What it does:
+- Reads:
+  - `../LR/results/test_metrics.json`
+  - `../BERT/results/metrics_test.json`
+  - `./results/test_metrics.json`
+- Prints a terminal table of Macro Precision / Recall / F1 for LR, Optimized BERT, and FP-gate Ensemble
+
+This script does **not** retrain or re-sweep thresholds; it only displays existing results.  
+
+
+## Suggested full workflow
+
+```powershell
+. E:\ml\activate.ps1
+cd model_algorithm/sprint3
+
+# if artifacts are already present
+python BERT/code/run.py export-val
+python BERT/code/run.py evaluate --split test
+python LR/code/train_lr_none_bigram_no_cv.py
+
+# Ensemble
+python ensemble_BERT_FP/code/run_fp_gate_ensemble.py
+
+# print Macro comparison table
+python ensemble_BERT_FP/code/show_test_macro_table.py
+```
 
 See [Ensemble Risk Score and Three-Level Output](../risk_score/RISK_SCORE_AND_LEVEL.md)
 for the public risk-output contract.
