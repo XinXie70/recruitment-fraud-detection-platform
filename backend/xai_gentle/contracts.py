@@ -1,21 +1,16 @@
 from __future__ import annotations
-
 from typing import Literal
-
 from pydantic import BaseModel, Field, model_validator
 
 # Reusable type alias
 EducationTopic = Literal["fake_jobs", "misinformation", "phishing", "scam_patterns"]
 
-
+# Limit the input fields, gen AI can make judgments even without accessing the model.
 class RiskContext(BaseModel):
-    """Stable ensemble fields Gentle AI is allowed to read."""
 
     risk_score: float = Field(..., ge=0, le=1)
     risk_level: Literal["low", "medium", "high"]
-    classification_label: Literal[
-        "Likely Legitimate", "Suspicious", "Likely Deceptive"
-    ]
+    classification_label: Literal[ "Likely Legitimate", "Suspicious", "Likely Deceptive"]
     recommended_action: Literal["Safe", "Review Required", "High Risk Warning"]
 
 
@@ -36,7 +31,7 @@ class EvidenceSpan(BaseModel):
             raise ValueError("lowers_risk evidence needs a negative contribution")
         return self
 
-
+# Save the complete SHAP result
 class XAIResult(BaseModel):
     status: Literal["success", "unavailable"]
     method: Literal["shap_partition", "unavailable"]
@@ -66,7 +61,6 @@ class GentleAIResult(BaseModel):
     disclaimer: str
     message: str | None = None
     version: str = "gentle-v1"
-
 
 class EducationItem(BaseModel):
     id: str

@@ -1,9 +1,7 @@
 """Tests for deterministic Gentle AI fallback guidance."""
 
 from __future__ import annotations
-
 import pytest
-
 from backend.xai_gentle import EvidenceSpan, GentleAIService, RiskContext, XAIResult
 from backend.xai_gentle.gentle_fallback import build_template_guidance
 
@@ -45,7 +43,7 @@ def test_disabled_ollama_returns_template_guidance() -> None:
     assert service.list_items("fake_jobs")
     assert service.get_item("missing") is None
 
-
+# display the risk score
 def test_generate_local_never_uses_ollama(monkeypatch) -> None:
     service = GentleAIService(ollama_enabled=True, ollama_model="configured-model")
     rewrite_calls = 0

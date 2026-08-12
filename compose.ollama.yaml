@@ -1,11 +1,4 @@
-# Optional Docker Compose override for using an Ollama service running on the host.
-#
-# Prerequisites:
-#   1. Install and start Ollama on the host computer.
-#   2. Download the configured model, for example: ollama pull qwen3:4b
-#
-# Start Almond Guard with this override:
-#   docker compose -f compose.yaml -f compose.ollama.yaml up --build -d
+# Responsible for connecting the already running local Ollama
 
 services:
   backend:

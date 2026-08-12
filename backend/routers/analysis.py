@@ -5,9 +5,7 @@ import hmac
 import logging
 import re
 from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
-
 from backend.auth import get_current_user
 from backend.config import settings
 from backend.database import get_db
@@ -61,7 +59,7 @@ def _hash_history_input(text: str) -> str:
         hashlib.sha256,
     ).hexdigest()
 
-
+# Historical record processing
 def _result_for_storage(result: AnalysisResponse, text: str) -> dict:
     """Build a useful historical result without retaining source-text excerpts."""
     stored = result.model_dump(mode="json")
@@ -178,7 +176,7 @@ def _run_score(
             detail="Analysis failed. Please try again later.",
         ) from exc
 
-
+# Invoke model score
 @router.post("/api/v1/analyze/score", response_model=AnalysisResponse)
 @limiter.limit(settings.rate_limit_analyze)
 def analyze_score_v1(

@@ -1,10 +1,7 @@
 from __future__ import annotations
-
 import logging
 from typing import Callable, Sequence
-
 from backend.config import settings
-
 from .contracts import EvidenceSpan, XAIResult
 from .evidence import (
     BatchScorer, LONG_TEXT_EVALS_PER_ITEM, LONG_TEXT_PHRASE_WORDS,
@@ -16,8 +13,7 @@ from .evidence import (
 
 logger = logging.getLogger("fake_job_detection_api.xai")
 
-class XAIService:
-    """Explain the exact FP-gate risk scorer with word or long-text phrase SHAP."""
+class XAIService:  # Explain the exact FP-gate risk scorer with word or long-text phrase SHAP.
 
     def __init__(
         self,
@@ -61,9 +57,7 @@ class XAIService:
         }
         invalid = [name for name, value in numeric_settings.items() if value <= 0]
         if invalid:
-            raise ValueError(
-                "XAI numeric settings must be positive: " + ", ".join(invalid)
-            )
+            raise ValueError("XAI numeric settings must be positive: " + ", ".join(invalid))
 
     def explain(
         self,
@@ -120,6 +114,7 @@ class XAIService:
             probabilities = score_batch([str(value) for value in values])
             return np.asarray([[1 - score, score] for score in probabilities])
 
+        # Partition SHAP
         masker = shap.maskers.Text(tokenizer, mask_token="...", collapse_mask_token=True)
         explainer = shap.Explainer(
             model_function,
@@ -143,6 +138,7 @@ class XAIService:
             base_value=base_value,
         )
 
+    # Short-term recruitment advertisement explanation precise down to the words
     def _explain_word_level_shap(
         self,
         text: str,
@@ -194,13 +190,7 @@ class XAIService:
         score_batch: BatchScorer,
         expected_output: float,
     ) -> XAIResult:
-        # Long advertisements are explained as sentence-aware phrase blocks across
-        # the complete input. The previous two-stage implementation first selected
-        # long paragraphs and then re-masked only those paragraphs. For saturated
-        # probabilities, the second pass could collapse every fine attribution to
-        # zero even though the first pass found non-zero evidence. A single phrase
-        # pass keeps every attribution tied to the formal scorer, returns useful
-        # original-text offsets, and avoids repeating the most expensive SHAP stage.
+        
         total_budget = min(
             self.max_evals,
             self.hierarchical_max_evals,

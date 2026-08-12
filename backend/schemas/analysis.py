@@ -1,8 +1,6 @@
 from __future__ import annotations
-
 from datetime import datetime
 from typing import Any, Final, Literal
-
 from backend.config import settings
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
@@ -11,7 +9,7 @@ from backend.xai_gentle import EducationItem, GentleAIResult, XAIResult
 API_VERSION: Final[Literal["1.0"]] = "1.0"
 MAX_INPUT_CHARS = settings.max_input_chars
 
-
+# not empty and not exceed the maximum character limit.
 class AnalysisRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=MAX_INPUT_CHARS)
 
@@ -22,7 +20,6 @@ class AnalysisRequest(BaseModel):
         if not cleaned:
             raise ValueError("Job description text cannot be empty.")
         return cleaned
-
 
 class ModelMemberOutput(BaseModel):
     key: str
@@ -37,7 +34,7 @@ class ModelMemberOutput(BaseModel):
         | None
     ) = None
 
-
+# Verify risk scores, levels, thresholds and FP-gate information
 class EnsembleResult(BaseModel):
     status: Literal["success", "degraded"]
     risk_score: float = Field(..., ge=0, le=1)

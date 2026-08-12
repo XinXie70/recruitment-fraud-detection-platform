@@ -1,11 +1,8 @@
 """Tests for SHAP-only word and long-text phrase XAI."""
 
 from __future__ import annotations
-
 import math
-
 import pytest
-
 from backend.xai_gentle import EvidenceSpan, XAIService
 from backend.xai_gentle.xai_service import (
     WORD_PATTERN,
@@ -15,7 +12,7 @@ from backend.xai_gentle.xai_service import (
     _top_evidence,
 )
 
-
+# noise filtering
 def _span(text: str, value: str, contribution: float) -> EvidenceSpan:
     start = text.index(value)
     return EvidenceSpan(
@@ -50,7 +47,7 @@ def test_evidence_selection_filters_noise_and_merges_adjacent_shap_tokens() -> N
     assert math.isclose(phrase.contribution, 0.31)
     assert text[phrase.start : phrase.end] == phrase.text
 
-
+# Avoid showing isolated common words.
 def test_evidence_selection_contextualizes_numbers_and_short_generic_words() -> None:
     text = "Pay a small $50 registration fee to get your training kit."
     items = [
@@ -273,11 +270,7 @@ def test_shap_failure_returns_unavailable_without_leaking_details() -> None:
     def failing_scorer(_texts):
         raise RuntimeError(secret)
 
-    result = XAIService(max_evals=20).explain(
-        "Urgent job requires an advance fee.",
-        failing_scorer,
-        0.7,
-    )
+    result = XAIService(max_evals=20).explain("Urgent job requires an advance fee.",failing_scorer,0.7,)
 
     assert result.status == "unavailable"
     assert result.method == "unavailable"

@@ -7,13 +7,7 @@ from pathlib import Path
 from backend.config import settings
 from pydantic import BaseModel, Field
 
-from .contracts import (
-    EducationItem,
-    GentleAIResult,
-    GentleEvidenceExplanation,
-    RiskContext,
-    XAIResult,
-)
+from .contracts import (EducationItem,GentleAIResult,GentleEvidenceExplanation,RiskContext,XAIResult,)
 from .gentle_fallback import build_template_guidance
 
 logger = logging.getLogger("fake_job_detection_api.gentle_ai")
@@ -27,8 +21,7 @@ def default_knowledge_path() -> Path:
     return Path(__file__).resolve().parent / "knowledge" / "education_en.json"
 
 
-class GentleAIService:
-    """Turns structured ensemble/XAI data into cautious educational language."""
+class GentleAIService: # Load "education_en.json" and Read Ollama
 
     def __init__(
         self,
@@ -58,6 +51,7 @@ class GentleAIService:
     def get_item(self, item_id: str) -> EducationItem | None:
         return next((item for item in self.items if item.id == item_id), None)
 
+    # Select up to 3 educational programs
     def _select_learning_items(self, xai: XAIResult) -> list[EducationItem]:
         general = self.get_item("fake-job-general-checks")
         selected = [general] if general else []
@@ -70,6 +64,7 @@ class GentleAIService:
                 selected.append(item)
         return selected[:3]
 
+    # Template priority, GenAI as an option, fallback in case of failure
     def generate(self, risk: RiskContext, xai: XAIResult) -> GentleAIResult:
         template = self.generate_local(risk, xai)
         if not self.ollama_enabled:
@@ -86,13 +81,9 @@ class GentleAIService:
             template.message = "Local template guidance used because Ollama was unavailable."
             return template
 
+ # The scoring process does not require any network requests. Ollama is only used to enhance the explanatory text and not affect scoring results.
     def generate_local(self, risk: RiskContext, xai: XAIResult) -> GentleAIResult:
-        """Build deterministic guidance without making any network requests.
-
-        The score endpoint uses this path so a ready model score is never held up
-        by the optional Ollama rewrite. Full analyses may still call ``generate``
-        to request that richer rewrite.
-        """
+    
         learning_items = self._select_learning_items(xai)
         template = build_template_guidance(risk, xai, learning_items)
         template.message = "Local template guidance used for the fast score phase."

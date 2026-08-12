@@ -4,9 +4,9 @@ import math
 import re
 from dataclasses import dataclass
 from typing import Callable, NotRequired, Sequence, TypedDict
-
 from .contracts import EvidenceSpan
 
+# Identify words, sentence boundaries, and no value common words 
 BatchScorer = Callable[[Sequence[str]], list[float]]
 WORD_PATTERN = re.compile(r"\b[\w'-]+\b", re.UNICODE)
 COARSE_BOUNDARY_PATTERN = re.compile(r"[.!?]+(?=\s|$)|\n+", re.UNICODE)
@@ -48,12 +48,11 @@ GENERIC_RECRUITING_WORDS = frozenset(
     """.split()
 )
 
-
+# Save the text location
 @dataclass(frozen=True)
 class TextSegment:
     start: int
     end: int
-
 
 @dataclass(frozen=True)
 class PartitionAttribution:
@@ -66,7 +65,7 @@ class TokenizerOutput(TypedDict):
     input_ids: list[str]
     offset_mapping: NotRequired[list[tuple[int, int]]]
 
-
+# Phrase-level explanation
 def _build_segments(text: str, max_segments: int) -> list[TextSegment]:
     matches = list(WORD_PATTERN.finditer(text))
     if not matches:
@@ -148,7 +147,7 @@ def _contains_content(item: EvidenceSpan, *, allow_generic: bool) -> bool:
         excluded = excluded | GENERIC_RECRUITING_WORDS
     return any(word not in excluded for word in _evidence_words(item))
 
-
+# Merge SHAP words that are in the same direction and adjacent
 def _merge_adjacent_shap_items(
     items: list[EvidenceSpan],
     text: str,
@@ -189,7 +188,7 @@ def _merge_adjacent_shap_items(
 def _is_numeric_word(word: str) -> bool:
     return word.replace(",", "").replace(".", "").isdigit()
 
-
+# filtered noise
 def _is_noise_fragment(item: EvidenceSpan) -> bool:
     words = _evidence_words(item)
     meaningful = [
@@ -311,7 +310,7 @@ def _limit_interval_words(
     selected = words[selected_start : selected_start + max_words]
     return {"start": selected[0].start(), "end": selected[-1].end()}
 
-
+# Retain the true signal
 def _contextualize_noisy_items(
     items: list[EvidenceSpan],
     text: str,
@@ -421,7 +420,7 @@ def _contextualize_noisy_items(
         )
     return contextualized
 
-
+# Rank contributions
 def _top_evidence(
     items: list[EvidenceSpan],
     limit: int,

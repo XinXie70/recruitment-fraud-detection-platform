@@ -1,9 +1,7 @@
 from __future__ import annotations
-
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
-
 from backend.config import settings
 from backend.schemas.analysis import AnalysisResponse, URLAnalysis
 from backend.services.cache import TTLCache
@@ -94,7 +92,7 @@ class AnalysisService:
         }
         return self.ready
 
-    def _get_computation(self, text: str) -> EnsembleComputation:
+    def _get_computation(self, text: str) -> EnsembleComputation: # Use text hashing as the cache key.
         cache_key = f"computation:{TTLCache.text_key(text)}"
         return self.cache.get_or_compute(cache_key, lambda: self.ensemble.predict(text))
 
@@ -167,10 +165,7 @@ class AnalysisService:
 
 
     def score(self, text: str) -> AnalysisResponse:
-
-        # Score responses intentionally omit the expensive XAI phase. Keep them
-        # separate from complete-analysis entries so request order cannot change
-        # the response contract for this endpoint.
+        # Fast scoring stage: Run the model only, not run SHAP, not call Ollama.
         cache_key = f"score:{TTLCache.text_key(text)}"
         cached = self.cache.get(cache_key)
         if cached is not None:
@@ -204,9 +199,7 @@ class AnalysisService:
             classification_label=computation.ensemble.classification_label,
             recommended_action=computation.ensemble.recommended_action,
         )
-        # The score phase must return as soon as the model result is ready. Do
-        # not let the optional Ollama rewrite delay the first result shown in
-        # the UI; the complete analysis performs that richer work separately.
+  
         gentle_result = self.gentle_ai.generate_local(risk_context, pending_xai)
 
         url_failed = False
