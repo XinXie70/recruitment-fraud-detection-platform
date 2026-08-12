@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import re
 from dataclasses import dataclass
 from typing import Literal
@@ -13,7 +12,7 @@ from .contracts import (
     XAIResult,
 )
 
-
+# Fixed Disclaimer
 DISCLAIMER = (
     "This is educational decision support, not proof that an advertisement or "
     "company is genuine or deceptive. Verify important details independently."
@@ -210,7 +209,7 @@ PHRASE_MEANINGS = (
     ),
 )
 
-
+# Fixed explanation template
 def _summary_for(risk: RiskContext) -> str:
     score = round(risk.risk_score * 100)
     if risk.classification_label == "Likely Deceptive":
@@ -228,7 +227,7 @@ def _summary_for(risk: RiskContext) -> str:
         "signals were found, but normal employer verification is still important."
     )
 
-
+# Match safety education
 def _matching_education_indicator(
     evidence_text: str,
     learning_items: list[EducationItem],
@@ -244,7 +243,6 @@ def _matching_education_indicator(
         return None
     return max(matches, key=lambda match: len(match[1]))
 
-
 def _phrase_meaning(evidence_text: str) -> PhraseMeaning | None:
     return next(
         (
@@ -255,7 +253,7 @@ def _phrase_meaning(evidence_text: str) -> PhraseMeaning | None:
         None,
     )
 
-
+# Explanation sequence
 def _specific_explanation(
     item: EvidenceSpan,
     learning_items: list[EducationItem],
@@ -305,7 +303,7 @@ def _evidence_explanations(
         )
     return explanations
 
-
+# Construct the interpretation result
 def build_template_guidance(
     risk: RiskContext,
     xai: XAIResult,

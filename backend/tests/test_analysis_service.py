@@ -52,6 +52,7 @@ class CountingPredictor:
 
         return EnsembleComputation(ensemble, members, score_batch)
 
+    # Call the model in advance during startup
     def warm_up(self, sample):
         return {"final_ensemble": None}
 
@@ -132,7 +133,7 @@ def test_score_phase_never_calls_ollama(monkeypatch) -> None:
     assert result.gentle_ai.provider == "template"
     assert "fast score phase" in result.gentle_ai.message
 
-
+# Real-time health status check
 def test_readiness_is_refreshed_from_live_model_probe() -> None:
     service, predictor = _service()
     predictor.is_available = lambda: False

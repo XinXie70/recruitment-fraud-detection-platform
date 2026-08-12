@@ -1,11 +1,8 @@
 from __future__ import annotations
-
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, cast
-
 import httpx
-
 from backend.schemas.analysis import EnsembleResult, ModelMemberOutput
 
 
@@ -53,8 +50,7 @@ class FPGatePredictor:
             raise EnsembleUnavailableError("FP-gate model service returned an error.")
         return data
 
-    def is_available(self) -> bool:
-        """Probe the lightweight model-service health endpoint."""
+    def is_available(self) -> bool: # Probe the lightweight model-service health endpoint.
         try:
             response = self.client.get(f"{self.base_url}/health", timeout=2.0)
             response.raise_for_status()
@@ -63,6 +59,7 @@ class FPGatePredictor:
             return False
         return isinstance(data, dict) and data.get("ok") is True
 
+    # Prevent erroneous data from entering XAI or the front end.
     @staticmethod
     def _probability(value: str | int | float, field: str) -> float:
         try:
@@ -181,6 +178,7 @@ class FPGatePredictor:
             lr_gate_threshold=lr_gate_threshold,
         )
 
+        # Batch request
         def score_batch(texts: Sequence[str]) -> list[float]:
             values = list(texts)
             scores: list[float] = []

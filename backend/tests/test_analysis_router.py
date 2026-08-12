@@ -1,12 +1,9 @@
 """Unit tests for analysis route error mapping and supporting endpoints."""
 
 from __future__ import annotations
-
 from types import SimpleNamespace
-
 import pytest
 from fastapi import HTTPException
-
 from backend.routers import analysis as analysis_router
 from backend.schemas.analysis import AnalysisRequest
 from backend.services.analysis_service import InputRejectedError
@@ -25,9 +22,9 @@ class RaisingService:
 @pytest.mark.parametrize(
     ("error", "status_code"),
     [
-        (InputRejectedError("invalid", "Not a job", 0.1), 422),
-        (EnsembleUnavailableError("private model failure"), 503),
-        (RuntimeError("private server detail"), 500),
+        (InputRejectedError("invalid", "Not a job", 0.1), 422), # Input error returns 422.
+        (EnsembleUnavailableError("private model failure"), 503), # model unavailable returns 503.
+        (RuntimeError("private server detail"), 500), # unknown error returns 500.
     ],
 )
 def test_analysis_errors_map_to_safe_http_responses(error, status_code) -> None:
@@ -70,7 +67,7 @@ def test_history_preview_redacts_contact_details() -> None:
         "Contact recruiter@example.com or +61 412 345 678. "
         "Apply at https://jobs.example.com/private?token=abc and api_key=secret-value."
     )
-    preview = analysis_router._redact_history_preview(text)
+    preview = analysis_router._redact_history_preview(text)  # Save historical information
 
     assert "recruiter@example.com" not in preview
     assert "412 345 678" not in preview
@@ -151,7 +148,7 @@ def test_url_analysis_error_is_sanitized(monkeypatch) -> None:
     assert raised.value.status_code == 500
     assert "private" not in raised.value.detail
 
-
+# Existing knowledge entries are returned normally, while IDs that do not exist return 404.
 def test_education_endpoints_return_items_and_404() -> None:
     service = SimpleNamespace(gentle_ai=GentleAIService(ollama_enabled=False))
     listing = analysis_router.list_education(topic=None, service=service)
