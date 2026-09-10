@@ -1,232 +1,223 @@
-# Fake Job Advertisement Detection Platform
+# Almond Guard
 
-The supported product consists of a React frontend, an authenticated FastAPI
-application backend, PostgreSQL, and one separately deployable model service.
-The model service runs the paper-aligned BERT-primary + Logistic Regression
-false-positive-gate model. There is no local or weighted-ensemble fallback.
+### Explainable fake job advertisement detection with BERT and Logistic Regression
 
-## Supported services
+Almond Guard is a full-stack decision-support platform that helps job seekers assess
+potentially deceptive job advertisements. It turns model outputs into a 0–100 operational
+risk score, a three-level risk classification, evidence-based explanations, and practical
+safety guidance.
 
-| Service | Entry point | Responsibility |
-| --- | --- | --- |
-| Frontend | `frontend/` | Authentication, analysis, reports, history, education, and administration UI |
-| Application API | `backend.main:app` | Users, JWT, validation, analysis orchestration, XAI, guidance, and persistence |
-| FP-gate model API | `model_service.app:app` | BERT/LR inference, FP-gate decision, risk bands, and batch scoring |
+This repository contains the final implementation of a **UNSW COMP9900 team project**. It
+includes the research pipeline, frozen model artefacts, web application, model service,
+database, automated tests, and deployment documentation.
 
-The model API loads these frozen experiment assets from
-`model_service/models/`:
+> Almond Guard provides educational decision support. Its risk score is not a calibrated
+> probability of fraud and should not replace independent verification.
 
-- `model_service/models/bert/best/`
-- `model_service/models/lr/`
-- `model_service/models/ensemble/`
-- `model_service/models/risk/`
+## At a glance
 
-## Local development
+| Area | Final outcome |
+| --- | --- |
+| Problem | Detect deceptive job advertisements from unstructured English text |
+| Dataset | EMSCAD: 17,880 job advertisements |
+| Final model | BERT-primary classifier with a Logistic Regression false-positive gate |
+| User output | Low, Suspicious, or High risk; 0–100 score; XAI evidence; safety guidance |
+| Held-out test performance | Fraud F1 **0.9107**, Fraud Precision **0.9387**, Fraud Recall **0.8844** |
+| Application | React, FastAPI, Flask model service, PostgreSQL, Docker Compose |
 
-Requirements: Python 3.11+, Node.js 22.22+, PostgreSQL, and the new model
-artifacts. Install the application backend and frontend dependencies:
+## Why this project
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements-dev.txt
-cp backend/env.example .env
+Fake job advertisements can closely resemble legitimate opportunities. A binary prediction
+alone also gives users little support when the evidence is uncertain. Almond Guard was built
+to combine fraud-detection research with a usable system that:
 
-cd frontend
-npm ci
-cd ..
+- identifies potentially deceptive language in a submitted job advertisement;
+- separates uncertain cases from clearly low- or high-risk cases;
+- explains which text signals influenced the model output;
+- gives cautious, actionable guidance without presenting the model as definitive proof; and
+- stores privacy-minimised analysis history for authenticated users.
+
+## Product workflow
+
+```mermaid
+flowchart LR
+    A[Submit job advertisement] --> B[Validate and clean text]
+    B --> C[BERT primary prediction]
+    C --> D{BERT predicts High?}
+    D -- No --> F[Three-level risk classification]
+    D -- Yes --> E[Logistic Regression false-positive gate]
+    E --> F
+    F --> G[0-100 operational risk score]
+    G --> H[XAI evidence and safety guidance]
+    H --> I[Report and analysis history]
 ```
 
-`backend/requirements-dev.txt` installs only the lightweight application API
-and its development tools. TensorFlow, PyTorch, Transformers, XGBoost, and
-other model runtimes are not backend dependencies; model-specific packages are
-isolated in `model_service/requirements.txt`.
+## Key features
 
-Start the FP-gate model service first:
+- **Three-level risk classification:** Low, Suspicious, and High avoid forcing uncertain
+  advertisements into an overconfident binary answer.
+- **BERT–LR decision rule:** BERT supplies the primary fraud signal, while Logistic
+  Regression can demote a BERT high-risk candidate when independent evidence is weak.
+- **Explainable AI:** SHAP Partition explains the aggregated decision function, with an
+  occlusion fallback when required.
+- **Gentle AI guidance:** deterministic evidence is converted into cautious educational
+  language; optional generative rewriting cannot change the model result.
+- **User accounts and history:** JWT authentication, bcrypt password hashing, ownership
+  checks, redacted previews, and deletion controls.
+- **Admin analytics:** platform activity, risk distribution, service health, and deployed
+  model metrics.
+- **Defensive API design:** input validation, rate limits, explicit CORS, model-service
+  authentication, health checks, and safe error responses.
 
-```bash
-pip install -r model_service/requirements.txt
-python model_service/app.py
+## Research and model design
+
+The research process compared traditional and Transformer-based text classifiers under a
+fixed train/validation/test protocol. Validation data was used for model and threshold
+selection; the held-out test set was evaluated once after the configuration was frozen.
+
+The final decision rule is deliberately inspectable:
+
+1. BERT evaluates up to 512 tokens and acts as the primary classifier.
+2. If BERT predicts fraud, the LR model checks for an independently weak fraud signal.
+3. A validation-selected LR gate can remove a likely BERT false positive.
+4. Frozen validation boundaries map the result to Low, Suspicious, or High risk.
+
+The public risk score is an operational ranking signal. It is not presented as a calibrated
+fraud probability.
+
+### Held-out test results
+
+The test split contains 3,576 advertisements, including 173 fraudulent examples.
+
+| Model | Fraud Precision | Fraud Recall | Fraud F1 | Macro F1 | PR-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Logistic Regression | 0.9338 | 0.8150 | 0.8704 | 0.9321 | 0.9318 |
+| Optimised BERT | 0.9273 | 0.8844 | 0.9053 | 0.9503 | 0.9405 |
+| **BERT + LR false-positive gate** | **0.9387** | **0.8844** | **0.9107** | **0.9532** | **0.9478** |
+
+The final gate reduced BERT false positives from 12 to 10 while retaining 153 true fraud
+detections. Detailed experiment evidence is available in the
+[ensemble results](model_algorithm/sprint3/ensemble_BERT_FP/results/RESULTS.md).
+
+### Three-level evaluation
+
+| Risk level | Test advertisements | Fraudulent | Intended interpretation |
+| --- | ---: | ---: | --- |
+| Low | 3,291 | 7 | Limited model evidence; normal verification still applies |
+| Suspicious | 122 | 13 | Uncertain case requiring closer manual review |
+| High | 163 | 153 | Strong model evidence; proceed with extra caution |
+
+Overall, 166 of 173 known fraudulent test advertisements were kept outside the Low category.
+See the [frozen risk configuration](model_service/models/risk/risk_boundary_config.json) for
+the validation-selected rules.
+
+## System architecture
+
+```mermaid
+flowchart TB
+    U[User browser] --> FE[React frontend]
+    FE -->|/api| API[FastAPI application]
+    API --> DB[(PostgreSQL)]
+    API --> XAI[XAI and guidance service]
+    API -->|Authenticated HTTP| MS[Flask model service]
+    MS --> BERT[BERT checkpoint]
+    MS --> LR[LR artefact]
+    MS --> CFG[Frozen gate and risk boundaries]
 ```
 
-For any production deployment, set `APP_ENV=production`, a non-empty
-`MODEL_API_KEY`, and restrictive `MODEL_CORS_ORIGINS`. Use the same secret as
-`MODEL_SERVER_API_KEY` in the application backend.
+The business application remains a modular FastAPI service, while compute-heavy inference is
+isolated behind a model API. This keeps authentication, persistence, and user workflows
+separate from model artefacts and inference dependencies. The full rationale is documented in
+[Design Justification](docs/design-justification.md) and the
+[architecture records](docs/architecture/README.md).
 
-The checked-in Cloud Run workflow deploys the application backend and frontend;
-the model service has a separate release lifecycle. See the
-[deployment ownership and verification checklist](docs/architecture/deployment.md#production-ownership)
-before releasing the application.
+## Technology stack
 
-Set `MODEL_SERVER_URL=http://127.0.0.1:5000`, then start the application API:
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, Vite, React Router, ECharts |
+| Application API | FastAPI, SQLAlchemy, Alembic, JWT, bcrypt |
+| Model service | Flask, PyTorch, Transformers, scikit-learn, SHAP |
+| Data | PostgreSQL, EMSCAD |
+| Delivery | Docker, Docker Compose, Nginx/Cloud deployment configurations |
+| Quality | pytest, Vitest, Playwright, Ruff, ESLint |
 
-```bash
-python -m alembic -c backend/alembic.ini upgrade head
-uvicorn backend.main:app --host 127.0.0.1 --port 8000
-```
+## My contribution — Xin Xie
 
-Start the frontend from `frontend/` with `npm run dev`. It is served at
-`http://localhost:5190` and proxies `/api` to FastAPI.
+This was a team project. My model-research and evaluation contributions, preserved in the Git
+history, focused on:
 
-## Model contract
+- establishing the shared preprocessing pipeline and fixed train/validation/test splits;
+- investigating duplicate leakage through random, deduplicated, and group-aware experiments;
+- implementing and evaluating Logistic Regression and calibrated Linear SVM baselines;
+- running paper-aligned LR comparisons and BERT–LR ensemble experiments;
+- implementing validation-selected three-level risk boundaries; and
+- developing the gate-adjusted operational risk score and its evaluation reports.
 
-FastAPI uses only the following model-service endpoints:
+See the repository [contributors](https://github.com/kdksalskkd/almond-guard/graphs/contributors)
+and commit history for the complete team contribution record.
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Model service health |
-| `POST` | `/predict/all` | LR score, BERT score, FP-gate decision, and risk result |
-| `POST` | `/predict/batch` | Batched final risk scores used by SHAP |
+## Quality assurance
 
-`MODEL_SERVER_URL` is required. If the service is unavailable or returns an
-invalid contract, the application returns `503`; it never silently switches to
-an older model.
+| Area | Verified coverage |
+| --- | ---: |
+| Backend | 92.16% |
+| Model service | 95.71% |
+| Frontend statements | 88.96% |
 
-## Testing strategy and coverage
+The verified baseline contains 185 passing Python tests and 65 passing frontend tests across
+unit, integration, browser-flow, concurrency, failure-handling, and opt-in real-model layers.
+Testing details and commands are retained in the
+[original technical README](docs/archive/README-technical-original.md).
 
-Testing is split into four deliberately named layers. The distinction matters: a test is
-only called end-to-end when it crosses real process boundaries rather than intercepting
-those boundaries with mocks.
+## Run locally with Docker
 
-| Layer | Scope | External dependencies |
-| --- | --- | --- |
-| Unit | Pure functions, services, validation, React components and rendering logic | Mocked or stubbed |
-| Integration | FastAPI/Flask routes, database transactions, model-service HTTP contracts and component/API interaction | Test database or mocked model/network boundary |
-| Mocked browser flow | Browser rendering, navigation, responsive layouts and user interactions across the frontend | API calls intercepted with Playwright `page.route()` |
-| Real E2E / smoke | A real browser, Vite proxy, FastAPI process and isolated SQLite database; separately, the real BERT/LR model artifacts | No mock at the boundary under test |
+### Requirements
 
-Happy paths and sad paths are covered at every practical layer. Examples include valid
-and invalid input, authentication failures, database rollback, model timeouts and
-unavailability, sanitized `500` responses, concurrent cache misses, failed inference
-coalescing, frontend submission recovery, and unavailable explanation data.
+- Docker Desktop with Docker Compose v2
+- Git and Git LFS
+- At least 8 GB RAM and 10 GB free disk space
 
-### Current coverage gates and verified baseline
-
-The following baseline was verified locally on 11 August 2026. CI rejects regressions
-below the configured gates.
-
-| Area | CI gate | Verified baseline | Test focus |
-| --- | --- | --- | --- |
-| Backend | 85% total | 92.16% | Validation, auth, database behavior, business logic, error mapping, cache races |
-| Model service | 90% total | 95.71% | Model loading/inference adapters, FP-gate rules, HTTP contracts, concurrent request coalescing |
-| Frontend | 80% statements, 76% branches, 75% functions, 83% lines | 88.96% statements, 85.01% branches, 86.13% functions, 91.67% lines | Rendering, component behavior, user interaction, routing and API failures |
-
-The verified default suites contain 185 passing Python tests and 65 passing frontend
-tests. Coverage is a regression gate rather than the sole quality measure; assertions
-also check observable behavior, error safety, persistence and concurrency.
-
-### Install test dependencies
-
-Application and model-service tests use **pytest**. Install their development
-dependencies first:
+### Start the application
 
 ```bash
-pip install -r backend/requirements-dev.txt
-pip install -r model_service/requirements-dev.txt
+git lfs install
+git clone https://github.com/kdksalskkd/almond-guard.git
+cd almond-guard
+git lfs pull
+docker compose up --build -d
 ```
 
-Run the full suite from the repository root:
+Open [http://localhost:5190/login](http://localhost:5190/login). The first build can take
+10–30 minutes, followed by additional CPU model warm-up time.
 
-```bash
-pytest -q
-```
+Check the services with `docker compose ps -a`. Stop the application without deleting saved
+data using `docker compose down`.
 
-Run the backend coverage gate:
+> Do not use `docker compose down -v` unless you intend to permanently delete local accounts
+> and analysis history.
 
-```bash
-cd backend
-pytest tests -q --cov=. --cov-config=.coveragerc --cov-fail-under=85
-```
+## Documentation
 
-Run only the model-service unit and mocked integration tests:
+- [Original technical README](docs/archive/README-technical-original.md)
+- [Development guide](docs/development-guide.md)
+- [Architecture documentation](docs/architecture/README.md)
+- [Design justification](docs/design-justification.md)
+- [Data contract](DATA_CONTRACT_V1.md)
+- [Model experiment contract](MODEL_EXPERIMENT_CONTRACT_V1.md)
+- [Model-service testing strategy](model_service/tests/README.md)
 
-```bash
-pytest model_service/tests -q
-```
+## Current limitations
 
-Run the frontend unit/component coverage gate:
+- Performance has primarily been evaluated on EMSCAD, so generalisation to newer job markets,
+  languages, and AI-generated advertisements requires further study.
+- Risk scores rank model concern but are not calibrated fraud probabilities.
+- XAI describes model behaviour and should not be interpreted as causal evidence of fraud.
+- CPU inference and perturbation-based explanations can introduce noticeable latency.
+- A formal user study is still required to validate interpretation of risk levels and guidance.
 
-```bash
-cd frontend
-npm ci
-npm run test:coverage
-```
+## Project attribution
 
-### Browser tests
-
-Install the pinned Chromium build once, then run the mocked browser flows:
-
-```bash
-cd frontend
-npx playwright install chromium
-npm run test:e2e
-```
-
-These flows intentionally intercept API requests. They test frontend navigation,
-rendering, responsive desktop/tablet/mobile layouts, request payloads, successful user
-journeys and recoverable service failures. They do **not** prove that the backend or
-database is reachable.
-
-Run the separate real-backend smoke test with:
-
-```bash
-cd frontend
-npm run test:e2e:real
-```
-
-This test starts Vite on port `5191` and FastAPI on port `8001`, creates a disposable
-SQLite database, registers a user through the real API, and reads that user's history
-through the real API. It performs no `page.route()` interception. The database is
-deleted when the backend test process exits. It deliberately stops at the model-service
-boundary so the fast CI smoke test does not load multi-gigabyte model artifacts.
-
-### Real model-service E2E
-
-The model-service E2E test loads the committed BERT checkpoint and LR artifact and calls
-the real `/predict/all` route without mocking model loading or inference:
-
-```bash
-RUN_MODEL_SERVICE_E2E=1 pytest model_service/tests -m e2e -q
-```
-
-It is excluded from the default suite because loading Transformer/PyTorch weights is
-slow and memory intensive, and CPU-only runners can take substantially longer or run out
-of memory. Run it on a machine with enough RAM and disk space; a GPU is optional. A
-failure caused by unavailable memory, missing large artifacts, or runner time limits is
-an environment limitation and must be recorded in the report/CI result rather than
-silently treated as a product assertion failure. Without `RUN_MODEL_SERVICE_E2E=1`,
-pytest reports the test as skipped with the reason.
-
-### Detailed coverage map
-
-| Area | Tests | Notes |
-| --- | --- | --- |
-| Input validation | `test_text_utils.py` | Happy + sad cases for JSON/text limits |
-| Business logic | `test_ensemble_service.py` | FP-gate and risk-band rules |
-| Race conditions | `test_coalesce.py` | Concurrent identical inference coalescing |
-| HTTP integration | `test_app_integration.py` | Auth, batch limits, sanitized 500 responses |
-| Real weights (opt-in) | `test_app_e2e.py` | Skipped unless `RUN_MODEL_SERVICE_E2E=1` |
-| Backend routes and persistence | `backend/tests/test_api.py`, `test_analysis_router.py` | Real test database, auth, rollback and safe error mapping |
-| Backend race conditions | `backend/tests/test_cache.py` | Concurrent misses compute once and share the result |
-| Frontend unit/component | `frontend/src/**/*.test.{js,jsx}` | Rendering, interactions, storage and API happy/sad paths |
-| Mocked browser flow | `frontend/e2e/core-flows.spec.js` | Browser journeys against intercepted API responses |
-| Real-backend browser smoke | `frontend/e2e/real-backend-smoke.spec.js` | Browser → Vite proxy → FastAPI → disposable SQLite |
-
-See [`model_service/tests/README.md`](model_service/tests/README.md) for the full testing
-approach and mocking strategy.
-
-Full CI-equivalent frontend checks:
-
-```bash
-cd frontend
-npm run lint
-npm run format:check
-npm run test:coverage
-npx playwright install chromium
-npm run test:e2e
-npm run test:e2e:real
-npm run build
-```
-
-See [the development guide](docs/development-guide.md) and
-[architecture documentation](docs/architecture/README.md) for more details.
+Almond Guard was developed as a UNSW COMP9900 capstone team project. All original contributor
+names and commits have been retained in this public repository. This portfolio section
+highlights Xin Xie's work without claiming sole authorship of the system.
