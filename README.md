@@ -154,7 +154,7 @@ history, focused on:
 - implementing validation-selected three-level risk boundaries; and
 - developing the gate-adjusted operational risk score and its evaluation reports.
 
-See the repository [contributors](https://github.com/kdksalskkd/almond-guard/graphs/contributors)
+See the repository [contributors](https://github.com/XinXie70/almond-guard/graphs/contributors)
 and commit history for the complete team contribution record.
 
 ## Quality assurance
@@ -182,7 +182,7 @@ Testing details and commands are retained in the
 
 ```bash
 git lfs install
-git clone https://github.com/kdksalskkd/almond-guard.git
+git clone https://github.com/XinXie70/almond-guard.git
 cd almond-guard
 git lfs pull
 docker compose up --build -d
