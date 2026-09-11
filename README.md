@@ -1,8 +1,8 @@
-# Almond Guard
+# Recruitment Fraud Detection Platform
 
 ### Explainable fake job advertisement detection with BERT and Logistic Regression
 
-Almond Guard is a full-stack decision-support platform that helps job seekers assess
+Recruitment Fraud Detection Platform is a full-stack decision-support platform that helps job seekers assess
 potentially deceptive job advertisements. It turns model outputs into a 0–100 operational
 risk score, a three-level risk classification, evidence-based explanations, and practical
 safety guidance.
@@ -11,7 +11,7 @@ This repository contains the final implementation of a **UNSW COMP9900 team proj
 includes the research pipeline, frozen model artefacts, web application, model service,
 database, automated tests, and deployment documentation.
 
-> Almond Guard provides educational decision support. Its risk score is not a calibrated
+> Recruitment Fraud Detection Platform provides educational decision support. Its risk score is not a calibrated
 > probability of fraud and should not replace independent verification.
 
 ## At a glance
@@ -28,7 +28,7 @@ database, automated tests, and deployment documentation.
 ## Why this project
 
 Fake job advertisements can closely resemble legitimate opportunities. A binary prediction
-alone also gives users little support when the evidence is uncertain. Almond Guard was built
+alone also gives users little support when the evidence is uncertain. Recruitment Fraud Detection Platform was built
 to combine fraud-detection research with a usable system that:
 
 - identifies potentially deceptive language in a submitted job advertisement;
@@ -154,7 +154,7 @@ history, focused on:
 - implementing validation-selected three-level risk boundaries; and
 - developing the gate-adjusted operational risk score and its evaluation reports.
 
-See the repository [contributors](https://github.com/XinXie70/almond-guard/graphs/contributors)
+See the repository [contributors](https://github.com/XinXie70/recruitment-fraud-detection-platform/graphs/contributors)
 and commit history for the complete team contribution record.
 
 ## Quality assurance
@@ -182,8 +182,8 @@ Testing details and commands are retained in the
 
 ```bash
 git lfs install
-git clone https://github.com/XinXie70/almond-guard.git
-cd almond-guard
+git clone https://github.com/XinXie70/recruitment-fraud-detection-platform.git
+cd recruitment-fraud-detection-platform
 git lfs pull
 docker compose up --build -d
 ```
@@ -218,6 +218,6 @@ data using `docker compose down`.
 
 ## Project attribution
 
-Almond Guard was developed as a UNSW COMP9900 capstone team project. All original contributor
+Recruitment Fraud Detection Platform was developed as a UNSW COMP9900 capstone team project. All original contributor
 names and commits have been retained in this public repository. This portfolio section
 highlights Xin Xie's work without claiming sole authorship of the system.
