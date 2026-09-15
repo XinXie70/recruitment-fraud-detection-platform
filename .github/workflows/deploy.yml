@@ -1,9 +1,8 @@
-name: Deploy to Cloud Run
+name: Legacy Cloud Run Deployment (manual only)
 
 on:
-  push:
-    branches:
-      - main
+  # The public portfolio deployment now runs on a Compute Engine VM.
+  # Keep this workflow only as a reference for the original Cloud Run setup.
   workflow_dispatch:
 
 concurrency:
