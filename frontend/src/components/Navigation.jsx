@@ -14,11 +14,15 @@ export default function Navigation({ auth, onLogout }) {
   return (
     <nav className="app-nav">
       <div className="app-nav-inner">
-        <Link to="/analyze" className="nav-brand" aria-label="FakeJobDetect home">
+        <Link
+          to="/analyze"
+          className="nav-brand"
+          aria-label="Recruitment Fraud Detection Platform home"
+        >
           <div className="nav-logo">
             <ShieldAlert size={22} />
           </div>
-          <span className="nav-brand-text">FakeJobDetect</span>
+          <span className="nav-brand-text">Recruitment Fraud Detection Platform</span>
         </Link>
         <div className="nav-actions">
           <Link to="/analyze" className="nav-link">

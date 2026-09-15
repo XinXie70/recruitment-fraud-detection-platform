@@ -565,7 +565,7 @@ textarea {
 
 .nav-brand-text {
   color: var(--text);
-  font-size: 1.55rem;
+  font-size: clamp(1.05rem, 1.7vw, 1.55rem);
   font-weight: 900;
 }
 
