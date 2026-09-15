@@ -111,8 +111,8 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile.single-host
-    ports:
-      - "${PUBLIC_PORT:-8080}:80"
+    expose:
+      - "80"
     depends_on:
       backend:
         condition: service_healthy
@@ -124,5 +124,23 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  gateway:
+    image: caddy:2.10-alpine
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN in the deployment environment file}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:
