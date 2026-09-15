@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml)
 
-**[Live Demo](http://35.253.151.219/login)** ·
+**[Live Demo](https://recruitment-fraud.35-253-151-219.sslip.io/login)** ·
 **[Model Design](#research-and-model-design)** ·
 **[System Architecture](#system-architecture)** ·
 **[Run Locally](#run-locally-with-docker)**
