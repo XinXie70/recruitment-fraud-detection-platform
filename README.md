@@ -1,6 +1,6 @@
-# Recruitment Fraud Detection Platform
+# Fraudulent Job Advertisement Detection Platform
 
-### Explainable fake job advertisement detection with BERT and Logistic Regression
+### Explainable fraudulent job advertisement detection with BERT and Logistic Regression
 
 [![CI](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml)
 
@@ -14,7 +14,7 @@
 *Example high-risk output: the platform combines a 0-100 operational risk score, a
 three-level classification, structured XAI evidence, and cautious safety guidance.*
 
-Recruitment Fraud Detection Platform is a full-stack decision-support platform that helps job seekers assess
+Fraudulent Job Advertisement Detection Platform is a full-stack decision-support platform that helps job seekers assess
 potentially deceptive job advertisements. It turns model outputs into a 0–100 operational
 risk score, a three-level risk classification, evidence-based explanations, and practical
 safety guidance.
@@ -23,7 +23,7 @@ This repository contains the final implementation of a **UNSW COMP9900 team proj
 includes the research pipeline, frozen model artefacts, web application, model service,
 database, automated tests, and deployment documentation.
 
-> Recruitment Fraud Detection Platform provides educational decision support. Its risk score is not a calibrated
+> Fraudulent Job Advertisement Detection Platform provides educational decision support. Its risk score is not a calibrated
 > probability of fraud and should not replace independent verification.
 
 ## At a glance
@@ -53,7 +53,7 @@ database, automated tests, and deployment documentation.
 ## Why this project
 
 Fake job advertisements can closely resemble legitimate opportunities. A binary prediction
-alone also gives users little support when the evidence is uncertain. Recruitment Fraud Detection Platform was built
+alone also gives users little support when the evidence is uncertain. Fraudulent Job Advertisement Detection Platform was built
 to combine fraud-detection research with a usable system that:
 
 - identifies potentially deceptive language in a submitted job advertisement;
@@ -243,6 +243,6 @@ data using `docker compose down`.
 
 ## Project attribution
 
-Recruitment Fraud Detection Platform was developed as a UNSW COMP9900 capstone team project. All original contributor
+Fraudulent Job Advertisement Detection Platform was developed as a UNSW COMP9900 capstone team project. All original contributor
 names and commits have been retained in this public repository. This portfolio section
 highlights Xin Xie's work without claiming sole authorship of the system.
