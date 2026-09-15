@@ -2,6 +2,18 @@
 
 ### Explainable fake job advertisement detection with BERT and Logistic Regression
 
+[![CI](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/XinXie70/recruitment-fraud-detection-platform/actions/workflows/frontend-ci.yml)
+
+**[Live Demo](http://35.253.151.219/login)** ·
+**[Model Design](#research-and-model-design)** ·
+**[System Architecture](#system-architecture)** ·
+**[Run Locally](#run-locally-with-docker)**
+
+![High-risk analysis result showing the operational risk score and safety guidance](docs/assets/readme/high-risk-result.png)
+
+*Example high-risk output: the platform combines a 0-100 operational risk score, a
+three-level classification, structured XAI evidence, and cautious safety guidance.*
+
 Recruitment Fraud Detection Platform is a full-stack decision-support platform that helps job seekers assess
 potentially deceptive job advertisements. It turns model outputs into a 0–100 operational
 risk score, a three-level risk classification, evidence-based explanations, and practical
@@ -24,6 +36,19 @@ database, automated tests, and deployment documentation.
 | User output | Low, Suspicious, or High risk; 0–100 score; XAI evidence; safety guidance |
 | Held-out test performance | Fraud F1 **0.9107**, Fraud Precision **0.9387**, Fraud Recall **0.8844** |
 | Application | React, FastAPI, Flask model service, PostgreSQL, Docker Compose |
+
+<details>
+<summary><strong>View Low and Suspicious output examples</strong></summary>
+
+#### Low-risk output
+
+![Low-risk analysis result](docs/assets/readme/low-risk-result.png)
+
+#### Suspicious output
+
+![Suspicious analysis result requiring manual review](docs/assets/readme/suspicious-result.png)
+
+</details>
 
 ## Why this project
 
